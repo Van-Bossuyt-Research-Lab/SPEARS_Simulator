@@ -22,7 +22,7 @@ public class LandMapPanel extends Panel{
 	private int mapSize = 6;
 	private double mapRough = 0.06;
 	
-	private Point focusPoint; //the center point of the display stored as a grid point, not a location point
+	private DecimalPoint focusPoint; //the center point of the display stored as a grid point, not a location point
 	private int focusedRover;
 	private boolean focusEngauged = false;
 	
@@ -38,10 +38,12 @@ public class LandMapPanel extends Panel{
 		super(size, title);
 		setBackground(Color.BLACK);
 		
+		roverIcons = new RoverIcon[0];
+		
 		HeightMap = new PlasmaPanel();
 		HeightMap.genorateLandscape(mapSize, mapRough);
 		HeightMap.genorateTargets();
-		setFocusPoint(new Point(HeightMap.getWidth()/HeightMap.getResolution()/2, HeightMap.getHeight()/HeightMap.getResolution()/2));
+		setFocusPoint(new DecimalPoint(HeightMap.getWidth()/HeightMap.getResolution()/2, HeightMap.getHeight()/HeightMap.getResolution()/2));
 		add(HeightMap);
 		
 		//Allows the user to Pan across the map
@@ -51,39 +53,42 @@ public class LandMapPanel extends Panel{
 				Integer key = e.getKeyCode();
 				switch (key) {
 				case KeyEvent.VK_LEFT:
-					setFocusPoint(new Point((int)focusPoint.getX()-1, (int)focusPoint.getY()));
+					setFocusPoint(new DecimalPoint((int)focusPoint.getX()-1, (int)focusPoint.getY()));
 					focusEngauged = false;
 					break;
 				case KeyEvent.VK_RIGHT:
-					setFocusPoint(new Point((int)focusPoint.getX()+1, (int)focusPoint.getY()));
+					setFocusPoint(new DecimalPoint((int)focusPoint.getX()+1, (int)focusPoint.getY()));
 					focusEngauged = false;
 					break;
 				case KeyEvent.VK_UP:
-					setFocusPoint(new Point((int)focusPoint.getX(), (int)focusPoint.getY()-1));
+					setFocusPoint(new DecimalPoint((int)focusPoint.getX(), (int)focusPoint.getY()+1));
 					focusEngauged = false;
 					break;
 				case KeyEvent.VK_DOWN:
-					setFocusPoint(new Point((int)focusPoint.getX(), (int)focusPoint.getY()+1));
+					setFocusPoint(new DecimalPoint((int)focusPoint.getX(), (int)focusPoint.getY()-1));
 					focusEngauged = false;
 					break;
 				case KeyEvent.VK_PAGE_UP:
 					try {
-						focusedRover = (focusedRover + 1) % roverIcons.length;
-						setFocusPoint(roverIcons[focusedRover].getLocation());
+						if (focusEngauged){
+							focusedRover = (focusedRover + 1) % roverIcons.length;
+						}
+						setFocusPoint(roverIcons[focusedRover].getMapLocation());
 						focusEngauged = true;
 					} catch (Exception ex) {}
 					break;					
 				case KeyEvent.VK_PAGE_DOWN:
 					try {
-						focusedRover = (roverIcons.length + focusedRover - 1) % roverIcons.length;
-						setFocusPoint(roverIcons[focusedRover].getLocation());
+						if (focusEngauged){
+							focusedRover = (roverIcons.length + focusedRover - 1) % roverIcons.length;
+						}
+						setFocusPoint(roverIcons[focusedRover].getMapLocation());
 						focusEngauged = true;
 					} catch (Exception ex) {}
 					break;
 				case KeyEvent.VK_SPACE:
 					try {
-						setFocusPoint(roverIcons[focusedRover].getLocation());
-						System.out.println("centered: " + focusPoint.toString());
+						setFocusPoint(roverIcons[focusedRover].getMapLocation());
 						focusEngauged = !focusEngauged;
 					} catch (Exception ex) {}
 					break;
@@ -115,35 +120,46 @@ public class LandMapPanel extends Panel{
 			}
 		});
 		
-		setRoverSwarm(new RoverObj[] { new RoverObj("Rover 1", null, null, new DecimalPoint(rnd.nextInt(10), rnd.nextInt(10)), 2*Math.PI*rnd.nextDouble()) });		
+		setFocusPoint(new DecimalPoint(0, 0));
+		redraw();
+		
+		setRoverSwarm(new RoverObj[] { 
+				new RoverObj("Rover 1", null, null,	new DecimalPoint(5, 2), 360*rnd.nextDouble())
+		});
 	}
 	
 	//changes which point is in the center of the screen
-	private void setFocusPoint(Point focus){
+	private void setFocusPoint(DecimalPoint focus){
 		focusPoint = focus;
 		redraw();
 	}
 	
 	//replaces the height map with the focus point in the center
 	private void redraw(){
-		HeightMap.setLocation((int)(this.getWidth()/2-focusPoint.getX()*HeightMap.getResolution()), (int)(this.getHeight()/2-focusPoint.getY()*HeightMap.getResolution()));		
+		HeightMap.setLocation((int)(this.getWidth()/2-focusPoint.getX()*HeightMap.getResolution()-HeightMap.getWidth()/2), 
+				(int)(this.getHeight()/2+focusPoint.getY()*HeightMap.getResolution())-HeightMap.getHeight()/2);
+		int x = 0;
+		while (x < roverIcons.length){
+			Point p = mapWorldToScreen(roverIcons[x].getMapLocation());
+			System.out.println(p);
+			p.translate(HeightMap.getX(), HeightMap.getY());
+			roverIcons[x].setLocation(p);
+			x++;
+		}
 	}
 	
 	//populates an array of roverIcons in the simulator
 	public void setRoverSwarm(RoverObj[] rovers){
-		RoverIcon[] icons = new RoverIcon[rovers.length];
+		roverIcons = new RoverIcon[rovers.length];
 		int x = 0;
-		while (x < rovers.length){
-			icons[x] = new RoverIcon(rovers[x].getName(), mapWorldToScreen(rovers[x].getLocation()), rovers[x].getDirection());
-			x++;
-		}
-		roverIcons = icons;
-		x = 0;
 		while (x < roverIcons.length){
-			HeightMap.add(roverIcons[x]);
+			roverIcons[x] = new RoverIcon(rovers[x].getName(), rovers[x].getLocation(), rovers[x].getDirection());
+			this.add(roverIcons[x]);
+			this.setComponentZOrder(roverIcons[x], 0);
 			x++;
 		}
 		focusedRover = 0;
+		redraw();
 	}
 	
 	//update a rover icon to match current stats
@@ -151,10 +167,11 @@ public class LandMapPanel extends Panel{
 		int x = 0;
 		while (x < roverIcons.length){
 			if (roverIcons[x].getName().equals(name)){
-				roverIcons[x].updatePlacement(mapWorldToScreen(loc), dir);
+				roverIcons[x].updatePlacement(loc, dir);
 				if (focusEngauged && x == focusedRover){
-					setFocusPoint(roverIcons[focusedRover].getLocation());
+					setFocusPoint(roverIcons[focusedRover].getMapLocation());
 				}
+				redraw();
 				break;
 			}
 			x++;

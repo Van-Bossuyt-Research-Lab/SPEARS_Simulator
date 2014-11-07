@@ -209,6 +209,11 @@ public class PlasmaPanel extends JPanel {
 								g.setColor(getColor(values[x][y]));
 							}
 						}
+						finally {
+							if (x == values.length/2 && y == values.length/2){
+								g.setColor(Color.CYAN);
+							}
+						}
 						g.fillRect(x * squareResolution / detail, y * squareResolution / detail, squareResolution, squareResolution);
 						switch (currentColorScheme){
 						case REDtoGREEN:

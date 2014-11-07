@@ -14,43 +14,47 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+import objects.DecimalPoint;
+
 public class RoverIcon extends JPanel{
+	
+	private int _size = 80;
 	
 	private JLabel nameTitle;
 	private JLabel iconImage;
 	
 	private double Angle;
-
-	public RoverIcon(String name, Point location, double direction){
+	private DecimalPoint mapLocation;
+	
+	public RoverIcon(String name, DecimalPoint mapLoc, double direction){
 		super.setOpaque(false);
 		super.setName(name);
 		
 		nameTitle = new JLabel(name);
-		nameTitle.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
+		nameTitle.setFont(new Font("Trebuchet MS", Font.BOLD, 17));
 		nameTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		if (nameTitle.getPreferredSize().getWidth() > 60){
+		if (nameTitle.getPreferredSize().getWidth() > _size){
 			nameTitle.setSize((int)nameTitle.getPreferredSize().getWidth(), (int)nameTitle.getPreferredSize().getHeight()+5);
 		}
 		else {
-			nameTitle.setSize(60, (int)nameTitle.getPreferredSize().getHeight()+5);
+			nameTitle.setSize(_size, (int)nameTitle.getPreferredSize().getHeight()+5);
 		}
 		nameTitle.setLocation(0, 0);
 		this.add(nameTitle);
 		
 		iconImage = new JLabel();
-		iconImage.setSize(60, 60);
+		iconImage.setSize(_size, _size);
 		iconImage.setLocation((nameTitle.getWidth()-iconImage.getWidth())/2, nameTitle.getHeight());
 		updateAngle(direction);
 		this.add(iconImage);
 		
 		this.setSize(nameTitle.getWidth(), (nameTitle.getHeight()+iconImage.getHeight()));
-		setLocation((int)location.getX(), (int)location.getY());
-		
-		System.out.println(name  + ": " + location.toString());
+		mapLocation = mapLoc;
+		setLocation(0, 0);
 	}
 	
-	public void updatePlacement(Point loc, double dir){
-		setLocation((int)loc.getX(), (int)loc.getY());
+	public void updatePlacement(DecimalPoint loc, double dir){
+		mapLocation = loc;
 		updateAngle(dir);
 	}
 	
@@ -61,17 +65,35 @@ public class RoverIcon extends JPanel{
 		Angle = Math.toDegrees(angle) % 360;
 		try {
 			ImageIcon img = new ImageIcon(RoverIcon.class.getResource("/Rover Marker " + (int)(Angle - Angle%5) + ".png"));
-			img = resize(img, this.getWidth(), this.getHeight());
+			img = resize(img, iconImage.getWidth(), iconImage.getHeight());
 			iconImage.setIcon(img);
 		}
 		catch (Exception e){
+			e.printStackTrace();
 			iconImage.setIcon(null);
 		}
+	}
+	
+	public void setMapLocation(double x, double y){
+		mapLocation = new DecimalPoint(x, y);
+	}
+	
+	public void setMapLocation(DecimalPoint loc){
+		mapLocation = loc;
+	}
+	
+	public DecimalPoint getMapLocation(){
+		return mapLocation;
 	}
 	
 	@Override
 	public void setLocation(int x, int y){
 		super.setBounds((x - this.getWidth()/2), (y - this.getHeight()/2-nameTitle.getHeight()), this.getWidth(), this.getHeight());
+	}
+	
+	@Override
+	public void setLocation(Point loc){
+		setLocation((int)loc.getX(), (int)loc.getY());
 	}
 	
 	@Override

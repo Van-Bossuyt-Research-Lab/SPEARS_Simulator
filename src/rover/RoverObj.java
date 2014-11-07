@@ -42,7 +42,6 @@ public class RoverObj {
 		autoCode = code;
 		location = loc;
 		direction = dir;
-		System.out.println(name + ": " + loc.toString());
 	}
 	
 	public void start(){

@@ -86,7 +86,7 @@ public class Panel extends JPanel{
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		try { 
+		try {
 			g.drawImage(resize(background, this.getWidth(), this.getHeight()).getImage(), 0, 0, null);
 		} catch (Exception e) {}
 	}
