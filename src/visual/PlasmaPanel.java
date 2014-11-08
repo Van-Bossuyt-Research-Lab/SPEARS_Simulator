@@ -95,14 +95,13 @@ public class PlasmaPanel extends JPanel {
 			}
 			master++;
 		}
-		double[][] values2 = new double[values.length-4][values.length-4];
+		double[][] values2 = new double[values.length-4-((size+detail)%2+1)][values.length-4-((size+detail)%2+1)];
 		int count = 9;
 		int x = 0;
 		while (x < values.length){
 			int y = 0;
 			while (y < values.length){
-				if (x < 2 || y < 2 || x > values.length - 3 || y > values.length - 3) {}
-				else {
+				if (x >= 2 && y >= 2 && x-2 < values2.length && y-2 < values2.length) {
 					if (count % 4 == 0){
 						values2[x-2][y-2] = (values[x][y] + (values[x-1][y-2] + values[x+1][y+2]) / 2) / 2;
 					}
@@ -206,6 +205,7 @@ public class PlasmaPanel extends JPanel {
 							try {
 								g.setColor(getColor(values[x+detail/2][y+detail/2]));
 							} catch (Exception i){
+								i.printStackTrace();
 								g.setColor(getColor(values[x][y]));
 							}
 						}
@@ -401,14 +401,6 @@ public class PlasmaPanel extends JPanel {
 	
 	public int getDetail(){
 		return detail;
-	}
-	
-	public void setDetail(int det){
-		if (det > 0){
-			detail = det;
-			this.setSize(values.length*squareResolution/detail, values[0].length*squareResolution/detail);
-			this.repaint();
-		}
 	}
 	
 	public void SaveImage(double[][] values, int detail, int scheme, String name){

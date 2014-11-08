@@ -19,7 +19,7 @@ public class LandMapPanel extends Panel{
 	
 	private Random rnd = new Random();
 	
-	private int mapSize = 6;
+	private int mapSize = 7;
 	private double mapRough = 0.06;
 	
 	private DecimalPoint focusPoint; //the center point of the display stored as a grid point, not a location point
@@ -36,13 +36,14 @@ public class LandMapPanel extends Panel{
 
 	public LandMapPanel(Dimension size, String title){
 		super(size, title);
-		setBackground(Color.BLACK);
+		setBackground(Color.GRAY);
 		
 		roverIcons = new RoverIcon[0];
 		
 		HeightMap = new PlasmaPanel();
 		HeightMap.genorateLandscape(mapSize, mapRough);
 		HeightMap.genorateTargets();
+		HeightMap.setResolution(53);
 		setFocusPoint(new DecimalPoint(HeightMap.getWidth()/HeightMap.getResolution()/2, HeightMap.getHeight()/HeightMap.getResolution()/2));
 		add(HeightMap);
 		
@@ -112,7 +113,7 @@ public class LandMapPanel extends Panel{
 					HeightMap.setResolution(HeightMap.getResolution()+5);
 				}
 				else {
-					if (HeightMap.getResolution() > 5){
+					if (HeightMap.getResolution()-5 > 0){
 						HeightMap.setResolution(HeightMap.getResolution()-5);
 					}
 				}
@@ -122,10 +123,6 @@ public class LandMapPanel extends Panel{
 		
 		setFocusPoint(new DecimalPoint(0, 0));
 		redraw();
-		
-		setRoverSwarm(new RoverObj[] { 
-				new RoverObj("Rover 1", null, null,	new DecimalPoint(5, 2), 360*rnd.nextDouble())
-		});
 	}
 	
 	//changes which point is in the center of the screen
@@ -136,12 +133,11 @@ public class LandMapPanel extends Panel{
 	
 	//replaces the height map with the focus point in the center
 	private void redraw(){
-		HeightMap.setLocation((int)(this.getWidth()/2-focusPoint.getX()*HeightMap.getResolution()-HeightMap.getWidth()/2), 
-				(int)(this.getHeight()/2+focusPoint.getY()*HeightMap.getResolution())-HeightMap.getHeight()/2);
+		HeightMap.setLocation((int)Math.round(this.getWidth()/2.0-focusPoint.getX()*HeightMap.getResolution()-HeightMap.getWidth()/2.0), 
+				(int)Math.round(this.getHeight()/2.0+focusPoint.getY()*HeightMap.getResolution()-HeightMap.getHeight()/2.0));
 		int x = 0;
 		while (x < roverIcons.length){
 			Point p = mapWorldToScreen(roverIcons[x].getMapLocation());
-			System.out.println(p);
 			p.translate(HeightMap.getX(), HeightMap.getY());
 			roverIcons[x].setLocation(p);
 			x++;

@@ -1,6 +1,7 @@
 package visual;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -69,7 +70,6 @@ public class RoverIcon extends JPanel{
 			iconImage.setIcon(img);
 		}
 		catch (Exception e){
-			e.printStackTrace();
 			iconImage.setIcon(null);
 		}
 	}
@@ -96,10 +96,10 @@ public class RoverIcon extends JPanel{
 		setLocation((int)loc.getX(), (int)loc.getY());
 	}
 	
-	@Override
+	/*@Override
 	public Point getLocation(){
 		return new Point((super.getX() + this.getWidth()/2), (super.getY() + this.getHeight()/2+nameTitle.getHeight()));
-	}
+	}*/
 	
 	@Override
 	public int getX(){
