@@ -1,4 +1,4 @@
-package visual;
+package map;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

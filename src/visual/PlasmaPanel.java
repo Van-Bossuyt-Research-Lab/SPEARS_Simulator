@@ -22,7 +22,7 @@ public class PlasmaPanel extends JPanel {
 	private double rough;
 	private double minval;
 	private double maxval;
-	private double maxHeight = 6;
+	private double maxHeight = 6.5;
 	private Random rnd = new Random();
 	private int squareResolution = 50;
 	
@@ -30,7 +30,7 @@ public class PlasmaPanel extends JPanel {
 	private int detail = 3;
 	
 	private int currentColorScheme = 0;
-	static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
+	public static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
 	
 	private double ColorModifier;
 	
@@ -267,7 +267,7 @@ public class PlasmaPanel extends JPanel {
 	}
 	
 	//is the given point a target
-	public boolean targetAtPoint(DecimalPoint loc){
+	public boolean isPointOnTarget(DecimalPoint loc){
 		int x = (int) getMapSquare(loc).getX();
 		int y = (int) getMapSquare(loc).getY();
 		int i = 0;
@@ -483,5 +483,9 @@ public class PlasmaPanel extends JPanel {
 		int outx = (int)(x*detail);
 		int outy = (int)(y*detail);
 		return new Point(outx, outy);
+	}
+	
+	public double getValueAtLocation(int x, int y){
+		return values[x][y];
 	}
 }

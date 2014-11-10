@@ -28,18 +28,26 @@ import java.awt.Font;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+import map.LandMapPanel;
+import map.PlanetParametersList;
+
+import javax.swing.JButton;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
 public class Form extends JFrame {
 
-	static Form frame;
+	static public Form frame;
 	private static Dimension screenSize;
 	private JPanel contentPane;
 	
-	Panel WrapperPnl;
-	Panel OrbitalPnl;
-	Panel TerrainPnl;
-	Panel InterfacePnl;
-	Panel RoverHubPnl;
-	Panel SatelliteHubPnl;
+	public Panel WrapperPnl;
+	public Panel OrbitalPnl;
+	public LandMapPanel TerrainPnl;
+	public Panel InterfacePnl;
+	public Panel RoverHubPnl;
+	public Panel SatelliteHubPnl;
 
 	/**
 	 * Launch the application.
@@ -50,7 +58,7 @@ public class Form extends JFrame {
 				try {
 					screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 					frame = new Form();
-					//Code.align();
+					wrapper.Admin.align();
 					frame.setUndecorated(true);
 					frame.setSize(screenSize);
 				    frame.setVisible(true);
@@ -151,7 +159,7 @@ public class Form extends JFrame {
 		OrbitalPnl.setVisible(false);
 		contentPane.add(OrbitalPnl);
 		
-		TerrainPnl = new LandMapPanel(screenSize, "Terrain View");
+		TerrainPnl = new LandMapPanel(screenSize, "Terrain View", new PlanetParametersList());
 		TerrainPnl.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {

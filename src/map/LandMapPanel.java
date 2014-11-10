@@ -1,4 +1,4 @@
-package visual;
+package map;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -13,11 +13,14 @@ import java.awt.event.MouseWheelListener;
 import java.util.Random;
 
 import objects.DecimalPoint;
+import wrapper.Globals;
 import rover.RoverObj;
+import visual.Panel;
+import visual.PlasmaPanel;
 
 public class LandMapPanel extends Panel{
 	
-	private Random rnd = new Random();
+	private PlanetParametersList params;
 	
 	private int mapSize = 7;
 	private double mapRough = 0.06;
@@ -26,7 +29,7 @@ public class LandMapPanel extends Panel{
 	private int focusedRover;
 	private boolean focusEngauged = false;
 	
-	private PlasmaPanel HeightMap;
+	public PlasmaPanel HeightMap;
 	private double[][] TemperatureMap;
 	private double[][] PressureMap;
 	private double[][][][] WindMap;
@@ -34,11 +37,12 @@ public class LandMapPanel extends Panel{
 	private RoverIcon[] roverIcons;
 	private DecimalPoint[][] roverTrails;
 
-	public LandMapPanel(Dimension size, String title){
+	public LandMapPanel(Dimension size, String title, PlanetParametersList params){
 		super(size, title);
 		setBackground(Color.GRAY);
 		
 		roverIcons = new RoverIcon[0];
+		this.params = params;
 		
 		HeightMap = new PlasmaPanel();
 		HeightMap.genorateLandscape(mapSize, mapRough);
@@ -125,6 +129,11 @@ public class LandMapPanel extends Panel{
 		redraw();
 	}
 	
+	//Returns the assigned parameters list of the loaded planet
+	public PlanetParametersList getParameters(){
+		return params;
+	}
+	
 	//changes which point is in the center of the screen
 	private void setFocusPoint(DecimalPoint focus){
 		focusPoint = focus;
@@ -182,4 +191,67 @@ public class LandMapPanel extends Panel{
 			HeightMap.getHeight()/2 - (int)(loc.getY()*HeightMap.getResolution())
 		);
 	}
+	
+	//returns the array point in which the map location falls
+	private Point getMapSquare(DecimalPoint loc){ // says which display square a given coordinate falls in
+		int shift = HeightMap.getWidth()/HeightMap.getResolution() / (HeightMap.getDetail() * 2);
+		double x = loc.getX() + shift;
+		double y = shift - loc.getY();
+		int outx = (int)(x*HeightMap.getDetail());
+		int outy = (int)(y*HeightMap.getDetail());
+		return new Point(outx, outy);
+	}
+	
+	//returns the angle which the rover is facing
+	public double getIncline(DecimalPoint loc, double dir){
+		Point mapSquare = getMapSquare(loc);
+		int x = (int) mapSquare.getX();
+		int y = (int) mapSquare.getY();
+		double locx = ((int)((loc.getX() - (int)loc.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
+		double locy = ((int)((loc.getY() - (int)loc.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
+		double h0 = getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
+		DecimalPoint point2 = loc.offset(Math.cos(dir), Math.sin(dir));
+		x = (int) getMapSquare(point2).getX();
+		y = (int) getMapSquare(point2).getY();
+		locx = ((int)((point2.getX() - (int)point2.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
+		locy = ((int)((point2.getY() - (int)point2.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
+		double hnew = getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
+		return Math.atan(hnew-h0);
+	}
+	
+	//returns the angle perpendicular to the direction the rover is facing
+	public double getCrossSlope(DecimalPoint loc, double dir){
+		return getIncline(loc, dir-Math.PI/2.0);
+	}
+	
+	// retrieve temperature from a coordinate, with interpolation
+	public double getTemperature(DecimalPoint loc){ 
+		try {
+			Point mapSquare = getMapSquare(loc);
+			int x = (int) mapSquare.getX();
+			int y = (int) mapSquare.getY();
+			double locx = ((int)((loc.getX() - (int)loc.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
+			double locy = ((int)((loc.getY() - (int)loc.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
+			return getIntermidiateValue(TemperatureMap[x][y], TemperatureMap[x+1][y], TemperatureMap[x][y+1], TemperatureMap[x+1][y+1], locx, locy);
+		}
+		catch (Exception e){
+			Globals.reportError("MapFrame", "getTempAtLoc", e);
+			return 0;
+		}
+	}
+	
+	// interpolates between the corners of a square to find mid-range values
+		public double getIntermidiateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
+			relativex *= HeightMap.getDetail();
+			relativey *= HeightMap.getDetail();
+			if (relativex > relativey){ //top right triangle
+				return (topright - topleft) * relativex - (topright - bottomright) * relativey;
+			}
+			else if (relativex < relativey){ //bottom left triangle
+				return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey;
+			}
+			else { //center line
+				return ((bottomright - topleft) * relativex + topleft);
+			}
+		}
 }

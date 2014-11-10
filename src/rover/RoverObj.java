@@ -3,6 +3,7 @@ package rover;
 import java.io.InputStream;
 
 import objects.DecimalPoint;
+import wrapper.Access;
 import wrapper.Globals;
 
 public class RoverObj {
@@ -92,7 +93,7 @@ public class RoverObj {
 	public RoverObj(String name, RoverParametersList param, RoverAutonomusCode code, DecimalPoint loc, double dir, double temp){
 		this.name = name;
 		params = param;
-		battery_charge = params.battery_max_charge;
+		battery_charge = params.getbattery_max_charge();
 		autoCode = code;
 		location = loc;
 		direction = dir;
@@ -480,7 +481,7 @@ public class RoverObj {
 					lastLogWrite = Globals.TimeMillis;
 				}
 				
-				if (WrapperEvents.isAtTarget() && !atTarget){
+				if (Access.isAtTarget(location) && !atTarget){
 					atTarget = true;
 					driveStop();
 					takePicture();
@@ -725,10 +726,10 @@ public class RoverObj {
 	private void excecutePhysics(){
 		try {
 			// Motor Currents, based on voltage
-			motor_current[FL] += ( motor_power[FL]*motor_states[FL]/255.0*battery_voltage - params.motor_voltage_transform*wheel_speed[FL] - motor_current[FL]*params.motor_resistance) / params.motor_inductance * time_step;
-			motor_current[FR] += ( motor_power[FR]*motor_states[FR]/255.0*battery_voltage - params.motor_voltage_transform*wheel_speed[FR] - motor_current[FR]*params.motor_resistance) / params.motor_inductance * time_step;
-			motor_current[BL] += ( motor_power[BL]*motor_states[BL]/255.0*battery_voltage - params.motor_voltage_transform*wheel_speed[BL] - motor_current[BL]*params.motor_resistance) / params.motor_inductance * time_step;
-			motor_current[BR] += ( motor_power[BR]*motor_states[BR]/255.0*battery_voltage - params.motor_voltage_transform*wheel_speed[BR] - motor_current[BR]*params.motor_resistance) / params.motor_inductance * time_step;
+			motor_current[FL] += ( motor_power[FL]*motor_states[FL]/255.0*battery_voltage - params.getmotor_voltage_transform()*wheel_speed[FL] - motor_current[FL]*params.getmotor_resistance()) / params.getmotor_inductance() * time_step;
+			motor_current[FR] += ( motor_power[FR]*motor_states[FR]/255.0*battery_voltage - params.getmotor_voltage_transform()*wheel_speed[FR] - motor_current[FR]*params.getmotor_resistance()) / params.getmotor_inductance() * time_step;
+			motor_current[BL] += ( motor_power[BL]*motor_states[BL]/255.0*battery_voltage - params.getmotor_voltage_transform()*wheel_speed[BL] - motor_current[BL]*params.getmotor_resistance()) / params.getmotor_inductance() * time_step;
+			motor_current[BR] += ( motor_power[BR]*motor_states[BR]/255.0*battery_voltage - params.getmotor_voltage_transform()*wheel_speed[BR] - motor_current[BR]*params.getmotor_resistance()) / params.getmotor_inductance() * time_step;
 			// min currents at 0, motor cannot generate current
 			if (motor_current[FL]*motor_states[FL] <= 0){
 				motor_current[FL] = 0;
@@ -743,20 +744,20 @@ public class RoverObj {
 				motor_current[BR] = 0;
 			}
 			// angular motor speeds, based on torques
-			wheel_speed[FL] += 1/params.wheel_inertia * ( params.motor_energy_transform*motor_current[FL] - params.wheel_radius*slip[FL] + params.wheel_radius*fric_gr_all*Math.cos(params.gamma) - params.friction_axle*wheel_speed[FL]/params.wheel_radius) * time_step;
-			wheel_speed[FR] += 1/params.wheel_inertia * ( params.motor_energy_transform*motor_current[FR] - params.wheel_radius*slip[FR] - params.wheel_radius*fric_gr_all*Math.cos(params.gamma) - params.friction_axle*wheel_speed[FR]/params.wheel_radius) * time_step;
-			wheel_speed[BL] += 1/params.wheel_inertia * ( params.motor_energy_transform*motor_current[BL] - params.wheel_radius*slip[BL] + params.wheel_radius*fric_gr_all*Math.cos(params.gamma) - params.friction_axle*wheel_speed[BL]/params.wheel_radius) * time_step;
-			wheel_speed[BR] += 1/params.wheel_inertia * ( params.motor_energy_transform*motor_current[BR] - params.wheel_radius*slip[BR] - params.wheel_radius*fric_gr_all*Math.cos(params.gamma) - params.friction_axle*wheel_speed[BR]/params.wheel_radius) * time_step;
+			wheel_speed[FL] += 1/params.getwheel_inertia() * ( params.getmotor_energy_transform()*motor_current[FL] - params.getwheel_radius()*slip[FL] + params.getwheel_radius()*fric_gr_all*Math.cos(params.getgamma()) - params.getfriction_axle()*wheel_speed[FL]/params.getwheel_radius()) * time_step;
+			wheel_speed[FR] += 1/params.getwheel_inertia() * ( params.getmotor_energy_transform()*motor_current[FR] - params.getwheel_radius()*slip[FR] - params.getwheel_radius()*fric_gr_all*Math.cos(params.getgamma()) - params.getfriction_axle()*wheel_speed[FR]/params.getwheel_radius()) * time_step;
+			wheel_speed[BL] += 1/params.getwheel_inertia() * ( params.getmotor_energy_transform()*motor_current[BL] - params.getwheel_radius()*slip[BL] + params.getwheel_radius()*fric_gr_all*Math.cos(params.getgamma()) - params.getfriction_axle()*wheel_speed[BL]/params.getwheel_radius()) * time_step;
+			wheel_speed[BR] += 1/params.getwheel_inertia() * ( params.getmotor_energy_transform()*motor_current[BR] - params.getwheel_radius()*slip[BR] - params.getwheel_radius()*fric_gr_all*Math.cos(params.getgamma()) - params.getfriction_axle()*wheel_speed[BR]/params.getwheel_radius()) * time_step;
 			// translational friction, approximately the same for all wheels
-			fric_gr_all = params.friction_gr * params.motor_arm * angular_velocity;
+			fric_gr_all = params.getfriction_gr() * params.getmotor_arm() * angular_velocity;
 			// Slip forces on wheels, based on speed differences
-			slip[FL] = params.friction_s * (wheel_speed[FL]*params.wheel_radius - speed);
-			slip[FR] = params.friction_s * (wheel_speed[FR]*params.wheel_radius - speed);
-			slip[BL] = params.friction_s * (wheel_speed[BL]*params.wheel_radius - speed);
-			slip[BR] = params.friction_s * (wheel_speed[BR]*params.wheel_radius - speed);
+			slip[FL] = params.getfriction_s() * (wheel_speed[FL]*params.getwheel_radius() - speed);
+			slip[FR] = params.getfriction_s() * (wheel_speed[FR]*params.getwheel_radius() - speed);
+			slip[BL] = params.getfriction_s() * (wheel_speed[BL]*params.getwheel_radius() - speed);
+			slip[BR] = params.getfriction_s() * (wheel_speed[BR]*params.getwheel_radius() - speed);
 			// Acceleration changes based on forces
-			acceleration = 1/params.rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - grav_accel*Math.sin(WrapperEvents.getIncline());
-			angular_acceleration = 1/params.rover_inertia * ((params.motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(params.gamma) - params.motor_arm*(4*fric_gr_all)));
+			acceleration = 1/params.getrover_mass()*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - Access.getPlanetParameters().getgrav_accel()*Math.sin(Access.getMapInclineAtPoint(location, direction));
+			angular_acceleration = 1/params.getrover_inertia() * ((params.getmotor_arm()*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(params.getgamma()) - params.getmotor_arm()*(4*fric_gr_all)));
 			// Speed changes based on Acceleration
 			speed += acceleration * time_step;
 			angular_velocity += angular_acceleration * time_step;
@@ -765,33 +766,38 @@ public class RoverObj {
 				//System.out.println(round(wheel_speed[BL]) + " rad/s -> " + round(slip[BL]) + " N -> " + round(angular_acceleration) + " rad/s^2 -> " + round(angular_velocity) + " rad/s");
 				//System.out.println(round(wheel_speed[BR]) + " rad/s -> " + round(slip[BR]) + " N");
 			// Calculate the amount the rover slips sideways
-			slip_acceleration = (-params.friction_gr*slip_velocity*4 - params.rover_mass*grav_accel*Math.sin(WrapperEvents.getCrossSlope()) / rover_mass);
+			slip_acceleration = (-params.getfriction_gr()*slip_velocity*4 - params.getrover_mass()*Access.getPlanetParameters().getgrav_accel()*Math.sin(Access.getMapCrossSlopeAtPoint(location, direction)) / params.getrover_mass());
 			slip_velocity += slip_acceleration * time_step;
+			// Calculate new location
+			location.offset(speed*time_step*Math.cos(direction), speed*time_step*(Math.sin(direction)));
+			//TODO													  + here??
+			location.offset(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
+			direction += angular_velocity*time_step;
 			// report new location to map
-			WrapperEvents.moveRover(speed*time_step, angular_velocity*time_step, slip_velocity*time_step);
+			Access.updateRoverLocation(name, location, direction);
 			
 			//Determining the current of the battery and the change in the stored charge
 			battery_current = Math.abs(motor_current[FL]) + Math.abs(motor_current[FR]) + Math.abs(motor_current[BL]) + Math.abs(motor_current[BR]);
-			double battery_change = battery_charge / params.capacitance_battery / params.resistance_parasite + battery_current;
-			double cp_change = battery_current - (battery_cp_charge / params.capacitance_cp / resistance_cp());
+			double battery_change = battery_charge / params.getcapacitance_battery() / params.getresistance_parasite() + battery_current;
+			double cp_change = battery_current - (battery_cp_charge / params.getcapacitance_cp() / resistance_cp());
 			battery_charge -= battery_change * time_step;
 			battery_cp_charge += cp_change * time_step;
-			battery_voltage = battery_charge/params.capacitance_battery - battery_cp_charge/params.capacitance_cp - params.resistance_s*battery_current;
-			SOC = 1 - (params.battery_max_charge - battery_charge) / params.battery_max_charge;
+			battery_voltage = battery_charge/params.getcapacitance_battery() - battery_cp_charge/params.getcapacitance_cp() - params.getresistance_s()*battery_current;
+			SOC = 1 - (params.getbattery_max_charge() - battery_charge) / params.getbattery_max_charge();
 				//System.out.println("Vb: " + battery_voltage + "\tVm: " + getMotorVoltage(FR) + "\tQcp: " + battery_cp_charge + "\tIb: " + battery_current + "\tIm: " + motor_current[FR]);
 			
 			//Determining the temperature of the battery
-			battery_temperature += ((params.resistance_parasite*Math.pow(battery_change-battery_current, 2) + resistance_s*Math.pow(battery_current, 2) + resistance_cp()*Math.pow(battery_current-cp_change, 2)) - params.battery_heat_transfer*(battery_temperature - WrapperMain.MAP.getTemperatureAtLoc()) / params.battery_thermal_cap) * time_step;
+			battery_temperature += ((params.getresistance_parasite()*Math.pow(battery_change-battery_current, 2) + params.getresistance_s()*Math.pow(battery_current, 2) + resistance_cp()*Math.pow(battery_current-cp_change, 2)) - params.getbattery_heat_transfer()*(battery_temperature - Access.getMapTemperatureAtPoint(location)) / params.getbattery_thermal_cap()) * time_step;
 			//Determining the temperature of the motor coils
-			winding_temp[FL] += ((params.motor_resistance*Math.pow(motor_current[FL], 2) - params.winding_heat_transfer*(winding_temp[FL] - motor_temp[FL])) / params.winding_thermal_cap) * time_step;
-			winding_temp[FR] += ((params.motor_resistance*Math.pow(motor_current[FR], 2) - params.winding_heat_transfer*(winding_temp[FR] - motor_temp[FR])) / params.winding_thermal_cap) * time_step;
-			winding_temp[BR] += ((params.motor_resistance*Math.pow(motor_current[BR], 2) - params.winding_heat_transfer*(winding_temp[BR] - motor_temp[BR])) / params.winding_thermal_cap) * time_step;
-			winding_temp[BR] += ((params.motor_resistance*Math.pow(motor_current[BR], 2) - params.winding_heat_transfer*(winding_temp[BR] - motor_temp[BR])) / params.winding_thermal_cap) * time_step;
+			winding_temp[FL] += ((params.getmotor_resistance()*Math.pow(motor_current[FL], 2) - params.getwinding_heat_transfer()*(winding_temp[FL] - motor_temp[FL])) / params.getwinding_thermal_cap()) * time_step;
+			winding_temp[FR] += ((params.getmotor_resistance()*Math.pow(motor_current[FR], 2) - params.getwinding_heat_transfer()*(winding_temp[FR] - motor_temp[FR])) / params.getwinding_thermal_cap()) * time_step;
+			winding_temp[BR] += ((params.getmotor_resistance()*Math.pow(motor_current[BR], 2) - params.getwinding_heat_transfer()*(winding_temp[BR] - motor_temp[BR])) / params.getwinding_thermal_cap()) * time_step;
+			winding_temp[BR] += ((params.getmotor_resistance()*Math.pow(motor_current[BR], 2) - params.getwinding_heat_transfer()*(winding_temp[BR] - motor_temp[BR])) / params.getwinding_thermal_cap()) * time_step;
 			//Determining the surface temperature of the motor
-			motor_temp[FL] += ((params.winding_heat_transfer*(winding_temp[FL] - motor_temp[FL]) - params.motor_surface_heat_transfer*(motor_temp[FL] - WrapperMain.MAP.getTemperatureAtLoc())) / params.motor_thermal_cap) * time_step;
-			motor_temp[FR] += ((params.winding_heat_transfer*(winding_temp[FR] - motor_temp[FR]) - params.motor_surface_heat_transfer*(motor_temp[FR] - WrapperMain.MAP.getTemperatureAtLoc())) / params.motor_thermal_cap) * time_step;
-			motor_temp[BL] += ((params.winding_heat_transfer*(winding_temp[BL] - motor_temp[BL]) - params.motor_surface_heat_transfer*(motor_temp[BL] - WrapperMain.MAP.getTemperatureAtLoc())) / params.motor_thermal_cap) * time_step;
-			motor_temp[BR] += ((params.winding_heat_transfer*(winding_temp[BR] - motor_temp[BR]) - params.motor_surface_heat_transfer*(motor_temp[BR] - WrapperMain.MAP.getTemperatureAtLoc())) / params.motor_thermal_cap) * time_step;
+			motor_temp[FL] += ((params.getwinding_heat_transfer()*(winding_temp[FL] - motor_temp[FL]) - params.getmotor_surface_heat_transfer()*(motor_temp[FL] - Access.getMapTemperatureAtPoint(location))) / params.getmotor_thermal_cap()) * time_step;
+			motor_temp[FR] += ((params.getwinding_heat_transfer()*(winding_temp[FR] - motor_temp[FR]) - params.getmotor_surface_heat_transfer()*(motor_temp[FR] - Access.getMapTemperatureAtPoint(location))) / params.getmotor_thermal_cap()) * time_step;
+			motor_temp[BL] += ((params.getwinding_heat_transfer()*(winding_temp[BL] - motor_temp[BL]) - params.getmotor_surface_heat_transfer()*(motor_temp[BL] - Access.getMapTemperatureAtPoint(location))) / params.getmotor_thermal_cap()) * time_step;
+			motor_temp[BR] += ((params.getwinding_heat_transfer()*(winding_temp[BR] - motor_temp[BR]) - params.getmotor_surface_heat_transfer()*(motor_temp[BR] - Access.getMapTemperatureAtPoint(location))) / params.getmotor_thermal_cap()) * time_step;
 			
 			//RoverEvents.updateStats();
 		}
@@ -801,7 +807,7 @@ public class RoverObj {
 	}
 	
 	private double resistance_cp(){ // get the resistance of the CP resistor as a function of SOC
-		return params.R_cp0+params.R_cp1*Math.exp(params.R_cp2*(1-SOC));
+		return params.getR_cp0()+params.getR_cp1()*Math.exp(params.getR_cp2()*(1-SOC));
 	}
 	
 	private void setMotorPower(int which, int power){ // set power to a motor
