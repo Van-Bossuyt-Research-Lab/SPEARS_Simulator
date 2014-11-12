@@ -41,11 +41,11 @@ public class Panel extends JPanel{
 		titleLbl.setSize((int)titleLbl.getPreferredSize().getWidth()+5, (int)titleLbl.getPreferredSize().getHeight()+5);
 		this.add(titleLbl);
 		
-		postScript = new JLabel("<html><p align=\"right\">Colorado School of Mines<br>Prognostics and Health Management Project<br>System Simulator v" + Globals.vrsionNumber + "</p></html>");
+		postScript = new JLabel("Colorado School of Mines     Prognostics and Health Management Project     System Simulator v" + Globals.vrsionNumber);
 		postScript.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		postScript.setSize((int)postScript.getPreferredSize().getWidth()+5, (int)postScript.getPreferredSize().getHeight()+5);
-		postScript.setLocation(this.getWidth()-postScript.getWidth()-10, this.getHeight()-postScript.getHeight()-10);
-		postScript.setHorizontalAlignment(SwingConstants.RIGHT);
+		postScript.setLocation((this.getWidth()-postScript.getWidth())/2, this.getHeight()-postScript.getHeight()-10);
+		postScript.setHorizontalAlignment(SwingConstants.CENTER);
 		this.add(postScript);
 		
 		exitBtn = new ImageButton();
@@ -109,5 +109,13 @@ public class Panel extends JPanel{
 	
 	public ImageIcon getImage(){
 		return background;
+	}
+	
+	public int getWorkingHeight(){
+		return this.postScript.getY() - titleLbl.getHeight() - titleLbl.getY();
+	}
+	
+	public int getTopOfPage(){
+		return titleLbl.getHeight() + titleLbl.getY();
 	}
 }

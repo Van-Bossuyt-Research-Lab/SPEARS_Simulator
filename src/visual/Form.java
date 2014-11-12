@@ -33,6 +33,8 @@ import map.PlanetParametersList;
 
 import javax.swing.JButton;
 
+import rover.RoverHub;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -46,7 +48,7 @@ public class Form extends JFrame {
 	public Panel OrbitalPnl;
 	public LandMapPanel TerrainPnl;
 	public Panel InterfacePnl;
-	public Panel RoverHubPnl;
+	public RoverHub RoverHubPnl;
 	public Panel SatelliteHubPnl;
 
 	/**
@@ -225,7 +227,7 @@ public class Form extends JFrame {
 		InterfacePnl.setVisible(false);
 		contentPane.add(InterfacePnl);
 		
-		RoverHubPnl = new Panel(screenSize, "Rover Hub");
+		RoverHubPnl = new RoverHub(screenSize);
 		RoverHubPnl.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {

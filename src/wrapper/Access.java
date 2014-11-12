@@ -1,11 +1,16 @@
 package wrapper;
 
 import objects.DecimalPoint;
+import rover.RoverObj;
 import map.PlanetParametersList;
 
 public class Access {
 
 	static Admin CODE = new Admin();
+	
+	public static void addRoversToMap(RoverObj[] rovs){ 
+		CODE.GUI.TerrainPnl.setRoverSwarm(rovs);
+	}
 	
 	public static PlanetParametersList getPlanetParameters(){
 		return CODE.GUI.TerrainPnl.getParameters();
