@@ -3,10 +3,19 @@ package rover;
 import java.io.InputStream;
 
 import objects.DecimalPoint;
+import objects.ThreadTimer;
 import wrapper.Access;
 import wrapper.Globals;
 
 public class RoverObj {
+	
+	public static final int FORWARD = 1, BACKWARD = -1, RELEASE = 0; // possible motor states
+	public static final int FL = 0, BL = 1, BR = 2, FR = 3; // identifiers on wheels
+
+	private String name;
+	private String IDcode;
+	private RoverParametersList params;
+	private RoverAutonomusCode autoCode;
 	
 	private double time_step = 0.01; // time step of physics, in seconds
 	
@@ -55,13 +64,6 @@ public class RoverObj {
 	private float averageCurrent = 0; // integral divided by time
 	
 	
-	public static final int FORWARD = 1, BACKWARD = -1, RELEASE = 0; // possible motor states
-	public static final int FL = 0, BL = 1, BR = 2, FR = 3; // identifiers on wheels
-
-	private String name;
-	private RoverParametersList params;
-	private RoverAutonomusCode autoCode;
-	
 	private DecimalPoint location; //mxm from center of map
 	private double direction; //rad
 	private double speed = 0; //m/s
@@ -90,8 +92,9 @@ public class RoverObj {
 	private double[] winding_temp = { 22, 22, 22, 22 }; //*c
 	private double[] motor_temp = { 22, 22, 22, 22 }; //*c
 	
-	public RoverObj(String name, RoverParametersList param, RoverAutonomusCode code, DecimalPoint loc, double dir, double temp){
+	public RoverObj(String name, String ID, RoverParametersList param, RoverAutonomusCode code, DecimalPoint loc, double dir, double temp){
 		this.name = name;
+		IDcode = ID;
 		params = param;
 		battery_charge = params.getbattery_max_charge();
 		autoCode = code;
@@ -105,7 +108,18 @@ public class RoverObj {
 	}
 	
 	public void start(){
-		
+		ThreadTimer codeThread = new ThreadTimer(1, new Runnable(){
+			public void run(){
+				excecuteCode();
+			}
+		},
+		ThreadTimer.FOREVER);
+		ThreadTimer physicsThread = new ThreadTimer(time_step*1000, new Runnable(){
+			public void run(){
+				excecutePhysics();
+			}
+		},
+		ThreadTimer.FOREVER);
 	}
 	
 	private void excecuteCode(){
@@ -126,18 +140,19 @@ public class RoverObj {
 				Globals.reportError("RoverCode", "runCode - voltage", e);
 			}
 			
-			if (Globals.RFAvailable('r') > 0) { // if there is a message
-				if (Globals.ReadSerial('r') == 'r' && go) { // if the message is for us and are we allowed to read it
-															// go is set to false if the first read is not 'r' to prevent starting a message not intened for the rover from within the body of another message
+			if (Globals.RFAvailable(IDcode) > 0) { // if there is a message
+				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
+				if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
+															// go is set to false if the first read is not IDcode to prevent starting a message not intened for the rover from within the body of another message
 					delay(500); // let the full message arrive
-					Globals.ReadSerial('r'); // white space
-					tag = (char) Globals.ReadSerial('r'); // get type tag
-					if (Globals.RFAvailable('r') > 0) { // if there is more to the message
+					Globals.ReadSerial(IDcode); // white space
+					tag = (char) Globals.ReadSerial(IDcode); // get type tag
+					if (Globals.RFAvailable(IDcode) > 0) { // if there is more to the message
 						run_auto = false; // stop running autonmusly
 						data[0] = tag; // tag is not actually import, just read the entire body of the message
 						index++;
-						while (Globals.RFAvailable('r') > 0 && index < data.length-1) { //read in message body
-							data[index] = (char) Globals.ReadSerial('r');
+						while (Globals.RFAvailable(IDcode) > 0 && index < data.length-1) { //read in message body
+							data[index] = (char) Globals.ReadSerial(IDcode);
 							index++;
 						}
 						data[index] = '\0'; // end of string
@@ -209,13 +224,13 @@ public class RoverObj {
 						} 
 						else if (strcmp(data, "instructions") == 0) { // if we are recieving instructions
 							instructions = ""; // clear existing "file"
-							while (Globals.RFAvailable('r') == 0) { // wait for transmission to start
+							while (Globals.RFAvailable(IDcode) == 0) { // wait for transmission to start
 								delay(5);
 							}
 							delay(1000); // begin syncopation of read/write
-							while (Globals.RFAvailable('r') > 0) { 
-								while (Globals.RFAvailable('r') > 0) {
-									instructions += (char) Globals.ReadSerial('r'); // read in character, add to list
+							while (Globals.RFAvailable(IDcode) > 0) { 
+								while (Globals.RFAvailable(IDcode) > 0) {
+									instructions += (char) Globals.ReadSerial(IDcode); // read in character, add to list
 								}
 								delay(2000); // continue syncopation, we want to avoid the incoming message running out of room in the buffer
 							}
@@ -276,9 +291,9 @@ public class RoverObj {
 				else { // the message wasn't for us
 					delay(300);
 					go = false; // ignore it
-					int waiting = Globals.RFAvailable('r');
+					int waiting = Globals.RFAvailable(IDcode);
 					while (waiting >= 0) { // delete it
-						Globals.ReadSerial('r');
+						Globals.ReadSerial(IDcode);
 						waiting--;
 					}
 				}
@@ -322,7 +337,7 @@ public class RoverObj {
 							count++;
 						}
 						System.out.println(cmd); // TODO: more debugging
-						if (cmd.charAt(0) == 'r') { // if the instruction is for us
+						if (strcmp(cmd.substring(0, 2), IDcode) == 0) { // if the instruction is for us
 							String temp = cmd; //drop the first 2 characters cause they're not important
 							cmd = "";
 							x = 2;
@@ -539,7 +554,7 @@ public class RoverObj {
 			while (hold != -1) { // send the file in 60 byte chunks
 				index = 0;
 				while (index < 60 && hold != -1) {
-					Globals.writeToSerial((byte) hold, 'r');
+					Globals.writeToSerial((byte) hold, IDcode);
 					hold = data.read();
 					index++;
 				}
@@ -636,7 +651,7 @@ public class RoverObj {
 				if (message[x] == '\0') { // while not the end of string
 					break;
 				}
-				Globals.writeToSerial(message[x], 'r'); // Write to Serial one char at a time
+				Globals.writeToSerial(message[x], IDcode); // Write to Serial one char at a time
 				try {
 					Thread.sleep((int) (5 / Globals.getTimeScale())); // Pause for sending
 				} 
@@ -666,7 +681,7 @@ public class RoverObj {
 
 	private boolean sendSerial(char mess) {
 		if (!mute) {
-			Globals.writeToSerial(mess, 'r');
+			Globals.writeToSerial(mess, IDcode);
 			/*GUI.SerialHistoryLbl.setText(GUI.SerialHistoryLbl.getText() + mess
 					+ "\t\t\t\t"
 					+ Globals.TimeMillis
@@ -715,6 +730,46 @@ public class RoverObj {
 			Globals.reportError("RoverCode", "strcmp", e);
 			return 1;
 		}
+	}
+	
+	private char[] strcat(char[] first, char[] second){
+		char[] out = new char[first.length + second.length];
+		int x = 0;
+		while (x < first.length){
+			out[x] = first[x];
+			x++;
+		}
+		while (x < out.length){
+			out[x] = second[x-first.length];
+			x++;
+		}
+		return out;
+	}
+	
+	private char[] strcat(char first, char[] second){
+		char[] out = new char[second.length + 1];
+		out[0] = first;
+		int x = 1;
+		while (x < out.length){
+			out[x] = second[x-1];
+			x++;
+		}
+		return out;
+	}
+	
+	private char[] strcat(char[] first, char second){
+		char[] out = new char[first.length + 1];
+		int x = 0;
+		while (x < first.length){
+			out[x] = first[x];
+			x++;
+		}
+		out[x] = second;
+		return out;
+	}
+	
+	private char[] strcat(char first, char second){
+		return new char[] { first, second };
 	}
 	
 	private int strcmp(String first, String second){ // see if 2 strings are equal

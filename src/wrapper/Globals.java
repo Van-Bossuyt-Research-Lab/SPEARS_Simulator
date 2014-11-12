@@ -2,15 +2,16 @@ package wrapper;
 
 import java.util.Random;
 
+import objects.Queue;
+import objects.Map;
 import objects.ThreadTimer;
 
 public class Globals {
 
 	public static String vrsionNumber = "2.0";
 	
-	private static byte[] SatelliteRFserial = new byte[0]; // the buffer for messages received by the Satellite
-	private static byte[] RoverRFserial = new byte[0]; // the buffer for the messages received by the Rover
-	private static byte[] GroundRFserial = new byte[0]; // the buffer for the Ground Station
+	private static Queue<Byte>[] SerialBuffers; // the buffer for messages
+	private static String[] SerialBufferCodes;
 	
 	private static double timeScale = 1.0;
 	public static long TimeMillis = 0;
@@ -31,124 +32,65 @@ public class Globals {
 		}, 1);
 	}
 	
-	public static void writeToSerial(char write, char from){
+	public static void writeToSerial(char write, String from){
 		writeToSerial((byte)write, from);
 	}
 	
-	public static void writeToSerial(byte write, char from){ // writes the character to the other 2 buffers
-		if (from == 'r'){
-			writeToLogFile("Rover Comm", "Sent: " + (char)write);
-			if (SatelliteRFserial.length < 64){ // Serial buffer is only 64 bytes
-				SatelliteRFserial = Augment(SatelliteRFserial, write);
+	@SuppressWarnings("unchecked")
+	public static void initalizeLists(String[] IDs){
+		SerialBufferCodes = IDs;
+		SerialBuffers = (Queue<Byte>[])(new Object[0]);
+	}
+	
+	public static void writeToSerial(byte write, String from){ // writes the character to the other 2 buffers
+		int x = 0;
+		while (x < SerialBufferCodes.length){
+			if (!SerialBufferCodes[x].equals(from)){
+				if (SerialBuffers[x].size() < 64){
+					SerialBuffers[x].push(write);
+				}
+				else {
+					writeToLogFile(SerialBufferCodes[x], "Failed to recieve: " + (char)write + ", full buffer.");
+				}
 			}
-			else {
-				writeToLogFile("Satellite Comm", "Failed to recieve: " + (char)write + ", full buffer.");
-			}
-			if (GroundRFserial.length < 64){
-				GroundRFserial = Augment(GroundRFserial, write);
-			}
-			else {
-				writeToLogFile("Ground Comm", "Failed to recieve: " + (char)write + ", full buffer.");
-			}
-		}
-		else if (from == 's'){
-			writeToLogFile("Satellite Comm", "Sent: " + (char)write);
-			if (RoverRFserial.length < 64){
-				RoverRFserial = Augment(RoverRFserial, write);
-			}
-			else {
-				writeToLogFile("Rover Comm", "Failed to recieve: " + (char)write + ", full buffer.");
-			}
-			if (GroundRFserial.length < 64){
-				GroundRFserial = Augment(GroundRFserial, write);
-			}
-			else {
-				writeToLogFile("Ground Comm", "Failed to recieve: " + (char)write + ", full buffer.");
-			}
-		}
-		else if (from == 'g'){
-			writeToLogFile("Ground Comm", "Sent: " + (char)write);
-			if (SatelliteRFserial.length < 64){
-				SatelliteRFserial = Augment(SatelliteRFserial, write);
-			}
-			else {
-				writeToLogFile("Satellite Comm", "Failed to recieve: " + (char)write + ", full buffer.");
-			}
-			if (RoverRFserial.length < 64){
-				RoverRFserial = Augment(RoverRFserial, write);
-			}
-			else {
-				writeToLogFile("Rover Comm", "Failed to recieve: " + (char)write + ", full buffer.");
-			}
+			x++;
 		}
 		//WrapperEvents.SerialBuffersChanged(RoverRFserial, SatelliteRFserial, GroundRFserial);
 	}
 	
-	public static int RFAvailable(char which){ // Returns the number of chars waiting
-		if (which == 'r'){
-			return RoverRFserial.length;
-		}
-		else if (which == 's'){
-			return SatelliteRFserial.length;
-		}
-		else if (which == 'g'){
-			return GroundRFserial.length;
+	public static int RFAvailable(String which){ // Returns the number of chars waiting
+		int x = 0;
+		while (x < SerialBufferCodes.length){
+			if (SerialBufferCodes[x].equals(which)){
+				return SerialBuffers[x].size();
+			}
+			x++;
 		}
 		return -1;
 	}
 	
-	public static byte ReadSerial(char which){ // Returns the first waiting character
+	public static byte ReadSerial(String which){ // Returns the first waiting character
 		byte out = '\0';
-		if (RFAvailable(which) > 0){
-			if (which == 'r'){
-				out = RoverRFserial[0];
-				RoverRFserial = dropFirst(RoverRFserial);
+		int x = 0;
+		while (x < SerialBufferCodes.length){
+			if (SerialBufferCodes[x].equals(which)){
+				out = SerialBuffers[x].pop();
+				break;
 			}
-			else if (which == 's'){
-				out = SatelliteRFserial[0];
-				SatelliteRFserial = dropFirst(SatelliteRFserial);
-			}
-			else if (which == 'g'){
-				out = GroundRFserial[0];
-				GroundRFserial = dropFirst(GroundRFserial);
-			}
+			x++;
 		}
 		//WrapperEvents.SerialBuffersChanged(RoverRFserial, SatelliteRFserial, GroundRFserial);
 		return out;
 	}
 	
-	public static byte PeekSerial(char which){  // get first waiting character without changing availability
+	public static byte PeekSerial(String which){  // get first waiting character without changing availability
 		byte out = '\0';
-		if (RFAvailable(which) > 0){
-			if (which == 'r'){
-				out = RoverRFserial[0];
-			}
-			else if (which == 's'){
-				out = SatelliteRFserial[0];
-			}
-			else if (which == 'g'){
-				out = GroundRFserial[0];
-			}
-		}
-		return out;
-	}
-	
-	private static byte[] Augment(byte[] array, byte val){ // expand the array by one
-		byte[] out = new byte[array.length + 1];
 		int x = 0;
-		while (x < array.length){
-			out[x] = array[x];
-			x++;
-		}
-		out[x] = val;
-		return out;
-	}
-	
-	private static byte[] dropFirst(byte[] val){ // remove the first term of an array
-		byte[] out = new byte[val.length - 1];
-		int x = 0;
-		while (x < out.length){
-			out[x] = val[x + 1];
+		while (x < SerialBufferCodes.length){
+			if (SerialBufferCodes[x].equals(which)){
+				out = SerialBuffers[x].peek();
+				break;
+			}
 			x++;
 		}
 		return out;
