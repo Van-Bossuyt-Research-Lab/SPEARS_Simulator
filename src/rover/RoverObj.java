@@ -30,7 +30,7 @@ public class RoverObj {
 	private long timeOfLastCmd = Globals.TimeMillis+3600000; // how long since the ground station talked last
 	private boolean waiting = false; // are we waiting
 	private long cmdWaitTime = 0; // how long to wait
-	private boolean run_auto = false; // are we running autonomusly
+	private boolean run_auto = false; // are we running autonomously
 	private String temperatureData = ""; // "file" for recorded temperature data
 
 	private float boardVoltage = 9; // The measured voltage of the battery powering the board
@@ -47,14 +47,14 @@ public class RoverObj {
 	private char tag = '\0'; // message identification tag
 	private char[] data = new char[30]; // message body
 	private int index = 0;
-	private boolean go = true; // allowed to interperet message
+	private boolean go = true; // allowed to interpret message
 	
 	private double EOLbattery = -1;
 	private double EOLmotor = Double.MAX_VALUE;
 	
 	private boolean atTarget = false; // did we find a target
 	private int actionCounter = 0; 
-	private long autoWaitUntil = 0; // how long to wait in autonomus mode
+	private long autoWaitUntil = 0; // how long to wait in autonomous mode
 	private long lastLogWrite = 0; // the last time the log was written to
 	
 	private boolean checkCurrent = false; // are we checking current
@@ -64,7 +64,7 @@ public class RoverObj {
 	private float averageCurrent = 0; // integral divided by time
 	
 	
-	private DecimalPoint location; //mxm from center of map
+	private DecimalPoint location; //m x m from center of map
 	private double direction; //rad
 	private double speed = 0; //m/s
 	private double angular_velocity = 0; //rad/s

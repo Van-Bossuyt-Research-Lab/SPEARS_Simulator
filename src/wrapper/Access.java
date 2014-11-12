@@ -35,4 +35,8 @@ public class Access {
 	public static void updateRoverLocation(String name, DecimalPoint loc, double dir){
 		CODE.GUI.TerrainPnl.updateRover(name, loc, dir);
 	}
+	
+	public static void requestFocusToMap(){
+		CODE.GUI.TerrainPnl.requestFocus();
+	}
 }
