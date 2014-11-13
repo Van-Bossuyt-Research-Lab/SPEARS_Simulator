@@ -75,7 +75,7 @@ public class RoverHub extends Panel {
 		int x = 0;
 		while (x < standardDisplayLinks.length){
 			int y = 0;
-			while (x < numberOfDisplays){
+			while (y < numberOfDisplays){
 				standardDisplayLinks[x][y] = -1;
 				y++;
 			}
@@ -116,6 +116,7 @@ public class RoverHub extends Panel {
 				}
 			}		
 		});
+		
 		setVisible(false);
 	}
 	
@@ -147,6 +148,7 @@ public class RoverHub extends Panel {
 					changeLinkedRover(a, -1);
 				}
 			});
+			PageLeftBtn[x].setEnabled(false);
 			rack.add(PageLeftBtn[x], BorderLayout.WEST);
 			
 			PageRightBtn[x] = new JButton(">");
@@ -156,6 +158,7 @@ public class RoverHub extends Panel {
 					changeLinkedRover(a, 1);
 				}
 			});
+			PageRightBtn[x].setEnabled(false);
 			rack.add(PageRightBtn[x], BorderLayout.EAST);
 			
 			tabbedPane[x] = new JTabbedPane(JTabbedPane.TOP);
@@ -215,7 +218,6 @@ public class RoverHub extends Panel {
 			TemperatureScroll[x].setViewportView(TemperatureStatsLbl[x]);
 			
 			LEDPnl[x] = new JPanel();
-			LEDPnl[x].setOpaque(false);
 			tabbedPane[x].addTab("LED's", null, LEDPnl[x], null);
 			LEDPnl[x].setLayout(null);
 			
@@ -350,6 +352,19 @@ public class RoverHub extends Panel {
 			standardDisplayLinks[x/numberOfDisplays][x%numberOfDisplays] = x;
 			x++;
 		}
+		while (x < numberOfDisplays*standardDisplayLinks.length){
+			standardDisplayLinks[x/numberOfDisplays][x%numberOfDisplays] = -1;
+			x++;
+		}
+		
+		updateDisplays();
+	}
+	
+	public void setfocusedRover(int which){
+		if (which >= 0 && which < rovers.length){
+			HUDDisplayLinks[0] = which;
+			updateDisplays();
+		}
 	}
 	
 	public void updateDisplays(){
@@ -359,11 +374,13 @@ public class RoverHub extends Panel {
 				if (HUDDisplayLinks[x] == -1){
 					PageLeftBtn[x].setVisible(false);
 					tabbedPane[x].setVisible(false);
+					RoverDisplayWindow[x].setOpaque(false);
 					RoverNameLbl[x].setText("Undefined");
 				}
 				else {
 					PageLeftBtn[x].setVisible(true);
 					tabbedPane[x].setVisible(true);
+					RoverDisplayWindow[x].setOpaque(true);
 					RoverNameLbl[x].setText(rovers[HUDDisplayLinks[x]].getName());
 					MovementStatsLbl[x].setText("X: " + formatDouble(rovers[HUDDisplayLinks[x]].getLocation().getX()) 
 							+ " m\tAngular Spin FL: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getWheelSpeed(RoverObj.FL))) 
@@ -399,13 +416,15 @@ public class RoverHub extends Panel {
 							"Motor Temperature BR: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorTemp(RoverObj.BR)) + " *c\n\n" +
 							"Battery Temperature: " + formatDouble(rovers[HUDDisplayLinks[x]].getBatteryTemperature()) + " *c\n\n" +
 							"Air Temperature: " + formatDouble(Access.getMapTemperatureAtPoint(rovers[HUDDisplayLinks[x]].getLocation())) + "*c");
-				}				
+				}	
+				PageLeftBtn[x].setEnabled(HUDDisplayLinks[x] >= 0 && x != 0);
+				PageRightBtn[x].setEnabled(HUDDisplayLinks[x] < rovers.length-1 && x != 0);			
 				if (x+1 == numberOfHUDDisplays){
 					break;
 				}
 			}
 			else {
-				if (HUDDisplayLinks[x] == -1){
+				if (standardDisplayLinks[currentPage][x] == -1){
 					RoverNameLbl[x].setText("Undefined");
 					PageLeftBtn[x].setEnabled(false);
 				}
@@ -449,6 +468,8 @@ public class RoverHub extends Panel {
 							"Battery Temperature: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getBatteryTemperature()) + " *c\n\n" +
 							"Air Temperature: " + formatDouble(Access.getMapTemperatureAtPoint(rovers[standardDisplayLinks[currentPage][x]].getLocation())) + "*c");
 				}
+				PageLeftBtn[x].setEnabled(standardDisplayLinks[currentPage][x] >= 0);
+				PageRightBtn[x].setEnabled(standardDisplayLinks[currentPage][x] < rovers.length-1);
 			}
 			x++;
 		}
@@ -464,7 +485,9 @@ public class RoverHub extends Panel {
 		}
 		finally {
 			if (inHUDmode){
-				HUDDisplayLinks[display] += by;
+				if (display != 0){
+					HUDDisplayLinks[display] += by;
+				}
 			}
 			else {
 				standardDisplayLinks[currentPage][display] += by;
@@ -476,7 +499,7 @@ public class RoverHub extends Panel {
 	//whether or not to show the panel as an overlay on the map
 	public void setInHUDMode(boolean b){
 		inHUDmode = b;
-		setVisible(this.isVisible());
+		updateDisplays();
 	}
 	
 	public boolean isInHUDMode(){
@@ -493,16 +516,12 @@ public class RoverHub extends Panel {
 			int spacing = 20;
 			RoverDisplayWindow[0].setLocation(spacing, super.getTopOfPage()+spacing);
 			RoverDisplayWindow[0].setSize(RoverDisplayWindow[0].getPreferredSize());
-			RoverDisplayWindow[0].setOpaque(false);
 			RoverDisplayWindow[1].setLocation(spacing, RoverDisplayWindow[0].getY()+RoverDisplayWindow[0].getHeight()+spacing);
 			RoverDisplayWindow[1].setSize(RoverDisplayWindow[1].getPreferredSize());
-			RoverDisplayWindow[1].setOpaque(false);
 			RoverDisplayWindow[2].setSize(RoverDisplayWindow[2].getPreferredSize());
 			RoverDisplayWindow[2].setLocation(this.getWidth()-RoverDisplayWindow[2].getWidth()-spacing, RoverDisplayWindow[0].getY());
-			RoverDisplayWindow[2].setOpaque(false);
 			RoverDisplayWindow[3].setLocation(RoverDisplayWindow[2].getX(), RoverDisplayWindow[1].getY());
 			RoverDisplayWindow[3].setSize(RoverDisplayWindow[3].getPreferredSize());
-			RoverDisplayWindow[3].setOpaque(false);
 			int x = numberOfHUDDisplays;
 			while (x < numberOfDisplays){
 				RoverDisplayWindow[x].setVisible(false);

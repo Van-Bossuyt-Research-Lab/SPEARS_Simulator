@@ -13,6 +13,7 @@ import java.awt.event.MouseWheelListener;
 import java.util.Random;
 
 import objects.DecimalPoint;
+import wrapper.Access;
 import wrapper.Globals;
 import rover.RoverObj;
 import visual.Panel;
@@ -37,8 +38,8 @@ public class LandMapPanel extends Panel{
 	private RoverIcon[] roverIcons;
 	private DecimalPoint[][] roverTrails;
 
-	public LandMapPanel(Dimension size, String title, PlanetParametersList params){
-		super(size, title);
+	public LandMapPanel(Dimension size, PlanetParametersList params){
+		super(size, "Terrain View");
 		setBackground(Color.GRAY);
 		
 		roverIcons = new RoverIcon[0];
@@ -57,6 +58,9 @@ public class LandMapPanel extends Panel{
 			public void keyPressed(KeyEvent e) {
 				Integer key = e.getKeyCode();
 				switch (key) {
+				case KeyEvent.VK_H:
+					Access.toggleHUDonMap();
+					break;
 				case KeyEvent.VK_LEFT:
 					setFocusPoint(new DecimalPoint((int)focusPoint.getX()-1, (int)focusPoint.getY()));
 					focusEngauged = false;
@@ -78,6 +82,7 @@ public class LandMapPanel extends Panel{
 						if (focusEngauged){
 							focusedRover = (focusedRover + 1) % roverIcons.length;
 						}
+						Access.setFocusDisplayHUD(focusedRover);
 						setFocusPoint(roverIcons[focusedRover].getMapLocation());
 						focusEngauged = true;
 					} catch (Exception ex) {}
@@ -87,6 +92,7 @@ public class LandMapPanel extends Panel{
 						if (focusEngauged){
 							focusedRover = (roverIcons.length + focusedRover - 1) % roverIcons.length;
 						}
+						Access.setFocusDisplayHUD(focusedRover);
 						setFocusPoint(roverIcons[focusedRover].getMapLocation());
 						focusEngauged = true;
 					} catch (Exception ex) {}
@@ -151,6 +157,9 @@ public class LandMapPanel extends Panel{
 			roverIcons[x].setLocation(p);
 			x++;
 		}
+		try {
+			this.getParent().repaint();
+		} catch (Exception e) {}
 	}
 	
 	//populates an array of roverIcons in the simulator
@@ -232,7 +241,13 @@ public class LandMapPanel extends Panel{
 			int y = (int) mapSquare.getY();
 			double locx = ((int)((loc.getX() - (int)loc.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
 			double locy = ((int)((loc.getY() - (int)loc.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
-			return getIntermidiateValue(TemperatureMap[x][y], TemperatureMap[x+1][y], TemperatureMap[x][y+1], TemperatureMap[x+1][y+1], locx, locy);
+			try {
+				return getIntermidiateValue(TemperatureMap[x][y], TemperatureMap[x+1][y], TemperatureMap[x][y+1], TemperatureMap[x+1][y+1], locx, locy);
+			}
+			catch (Exception e){
+				//TODO actually initialize this map
+				return 0;
+			}
 		}
 		catch (Exception e){
 			Globals.reportError("MapFrame", "getTempAtLoc", e);

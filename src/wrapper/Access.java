@@ -1,5 +1,7 @@
 package wrapper;
 
+import java.awt.event.KeyEvent;
+
 import objects.DecimalPoint;
 import rover.RoverObj;
 import map.PlanetParametersList;
@@ -8,8 +10,27 @@ public class Access {
 
 	static Admin CODE = new Admin();
 	
+	public static void beginSimulation(){
+		CODE.beginSimulation();
+	}
+	
 	public static void addRoversToMap(RoverObj[] rovs){ 
 		CODE.GUI.TerrainPnl.setRoverSwarm(rovs);
+	}
+	
+	
+	private static long lastEvent = 0;
+	private static int lastCode = 0;
+	public static void handleGlobalKeyEvent(KeyEvent arg){
+		if (System.currentTimeMillis()-lastEvent > 300 || lastCode != arg.getKeyCode()){
+			lastEvent = System.currentTimeMillis();
+			lastCode = arg.getKeyCode();
+			CODE.GUI.MasterKeyHandler(arg);
+		}
+		else {
+			lastEvent = System.currentTimeMillis();
+			lastCode = arg.getKeyCode();
+		}
 	}
 	
 	public static PlanetParametersList getPlanetParameters(){
@@ -38,5 +59,14 @@ public class Access {
 	
 	public static void requestFocusToMap(){
 		CODE.GUI.TerrainPnl.requestFocus();
+	}
+	
+	public static void toggleHUDonMap(){
+		CODE.GUI.RoverHubPnl.setInHUDMode(!CODE.GUI.RoverHubPnl.isInHUDMode());
+		CODE.GUI.RoverHubPnl.setVisible(!CODE.GUI.RoverHubPnl.isVisible());
+	}
+	
+	public static void setFocusDisplayHUD(int which){
+		CODE.GUI.RoverHubPnl.setfocusedRover(which);
 	}
 }
