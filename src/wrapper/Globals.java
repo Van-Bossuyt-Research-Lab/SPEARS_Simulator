@@ -3,7 +3,6 @@ package wrapper;
 import java.util.Random;
 
 import objects.Queue;
-import objects.Map;
 import objects.ThreadTimer;
 
 public class Globals {
@@ -39,7 +38,12 @@ public class Globals {
 	@SuppressWarnings("unchecked")
 	public static void initalizeLists(String[] IDs){
 		SerialBufferCodes = IDs;
-		SerialBuffers = (Queue<Byte>[])(new Object[0]);
+		SerialBuffers = new Queue[IDs.length];
+		int x = 0;
+		while (x < IDs.length){
+			SerialBuffers[x] = new Queue<Byte>();
+			x++;
+		}
 	}
 	
 	public static void writeToSerial(byte write, String from){ // writes the character to the other 2 buffers

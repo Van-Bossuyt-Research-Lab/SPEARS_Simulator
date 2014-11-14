@@ -108,7 +108,7 @@ public class RoverObj {
 	}
 	
 	public void start(){
-		ThreadTimer codeThread = new ThreadTimer(1, new Runnable(){
+		ThreadTimer codeThread = new ThreadTimer(100, new Runnable(){
 			public void run(){
 				excecuteCode();
 			}

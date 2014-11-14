@@ -12,6 +12,7 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -88,7 +89,9 @@ public class Panel extends JPanel{
 		super.paintComponent(g);
 		try {
 			g.drawImage(resize(background, this.getWidth(), this.getHeight()).getImage(), 0, 0, null);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	protected ImageIcon resize(Icon image, int width, int height) throws Exception {

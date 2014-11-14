@@ -71,14 +71,10 @@ public class RoverHub extends Panel {
 	public RoverHub(Dimension size){
 		super(size, "Rover Hub");
 		
-		standardDisplayLinks = new int[20][numberOfDisplays];
+		standardDisplayLinks = new int[1][numberOfDisplays];
 		int x = 0;
-		while (x < standardDisplayLinks.length){
-			int y = 0;
-			while (y < numberOfDisplays){
-				standardDisplayLinks[x][y] = -1;
-				y++;
-			}
+		while (x < numberOfDisplays){
+			standardDisplayLinks[0][x] = -1;
 			x++;
 		}
 		
@@ -338,6 +334,11 @@ public class RoverHub extends Panel {
 				updateDisplays();
 			}
 		}, ThreadTimer.FOREVER);
+		int x = 0;
+		while (x < rovers.length){
+			rovers[x].start();
+			x++;
+		}
 	}
 	
 	//adds the rover objects to the hub
@@ -418,7 +419,12 @@ public class RoverHub extends Panel {
 							"Air Temperature: " + formatDouble(Access.getMapTemperatureAtPoint(rovers[HUDDisplayLinks[x]].getLocation())) + "*c");
 				}	
 				PageLeftBtn[x].setEnabled(HUDDisplayLinks[x] >= 0 && x != 0);
-				PageRightBtn[x].setEnabled(HUDDisplayLinks[x] < rovers.length-1 && x != 0);			
+				try {
+					PageRightBtn[x].setEnabled(HUDDisplayLinks[x] < rovers.length-1 && x != 0);
+				}
+				catch (Exception e){
+					PageRightBtn[x].setEnabled(false);
+				}
 				if (x+1 == numberOfHUDDisplays){
 					break;
 				}
@@ -469,7 +475,12 @@ public class RoverHub extends Panel {
 							"Air Temperature: " + formatDouble(Access.getMapTemperatureAtPoint(rovers[standardDisplayLinks[currentPage][x]].getLocation())) + "*c");
 				}
 				PageLeftBtn[x].setEnabled(standardDisplayLinks[currentPage][x] >= 0);
-				PageRightBtn[x].setEnabled(standardDisplayLinks[currentPage][x] < rovers.length-1);
+				try {
+					PageRightBtn[x].setEnabled(standardDisplayLinks[currentPage][x] < rovers.length-1);
+				}
+				catch (Exception e){
+					PageRightBtn[x].setEnabled(false);
+				}
 			}
 			x++;
 		}
