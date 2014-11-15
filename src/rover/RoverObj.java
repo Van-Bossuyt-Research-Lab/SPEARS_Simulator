@@ -141,10 +141,10 @@ public class RoverObj {
 			}
 			
 			if (Globals.RFAvailable(IDcode) > 0) { // if there is a message
+				delay(500); // let the full message arrive
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
 															// go is set to false if the first read is not IDcode to prevent starting a message not intened for the rover from within the body of another message
-					delay(500); // let the full message arrive
 					Globals.ReadSerial(IDcode); // white space
 					tag = (char) Globals.ReadSerial(IDcode); // get type tag
 					if (Globals.RFAvailable(IDcode) > 0) { // if there is more to the message
@@ -289,10 +289,9 @@ public class RoverObj {
 					}
 				} 
 				else { // the message wasn't for us
-					delay(300);
 					go = false; // ignore it
 					int waiting = Globals.RFAvailable(IDcode);
-					while (waiting >= 0) { // delete it
+					while (waiting > 0) { // delete it
 						Globals.ReadSerial(IDcode);
 						waiting--;
 					}
@@ -394,13 +393,13 @@ public class RoverObj {
 							else if (cmd.equals("photo")) {
 								takePicture();
 							}
-							else if (cmd.equals("recTemp")){ // record temperature
+							else if (strcmp(cmd, "recTemp") == 0){ // record temperature
 								if (temperatureData.equals("")){ // if there is not an existing "file," create one
 						    		temperatureData += "Graph Title,Temperatures," + "Vertical Units,*C," + "Horizontal Units,s," + "Label,\nSys Time,Temperature,";
 						    	}
 						    	temperatureData += Globals.TimeMillis + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
 						    }
-						    else if (cmd.equals("sendTemp")){ // report temperature
+						    else if (strcmp(cmd, "sendTemp") == 0){ // report temperature
 						    	sendSerial("s r }"); // mute the ground so they can't interrupt
 						    	delay(2000);
 						    	sendSerial("s c CSV"); // tell the satellite a file is coming
@@ -417,11 +416,11 @@ public class RoverObj {
 						    	}
 						    	temperatureData = ""; // delete existing "file"
 						    }
-						    else if (cmd.equals("delay1")) { // wait a second
+						    else if (strcmp(cmd, "delay1") == 0) { // wait a second
 						    	waiting = true;
 								cmdWaitTime = Globals.TimeMillis;
 							}
-							else if (cmd.equals("report")) { // report completion of instructions to ground
+							else if (strcmp(cmd, "report") == 0) { // report completion of instructions to ground
 								if (sendSerial("s r n Rover Instructs Done")) { // if we're not muted
 									hasInstructions = false; // we no longer have instructions
 									instructsComplete = 0;
@@ -480,6 +479,102 @@ public class RoverObj {
 				//GUI.InstructionsLED.setSelected(false);
 				// TODO Autonomous
 				
+				String cmd = autoCode.nextCommand(
+						Globals.TimeMillis,
+						getAcceleration(),
+						getAngularAcceleration(),
+						getWheelSpeed(FL),
+						getWheelSpeed(FR),
+						getWheelSpeed(BL),
+						getWheelSpeed(BR),
+						getMotorCurrent(FL),
+						getMotorCurrent(FR),
+						getMotorCurrent(BL),
+						getMotorCurrent(BR),
+						getMotorTemp(FL),
+						getMotorTemp(FR),
+						getMotorTemp(BL),
+						getMotorTemp(BR),
+						getBatteryVoltage(),
+						getBatteryCurrent(),
+						getBatteryTemperature()
+				);
+				// switch all known commands
+				if (strcmp(cmd, "move") == 0) {
+					driveForward();
+					moving = true;
+					motorState = cmd;
+				} 
+				else if (strcmp(cmd, "backward") == 0) {
+					driveBackward();
+					moving = true;
+					motorState = cmd;
+				} 
+				else if (strcmp(cmd, "spin_cw") == 0) {
+					driveSpinCW();
+					moving = true;
+					motorState = cmd;
+				} 
+				else if (strcmp(cmd, "spin_ccw") == 0) {
+					driveSpinCCW();
+					moving = true;
+					motorState = cmd;
+				} 
+				else if (strcmp(cmd, "stop") == 0) {
+					driveStop();
+					moving = false;
+				}
+				else if (strcmp(cmd, "turnFL") == 0){
+					driveTurnFL();
+					moving = true;
+					motorState = cmd;
+				}
+				else if (strcmp(cmd, "turnFR") == 0){
+					driveTurnFR();
+					moving = true;
+					motorState = cmd;
+				}
+				else if (strcmp(cmd, "turnBL") == 0){
+					driveTurnBL();
+					moving = true;
+					motorState = cmd;
+				}
+				else if (strcmp(cmd, "turnBR") == 0){
+					driveTurnBR();
+					moving = true;
+					motorState = cmd;
+				}
+				else if (cmd.equals("photo")) {
+					takePicture();
+				}
+				else if (strcmp(cmd, "recTemp") == 0){ // record temperature
+					if (temperatureData.equals("")){ // if there is not an existing "file," create one
+			    		temperatureData += "Graph Title,Temperatures," + "Vertical Units,*C," + "Horizontal Units,s," + "Label,\nSys Time,Temperature,";
+			    	}
+			    	temperatureData += Globals.TimeMillis + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
+			    }
+			    else if (strcmp(cmd, "sendTemp") == 0){ // report temperature
+			    	sendSerial("s r }"); // mute the ground so they can't interrupt
+			    	delay(2000);
+			    	sendSerial("s c CSV"); // tell the satellite a file is coming
+			    	delay(2000);
+			    	int i = 0;
+			    	while (i < temperatureData.length()) { // send the file in 60 byte chunks
+			    		index = 0;
+			    		while (index < 60 && i < temperatureData.length()){
+			    			sendSerial(temperatureData.charAt(i));
+			    			index++;
+			    			i++;
+			    		}
+			    		delay(2000); // synocpation
+			    	}
+			    	temperatureData = ""; // delete existing "file"
+			    }
+			    else if (strcmp(cmd, "delay1") == 0) { // wait a second
+			    	waiting = true;
+					cmdWaitTime = Globals.TimeMillis;
+				}
+				
 				/*if (Globals.TimeMillis >= autoWaitUntil){
 					driveSpinCCW();
 					// EOL Calculation
@@ -489,7 +584,7 @@ public class RoverObj {
 				}
 				else {
 					//System.out.println(Globals.TimeMillis + " < " + autoWaitUntil);
-				}*/
+				}
 				
 				if (Globals.TimeMillis - this.lastLogWrite > 10*60*1000){
 					Globals.writeToLogFile("Autonomus", "Battery Voltage = " + getBatteryVoltage() + " V\t\tSOC = " + getSOC() + "%");
@@ -518,7 +613,7 @@ public class RoverObj {
 						driveForward();
 						autoWaitUntil = Globals.TimeMillis + 4*1000;
 					}							
-				}
+				}*/
 				
 			}
 
@@ -538,6 +633,7 @@ public class RoverObj {
 		} catch (Exception e) {
 			// something went wrong
 			System.out.println("Error in Rover Run Code");
+			e.printStackTrace();
 			Globals.reportError("RoverCode", "runCode - code", e);
 		}
 	}
@@ -733,9 +829,9 @@ public class RoverObj {
 	}
 	
 	private char[] strcat(char[] first, char[] second){
-		char[] out = new char[first.length + second.length];
+		char[] out = new char[first.length + second.length - 1];
 		int x = 0;
-		while (x < first.length){
+		while (x < first.length - 1){
 			out[x] = first[x];
 			x++;
 		}
@@ -760,16 +856,18 @@ public class RoverObj {
 	private char[] strcat(char[] first, char second){
 		char[] out = new char[first.length + 1];
 		int x = 0;
-		while (x < first.length){
+		while (x < first.length-1){
 			out[x] = first[x];
 			x++;
 		}
 		out[x] = second;
+		x++;
+		out[x] = '\0';
 		return out;
 	}
 	
 	private char[] strcat(char first, char second){
-		return new char[] { first, second };
+		return new char[] { first, second, '\0' };
 	}
 	
 	private int strcmp(String first, String second){ // see if 2 strings are equal
@@ -824,9 +922,9 @@ public class RoverObj {
 			slip_acceleration = (-params.getfriction_gr()*slip_velocity*4 - params.getrover_mass()*Access.getPlanetParameters().getgrav_accel()*Math.sin(Access.getMapCrossSlopeAtPoint(location, direction)) / params.getrover_mass());
 			slip_velocity += slip_acceleration * time_step;
 			// Calculate new location
-			location.offset(speed*time_step*Math.cos(direction), speed*time_step*(Math.sin(direction)));
+			location.offsetThis(speed*time_step*Math.cos(direction), speed*time_step*(Math.sin(direction)));
 			//TODO													  + here??
-			location.offset(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
+			location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
 			direction += angular_velocity*time_step;
 			// report new location to map
 			Access.updateRoverLocation(name, location, direction);

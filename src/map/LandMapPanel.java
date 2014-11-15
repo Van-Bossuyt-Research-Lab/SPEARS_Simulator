@@ -41,6 +41,7 @@ public class LandMapPanel extends Panel{
 	public LandMapPanel(Dimension size, PlanetParametersList params){
 		super(size, "Terrain View");
 		setBackground(Color.GRAY);
+		super.hasImage = false;
 		
 		roverIcons = new RoverIcon[0];
 		this.params = params;
@@ -203,7 +204,7 @@ public class LandMapPanel extends Panel{
 	
 	//returns the array point in which the map location falls
 	private Point getMapSquare(DecimalPoint loc){ // says which display square a given coordinate falls in
-		int shift = HeightMap.getWidth()/HeightMap.getResolution() / (HeightMap.getDetail() * 2);
+		double shift = HeightMap.getWidth()/HeightMap.getResolution() / 2.0;
 		double x = loc.getX() + shift;
 		double y = shift - loc.getY();
 		int outx = (int)(x*HeightMap.getDetail());

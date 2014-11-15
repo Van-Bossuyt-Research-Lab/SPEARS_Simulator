@@ -133,4 +133,13 @@ public class Globals {
 		return Math.round((measurement + deviation)*1000)/1000;
 	}
 	
+	private static void printBuffers(){
+		int x = 0;
+		while (x < SerialBuffers.length){
+			System.out.println(SerialBufferCodes[x] + ": " + SerialBuffers[x].toString());
+			x++;
+		}
+		System.out.println("\n\n");
+	}
+	
 }

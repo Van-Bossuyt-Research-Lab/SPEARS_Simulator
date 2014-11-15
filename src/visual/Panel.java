@@ -29,6 +29,7 @@ public class Panel extends JPanel{
 	private ImageButton exitBtn;
 	private ImageButton minimizeBtn;
 	protected ImageIcon background;
+	protected boolean hasImage = false;
 	
 	public Panel(Dimension size, String title){
 		super.setName(title);
@@ -87,10 +88,12 @@ public class Panel extends JPanel{
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		try {
-			g.drawImage(resize(background, this.getWidth(), this.getHeight()).getImage(), 0, 0, null);
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (hasImage){
+			try {
+				g.drawImage(resize(background, this.getWidth(), this.getHeight()).getImage(), 0, 0, null);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -108,6 +111,7 @@ public class Panel extends JPanel{
 	
 	public void setImage(ImageIcon icon){
 		background = icon;
+		hasImage = !icon.equals(null);
 	}
 	
 	public ImageIcon getImage(){

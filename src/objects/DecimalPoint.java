@@ -37,6 +37,11 @@ public class DecimalPoint {
 		return (int)Math.round(y);
 	}
 	
+	public void offsetThis(double x, double y){
+		this.x += x;
+		this.y += y;
+	}
+	
 	public DecimalPoint offset(double x, double y){
 		return new DecimalPoint(this.x+x, this.y+y);
 	}

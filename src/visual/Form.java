@@ -206,6 +206,8 @@ public class Form extends JFrame {
 				switch (arg0.getKeyCode()){
 				case KeyEvent.VK_RIGHT:
 					TerrainPnl.setVisible(false);
+					RoverHubPnl.setInHUDMode(false);
+					RoverHubPnl.setVisible(false);
 					WrapperPnl.setVisible(true);
 					WrapperPnl.requestFocus();
 					currentPage = WRAPPER;
@@ -219,6 +221,8 @@ public class Form extends JFrame {
 					break;
 				case KeyEvent.VK_UP:
 					TerrainPnl.setVisible(false);
+					RoverHubPnl.setInHUDMode(false);
+					RoverHubPnl.setVisible(false);
 					InterfacePnl.setVisible(true);
 					InterfacePnl.requestFocus();
 					currentPage = INTERFACE;

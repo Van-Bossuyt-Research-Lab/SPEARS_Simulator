@@ -12,12 +12,12 @@ public class Map < KeyType extends Object, ItemType extends Object >{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void push(KeyType key, ItemType item){
+	public void add(KeyType key, ItemType item){
 		keys = (KeyType[]) augment(keys, key);
 		items = (ItemType[]) augment(items, item);
 	}
 	
-	public ItemType pull(KeyType key){
+	public ItemType get(KeyType key){
 		for (int x = 0; x < keys.length; x++){
 			if (key.equals(keys[x])){
 				return items[x];
@@ -27,17 +27,13 @@ public class Map < KeyType extends Object, ItemType extends Object >{
 	}
 	
 	public void set(KeyType key, ItemType item){
-		for (int x = 0; x < keys.length; x++){
-			if (key.equals(keys[x])){
-				items[x] = item;
-			}
-		}
+		//set
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void remove(KeyType key){
 		try {
-			items = (ItemType[]) remove(items, pull(key));
+			items = (ItemType[]) remove(items, get(key));
 			keys = (KeyType[]) remove(keys, key);
 		} catch (NullPointerException e) {}
 	}

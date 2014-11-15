@@ -14,10 +14,16 @@ public class Queue < Type extends Object >{
 	}
 	
 	public Type peek(){
+		if (isEmpty()){
+			return null;
+		}
 		return array[0];
 	}
 	
 	public Type pop(){
+		if (isEmpty()){
+			return null;
+		}
 		Type out = array[0];
 		array = diminish(array);
 		return out;
@@ -33,6 +39,9 @@ public class Queue < Type extends Object >{
 	
 	@Override
 	public String toString(){
+		if (isEmpty()){
+			return "Queue Empty";
+		}
 		String out = "FOQ <";
 		int x = 0;
 		while (x < size()-1){

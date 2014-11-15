@@ -425,7 +425,7 @@ public class InterfaceCode {
 				Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "You are not Connected.\n");
 			}
 			//writeToSerial("s g " + Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText());
-			writeToSerial(Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText());
+			writeToSerial(Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText(), true);
             Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText() + "\"\n");
             listenForSignal("g #", new Runnable(){
 				public void run(){

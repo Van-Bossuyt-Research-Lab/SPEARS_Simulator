@@ -1,5 +1,7 @@
 package objects;
 
+import wrapper.Globals;
+
 public class ThreadTimer extends Thread {
 
 	private double delay;
@@ -19,12 +21,12 @@ public class ThreadTimer extends Thread {
 	public void run(){
 		while (actions > 0 || forever){
 //			long start = System.nanoTime();
-//			while (((System.nanoTime()-start) < (delay/Globals.getTimeScale())) && !isInterrupted()) {}
+//			while (((System.nanoTime()-start) < (delay/Globals.getTimeScale())*1000000) && !isInterrupted()) {}
 //			if (isInterrupted()){
 //				return;
 //			}
 			try{
-				//Thread.sleep((long)(delay/Globals.getTimeScale()), (int)((delay/Globals.getTimeScale()-(int)(delay/Globals.getTimeScale()))*1000000));
+				Thread.sleep((long)(delay/Globals.getTimeScale()), (int)((delay/Globals.getTimeScale()-(int)(delay/Globals.getTimeScale()))*1000000));
 			} 
 			catch (Exception e) {
 				return;
