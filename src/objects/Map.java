@@ -1,6 +1,6 @@
 package objects;
 
-public class Map < KeyType extends Object, ItemType extends Object >{
+public class Map < KeyType, ItemType >{
 	
 	private KeyType[] keys;
 	private ItemType[] items;
@@ -13,8 +13,13 @@ public class Map < KeyType extends Object, ItemType extends Object >{
 	
 	@SuppressWarnings("unchecked")
 	public void add(KeyType key, ItemType item){
-		keys = (KeyType[]) augment(keys, key);
-		items = (ItemType[]) augment(items, item);
+		if (!contains(key)){
+			keys = (KeyType[]) augment(keys, key);
+			items = (ItemType[]) augment(items, item);
+		}
+		else {
+			set(key, item);
+		}
 	}
 	
 	public ItemType get(KeyType key){
@@ -27,7 +32,33 @@ public class Map < KeyType extends Object, ItemType extends Object >{
 	}
 	
 	public void set(KeyType key, ItemType item){
-		//set
+		int x = 0;
+		while (x < keys.length){
+			if (keys[x].equals(key)){
+				items[x] = item;
+				break;
+			}
+			x++;
+		}
+	}
+	
+	public boolean contains(KeyType key){
+		int x = 0;
+		while (x < keys.length){
+			if (keys[x].equals(key)){
+				return true;
+			}
+			x++;
+		}
+		return false;
+	}
+	
+	public KeyType[] getKeys(){
+		return keys;
+	}
+	
+	public ItemType[] getValues(){
+		return items;
 	}
 	
 	@SuppressWarnings("unchecked")

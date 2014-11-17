@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 
 import objects.ThreadTimer;
 import objects.ZDate;
+import objects.Map;
 import wrapper.Access;
 import wrapper.Globals;
 
@@ -24,6 +25,8 @@ public class InterfaceCode {
 	private int connectionTime = 0;
 	private int countSec = 0;
 	private boolean Connected = false;
+	private Map<String, String> roverNames;
+	private Map<String, String> satelliteNames;
 	public boolean muted = false;
 	private Runnable confirmMessage;
 	private Runnable failMessage;
@@ -173,7 +176,7 @@ public class InterfaceCode {
 	
 	public void pingRover(){
 		Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Pinging Rover...\n");
-		writeToSerial("s g ^", true);
+		writeToSerial(tagMessage("^", 'r'), true);
 		listenForSignal("g ^", new Runnable(){
 			public void run(){
 				Connected = true;
@@ -192,7 +195,12 @@ public class InterfaceCode {
 		10);
 	}
 	
-		
+	public void setCallTags(Map<String, String> rover, Map<String, String> satellite){
+		roverNames = rover;
+		satelliteNames = satellite;
+		Access.CODE.GUI.InterfacePnl.setNamesLists(rover.getKeys(), satellite.getKeys());
+	}
+	
 	// COM CONNECTION STUFF
 	
 	public void resetConnection(){
@@ -247,6 +255,18 @@ public class InterfaceCode {
 		}
 	}
 	
+	private String tagMessage(String mess, char which){
+		if (which == 'r'){
+			return satelliteNames.get((String)Access.CODE.GUI.InterfacePnl.SatSelectionCombo.getSelectedItem()) + " " + roverNames.get((String)Access.CODE.GUI.InterfacePnl.RoverSelectionCombo.getSelectedItem()) + " " + mess;
+		}
+		else if (which == 's'){
+			return satelliteNames.get((String)Access.CODE.GUI.InterfacePnl.SatSelectionCombo.getSelectedItem()) + " c " + mess;
+		}
+		else {
+			return mess;
+		}
+	}
+	
 	public void updateSerialCom(){
 		if (!receivingFile){
 			char[] input = readFromSerial().toCharArray();
@@ -280,7 +300,7 @@ public class InterfaceCode {
 					}
 					else if (input[2] == '*'){
 						Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "The rover has pinged the ground station.\n");
-						writeToSerial("s g *");
+						writeToSerial(tagMessage("*", 'r'));
 					}
 				}
 				else {
@@ -384,7 +404,7 @@ public class InterfaceCode {
 			if (!actionCommands[section][which].equals("")){
 	            Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + actionCommands[section][which] + "\"\n");
 				if (section == 0){
-					writeToSerial("s g " + actionCommands[section][which]);
+					writeToSerial(tagMessage(actionCommands[section][which], 'r'));
 					listenForSignal("g #", new Runnable(){
 						public void run(){
 							listenForSignal("g %", new Runnable(){
@@ -404,7 +424,7 @@ public class InterfaceCode {
 					}, 4);
 				}
 				else {
-					writeToSerial("s c " + actionCommands[section][which]);
+					writeToSerial(tagMessage(actionCommands[section][which], 's'));
 					listenForSignal("g #", new Runnable(){
 						public void run(){
 							new ThreadTimer(0, confirmMessage, 1);
@@ -424,7 +444,7 @@ public class InterfaceCode {
 			if (!Connected){
 				Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "You are not Connected.\n");
 			}
-			//writeToSerial("s g " + Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText());
+			//writeToSerial(tagMessage(Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText(), 'r'));
 			writeToSerial(Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText(), true);
             Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText() + "\"\n");
             listenForSignal("g #", new Runnable(){
@@ -457,7 +477,7 @@ public class InterfaceCode {
 	
 	public void sendSatCommand(){
 		if (!Access.CODE.GUI.InterfacePnl.SatSendTxt.getText().equals("")){
-			writeToSerial("s c " + Access.CODE.GUI.InterfacePnl.SatSendTxt.getText());
+			writeToSerial(tagMessage(Access.CODE.GUI.InterfacePnl.SatSendTxt.getText(), 's'));
             Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + Access.CODE.GUI.InterfacePnl.SatSendTxt.getText() + "\"\n");
 			listenForSignal("g #", new Runnable(){
 				public void run(){
@@ -1090,7 +1110,7 @@ public class InterfaceCode {
 	// INSTRUCTION STUFF
 	
 	public void cancelInstructions(){
-		writeToSerial("s !instructs");
+		writeToSerial(tagMessage("!instructs", 's'));
         Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Canceling Instructions...");
 		listenForSignal("g KillDone", new Runnable(){
 			public void run(){
@@ -1210,9 +1230,9 @@ public class InterfaceCode {
 		Access.CODE.GUI.InterfacePnl.InstructionsList.setValues(new String[0]);
 		Access.CODE.GUI.InterfacePnl.InstructionsSubmitBtn.setEnabled(false);
 		Access.CODE.GUI.InterfacePnl.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-		writeToSerial("s g }");
+		writeToSerial(tagMessage("}", 'r'));
 		delay(2000);
-		writeToSerial("s c instructions");
+		writeToSerial(tagMessage("instructions", 's'));
 		delay(1000);
 		char[] instructChars = out.toCharArray();
 		int x = 0;

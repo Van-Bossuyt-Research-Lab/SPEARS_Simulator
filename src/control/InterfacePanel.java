@@ -4,11 +4,8 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.SystemColor;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -17,8 +14,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -26,7 +21,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -49,8 +43,6 @@ import wrapper.Globals;
 
 public class InterfacePanel extends Panel{
 
-private Point FrameLocation = new Point(0, 0);
-	
 	JPanel ProgramBtnsPnl;
 		ImageButton LinkBtn;
 		ImageButton PingBtn;
@@ -59,7 +51,7 @@ private Point FrameLocation = new Point(0, 0);
 		ImageButton CommentBtn;
 		ImageButton OptionsBtn;
 		ImageButton FolderBtn;
-		JComboBox PortSelectCombo;
+		JComboBox<String> PortSelectCombo;
 		JLabel MuteIcon;
 	JPanel StatusPnl;
 		JLabel StatusSatPowerLbl;
@@ -71,7 +63,9 @@ private Point FrameLocation = new Point(0, 0);
 		JLabel StatusArmPowerLbl;
 		JProgressBar StatusArmPower;
 	JPanel RoverBtnsPnl;
-		ImageButton[] RoverBtns = new ImageButton[10];
+		JLabel RoverSelectionLbl;
+		JComboBox<String> RoverSelectionCombo;
+		ImageButton[] RoverBtns = new ImageButton[18];
 		JLabel RoverSendLbl;
 		JTextField RoverSendTxt;
 		JButton RoverSendBtn;
@@ -81,7 +75,9 @@ private Point FrameLocation = new Point(0, 0);
 		JLabel RoverPageLeftBtn;
 		JLabel RoverPageRightBtn;
 		JLabel RoverPageLbl;
-	JPanel SatiliteBtnsPnl;
+	JPanel SatelliteBtnsPnl;
+		JLabel SatSelectionLbl;
+		JComboBox<String> SatSelectionCombo;
 		ImageButton[] SatBtns = new ImageButton[RoverBtns.length];
 		JLabel SatSendLbl;
 		JTextField SatSendTxt;
@@ -257,10 +253,10 @@ private Point FrameLocation = new Point(0, 0);
 		});
 		ProgramBtnsPnl.add(FolderBtn);
 		
-		PortSelectCombo = new JComboBox();
+		PortSelectCombo = new JComboBox<String>();
 		PortSelectCombo.setMaximumRowCount(20);
 		PortSelectCombo.setFont(new Font("OCR B MT", Font.BOLD, 13));
-		PortSelectCombo.setModel(new DefaultComboBoxModel(new String[] {"COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "COM10", "COM11", "COM12", "COM13", "COM14", "COM15", "COM16", "COM17", "COM18", "COM19", "COM20"}));
+		PortSelectCombo.setModel(new DefaultComboBoxModel<String>(new String[] {"COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "COM10", "COM11", "COM12", "COM13", "COM14", "COM15", "COM16", "COM17", "COM18", "COM19", "COM20"}));
 		PortSelectCombo.setSelectedIndex(12);
 		PortSelectCombo.setBounds(570, 20, 85, 20);
 		PortSelectCombo.addActionListener(new ActionListener() {
@@ -313,6 +309,18 @@ private Point FrameLocation = new Point(0, 0);
 		RoverBtnsPnl.setBounds(10, 107, 665, 106);
 		this.add(RoverBtnsPnl);
 		RoverBtnsPnl.setLayout(null);
+		
+		RoverSelectionLbl = new JLabel("Select Active Rover:");
+		RoverSelectionLbl.setForeground(Color.WHITE);
+		RoverSelectionLbl.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
+		RoverSelectionLbl.setSize((int) RoverSelectionLbl.getPreferredSize().getWidth(), 20);
+		RoverBtnsPnl.add(RoverSelectionLbl);
+		
+		RoverSelectionCombo = new JComboBox<String>();
+		RoverSelectionCombo.setMaximumRowCount(20);
+		RoverSelectionCombo.setFont(new Font("OCR B MT", Font.BOLD, 13));
+		RoverSelectionCombo.setBounds(570, 20, 175, 20);
+		RoverBtnsPnl.add(RoverSelectionCombo);
 		
 		RoverSendLbl = new JLabel("Send Command:");
 		RoverSendLbl.setForeground(Color.WHITE);
@@ -427,7 +435,7 @@ private Point FrameLocation = new Point(0, 0);
 		int x = 0;
 		while (x < RoverBtns.length){
 			RoverBtns[x] = new ImageButton();
-			RoverBtns[x].setBounds(10 + 65 * x, 20, 55, 55);
+			RoverBtns[x].setBounds(10 + 65 * x, 20, 70, 70);
 			RoverBtns[x].setEnabled(false);
 			RoverBtns[x].setHorizontalTextPosition(SwingConstants.CENTER);
 			RoverBtns[x].setIcon(null);
@@ -445,18 +453,30 @@ private Point FrameLocation = new Point(0, 0);
 			x++;
 		}
 		
-		SatiliteBtnsPnl = new JPanel();
-		SatiliteBtnsPnl.setOpaque(false);
-		SatiliteBtnsPnl.setBounds(10, 224, 665, 123);
-		SatiliteBtnsPnl.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(192, 192, 192)), "Satellite Controls", TitledBorder.LEADING, TitledBorder.TOP, new Font("Iskoola Pota", Font.BOLD, 16), Color.WHITE));
-		SatiliteBtnsPnl.setLayout(null);
-		this.add(SatiliteBtnsPnl);
+		SatelliteBtnsPnl = new JPanel();
+		SatelliteBtnsPnl.setOpaque(false);
+		SatelliteBtnsPnl.setBounds(10, 224, 665, 123);
+		SatelliteBtnsPnl.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(192, 192, 192)), "Satellite Controls", TitledBorder.LEADING, TitledBorder.TOP, new Font("Iskoola Pota", Font.BOLD, 16), Color.WHITE));
+		SatelliteBtnsPnl.setLayout(null);
+		this.add(SatelliteBtnsPnl);
+		
+		SatSelectionLbl = new JLabel("Select Active Satellite:");
+		SatSelectionLbl.setForeground(Color.WHITE);
+		SatSelectionLbl.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
+		SatSelectionLbl.setSize((int) SatSelectionLbl.getPreferredSize().getWidth(), 20);
+		SatelliteBtnsPnl.add(SatSelectionLbl);
+		
+		SatSelectionCombo = new JComboBox<String>();
+		SatSelectionCombo.setMaximumRowCount(20);
+		SatSelectionCombo.setFont(new Font("OCR B MT", Font.BOLD, 13));
+		SatSelectionCombo.setBounds(570, 20, 175, 20);
+		SatelliteBtnsPnl.add(SatSelectionCombo);
 		
 		SatSendLbl = new JLabel("Send Command:");
 		SatSendLbl.setForeground(Color.WHITE);
 		SatSendLbl.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		SatSendLbl.setBounds(10, 92, 93, 14);
-		SatiliteBtnsPnl.add(SatSendLbl);
+		SatelliteBtnsPnl.add(SatSendLbl);
 		
 		SatSendTxt = new JTextField();
 		SatSendTxt.addKeyListener(new KeyAdapter() {
@@ -470,7 +490,7 @@ private Point FrameLocation = new Point(0, 0);
 		SatSendTxt.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		SatSendTxt.setColumns(10);
 		SatSendTxt.setBounds(113, 88, 200, 23);
-		SatiliteBtnsPnl.add(SatSendTxt);
+		SatelliteBtnsPnl.add(SatSendTxt);
 		
 		SatSendBtn = new JButton("Send");
 		SatSendBtn.addActionListener(new ActionListener() {
@@ -481,7 +501,7 @@ private Point FrameLocation = new Point(0, 0);
 		SatSendBtn.setOpaque(false);
 		SatSendBtn.setFont(new Font("Lucida Sans Unicode", Font.PLAIN, 12));
 		SatSendBtn.setBounds(314, 89, 86, 23);
-		SatiliteBtnsPnl.add(SatSendBtn);
+		SatelliteBtnsPnl.add(SatSendBtn);
 		
 		SatAddLink = new JLabel("<HTML><U>Add</U></HTML>");
 		SatAddLink.addMouseListener(new MouseAdapter() {
@@ -494,7 +514,7 @@ private Point FrameLocation = new Point(0, 0);
 		SatAddLink.setForeground(Color.LIGHT_GRAY);
 		SatAddLink.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		SatAddLink.setBounds(548, 97, 22, 14);
-		SatiliteBtnsPnl.add(SatAddLink);
+		SatelliteBtnsPnl.add(SatAddLink);
 		
 		SatEditLink = new JLabel("<HTML><U>Edit</U></HTML>");
 		SatEditLink.addMouseListener(new MouseAdapter() {
@@ -507,7 +527,7 @@ private Point FrameLocation = new Point(0, 0);
 		SatEditLink.setForeground(Color.LIGHT_GRAY);
 		SatEditLink.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		SatEditLink.setBounds(580, 97, 22, 14);
-		SatiliteBtnsPnl.add(SatEditLink);
+		SatelliteBtnsPnl.add(SatEditLink);
 		
 		SatDeleteLink = new JLabel("<HTML><U>Delete</U></HTML>");
 		SatDeleteLink.addMouseListener(new MouseAdapter() {
@@ -520,7 +540,7 @@ private Point FrameLocation = new Point(0, 0);
 		SatDeleteLink.setForeground(Color.LIGHT_GRAY);
 		SatDeleteLink.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		SatDeleteLink.setBounds(612, 97, 43, 14);
-		SatiliteBtnsPnl.add(SatDeleteLink);
+		SatelliteBtnsPnl.add(SatDeleteLink);
 		
 		SatPageLeftBtn = new JLabel("");
 		SatPageLeftBtn.addMouseListener(new MouseAdapter() {
@@ -536,7 +556,7 @@ private Point FrameLocation = new Point(0, 0);
 		SatPageLeftBtn.setHorizontalAlignment(SwingConstants.CENTER);
 		SatPageLeftBtn.setEnabled(false);
 		SatPageLeftBtn.setBounds(435, 92, 34, 18);
-		SatiliteBtnsPnl.add(SatPageLeftBtn);
+		SatelliteBtnsPnl.add(SatPageLeftBtn);
 		
 		SatPageRightBtn = new JLabel("");
 		SatPageRightBtn.addMouseListener(new MouseAdapter() {
@@ -551,19 +571,19 @@ private Point FrameLocation = new Point(0, 0);
 		SatPageRightBtn.setHorizontalTextPosition(SwingConstants.CENTER);
 		SatPageRightBtn.setHorizontalAlignment(SwingConstants.CENTER);
 		SatPageRightBtn.setBounds(479, 93, 34, 18);
-		SatiliteBtnsPnl.add(SatPageRightBtn);
+		SatelliteBtnsPnl.add(SatPageRightBtn);
 		
 		SatPageLbl = new JLabel("1 / 4");
 		SatPageLbl.setHorizontalAlignment(SwingConstants.CENTER);
 		SatPageLbl.setForeground(Color.WHITE);
 		SatPageLbl.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		SatPageLbl.setBounds(491, 88, 51, 18);
-		SatiliteBtnsPnl.add(SatPageLbl);
+		SatelliteBtnsPnl.add(SatPageLbl);
 		
 		x = 0;
 		while (x < SatBtns.length){
 			SatBtns[x] = new ImageButton();
-			SatBtns[x].setBounds(10 + 65 * x, 20, 55, 55);
+			SatBtns[x].setBounds(10 + 80 * x, 20, 70, 70);
 			SatBtns[x].setEnabled(false);
 			SatBtns[x].setHorizontalTextPosition(SwingConstants.CENTER);
 			SatBtns[x].setIcon(null);
@@ -577,7 +597,7 @@ private Point FrameLocation = new Point(0, 0);
 					}
 				}
 			});
-			SatiliteBtnsPnl.add(SatBtns[x]);
+			SatelliteBtnsPnl.add(SatBtns[x]);
 			x++;
 		}
 		
@@ -874,12 +894,19 @@ private Point FrameLocation = new Point(0, 0);
 		StatusPnl.add(StatusArmPower);
 	}
 	
+	public void setNamesLists(Object[] rovers, Object[] sats){
+		RoverSelectionCombo.setModel(new DefaultComboBoxModel(rovers));
+		SatSelectionCombo.setModel(new DefaultComboBoxModel(sats));
+	}
+	
 	private void alignComponents(){
 		SerialDisplayScroll.setSize(getWidth() / 4, getHeight() - 10 - super.getTopOfPage());
 		SerialDisplayScroll.setLocation(getWidth() - 10 - SerialDisplayScroll.getWidth(), super.getTopOfPage());
 		VersionLbl.setLocation((getWidth() - VersionLbl.getWidth()) / 2, getHeight() - VersionLbl.getHeight() - 3);
 		
-		RoverBtnsPnl.setBounds(10, ProgramBtnsPnl.getHeight() + 20, (SerialDisplayScroll.getX() - 20), 20 + RoverBtns[0].getHeight() + 10 + RoverSendTxt.getHeight() + 10);
+		RoverBtnsPnl.setBounds(10, ProgramBtnsPnl.getHeight() + 20, (SerialDisplayScroll.getX() - 20), 20 + RoverSelectionCombo.getHeight() + 10 + RoverBtns[0].getHeight() + 10 + RoverSendTxt.getHeight() + 10);
+		RoverSelectionCombo.setLocation(150, 20);
+		RoverSelectionLbl.setLocation(RoverSelectionCombo.getX() - 5 - RoverSelectionLbl.getWidth(), RoverSelectionCombo.getY());
 		RoverSendLbl.setLocation(10, RoverBtnsPnl.getHeight() - 10 - RoverSendTxt.getHeight() + 4);
 		RoverSendTxt.setLocation(10 + RoverSendLbl.getWidth() + 5, (RoverSendLbl.getY() - 4));
 		RoverSendBtn.setLocation((RoverSendTxt.getX() + RoverSendTxt.getWidth() + 3), RoverSendTxt.getY());
@@ -890,26 +917,28 @@ private Point FrameLocation = new Point(0, 0);
 		RoverPageLeftBtn.setLocation((RoverPageRightBtn.getX() - RoverPageLeftBtn.getWidth()), RoverPageRightBtn.getY());
 		RoverPageLbl.setLocation((int)((RoverAddLink.getX() - RoverSendBtn.getX() - RoverSendBtn.getWidth()) * 2 / 3 + RoverSendBtn.getX() + RoverSendBtn.getWidth()), RoverPageRightBtn.getY());
 		
-		SatiliteBtnsPnl.setBounds(10, 10 + ProgramBtnsPnl.getHeight() + 10 + RoverBtnsPnl.getHeight() + 10, RoverBtnsPnl.getWidth(), 20 + SatBtns[0].getHeight() + 10 + SatSendTxt.getHeight() + 10);
-		SatSendLbl.setLocation(10, SatiliteBtnsPnl.getHeight() - 10 - SatSendTxt.getHeight() + 4);
+		SatelliteBtnsPnl.setBounds(10, 10 + ProgramBtnsPnl.getHeight() + 10 + RoverBtnsPnl.getHeight() + 10, RoverBtnsPnl.getWidth(), 20 + SatSelectionCombo.getHeight() + 10 + SatBtns[0].getHeight() + 10 + SatSendTxt.getHeight() + 10);
+		SatSelectionCombo.setLocation(150, 20);
+		SatSelectionLbl.setLocation(SatSelectionCombo.getX() - 5 - SatSelectionLbl.getWidth(), SatSelectionCombo.getY());
+		SatSendLbl.setLocation(10, SatelliteBtnsPnl.getHeight() - 10 - SatSendTxt.getHeight() + 4);
 		SatSendTxt.setLocation(10 + SatSendLbl.getWidth() + 5, (SatSendLbl.getY() - 4));
 		SatSendBtn.setLocation((SatSendTxt.getX() + SatSendTxt.getWidth() + 3), SatSendTxt.getY());
-		SatDeleteLink.setLocation(SatiliteBtnsPnl.getWidth() - 10 - SatDeleteLink.getWidth(), SatSendLbl.getY());
+		SatDeleteLink.setLocation(SatelliteBtnsPnl.getWidth() - 10 - SatDeleteLink.getWidth(), SatSendLbl.getY());
 		SatEditLink.setLocation((SatDeleteLink.getX() - 10 - SatEditLink.getWidth()), SatSendLbl.getY());
 		SatAddLink.setLocation((SatEditLink.getX() - 10 - SatAddLink.getWidth()), SatSendLbl.getY());
 		SatPageRightBtn.setLocation((int)((SatAddLink.getX() - SatSendBtn.getX() - SatSendBtn.getWidth()) / 3 + SatSendBtn.getX() + SatSendBtn.getWidth()), SatAddLink.getY());
 		SatPageLeftBtn.setLocation((SatPageRightBtn.getX() - SatPageLeftBtn.getWidth()), SatPageRightBtn.getY());
 		SatPageLbl.setLocation((int)((SatAddLink.getX() - SatSendBtn.getX() - SatSendBtn.getWidth()) * 2 / 3 + SatSendBtn.getX() + SatSendBtn.getWidth()), SatPageRightBtn.getY());
 		
-		int spacing = (RoverBtnsPnl.getWidth() - 20 - 55 * (SatBtns.length)) / (SatBtns.length - 1);
+		int spacing = (RoverBtnsPnl.getWidth() - 20 - 70 * (SatBtns.length)) / (SatBtns.length - 1);
 		int x = 0;
 		while (x < RoverBtns.length){
-			RoverBtns[x].setLocation(10 + (55 + spacing) * ((x + (RoverBtns.length)) % (RoverBtns.length)), 20 + 65 * (x / (RoverBtns.length)));
-			SatBtns[x].setLocation(10 + (55 + spacing) * ((x + (RoverBtns.length)) % (RoverBtns.length)), 20 + 65 * (x / (RoverBtns.length)));
+			RoverBtns[x].setLocation(10 + (70 + spacing) * ((x + (RoverBtns.length)) % (RoverBtns.length)), 20 + RoverSelectionCombo.getHeight() + 10 + 80 * (x / (RoverBtns.length)));
+			SatBtns[x].setLocation(10 + (70 + spacing) * ((x + (RoverBtns.length)) % (RoverBtns.length)), 20 + SatSelectionCombo.getHeight() + 10 + 80 * (x / (RoverBtns.length)));
 			x++;
 		}
 		
-		InstructionsPnl.setLocation(10, SatiliteBtnsPnl.getY() + SatiliteBtnsPnl.getHeight() + 10);
+		InstructionsPnl.setLocation(10, SatelliteBtnsPnl.getY() + SatelliteBtnsPnl.getHeight() + 10);
 		InstructionsPnl.setSize(RoverBtnsPnl.getWidth(), VersionLbl.getY() - InstructionsPnl.getY() - 10);
 		RoverCommandsLbl.setLocation(10, 20);
 		InstructionsDeleteBtn.setLocation((InstructionsPnl.getWidth() - InstructionsDeleteBtn.getWidth() - 10), (RoverCommandsLbl.getY() + RoverCommandsLbl.getHeight() + 5));

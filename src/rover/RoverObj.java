@@ -3,6 +3,7 @@ package rover;
 import java.io.InputStream;
 
 import objects.DecimalPoint;
+import objects.Map;
 import objects.ThreadTimer;
 import wrapper.Access;
 import wrapper.Globals;
@@ -94,8 +95,7 @@ public class RoverObj {
 	
 	
 	private String serialHistory = "";
-	private String[] LEDnames = new String[] { "Mute", "Instructions", "Autonomus", "", "", "", "", "", "", "" };
-	private boolean[] LEDlit = new boolean[] { false, false, false, false, false, false, false, false, false, false };
+	private Map<String, Boolean> LEDs = new Map<String, Boolean>();
 	
 	public RoverObj(String name, String ID, RoverParametersList param, RoverAutonomusCode code, DecimalPoint loc, double dir, double temp){
 		this.name = name;
@@ -110,6 +110,9 @@ public class RoverObj {
 			winding_temp[i] = temp;
 			motor_temp[i] = temp;
 		}
+		LEDs.add("Mute", false);
+		LEDs.add("Instructions", false);
+		LEDs.add("Autonomus", false);
 	}
 	
 	public void start(){
@@ -279,11 +282,11 @@ public class RoverObj {
 					}
 					else if (tag == '}') { // we have been muted
 						mute = true;
-						setLED("Mute", mute);
+						LEDs.set("Mute", mute);
 					} 
 					else if (tag == '{') { // we have been unmuted
 						mute = false;
-						setLED("Mute", mute);
+						LEDs.set("Mute", mute);
 					}
 					data = new char[data.length]; // reset data array
 					index = 0;
@@ -323,8 +326,8 @@ public class RoverObj {
 			// Autonomous and Instruction handling
 			if (Globals.TimeMillis - timeOfLastCmd > 60000){ // if it has been a minute since we heard from them
 				if (hasInstructions && !mute) { // if we have instructions, can send things
-					setLED("Instructions", true);
-					setLED("Autonomus", false);
+					LEDs.set("Instructions", true);
+					LEDs.set("Autonomus", false);
 					run_auto = false; // don't run autonomously
 					if (!waiting || (Globals.TimeMillis - cmdWaitTime > 1000)) { // if we're not waiting or have waiting long enough
 						waiting = false;
@@ -475,13 +478,13 @@ public class RoverObj {
 				}
 			}
 			else {
-				setLED("autonomus", run_auto);
-				setLED("Instructions", false);
+				LEDs.set("Autonomus", run_auto);
+				LEDs.set("Instructions", false);
 			}
 			
 			if (run_auto){//Follow Autonomous Thought
-				setLED("Autonomus", true);
-				setLED("Instructions", false);
+				LEDs.set("Autonomus", true);
+				LEDs.set("Instructions", false);
 				
 				String cmd = autoCode.nextCommand(
 						Globals.TimeMillis,
@@ -970,18 +973,6 @@ public class RoverObj {
 		serialHistory += out + "\t\t\t" + Globals.TimeMillis + "\n";
 	}
 	
-	public boolean setLED(String name, boolean on){
-		int x = 0;
-		while (x < LEDnames.length){
-			if (LEDnames[x].equalsIgnoreCase(name)){
-				LEDlit[x] = on;
-				return true;
-			}
-			x++;
-		}
-		return false;
-	}
-	
 	public String getName(){
 		return name;
 	}
@@ -991,14 +982,7 @@ public class RoverObj {
 	}
 	
 	public boolean getLEDisLit(String name){
-		int x = 0;
-		while (x < LEDnames.length){
-			if (LEDnames[x].equalsIgnoreCase(name)){
-				return LEDlit[x];
-			}
-			x++;
-		}
-		return (Boolean) null;
+		return LEDs.get(name);
 	}
 	
 	public RoverParametersList getParameters(){
