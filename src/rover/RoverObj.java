@@ -92,6 +92,11 @@ public class RoverObj {
 	private double[] winding_temp = { 22, 22, 22, 22 }; //*c
 	private double[] motor_temp = { 22, 22, 22, 22 }; //*c
 	
+	
+	private String serialHistory = "";
+	private String[] LEDnames = new String[] { "Mute", "Instructions", "Autonomus", "", "", "", "", "", "", "" };
+	private boolean[] LEDlit = new boolean[] { false, false, false, false, false, false, false, false, false, false };
+	
 	public RoverObj(String name, String ID, RoverParametersList param, RoverAutonomusCode code, DecimalPoint loc, double dir, double temp){
 		this.name = name;
 		IDcode = ID;
@@ -274,11 +279,11 @@ public class RoverObj {
 					}
 					else if (tag == '}') { // we have been muted
 						mute = true;
-						//GUI.MuteLED.setSelected(mute);
+						setLED("Mute", mute);
 					} 
 					else if (tag == '{') { // we have been unmuted
 						mute = false;
-						//GUI.MuteLED.setSelected(mute);
+						setLED("Mute", mute);
 					}
 					data = new char[data.length]; // reset data array
 					index = 0;
@@ -318,8 +323,8 @@ public class RoverObj {
 			// Autonomous and Instruction handling
 			if (Globals.TimeMillis - timeOfLastCmd > 60000){ // if it has been a minute since we heard from them
 				if (hasInstructions && !mute) { // if we have instructions, can send things
-					//GUI.InstructionsLED.setSelected(true);
-					//GUI.AutonomusLED.setSelected(false);
+					setLED("Instructions", true);
+					setLED("Autonomus", false);
 					run_auto = false; // don't run autonomously
 					if (!waiting || (Globals.TimeMillis - cmdWaitTime > 1000)) { // if we're not waiting or have waiting long enough
 						waiting = false;
@@ -470,14 +475,13 @@ public class RoverObj {
 				}
 			}
 			else {
-				//GUI.AutonomusLED.setSelected(run_auto);
-				//GUI.InstructionsLED.setSelected(false);
+				setLED("autonomus", run_auto);
+				setLED("Instructions", false);
 			}
 			
 			if (run_auto){//Follow Autonomous Thought
-				//GUI.AutonomusLED.setSelected(true);
-				//GUI.InstructionsLED.setSelected(false);
-				// TODO Autonomous
+				setLED("Autonomus", true);
+				setLED("Instructions", false);
 				
 				String cmd = autoCode.nextCommand(
 						Globals.TimeMillis,
@@ -756,17 +760,11 @@ public class RoverObj {
 				}
 				x++;
 			}
-			/*GUI.SerialHistoryLbl.setText(GUI.SerialHistoryLbl.getText() + mess // show what was sent on display
-					+ "\t\t\t"
-					+ Globals.TimeMillis
-					+ "\n");*/
+			addToSerialHistory(mess);
 			return true;
 		} 
 		else {
-			/*GUI.SerialHistoryLbl.setText(GUI.SerialHistoryLbl.getText() // show display that message was blocked
-					+ "Surpressed: " + mess + "\t\t"
-					+ Globals.TimeMillis
-					+ "\n");*/
+			addToSerialHistory("Surpressed: " + mess);
 			return false;
 		}
 	}
@@ -777,17 +775,10 @@ public class RoverObj {
 
 	private boolean sendSerial(char mess) {
 		if (!mute) {
-			Globals.writeToSerial(mess, IDcode);
-			/*GUI.SerialHistoryLbl.setText(GUI.SerialHistoryLbl.getText() + mess
-					+ "\t\t\t\t"
-					+ Globals.TimeMillis
-					+ "\n");*/			
+			addToSerialHistory(mess + "");		
 			return true;
 		} else {
-			/*GUI.SerialHistoryLbl.setText(GUI.SerialHistoryLbl.getText()
-					+ "Supressed: " + mess + "\t\t\t\t"
-					+ Globals.TimeMillis
-					+ "\n");*/
+			addToSerialHistory("Supressed: " + mess);
 			return false;
 		}
 	}
@@ -975,8 +966,39 @@ public class RoverObj {
 		}
 	}
 	
+	public void addToSerialHistory(String out){
+		serialHistory += out + "\t\t\t" + Globals.TimeMillis + "\n";
+	}
+	
+	public boolean setLED(String name, boolean on){
+		int x = 0;
+		while (x < LEDnames.length){
+			if (LEDnames[x].equalsIgnoreCase(name)){
+				LEDlit[x] = on;
+				return true;
+			}
+			x++;
+		}
+		return false;
+	}
+	
 	public String getName(){
 		return name;
+	}
+	
+	public String getSerialHistory(){
+		return serialHistory;
+	}
+	
+	public boolean getLEDisLit(String name){
+		int x = 0;
+		while (x < LEDnames.length){
+			if (LEDnames[x].equalsIgnoreCase(name)){
+				return LEDlit[x];
+			}
+			x++;
+		}
+		return (Boolean) null;
 	}
 	
 	public RoverParametersList getParameters(){

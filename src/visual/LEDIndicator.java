@@ -29,8 +29,8 @@ public class LEDIndicator extends ImageDisplay{
 			else{
 				setImage(new ImageIcon(LEDIndicator.class.getResource("/LED_Off.png")));
 			}
+			on = b;
 		}
-		on = b;
 	}
 	
 	public void toggle(){

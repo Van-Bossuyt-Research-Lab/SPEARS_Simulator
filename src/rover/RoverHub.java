@@ -383,6 +383,7 @@ public class RoverHub extends Panel {
 					tabbedPane[x].setVisible(true);
 					RoverDisplayWindow[x].setOpaque(true);
 					RoverNameLbl[x].setText(rovers[HUDDisplayLinks[x]].getName());
+					SerialHistoryLbl[x].setText(rovers[HUDDisplayLinks[x]].getSerialHistory());
 					MovementStatsLbl[x].setText("X: " + formatDouble(rovers[HUDDisplayLinks[x]].getLocation().getX()) 
 							+ " m\tAngular Spin FL: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getWheelSpeed(RoverObj.FL))) 
 							+ " deg/s\nY: " + formatDouble(rovers[HUDDisplayLinks[x]].getLocation().getY()) 
@@ -417,6 +418,9 @@ public class RoverHub extends Panel {
 							"Motor Temperature BR: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorTemp(RoverObj.BR)) + " *c\n\n" +
 							"Battery Temperature: " + formatDouble(rovers[HUDDisplayLinks[x]].getBatteryTemperature()) + " *c\n\n" +
 							"Air Temperature: " + formatDouble(Access.getMapTemperatureAtPoint(rovers[HUDDisplayLinks[x]].getLocation())) + "*c");
+					MuteLED[x].setSelected(rovers[HUDDisplayLinks[x]].getLEDisLit("Mute"));
+					InstructionsLED[x].setSelected(rovers[HUDDisplayLinks[x]].getLEDisLit("Instructions"));
+					AutonomusLED[x].setSelected(rovers[HUDDisplayLinks[x]].getLEDisLit("Autonomus"));					
 				}	
 				PageLeftBtn[x].setEnabled(HUDDisplayLinks[x] >= 0 && x != 0);
 				try {
@@ -439,6 +443,7 @@ public class RoverHub extends Panel {
 					PageLeftBtn[x].setEnabled(true);
 					tabbedPane[x].setVisible(true);
 					RoverNameLbl[x].setText(rovers[standardDisplayLinks[currentPage][x]].getName());
+					SerialHistoryLbl[x].setText(rovers[standardDisplayLinks[currentPage][x]].getSerialHistory());
 					MovementStatsLbl[x].setText("X: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getLocation().getX()) 
 							+ " m\tAngular Spin FL: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getWheelSpeed(RoverObj.FL))) 
 							+ " deg/s\nY: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getLocation().getY()) 
@@ -473,6 +478,9 @@ public class RoverHub extends Panel {
 							"Motor Temperature BR: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorTemp(RoverObj.BR)) + " *c\n\n" +
 							"Battery Temperature: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getBatteryTemperature()) + " *c\n\n" +
 							"Air Temperature: " + formatDouble(Access.getMapTemperatureAtPoint(rovers[standardDisplayLinks[currentPage][x]].getLocation())) + "*c");
+					MuteLED[x].setSelected(rovers[standardDisplayLinks[currentPage][x]].getLEDisLit("Mute"));
+					InstructionsLED[x].setSelected(rovers[standardDisplayLinks[currentPage][x]].getLEDisLit("Instructions"));
+					AutonomusLED[x].setSelected(rovers[standardDisplayLinks[currentPage][x]].getLEDisLit("Autonomus"));	
 				}
 				PageLeftBtn[x].setEnabled(standardDisplayLinks[currentPage][x] >= 0);
 				try {
