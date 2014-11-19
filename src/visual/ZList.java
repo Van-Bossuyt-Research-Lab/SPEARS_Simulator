@@ -1,4 +1,4 @@
-package control;
+package visual;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -12,6 +12,8 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import control.InstructionObj;
 
 public class ZList extends JPanel implements Cloneable{
 

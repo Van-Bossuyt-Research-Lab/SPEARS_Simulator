@@ -31,6 +31,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
+import visual.ZList;
 import wrapper.Access;
 
 import java.awt.event.KeyAdapter;
