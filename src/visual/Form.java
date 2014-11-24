@@ -26,6 +26,7 @@ import javax.swing.JButton;
 import control.InterfacePanel;
 import rover.RoverHub;
 import wrapper.Access;
+import wrapper.MainWrapper;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -38,7 +39,7 @@ public class Form extends JFrame {
 	private static Dimension screenSize;
 	private JPanel contentPane;
 	
-	public Panel WrapperPnl;
+	public MainWrapper WrapperPnl;
 	public Panel OrbitalPnl;
 	public LandMapPanel TerrainPnl;
 	public InterfacePanel InterfacePnl;
@@ -89,7 +90,7 @@ public class Form extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		WrapperPnl = new Panel(screenSize, "Wrapper HUD");
+		WrapperPnl = new MainWrapper(screenSize);
 		WrapperPnl.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -98,17 +99,6 @@ public class Form extends JFrame {
 		});
 		WrapperPnl.setImage(new ImageIcon(Toolkit.getDefaultToolkit().getImage("C:\\Users\\PHM-Lab2\\Eclipse Workspace\\Simulator 2 Protype\\lib\\Texture Backgroun.jpg")));
 		contentPane.add(WrapperPnl);
-		
-		//TODO
-		JButton start = new JButton("Start");
-		start.setBounds(100, 100, 300, 50);
-		start.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				Access.beginSimulation();
-			}			 
-		});
-		WrapperPnl.add(start);
 		
 		OrbitalPnl = new Panel(screenSize, "Orbital View");
 		OrbitalPnl.addMouseListener(new MouseAdapter() {
