@@ -48,6 +48,10 @@ public class Access {
 		return CODE.GUI.TerrainPnl.getCrossSlope(loc, dir);
 	}
 	
+	public static double getMapHeightatPoint(DecimalPoint loc){
+		return CODE.GUI.TerrainPnl.getHeight(loc);
+	}
+	
 	public static double getMapTemperatureAtPoint(DecimalPoint loc){
 		return CODE.GUI.TerrainPnl.getTemperature(loc);
 	}

@@ -212,6 +212,16 @@ public class LandMapPanel extends Panel{
 		return new Point(outx, outy);
 	}
 	
+	//returns the height of the map at the given point
+	public double getHeight(DecimalPoint loc){
+		Point mapSquare = getMapSquare(loc);
+		int x = (int) mapSquare.getX();
+		int y = (int) mapSquare.getY();
+		double locx = ((int)((loc.getX() - (int)loc.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
+		double locy = ((int)((loc.getY() - (int)loc.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
+		return getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
+	}
+	
 	//returns the angle which the rover is facing
 	public double getIncline(DecimalPoint loc, double dir){
 		Point mapSquare = getMapSquare(loc);

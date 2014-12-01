@@ -488,6 +488,8 @@ public class RoverObj {
 				
 				String cmd = autoCode.nextCommand(
 						Globals.TimeMillis,
+						location,
+						direction,
 						getAcceleration(),
 						getAngularAcceleration(),
 						getWheelSpeed(FL),

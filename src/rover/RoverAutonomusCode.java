@@ -1,5 +1,6 @@
 package rover;
 
+import objects.DecimalPoint;
 import wrapper.Globals;
 
 public abstract class RoverAutonomusCode {
@@ -14,6 +15,8 @@ public abstract class RoverAutonomusCode {
 	
 	abstract public String nextCommand(
 			long milliTime,
+			DecimalPoint location,
+			double direction,
 			double acceleration,
 			double angular_acceleration,
 			double wheel_speed_FL,

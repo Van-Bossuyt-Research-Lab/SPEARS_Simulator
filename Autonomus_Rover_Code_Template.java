@@ -12,6 +12,8 @@ public class CLASS_NAME_HERE extends RoverAutonomusCode {
 	@Override
 	public String nextCommand(
 		long milliTime,
+		DecimalPoint location, //meters from center of map
+		double direction, //radius counterclockwise from east
 		double acceleration,
 		double angular_acceleration,
 		double wheel_speed_FL,
