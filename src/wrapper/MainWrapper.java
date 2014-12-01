@@ -2,17 +2,34 @@ package wrapper;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+
 import visual.Panel;
 import visual.ZList;
+
 import javax.swing.JTabbedPane;
+
 import java.awt.Font;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JScrollPane;
+
+import rover.RoverObj;
+import satellite.SatelliteObject;
+
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.RowSpec;
+import com.jgoodies.forms.factories.FormFactory;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class MainWrapper extends Panel {
 
@@ -42,6 +59,18 @@ public class MainWrapper extends Panel {
 		JComboBox<String> MapTypeCombo;
 		JButton StartBtn;
 	JPanel RuntimePnl;
+		private JLabel SerialDisplayTitle;
+		private JLabel SerialAvialableLbl;
+		private JScrollPane SerialDisplayScroll;
+		private JPanel SerialDisplayPnl;
+		JLabel SerialGroundLbl;
+		JLabel SerialGroundAvailableLbl;
+		JLabel[] SerialRoverLbls;
+		JLabel[] SerialRoverAvailableLbls;
+		JLabel[] SerialSatelliteLbls;
+		JLabel[] SerialSatelliteAvailableLbls;
+	private JLabel lblDfsjfjkdhaFhdsjkflhdsDshfjksdh;
+	private JLabel lblNewLabel_1;
 		
 	
 	public MainWrapper(Dimension size) {
@@ -53,6 +82,7 @@ public class MainWrapper extends Panel {
 	
 	private void initalize(){
 		tabbedPane = new JTabbedPane();
+		tabbedPane.setEnabled(false);
 		tabbedPane.setTabPlacement(JTabbedPane.TOP);
 		tabbedPane.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
 		tabbedPane.setBounds(10, 56, 1900, 979);
@@ -156,6 +186,11 @@ public class MainWrapper extends Panel {
 		CreateNewPnl.add(MapTypeCombo);
 		
 		StartBtn = new JButton("Start Simulation");
+		StartBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Access.CODE.beginSimulation();
+			}
+		});
 		StartBtn.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		StartBtn.setBounds(1665, 874, 220, 55);
 		CreateNewPnl.add(StartBtn);
@@ -184,6 +219,27 @@ public class MainWrapper extends Panel {
 		
 		RuntimePnl = new JPanel();
 		tabbedPane.addTab("Running Simulation", null, RuntimePnl, null);
+		RuntimePnl.setLayout(null);
+		
+		SerialDisplayScroll = new JScrollPane();
+		SerialDisplayScroll.setBorder(null);
+		SerialDisplayScroll.setBounds(10, 43, 569, 123);
+		RuntimePnl.add(SerialDisplayScroll);
+		
+		SerialDisplayPnl = new JPanel();
+		SerialDisplayPnl.setBorder(null);
+		SerialDisplayScroll.setViewportView(SerialDisplayPnl);
+		
+		SerialDisplayTitle = new JLabel("Serial Buffers");
+		SerialDisplayTitle.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
+		SerialDisplayTitle.setBounds(10, 11, 118, 21);
+		RuntimePnl.add(SerialDisplayTitle);
+		
+		SerialAvialableLbl = new JLabel("Available");
+		SerialAvialableLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+		SerialAvialableLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
+		SerialAvialableLbl.setBounds(461, 12, 118, 21);
+		RuntimePnl.add(SerialAvialableLbl);
 	}
 	
 	private void align(){
@@ -208,5 +264,73 @@ public class MainWrapper extends Panel {
 		this.SatAddBtn.setLocation(SatAutonomusCodeList.getX()+SatAutonomusCodeList.getWidth()+spacing, SatAutonomusCodeList.getY());
 		this.SatelliteList.setBounds(SatAddBtn.getX()+SatAddBtn.getWidth()+spacing, this.SatAutonomusCodeList.getY(), listWidth, listHeight);
 		this.SatelliteListLbl.setLocation(SatelliteList.getX(), this.SatAutonomusCodeLbl.getY());
+		
+		this.SerialDisplayTitle.setLocation(spacing, spacing);
+		this.SerialDisplayScroll.setBounds(SerialDisplayTitle.getX(), SerialDisplayTitle.getY()+SerialDisplayTitle.getHeight()+spacing, (this.tabbedPane.getWidth()-spacing*4)/3, this.tabbedPane.getHeight()-spacing*3-SerialDisplayTitle.getHeight()-40);
+		this.SerialAvialableLbl.setLocation(SerialDisplayScroll.getX()+SerialDisplayScroll.getWidth()-SerialAvialableLbl.getWidth(), SerialDisplayTitle.getY());
+	}
+	
+	public void genorateSerialDisplays(RoverObj[] rovs, SatelliteObject[] sats){
+		RowSpec[] rows = new RowSpec[rovs.length*2+sats.length*2+2+1];
+		rows[0] = FormFactory.RELATED_GAP_ROWSPEC;
+		int x = 1;
+		while (x < rows.length){
+			rows[x] = FormFactory.DEFAULT_ROWSPEC;
+			rows[x+1] = FormFactory.RELATED_GAP_ROWSPEC;
+			x += 2;
+		}
+		SerialDisplayPnl.setLayout(new FormLayout(
+			new ColumnSpec[] {
+				FormFactory.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("center:default:grow"),
+				FormFactory.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("left:default:grow"),
+				FormFactory.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("right:default"),
+				FormFactory.RELATED_GAP_COLSPEC,},
+			rows ));
+		JLabel[] titles = new JLabel[rovs.length+sats.length+1];
+		SerialRoverLbls = new JLabel[rovs.length];
+		SerialRoverAvailableLbls = new JLabel[rovs.length];
+		SerialSatelliteLbls = new JLabel[sats.length];
+		SerialSatelliteAvailableLbls = new JLabel[sats.length];
+		titles[0] = new JLabel("Ground");
+		titles[0].setFont(new Font("Trebuchet MS", Font.BOLD, 13));
+		SerialDisplayPnl.add(titles[0], "2, 2, left, default");
+		SerialGroundLbl = new JLabel();
+		SerialGroundLbl.setFont(new Font("Lucida Console", Font.PLAIN, 12));
+		SerialDisplayPnl.add(SerialGroundLbl, "4, 2, left, default");
+		SerialGroundAvailableLbl = new JLabel("0");
+		SerialGroundAvailableLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
+		SerialDisplayPnl.add(SerialGroundAvailableLbl, "6, 2, right, default");
+		x = 1;
+		int i = 0;
+		while (i < sats.length){
+			titles[x] = new JLabel(sats[i].getName());
+			titles[x].setFont(new Font("Trebuchet MS", Font.BOLD, 13));
+			SerialDisplayPnl.add(titles[x], "2, " + (x*2+2) + ", left, default");
+			SerialSatelliteLbls[i] = new JLabel();
+			SerialSatelliteLbls[i].setFont(new Font("Lucida Console", Font.PLAIN, 12));
+			SerialDisplayPnl.add(SerialSatelliteLbls[i], "4, " + (x*2+2) + ", left, default");
+			SerialSatelliteAvailableLbls[i] = new JLabel("0");
+			SerialSatelliteAvailableLbls[i].setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
+			SerialDisplayPnl.add(SerialSatelliteAvailableLbls[i], "6, " + (x*2+2) + ", right, default");
+			i++;
+			x++;
+		}
+		i = 0;
+		while (i < rovs.length){
+			titles[x] = new JLabel(rovs[i].getName());
+			titles[x].setFont(new Font("Trebuchet MS", Font.BOLD, 13));
+			SerialDisplayPnl.add(titles[x], "2, " + (x*2+2) + ", left, default");
+			SerialRoverLbls[i] = new JLabel();
+			SerialRoverLbls[i].setFont(new Font("Lucida Console", Font.PLAIN, 12));
+			SerialDisplayPnl.add(SerialRoverLbls[i], "4, " + (x*2+2) + ", left, default");
+			SerialRoverAvailableLbls[i] = new JLabel("0");
+			SerialRoverAvailableLbls[i].setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
+			SerialDisplayPnl.add(SerialRoverAvailableLbls[i], "6, " + (x*2+2) + ", right, default");
+			i++;
+			x++;
+		}
 	}
 }

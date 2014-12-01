@@ -17,6 +17,7 @@ public class Globals {
 	private static ThreadTimer milliTimer;
 	
 	private static Random rnd = new Random();
+	private static int access_key = "qwert".hashCode();
 	
 	public static void startTime(){
 		milliTimer = new ThreadTimer(0, new Runnable(){
@@ -140,6 +141,20 @@ public class Globals {
 			x++;
 		}
 		System.out.println("\n\n");
+	}
+	
+	public static Queue<Byte>[] getSerialQueues(int key){
+		try {
+			if (key == access_key){
+				return SerialBuffers;
+			}
+			else {
+				return null;
+			}
+		}
+		catch (Exception e){
+			return null;
+		}		
 	}
 	
 }
