@@ -10,7 +10,8 @@ public class ThreadTimer extends Thread {
 	private boolean forever = false;
 	public static int FOREVER = -1;
 	
-	public ThreadTimer(double interval, Runnable run, int times){
+	public ThreadTimer(double interval, Runnable run, int times, String name){
+		super.setName(name);
 		delay = interval;
 		action = run;
 		actions = times;

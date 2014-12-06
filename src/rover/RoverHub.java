@@ -333,7 +333,7 @@ public class RoverHub extends Panel {
 			public void run(){
 				updateDisplays();
 			}
-		}, ThreadTimer.FOREVER);
+		}, ThreadTimer.FOREVER, "Rover Hub Update");
 		int x = 0;
 		while (x < rovers.length){
 			rovers[x].start();

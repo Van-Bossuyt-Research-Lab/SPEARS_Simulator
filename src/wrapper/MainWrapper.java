@@ -189,6 +189,7 @@ public class MainWrapper extends Panel {
 		StartBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Access.CODE.beginSimulation();
+				tabbedPane.setSelectedIndex(1);
 			}
 		});
 		StartBtn.setFont(new Font("Tahoma", Font.PLAIN, 16));

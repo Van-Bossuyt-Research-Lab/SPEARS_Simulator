@@ -9,6 +9,21 @@ public class Queue < Type extends Object >{
 		array =  (Type[]) new Object[0];
 	}
 	
+	public Queue(Queue<Type> q){
+		array = q.array;
+	}
+	
+	@Override
+	public Queue<Type> clone(){
+		Queue<Type> out = new Queue<Type>();
+		int x = 0;
+		while (x < array.length){
+			out.push(array[x]);
+			x++;
+		}
+		return out;
+	}
+	
 	public void push(Type a){
 		array = augment(array, a);
 	}

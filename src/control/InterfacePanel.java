@@ -136,7 +136,7 @@ public class InterfacePanel extends Panel{
 					public void run(){
 						OverrideMuteOptn.setVisible(CursorInMuteOptn);
 					}
-				}, 1);
+				}, 1, "mute watch");
 			}
 			@Override
 			public void mouseEntered(MouseEvent arg0) {

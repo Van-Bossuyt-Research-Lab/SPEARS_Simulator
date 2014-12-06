@@ -121,13 +121,13 @@ public class RoverObj {
 				excecuteCode();
 			}
 		},
-		ThreadTimer.FOREVER);
+		ThreadTimer.FOREVER, name+"-code");
 		ThreadTimer physicsThread = new ThreadTimer(time_step*1000, new Runnable(){
 			public void run(){
 				excecutePhysics();
 			}
 		},
-		ThreadTimer.FOREVER);
+		ThreadTimer.FOREVER, name+"-physics");
 	}
 	
 	private void excecuteCode(){
@@ -149,20 +149,25 @@ public class RoverObj {
 			}
 			
 			if (Globals.RFAvailable(IDcode) > 0) { // if there is a message
+				System.out.println(System.currentTimeMillis());
 				delay(500); // let the full message arrive
+				System.out.println(System.currentTimeMillis());
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
 															// go is set to false if the first read is not IDcode to prevent starting a message not intened for the rover from within the body of another message
 					Globals.ReadSerial(IDcode); // white space
 					tag = (char) Globals.ReadSerial(IDcode); // get type tag
 					if (Globals.RFAvailable(IDcode) > 0) { // if there is more to the message
-						run_auto = false; // stop running autonmusly
+						run_auto = false; // stop running autonomously
 						data[0] = tag; // tag is not actually import, just read the entire body of the message
 						index++;
+						System.out.print(tag);
 						while (Globals.RFAvailable(IDcode) > 0 && index < data.length-1) { //read in message body
 							data[index] = (char) Globals.ReadSerial(IDcode);
+							System.out.println(data[index]);
 							index++;
 						}
+						System.out.println();
 						data[index] = '\0'; // end of string
 						// switch through commands
 						if (strcmp(data, "move") == 0) {
@@ -509,7 +514,8 @@ public class RoverObj {
 						getBatteryTemperature()
 				);
 				// switch all known commands
-				if (strcmp(cmd, "move") == 0) {
+				if (strcmp(cmd, "") == 0){ /*Do Nothing*/ }
+				else if (strcmp(cmd, "move") == 0) {
 					driveForward();
 					moving = true;
 					motorState = cmd;
@@ -794,6 +800,7 @@ public class RoverObj {
 
 	private void delay(double length) { //put the thread to sleep for a bit
 		try{
+			System.out.println("" + (int)(length/Globals.getTimeScale()) + ", " + (int)((length/Globals.getTimeScale()-(int)length/Globals.getTimeScale())*1000000));
 			Thread.sleep((long)(length/Globals.getTimeScale()), (int)((length/Globals.getTimeScale()-(int)length/Globals.getTimeScale())*1000000));
 		} 
 		catch (Exception e) {
@@ -809,6 +816,9 @@ public class RoverObj {
 	
 	private int strcmp(char[] first, String second) { // see if 2 strings are equal
 		try {
+			if (first.length-1 != second.length()){
+				return 1;
+			}
 			char[] sec = second.toCharArray();
 			int x = 0;
 			while (first[x] != '\0') {

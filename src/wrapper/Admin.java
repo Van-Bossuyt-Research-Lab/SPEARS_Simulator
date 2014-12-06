@@ -8,6 +8,7 @@ import objects.Map;
 import objects.Queue;
 import rover.RoverObj;
 import rover.RoverParametersList;
+import rover.autoCode.GenericRover;
 import satellite.SatelliteObject;
 import visual.Form;
 
@@ -24,11 +25,22 @@ public class Admin {
 	
 	public void beginSimulation(){
 		
-		Globals.initalizeLists(new String[] { "g", "r1", "r2" });
-		GUI.WrapperPnl.genorateSerialDisplays(new RoverObj[] { 
-			new RoverObj("Rover 1", "r1", new RoverParametersList(), null, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0), 
-			new RoverObj("Rover 2", "r2", new RoverParametersList(), null, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0)
-		}, new SatelliteObject[0]);
+		Globals.startTime();
+		Globals.initalizeLists(new String[] { "g", "s", "r1", "r2" });
+		RoverObj[] rovers = new RoverObj[] { 
+				new RoverObj("Rover 1", "r1", new RoverParametersList(), new GenericRover("Rover 1", 2), new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0), 
+				new RoverObj("Rover 2", "r2", new RoverParametersList(), new GenericRover("Rover 2", 3), new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0)
+			};
+		GUI.WrapperPnl.genorateSerialDisplays(rovers, new SatelliteObject[] { new SatelliteObject("Satellite 1", "s") });
+		GUI.RoverHubPnl.setRovers(rovers);
+		Map<String, String> roverNames = new Map<String, String>();
+		roverNames.add("Rover 1", "r1");
+		roverNames.add("Rover 2", "r2");
+		Map<String, String> satelliteNames = new Map<String, String>();
+		satelliteNames.add("Satellite 1", "s");
+		Access.INTERFACE.setCallTags(roverNames, satelliteNames);
+		InterfaceCode.start();
+		GUI.RoverHubPnl.start();
 		
 		updateSerialDisplays();
 		

@@ -29,7 +29,7 @@ public class Globals {
 					end += (long)(1000000 / getTimeScale());
 				}
 			}
-		}, 1);
+		}, 1, "milli-clock");
 	}
 	
 	public static void writeToSerial(char write, String from){
@@ -60,7 +60,7 @@ public class Globals {
 			}
 			x++;
 		}
-		//WrapperEvents.SerialBuffersChanged(RoverRFserial, SatelliteRFserial, GroundRFserial);
+		Access.CODE.updateSerialDisplays();
 	}
 	
 	public static int RFAvailable(String which){ // Returns the number of chars waiting
@@ -79,12 +79,12 @@ public class Globals {
 		int x = 0;
 		while (x < SerialBufferCodes.length){
 			if (SerialBufferCodes[x].equals(which)){
-				out = SerialBuffers[x].pop();
+				out = SerialBuffers[x].pop().byteValue();
 				break;
 			}
 			x++;
 		}
-		//WrapperEvents.SerialBuffersChanged(RoverRFserial, SatelliteRFserial, GroundRFserial);
+		Access.CODE.updateSerialDisplays();
 		return out;
 	}
 	
@@ -140,19 +140,26 @@ public class Globals {
 			System.out.println(SerialBufferCodes[x] + ": " + SerialBuffers[x].toString());
 			x++;
 		}
-		System.out.println("\n\n");
 	}
 	
 	public static Queue<Byte>[] getSerialQueues(int key){
 		try {
 			if (key == access_key){
-				return SerialBuffers;
+				@SuppressWarnings("unchecked")
+				Queue<Byte>[] out = new Queue[SerialBuffers.length];
+				int x = 0;
+				while (x < out.length){
+					out[x] = new Queue<Byte>(SerialBuffers[x]);
+					x++;
+				}
+				return out;
 			}
 			else {
 				return null;
 			}
 		}
 		catch (Exception e){
+			e.printStackTrace();
 			return null;
 		}		
 	}

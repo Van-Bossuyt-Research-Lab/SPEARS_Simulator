@@ -224,7 +224,7 @@ public class InstrucitonEditor extends JDialog {
 				public void run(){
 					(new PopUp()).showConfirmDialog("You are missing required information.", "Submit Failed", PopUp.DEFAULT_OPTIONS);
 				}
-			}, 1);			
+			}, 1, "missing information");			
 		}
 	}
 	
@@ -244,7 +244,7 @@ public class InstrucitonEditor extends JDialog {
 					CommandsTable.setEnabled(true);
 				}
 			}
-		}, 1);
+		}, 1, "add paramter");
 	}
 	
 	private void ListSelection_Changed(){

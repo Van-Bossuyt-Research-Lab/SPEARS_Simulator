@@ -76,7 +76,8 @@ public class InterfaceCode {
 					Access.CODE.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected");
 				}
 			}
-		}, ThreadTimer.FOREVER);
+		}, ThreadTimer.FOREVER, "clock");
+		initalize();
 	}
 	
 	public static void start(){
@@ -84,20 +85,20 @@ public class InterfaceCode {
 			public void run(){
 				Access.INTERFACE.updateSerialCom();
 			}
-		}, ThreadTimer.FOREVER);
+		}, ThreadTimer.FOREVER, "Interface serial");
 	}
 	
 	public void initalize(){
 		try {
-			File logsFldr = new File("\\Logs\\");
+			File logsFldr = new File("Logs");
 			if (!logsFldr.exists()){
 				logsFldr.mkdir();
 			}
-			File dataFldr = new File("\\Data\\");
+			File dataFldr = new File("Data");
 			if (!dataFldr.exists()){
 				dataFldr.mkdir();
 			}
-			File photosFldr = new File("\\Photos\\");
+			File photosFldr = new File("Photos");
 			if (!photosFldr.exists()){
 				photosFldr.mkdir();
 			}
@@ -330,7 +331,7 @@ public class InterfaceCode {
 				}
 				if (listening){
 					if (out.equals(listenFor)){
-						new ThreadTimer(0, listenAction, 1);
+						new ThreadTimer(0, listenAction, 1, "interface listening");
 					}
 				}
 				return out;
@@ -360,7 +361,7 @@ public class InterfaceCode {
 				failaction.run();
 			}
 		};
-		listenTimer = new ThreadTimer((secs*1000), listenFail, 1);
+		listenTimer = new ThreadTimer((secs*1000), listenFail, 1, "listening timer");
 	}
 	
 	
@@ -409,17 +410,17 @@ public class InterfaceCode {
 						public void run(){
 							listenForSignal("g %", new Runnable(){
 								public void run(){
-									new ThreadTimer(0, confirmMessage, 1);
+									new ThreadTimer(0, confirmMessage, 1, "confirm 1");
 								}
 							}, new Runnable(){
 								public void run(){
-									new ThreadTimer(0, failMessage, 1);
+									new ThreadTimer(0, failMessage, 1, "fail 1");
 								}
 							}, 5);
 						}
 					}, new Runnable(){
 						public void run(){
-							new ThreadTimer(0, failMessage, 1);
+							new ThreadTimer(0, failMessage, 1, "fail 1.1");
 						}
 					}, 4);
 				}
@@ -427,11 +428,11 @@ public class InterfaceCode {
 					writeToSerial(tagMessage(actionCommands[section][which], 's'));
 					listenForSignal("g #", new Runnable(){
 						public void run(){
-							new ThreadTimer(0, confirmMessage, 1);
+							new ThreadTimer(0, confirmMessage, 1, "confirm 2");
 						}
 					}, new Runnable(){
 						public void run(){
-							new ThreadTimer(0, failMessage, 1);
+							new ThreadTimer(0, failMessage, 1, "fail 2");
 						}
 					}, 4);
 				}
@@ -451,17 +452,17 @@ public class InterfaceCode {
 				public void run(){
 					listenForSignal("g %", new Runnable(){
 						public void run(){
-							new ThreadTimer(0, confirmMessage, 1);
+							new ThreadTimer(0, confirmMessage, 1, "confirm 3");
 						}
 					}, new Runnable(){
 						public void run(){
-							new ThreadTimer(0, failMessage, 1);
+							new ThreadTimer(0, failMessage, 1, "fail 3");
 						}
 					}, 5);
 				}
 			}, new Runnable(){
 				public void run(){
-					new ThreadTimer(0, failMessage, 1);
+					new ThreadTimer(0, failMessage, 1, "fail 3.1");
 				}
 			}, 4);
 			Access.CODE.GUI.InterfacePnl.RoverSendTxt.setText("");
@@ -471,7 +472,7 @@ public class InterfaceCode {
 				public void run(){
 					(new PopUp()).showConfirmDialog("You must enter a message into the field.", "Message Failed", PopUp.DEFAULT_OPTIONS);
 				}
-			}, 1);
+			}, 1, "invalid message 1");
 		}
 	}
 	
@@ -481,11 +482,11 @@ public class InterfaceCode {
             Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + Access.CODE.GUI.InterfacePnl.SatSendTxt.getText() + "\"\n");
 			listenForSignal("g #", new Runnable(){
 				public void run(){
-					new ThreadTimer(0, confirmMessage, 1);
+					new ThreadTimer(0, confirmMessage, 1, "confirm 4");
 				}
 			}, new Runnable(){
 				public void run(){
-					new ThreadTimer(0, failMessage, 1);
+					new ThreadTimer(0, failMessage, 1, "fail 4");
 				}
 			}, 4);
 			Access.CODE.GUI.InterfacePnl.SatSendTxt.setText("");
@@ -495,7 +496,7 @@ public class InterfaceCode {
 				public void run(){
 					(new PopUp()).showConfirmDialog("You must enter a message into the field.", "Message Failed", PopUp.DEFAULT_OPTIONS);
 				}
-			}, 1);
+			}, 1, "invalid message 2");
 		}
 	}
 	
@@ -563,7 +564,7 @@ public class InterfaceCode {
 				UpdateActionBtns();
 				SaveProgrammer();
 			}
-		}, 1);
+		}, 1, "add rover");
 	}
 	
 	public void editRoverBtn1(){
@@ -621,7 +622,7 @@ public class InterfaceCode {
 				SaveProgrammer();
 				cancelProgrammer();
 			}
-		}, 1);
+		}, 1, "edit rover");
 	}
 	
 	private void deleteRover2(int which){
@@ -670,7 +671,7 @@ public class InterfaceCode {
 				UpdateActionBtns();
 				SaveProgrammer();
 			}
-		}, 1);
+		}, 1, "add sat");
 	}
 	
 	public void editSatBtn1(){
@@ -728,7 +729,7 @@ public class InterfaceCode {
 				SaveProgrammer();
 				cancelProgrammer();
 			}
-		}, 1);
+		}, 1, "edit sat 2");
 	}
 	
 	private void deleteSat2(int which){
@@ -1012,7 +1013,7 @@ public class InterfaceCode {
 											}								
 										}
 									}
-								}, 1);
+								}, 1, "open file 1");
 								receivedFiles = Remove(receivedFiles, choice);
 								if (receivedFiles.length == 0){
 									Access.CODE.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail.png")));
@@ -1053,7 +1054,7 @@ public class InterfaceCode {
 										}								
 									}
 								}
-							}, 1);
+							}, 1, "open file 2");
 							receivedFiles = Remove(receivedFiles, choice);
 							if (receivedFiles.length == 0){
 								Access.CODE.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail.png")));
@@ -1062,14 +1063,14 @@ public class InterfaceCode {
 						}
 					}
 				}
-			}, 1);
+			}, 1, "open file 3");
 		}
 		else {
 			new ThreadTimer(0, new Runnable() {
 				public void run(){
 					(new PopUp()).showConfirmDialog("There are no unread files.", "Received Files", PopUp.DEFAULT_OPTIONS);
 				}
-			}, 1);
+			}, 1, "no files");
 		}
 	}
 	
@@ -1117,7 +1118,7 @@ public class InterfaceCode {
 				new ThreadTimer(0, new Runnable(){
 					public void run(){
 						(new PopUp()).showConfirmDialog("All Instructions Canceled.", "Action Confirmed", PopUp.DEFAULT_OPTIONS);
-					}}, 1);
+					}}, 1, "cancel instructions");
 				Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Done.\n");
 			}
 		}, new Runnable(){
@@ -1214,7 +1215,7 @@ public class InterfaceCode {
 				public void run(){
 					(new PopUp()).showConfirmDialog("You must enter a typed value for the selected parameter parameter.", "Instruction Failed", PopUp.DEFAULT_OPTIONS);
 				}
-			}, 1);
+			}, 1, "add instructions");
 		}
 	}
 	
@@ -1294,7 +1295,7 @@ public class InterfaceCode {
 			public void run(){
 				(new InstrucitonEditor()).open();
 			}
-		}, 1);
+		}, 1, "add instructions 2");
 	}
 	
 	public void addInstructionsToList2(boolean addRover, boolean addSat, String title, InstructionObj[] instruct){
@@ -1346,7 +1347,7 @@ public class InterfaceCode {
 				public void run(){
 					(new InstrucitonEditor(true, false, (String)Access.CODE.GUI.InterfacePnl.RoverCommandsList.getSelectedItem(), finParam, finCommands, finBools)).open();
 				}
-			}, 1);
+			}, 1, "edit instructions");
 		}
 		if (Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex() != -1){
 			int selected = Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex();
@@ -1368,7 +1369,7 @@ public class InterfaceCode {
 				public void run(){
 					(new InstrucitonEditor(true, false, (String)Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getSelectedItem(), finParam, finCommands, finBools)).open();
 				}
-			}, 1);
+			}, 1, "edit instructions 2");
 		}
 	}
 	
