@@ -1,6 +1,7 @@
 package visual;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -90,23 +91,22 @@ public class Panel extends JPanel{
 		super.paintComponent(g);
 		if (hasImage){
 			try {
-				g.drawImage(resize(background, this.getWidth(), this.getHeight()).getImage(), 0, 0, null);
+				BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TRANSLUCENT);
+			    Graphics2D g1 = bi.createGraphics();
+			    g1.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+			            RenderingHints.VALUE_ANTIALIAS_ON);
+		        Composite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1);
+		        g1.setComposite(comp);
+		        g1.drawImage(((ImageIcon) (background)).getImage(), 0, 0, this.getWidth(), this.getHeight(), null);
+			    g1.dispose();
+				g1.drawImage((new ImageIcon(bi)).getImage(), 0, 0, this.getWidth(), this.getHeight(), null);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	protected ImageIcon resize(Icon image, int width, int height) throws Exception {
-		BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
-	    Graphics2D g = bi.createGraphics();
-	    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-	            RenderingHints.VALUE_ANTIALIAS_ON);
-        Composite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1);
-        g.setComposite(comp);
-        g.drawImage(((ImageIcon) (image)).getImage(), 0, 0, width, height, null);
-	    g.dispose();
-	    return new ImageIcon(bi);
+		else {
+			//System.out.println("no image");
+		}
 	}
 	
 	public void setImage(ImageIcon icon){

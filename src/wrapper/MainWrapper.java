@@ -20,7 +20,7 @@ import javax.swing.SwingConstants;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JScrollPane;
 
-import rover.RoverObj;
+import rover.RoverObject;
 import satellite.SatelliteObject;
 
 import com.jgoodies.forms.layout.FormLayout;
@@ -69,12 +69,9 @@ public class MainWrapper extends Panel {
 		JLabel[] SerialRoverAvailableLbls;
 		JLabel[] SerialSatelliteLbls;
 		JLabel[] SerialSatelliteAvailableLbls;
-	private JLabel lblDfsjfjkdhaFhdsjkflhdsDshfjksdh;
-	private JLabel lblNewLabel_1;
-		
 	
 	public MainWrapper(Dimension size) {
-		super(new Dimension(1920,1080), "Wrapper HUD");
+		super(new Dimension(1920, 1080), "Wrapper Display");
 		
 		initalize();
 		align();
@@ -118,6 +115,11 @@ public class MainWrapper extends Panel {
 		CreateNewPnl.add(RovAutonomusCodeList);
 		
 		RovAddBtn = new JButton("<HTML>=><br>Add</HTML>");
+		RovAddBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Access.CODE.addRoverToList();
+			}
+		});
 		RovAddBtn.setFont(new Font("Trebuchet MS", Font.PLAIN, 14));
 		RovAddBtn.setBounds(430, 152, 64, 64);
 		CreateNewPnl.add(RovAddBtn);
@@ -163,6 +165,11 @@ public class MainWrapper extends Panel {
 		CreateNewPnl.add(SatelliteList);
 		
 		SatAddBtn = new JButton("<HTML>=><br>Add</HTML>");
+		SatAddBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Access.CODE.addSatelliteToList();
+			}
+		});
 		SatAddBtn.setFont(new Font("Trebuchet MS", Font.PLAIN, 14));
 		SatAddBtn.setBounds(430, 607, 64, 64);
 		CreateNewPnl.add(SatAddBtn);
@@ -271,7 +278,7 @@ public class MainWrapper extends Panel {
 		this.SerialAvialableLbl.setLocation(SerialDisplayScroll.getX()+SerialDisplayScroll.getWidth()-SerialAvialableLbl.getWidth(), SerialDisplayTitle.getY());
 	}
 	
-	public void genorateSerialDisplays(RoverObj[] rovs, SatelliteObject[] sats){
+	public void genorateSerialDisplays(RoverObject[] rovs, SatelliteObject[] sats){
 		RowSpec[] rows = new RowSpec[rovs.length*2+sats.length*2+2+1];
 		rows[0] = FormFactory.RELATED_GAP_ROWSPEC;
 		int x = 1;

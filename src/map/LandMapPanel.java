@@ -15,7 +15,7 @@ import java.util.Random;
 import objects.DecimalPoint;
 import wrapper.Access;
 import wrapper.Globals;
-import rover.RoverObj;
+import rover.RoverObject;
 import visual.Panel;
 import visual.PlasmaPanel;
 
@@ -164,7 +164,7 @@ public class LandMapPanel extends Panel{
 	}
 	
 	//populates an array of roverIcons in the simulator
-	public void setRoverSwarm(RoverObj[] rovers){
+	public void setRoverSwarm(RoverObject[] rovers){
 		roverIcons = new RoverIcon[rovers.length];
 		int x = 0;
 		while (x < roverIcons.length){

@@ -25,11 +25,14 @@ import javax.swing.JButton;
 
 import control.InterfacePanel;
 import rover.RoverHub;
+import satellite.SatelliteHub;
 import wrapper.Access;
 import wrapper.MainWrapper;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class Form extends JFrame {
 	
@@ -44,7 +47,7 @@ public class Form extends JFrame {
 	public LandMapPanel TerrainPnl;
 	public InterfacePanel InterfacePnl;
 	public RoverHub RoverHubPnl;
-	public Panel SatelliteHubPnl;
+	public SatelliteHub SatelliteHubPnl;
 	
 	private int currentPage = WRAPPER;
 
@@ -74,6 +77,12 @@ public class Form extends JFrame {
 	 * Create the frame.
 	 */
 	public Form() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				Access.CODE.wakeUp();
+			}
+		});
 		KeyboardFocusManager masterKeyManager = KeyboardFocusManager
 				.getCurrentKeyboardFocusManager();
 		masterKeyManager.addKeyEventDispatcher((KeyEventDispatcher) new KeyDispatcher());
@@ -144,7 +153,7 @@ public class Form extends JFrame {
 		RoverHubPnl.setVisible(false);
 		contentPane.add(RoverHubPnl);
 		
-		SatelliteHubPnl = new Panel(screenSize, "Satellite Hub");
+		SatelliteHubPnl = new SatelliteHub(screenSize);
 		SatelliteHubPnl.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {

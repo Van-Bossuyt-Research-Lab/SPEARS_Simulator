@@ -1,16 +1,16 @@
-package rover;
+package satellite;
 
 import objects.DecimalPoint;
 import wrapper.Globals;
 
-public abstract class RoverAutonomusCode {
-
-	private String name;
-	private String roverName;
+public abstract class SatelliteAutonomusCode {
 	
-	public RoverAutonomusCode(String name, String rover){
+	private String name;
+	private String satelliteName;
+	
+	public SatelliteAutonomusCode(String name, String satellite){
 		this.name = name;
-		roverName = rover;
+		satelliteName = satellite;
 	}
 	
 	abstract public String nextCommand(
@@ -41,7 +41,7 @@ public abstract class RoverAutonomusCode {
 	}
 	
 	protected void writeToLog(String message){
-		Globals.writeToLogFile(roverName + ":" + name + " - Autonomous Code", message);
+		Globals.writeToLogFile(satelliteName + ":" + name + " - Autonomous Code", message);
 	}
 	
 }

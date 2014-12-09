@@ -6,10 +6,13 @@ import control.InterfaceCode;
 import objects.DecimalPoint;
 import objects.Map;
 import objects.Queue;
-import rover.RoverObj;
+import rover.RoverAutonomusCode;
+import rover.RoverObject;
 import rover.RoverParametersList;
 import rover.autoCode.GenericRover;
+import satellite.SatelliteAutonomusCode;
 import satellite.SatelliteObject;
+import satellite.SatelliteParametersList;
 import visual.Form;
 
 public class Admin {
@@ -19,48 +22,65 @@ public class Admin {
 	Random rnd = new Random();
 	private int queue_key = "qwert".hashCode();
 	
+	private Map<String, RoverParametersList> roverParameters = new Map<String, RoverParametersList>();
+	private Map<String, RoverAutonomusCode> roverLogics = new Map<String, RoverAutonomusCode>();
+	private Map<String, SatelliteParametersList> satelliteParameters = new Map<String, SatelliteParametersList>();
+	private Map<String, SatelliteAutonomusCode> satelliteLogics = new Map<String, SatelliteAutonomusCode>();
+	
+	private Map<String, RoverObject> roversToAdd = new Map<String, RoverObject>();
+	private Map<String, SatelliteObject> satsToAdd = new Map<String, SatelliteObject>();
+	
+	public void wakeUp(){};
 	public static void align(){
 		GUI = Form.frame;
+	}
+	
+	public Admin(){
+		roverParameters.add("Default", new RoverParametersList());
+		GUI.WrapperPnl.RovDriveModelList.addValue("Default");
+		roverLogics.add("Generic4", new GenericRover("Generic4", 4));
+		GUI.WrapperPnl.RovAutonomusCodeList.addValue("Generic4");
+		GUI.WrapperPnl.SatAutonomusCodeList.addValue("[null]");
+		GUI.WrapperPnl.SatDriveModelList.addValue("[null]");
 	}
 	
 	public void beginSimulation(){
 		
 		Globals.startTime();
-		Globals.initalizeLists(new String[] { "g", "s", "r1", "r2" });
-		RoverObj[] rovers = new RoverObj[] { 
-				new RoverObj("Rover 1", "r1", new RoverParametersList(), new GenericRover("Rover 1", 2), new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0), 
-				new RoverObj("Rover 2", "r2", new RoverParametersList(), new GenericRover("Rover 2", 3), new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0)
-			};
-		GUI.WrapperPnl.genorateSerialDisplays(rovers, new SatelliteObject[] { new SatelliteObject("Satellite 1", "s") });
-		GUI.RoverHubPnl.setRovers(rovers);
 		Map<String, String> roverNames = new Map<String, String>();
-		roverNames.add("Rover 1", "r1");
-		roverNames.add("Rover 2", "r2");
+		RoverObject[] rovers = new RoverObject[roversToAdd.size()];
 		Map<String, String> satelliteNames = new Map<String, String>();
-		satelliteNames.add("Satellite 1", "s");
+		SatelliteObject[] satellites = new SatelliteObject[satsToAdd.size()];
+		String[] tags = new String[roversToAdd.size()+satsToAdd.size()+1];
+		tags[0] = "g";
+		int x = 0;
+		while (x < GUI.WrapperPnl.RoverList.getItems().length){
+			String key = (String)GUI.WrapperPnl.RoverList.getItemAt(x);
+			rovers[x] = roversToAdd.get(key);
+			roverNames.add(key, rovers[x].getIDTag());
+			tags[x+1] = rovers[x].getIDTag();
+			x++;
+		}
+		x = 0;
+		while (x < GUI.WrapperPnl.SatelliteList.getItems().length){
+			String key = (String)GUI.WrapperPnl.SatelliteList.getItemAt(x);
+			satellites[x] = satsToAdd.get(key);
+			satelliteNames.add(key, satellites[x].getIDCode());
+			tags[x+1+roversToAdd.size()] = satellites[x].getIDCode();
+			x++;
+		}
+		Globals.initalizeLists(tags);
+		GUI.WrapperPnl.genorateSerialDisplays(rovers, satellites);
+		GUI.RoverHubPnl.setRovers(rovers);
+		GUI.SatelliteHubPnl.setSatellites(satellites);
 		Access.INTERFACE.setCallTags(roverNames, satelliteNames);
 		InterfaceCode.start();
 		GUI.RoverHubPnl.start();
+		GUI.SatelliteHubPnl.start();
 		
 		updateSerialDisplays();
 		
 		GUI.WrapperPnl.tabbedPane.setEnabled(true);
-		/*
-		Globals.startTime();
-		Map<String, String> roverNames = new Map<String, String>();
-		roverNames.add("Rover 1", "r1");
-		roverNames.add("Rover 2", "r2");
-		Map<String, String> satelliteNames = new Map<String, String>();
-		satelliteNames.add("Satellite 1", "s");
-		GUI.RoverHubPnl.setRovers(new RoverObj[] { 
-			new RoverObj("Rover 1", "r1", new RoverParametersList(), null, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0), 
-			new RoverObj("Rover 2", "r2", new RoverParametersList(), null, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0)
-		});
-		Globals.initalizeLists(add(new String[] { "g" }, add(roverNames.getValues(), satelliteNames.getValues())));
-		Access.INTERFACE.setCallTags(roverNames, satelliteNames);
-		InterfaceCode.start();
-		GUI.RoverHubPnl.start();
-		*/
 	}
 	
 	public void updateSerialDisplays(){
@@ -91,6 +111,47 @@ public class Admin {
 			i++;
 			x++;
 		}
+	}
+	
+	public void addRoverToList(){
+		if (GUI.WrapperPnl.RovAutonomusCodeList.getSelectedIndex() != -1 && GUI.WrapperPnl.RovDriveModelList.getSelectedIndex() != -1){
+			int numb = 1;
+			String newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
+			while (contains(GUI.WrapperPnl.RoverList.getItems(), newName)){
+				numb++;
+				newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
+			}
+			//TODO change temp to map temp
+			GUI.WrapperPnl.RoverList.addValue(newName);
+			roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem()), this.roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()), new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
+		}
+	}
+	
+	public void addSatelliteToList(){
+		if (GUI.WrapperPnl.SatAutonomusCodeList.getSelectedIndex() != -1 && GUI.WrapperPnl.SatDriveModelList.getSelectedIndex() != -1){
+			int numb = 1;
+			//TODO change to code name
+			String newName = "Satellite " + numb;
+			//newName = (String)GUI.WrapperPnl.SatAutonomusCodeList.getSelectedItem() + " " + numb;
+			while (contains(GUI.WrapperPnl.SatelliteList.getItems(), newName)){
+				numb++;
+				newName = "Satellite " + numb;
+				//newName = (String)GUI.WrapperPnl.SatAutonomusCodeList.getSelectedItem() + " " + numb;
+			}
+			GUI.WrapperPnl.SatelliteList.addValue(newName);
+			this.satsToAdd.add(newName, new SatelliteObject(newName, "s"+GUI.WrapperPnl.SatelliteList.getItems().length, null, null, rnd.nextDouble()*100000+10000000, rnd.nextDouble()*90, rnd.nextDouble()*360));
+		}
+	}
+	
+	private boolean contains(Object[] array, String val){
+		int x = 0;
+		while (x < array.length){
+			if (array[x].equals(val)){
+				return true;
+			}
+			x++;
+		}
+		return false;
 	}
 	
 	private String[] add(Object[] one, Object[] two){

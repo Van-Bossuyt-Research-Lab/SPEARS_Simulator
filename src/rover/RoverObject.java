@@ -8,7 +8,7 @@ import objects.ThreadTimer;
 import wrapper.Access;
 import wrapper.Globals;
 
-public class RoverObj {
+public class RoverObject {
 	
 	public static final int FORWARD = 1, BACKWARD = -1, RELEASE = 0; // possible motor states
 	public static final int FL = 0, BL = 1, BR = 2, FR = 3; // identifiers on wheels
@@ -63,8 +63,7 @@ public class RoverObj {
 	private long lastCurrentCheck = 0; // time of last current check
 	private long startCurretIntegral = 0; // time of initial integral check
 	private float averageCurrent = 0; // integral divided by time
-	
-	
+		
 	private DecimalPoint location; //m x m from center of map
 	private double direction; //rad
 	private double speed = 0; //m/s
@@ -97,7 +96,7 @@ public class RoverObj {
 	private String serialHistory = "";
 	private Map<String, Boolean> LEDs = new Map<String, Boolean>();
 	
-	public RoverObj(String name, String ID, RoverParametersList param, RoverAutonomusCode code, DecimalPoint loc, double dir, double temp){
+	public RoverObject(String name, String ID, RoverParametersList param, RoverAutonomusCode code, DecimalPoint loc, double dir, double temp){
 		this.name = name;
 		IDcode = ID;
 		params = param;
@@ -149,9 +148,7 @@ public class RoverObj {
 			}
 			
 			if (Globals.RFAvailable(IDcode) > 0) { // if there is a message
-				System.out.println(System.currentTimeMillis());
-				delay(500); // let the full message arrive
-				System.out.println(System.currentTimeMillis());
+				delay(500);
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
 															// go is set to false if the first read is not IDcode to prevent starting a message not intened for the rover from within the body of another message
@@ -161,13 +158,10 @@ public class RoverObj {
 						run_auto = false; // stop running autonomously
 						data[0] = tag; // tag is not actually import, just read the entire body of the message
 						index++;
-						System.out.print(tag);
 						while (Globals.RFAvailable(IDcode) > 0 && index < data.length-1) { //read in message body
 							data[index] = (char) Globals.ReadSerial(IDcode);
-							System.out.println(data[index]);
 							index++;
 						}
-						System.out.println();
 						data[index] = '\0'; // end of string
 						// switch through commands
 						if (strcmp(data, "move") == 0) {
@@ -656,7 +650,7 @@ public class RoverObj {
 	private void takePicture() { // take a picture
 		try {
 			sendSerial("s r }"); // mute the ground so it can't interrupt
-			InputStream data = RoverObj.class.getResourceAsStream("/Rover Sample.jpg"); // get the buffer from the "camera"
+			InputStream data = RoverObject.class.getResourceAsStream("/Rover Sample.jpg"); // get the buffer from the "camera"
 			delay(2000);
 			sendSerial("s c [o]"); // tell the satellite a file is coming
 			delay(2000);
@@ -786,6 +780,7 @@ public class RoverObj {
 
 	private boolean sendSerial(char mess) {
 		if (!mute) {
+			Globals.writeToSerial(mess, IDcode);
 			addToSerialHistory(mess + "");		
 			return true;
 		} else {
@@ -800,10 +795,10 @@ public class RoverObj {
 
 	private void delay(double length) { //put the thread to sleep for a bit
 		try{
-			System.out.println("" + (int)(length/Globals.getTimeScale()) + ", " + (int)((length/Globals.getTimeScale()-(int)length/Globals.getTimeScale())*1000000));
 			Thread.sleep((long)(length/Globals.getTimeScale()), (int)((length/Globals.getTimeScale()-(int)length/Globals.getTimeScale())*1000000));
 		} 
 		catch (Exception e) {
+			e.printStackTrace();
 			Globals.reportError("RoverCode", "delay", e);
 		}
 		//long start = System.nanoTime();
@@ -816,22 +811,19 @@ public class RoverObj {
 	
 	private int strcmp(char[] first, String second) { // see if 2 strings are equal
 		try {
-			if (first.length-1 != second.length()){
-				return 1;
-			}
-			char[] sec = second.toCharArray();
+			String firstStr = "";
 			int x = 0;
-			while (first[x] != '\0') {
-				if (first[x] != sec[x]) {
-					return 1;
-				}
+			while (first[x] != '\0' && x < first.length) {
+				firstStr += first[x];
 				x++;
 			}
-			return 0;
+			if (firstStr.equals(second)){
+				return 0;
+			}
 		} catch (Exception e) {
 			Globals.reportError("RoverCode", "strcmp", e);
-			return 1;
 		}
+		return 1;
 	}
 	
 	private char[] strcat(char[] first, char[] second){
@@ -877,8 +869,12 @@ public class RoverObj {
 	}
 	
 	private int strcmp(String first, String second){ // see if 2 strings are equal
-		char[] first2 = first.toCharArray();
-		return strcmp(first2, second);
+		if (first.equals(second)){
+			return 0;
+		}
+		else {
+			return 1;
+		}
 	}
 	
 //TODO PHYSCIS STARTS HERE *****************************************************************************************************************************************************************************************************
@@ -987,6 +983,10 @@ public class RoverObj {
 	
 	public String getName(){
 		return name;
+	}
+	
+	public String getIDTag(){
+		return IDcode;
 	}
 	
 	public String getSerialHistory(){

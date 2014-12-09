@@ -6,7 +6,7 @@ import java.io.File;
 import control.InstructionObj;
 import control.InterfaceCode;
 import objects.DecimalPoint;
-import rover.RoverObj;
+import rover.RoverObject;
 import map.PlanetParametersList;
 
 public class Access {
@@ -18,7 +18,7 @@ public class Access {
 		CODE.beginSimulation();
 	}
 	
-	public static void addRoversToMap(RoverObj[] rovs){ 
+	public static void addRoversToMap(RoverObject[] rovs){ 
 		CODE.GUI.TerrainPnl.setRoverSwarm(rovs);
 	}
 	
