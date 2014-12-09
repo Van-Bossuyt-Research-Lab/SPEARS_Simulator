@@ -22,7 +22,7 @@ public class PlasmaPanel extends JPanel {
 	private double rough;
 	private double minval;
 	private double maxval;
-	private double maxHeight = 6.5;
+	private double maxHeight = 13;
 	private Random rnd = new Random();
 	private int squareResolution = 50;
 	
@@ -355,22 +355,38 @@ public class PlasmaPanel extends JPanel {
 	private Color getColor(double numb) {
 		switch (currentColorScheme){
 		case REDtoGREEN:
-			int red = (int)(255 - (ColorModifier*4/3.0)*Math.pow((numb-((maxval-minval)/2.0+minval)), 2));
-			if (red < 0){
-				red = 0;
+			double scaled = numb / maxHeight * 100;
+			int red = 0, green = 0, blue = 0;
+			if (scaled < 25){
+				red = (int) ((scaled)/25*255);
 			}
-			int green = (int)(255 - (ColorModifier*3/4.0)*Math.pow((numb-maxval-0.5), 2));
-			if (green < 0){
-				green = 0;
+			else if (scaled < 50){
+				red = 255;
+				green = (int) ((scaled-25)/25*255);
 			}
-			int blue = (int) ((green - 240) / 2 + (numb - maxHeight) * 2);
-			if (blue < 0){
-				blue = 0;
+			else if (scaled < 75){
+				red =  (int) ((25-(scaled-50))/25*255);
+				green = 255;
+			}
+			else if (scaled < 100){
+				red = (int) ((scaled-75)/25*255);
+				green = 255;
+				blue = red;
+			}
+			else {
+				red = 255;
+				green = 255;
+				blue = 255;
 			}
 			if (numb > maxHeight){
 				//System.out.println(Math.round(numb*100)/100.0 + ": " + red + ", " + green + ", " + blue);
 			}
-			return new Color(red, green, blue);
+			try{
+				return new Color(red, green, blue);
+			}
+			catch (Exception e){
+				return Color.CYAN;
+			}
 		case BLACKtoWHITE:
 			int x = (int) Math.round((numb - minval) / maxval * 255);
 			return new Color(x, x, x);
@@ -444,7 +460,8 @@ public class PlasmaPanel extends JPanel {
 						if (values[x+detail/2][y+detail/2] > maxHeight){
 							//System.out.println(Math.round(numb*100)/100.0 + ": " + red + ", " + green + ", " + blue);
 						}
-						g.setColor(new Color(red, green, blue));
+						int scaled = (int) (values[x+detail/2][y+detail/2] * 100 / maxHeight);
+						g.setColor(new Color(2.0f * scaled, 2.0f * (1 - scaled), 0));
 						break;
 					case BLACKtoWHITE:
 						int i = (int) Math.round((values[x+detail/2][y+detail/2] - minval) / (maxval-minval) * 255);
