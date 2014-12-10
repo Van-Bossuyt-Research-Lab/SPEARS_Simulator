@@ -30,6 +30,12 @@ import com.jgoodies.forms.factories.FormFactory;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainWrapper extends Panel {
 
@@ -69,6 +75,7 @@ public class MainWrapper extends Panel {
 		JLabel[] SerialRoverAvailableLbls;
 		JLabel[] SerialSatelliteLbls;
 		JLabel[] SerialSatelliteAvailableLbls;
+		JSlider SerialHistorySlider;
 	
 	public MainWrapper(Dimension size) {
 		super(new Dimension(1920, 1080), "Wrapper Display");
@@ -231,7 +238,7 @@ public class MainWrapper extends Panel {
 		
 		SerialDisplayScroll = new JScrollPane();
 		SerialDisplayScroll.setBorder(null);
-		SerialDisplayScroll.setBounds(10, 43, 569, 123);
+		SerialDisplayScroll.setBounds(10, 41, 620, 444);
 		RuntimePnl.add(SerialDisplayScroll);
 		
 		SerialDisplayPnl = new JPanel();
@@ -248,6 +255,22 @@ public class MainWrapper extends Panel {
 		SerialAvialableLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
 		SerialAvialableLbl.setBounds(461, 12, 118, 21);
 		RuntimePnl.add(SerialAvialableLbl);
+		
+		SerialHistorySlider = new JSlider();
+		SerialHistorySlider.setMinorTickSpacing(1);
+		SerialHistorySlider.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				Access.CODE.drawSerialBuffers(SerialHistorySlider.getValue());
+			}
+		});
+		SerialHistorySlider.setMajorTickSpacing(10);
+		SerialHistorySlider.setSnapToTicks(true);
+		SerialHistorySlider.setValue(0);
+		SerialHistorySlider.setMaximum(10);
+		SerialHistorySlider.setPaintTicks(true);
+		SerialHistorySlider.setBounds(10, 491, 620, 25);
+		RuntimePnl.add(SerialHistorySlider);
 	}
 	
 	private void align(){
@@ -274,7 +297,7 @@ public class MainWrapper extends Panel {
 		this.SatelliteListLbl.setLocation(SatelliteList.getX(), this.SatAutonomusCodeLbl.getY());
 		
 		this.SerialDisplayTitle.setLocation(spacing, spacing);
-		this.SerialDisplayScroll.setBounds(SerialDisplayTitle.getX(), SerialDisplayTitle.getY()+SerialDisplayTitle.getHeight()+spacing, (this.tabbedPane.getWidth()-spacing*4)/3, this.tabbedPane.getHeight()-spacing*3-SerialDisplayTitle.getHeight()-40);
+		this.SerialDisplayScroll.setBounds(SerialDisplayTitle.getX(), SerialDisplayTitle.getY()+SerialDisplayTitle.getHeight()+spacing, (this.tabbedPane.getWidth()-spacing*4)/3, (this.tabbedPane.getHeight()-spacing*3-SerialDisplayTitle.getHeight()-40)/2);
 		this.SerialAvialableLbl.setLocation(SerialDisplayScroll.getX()+SerialDisplayScroll.getWidth()-SerialAvialableLbl.getWidth(), SerialDisplayTitle.getY());
 	}
 	

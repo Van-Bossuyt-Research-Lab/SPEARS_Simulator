@@ -21,6 +21,7 @@ public class InterfaceCode {
 	private String connectedPort = "COM13";
 	private ZDate DateTime;
 	private ThreadTimer clock;
+	private String IDcode = "g";
 	
 	private int connectionTime = 0;
 	private int countSec = 0;
@@ -230,7 +231,7 @@ public class InterfaceCode {
 			char[] output = msg.toCharArray();
 			int x = 0;
 			while (x < output.length){
-				Globals.writeToSerial(output[x], "g"); // Write to Serial one char at a time
+				Globals.writeToSerial(output[x], IDcode); // Write to Serial one char at a time
 				delay(20); // Pause for sending
 				x++;
 			}
@@ -249,7 +250,7 @@ public class InterfaceCode {
 			char[] output = msg.toCharArray();
 			int x = 0;
 			while (x < output.length){
-				Globals.writeToSerial(output[x], "g"); // Write to Serial one char at a time
+				Globals.writeToSerial(output[x], IDcode); // Write to Serial one char at a time
 				delay(20); // Pause for sending
 				x++;
 			}
@@ -272,7 +273,7 @@ public class InterfaceCode {
 		if (!receivingFile){
 			char[] input = readFromSerial().toCharArray();
 			if (input.length > 2){
-				if ((input[0]+"").equals("g")){
+				if ((input[0]+"").equals(IDcode)){
 					if (input[2] == 'n'){
 						String data = "";
 						int x = 4;
@@ -316,18 +317,18 @@ public class InterfaceCode {
 	private String readFromSerial(){
 		if (!connectedPort.equals("")){
 			//if (inputStream.available() > 0){
-			if (Globals.RFAvailable("g") > 0){
+			if (Globals.RFAvailable(IDcode) > 0){
 				// System.out.println("Available");
 				int hold = 0;
-				while (hold != Globals.RFAvailable("g")){
-					hold = Globals.RFAvailable("g");
+				while (hold != Globals.RFAvailable(IDcode)){
+					hold = Globals.RFAvailable(IDcode);
 					delay(7);
 				}
 				String out = "";
 					//while(inputStream.available() > 0) {
-				while (Globals.RFAvailable("g") > 0) {
+				while (Globals.RFAvailable(IDcode) > 0) {
 						//out += (char)(inputStream.read());
-					out += (char)Globals.ReadSerial("g");
+					out += (char)Globals.ReadSerial(IDcode);
 				}
 				if (listening){
 					if (out.equals(listenFor)){
@@ -840,7 +841,7 @@ public class InterfaceCode {
 	private void ReadPhoto(int length){
 		if (receivingFile){
 			try {
-				while (Globals.RFAvailable("g") == 0) {
+				while (Globals.RFAvailable(IDcode) == 0) {
 					delay(5);
 				}
 				delay(20);
@@ -859,12 +860,12 @@ public class InterfaceCode {
 				index = 0;
 				int i = 0;
 				//int escape = 0;
-				while (index < length && Globals.RFAvailable("g") > 0){
+				while (index < length && Globals.RFAvailable(IDcode) > 0){
 					i = 0;
 					while (i < 60 && index < length){
 						//escape = 0;
 						try {
-							bytes[index] = Globals.ReadSerial("g");
+							bytes[index] = Globals.ReadSerial(IDcode);
 						}
 						catch (ArrayIndexOutOfBoundsException e){
 							Globals.reportError("InterfaceCode", "ReadPhoto - e", e);
@@ -910,7 +911,7 @@ public class InterfaceCode {
 	private void ReadDataFile(int length){
 		if (receivingFile){
 			try {
-				while (Globals.RFAvailable("g") == 0) {}
+				while (Globals.RFAvailable(IDcode) == 0) {}
 					delay(20);
 					Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Receiving Data.\n");
 					//writeToLog("Receiving Data File");
@@ -927,10 +928,10 @@ public class InterfaceCode {
 					index = 0;
 					//int escape = 0;
 					while (index < length){
-						while(Globals.RFAvailable("g") > 0) {
+						while(Globals.RFAvailable(IDcode) > 0) {
 							//escape = 0;
 							try {
-								bytes[index] = Globals.ReadSerial("g");
+								bytes[index] = Globals.ReadSerial(IDcode);
 							}
 							catch (ArrayIndexOutOfBoundsException e){
 								Globals.reportError("InterfaceCode", "ReadDataFile - e", e);

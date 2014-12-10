@@ -29,7 +29,7 @@ public class SatelliteObject {
 	
 	private char[] data = new char[30]; // message data
 	private int index = 2;
-	private char tag = '\0';
+	private char[] tag = new char[2];
 	
 	private String serialHistory = "";
 	private Map<String, Boolean> LEDs = new Map<String, Boolean>();
@@ -72,32 +72,41 @@ public class SatelliteObject {
 				if (strcmp(id, IDcode) == 0){ // if the message is for us
 					delay(500);
 					Globals.ReadSerial(IDcode); // white space
-					tag = (char) Globals.ReadSerial(IDcode); // message type tag
+					tag[0] = (char) Globals.ReadSerial(IDcode); // message type tag
+					if (tag[0] == 'r'){
+						tag[1] = (char) Globals.ReadSerial(IDcode); //number of rover
+						index = 3;
+					}
+					else {
+						tag[1] = '\0';
+						index = 2;
+					}
 					Globals.ReadSerial(IDcode); // white space
-					data[1] = ' '; // fills in for message forward
+					data[index-1] = ' '; // fills in for message forward
 					while (Globals.RFAvailable(IDcode) > 0){
 						data[index] = (char) Globals.ReadSerial(IDcode); // read message body
 						index++;
 					}
 					data[index] = '\0'; // end string
 					// switch tags
-					if (tag == 'g'){ // from ground station - relay to rover
-						data[0] = 'r';
+					if (tag[0] == 'g'){ // from ground station - relay to rover
+						data[0] = 'g';
 						sendSerial(data);
 						delay(1000);
 						if (data[2] != '^' && data[2] != '*' && data[2] != '}' && data[2] != '{'){ // don't confirm tags
 							sendSerial("g #"); // confirm
 						}
 					}
-					if (tag == 'r'){ // from rover - relay to ground station
-						data[0] = 'g';
+					if (tag[0] == 'r'){ // from rover - relay to ground station
+						data[0] = 'r';
+						data[1] = tag[1];
 						sendSerial(data);
 						delay(1000);
 						if (data[2] != '^' && data[2] != '*' && data[2] != '%' && data[2] != '}' && data[2] != '{'){ // don't confirm tags
 							sendSerial("r #"); // confirm
 						}
 					}
-					if (tag == 'c'){ // command for the satellite
+					if (tag[0] == 'c'){ // command for the satellite
 						index = 0;
 						while (index < data.length - 2){ // remove first to characters to isolate message body
 							data[index] = data[index + 2];
@@ -223,7 +232,7 @@ public class SatelliteObject {
 					}
 					data = new char[30]; // reset data
 					index = 2;
-					tag = '\0';
+					tag = new char[2];
 					timeSinceCmd = System.currentTimeMillis(); // reset time since command
 				}
 			}

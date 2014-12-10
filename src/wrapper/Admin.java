@@ -4,6 +4,7 @@ import java.util.Random;
 
 import control.InterfaceCode;
 import objects.DecimalPoint;
+import objects.List;
 import objects.Map;
 import objects.Queue;
 import rover.RoverAutonomusCode;
@@ -30,6 +31,8 @@ public class Admin {
 	private Map<String, RoverObject> roversToAdd = new Map<String, RoverObject>();
 	private Map<String, SatelliteObject> satsToAdd = new Map<String, SatelliteObject>();
 	
+	private List<List<String>> serialHistory = new List<List<String>>();
+	
 	public void wakeUp(){};
 	public static void align(){
 		GUI = Form.frame;
@@ -46,6 +49,9 @@ public class Admin {
 	
 	public void beginSimulation(){
 		
+		serialHistory = new List<List<String>>();
+		GUI.WrapperPnl.SerialHistorySlider.setValue(0);
+		GUI.WrapperPnl.SerialHistorySlider.setMaximum(0);
 		Globals.startTime();
 		Map<String, String> roverNames = new Map<String, String>();
 		RoverObject[] rovers = new RoverObject[roversToAdd.size()];
@@ -53,23 +59,30 @@ public class Admin {
 		SatelliteObject[] satellites = new SatelliteObject[satsToAdd.size()];
 		String[] tags = new String[roversToAdd.size()+satsToAdd.size()+1];
 		tags[0] = "g";
+		serialHistory.add(new List<String>());
+		serialHistory.get(0).add("");
 		int x = 0;
-		while (x < GUI.WrapperPnl.RoverList.getItems().length){
-			String key = (String)GUI.WrapperPnl.RoverList.getItemAt(x);
-			rovers[x] = roversToAdd.get(key);
-			roverNames.add(key, rovers[x].getIDTag());
-			tags[x+1] = rovers[x].getIDTag();
-			x++;
-		}
-		x = 0;
 		while (x < GUI.WrapperPnl.SatelliteList.getItems().length){
 			String key = (String)GUI.WrapperPnl.SatelliteList.getItemAt(x);
 			satellites[x] = satsToAdd.get(key);
 			satelliteNames.add(key, satellites[x].getIDCode());
-			tags[x+1+roversToAdd.size()] = satellites[x].getIDCode();
+			tags[x+1] = satellites[x].getIDCode();
+			serialHistory.add(new List<String>());
+			serialHistory.get(x+1).add("");
+			x++;
+		}
+		x = 0;
+		while (x < GUI.WrapperPnl.RoverList.getItems().length){
+			String key = (String)GUI.WrapperPnl.RoverList.getItemAt(x);
+			rovers[x] = roversToAdd.get(key);
+			roverNames.add(key, rovers[x].getIDTag());
+			tags[x+1+roversToAdd.size()] = rovers[x].getIDTag();
+			serialHistory.add(new List<String>());
+			serialHistory.get(x+1+roversToAdd.size()).add("");
 			x++;
 		}
 		Globals.initalizeLists(tags);
+		
 		GUI.WrapperPnl.genorateSerialDisplays(rovers, satellites);
 		GUI.RoverHubPnl.setRovers(rovers);
 		GUI.SatelliteHubPnl.setSatellites(satellites);
@@ -94,20 +107,33 @@ public class Admin {
 			}
 			x++;
 		}
-		GUI.WrapperPnl.SerialGroundLbl.setText(stored[0]);
-		GUI.WrapperPnl.SerialGroundAvailableLbl.setText(stored[0].length()+"");
-		x = 1;
+		x = 0;
+		while (x < stored.length){
+			serialHistory.get(x).add(stored[x]);
+			x++;
+		}
+		GUI.WrapperPnl.SerialHistorySlider.setMaximum(GUI.WrapperPnl.SerialHistorySlider.getMaximum()+1);
+		if (GUI.WrapperPnl.SerialHistorySlider.getValue() == GUI.WrapperPnl.SerialHistorySlider.getMaximum()-1){
+			GUI.WrapperPnl.SerialHistorySlider.setValue(GUI.WrapperPnl.SerialHistorySlider.getMaximum());
+		}
+		drawSerialBuffers(GUI.WrapperPnl.SerialHistorySlider.getValue());
+	}
+	
+	public void drawSerialBuffers(int hist){
+		GUI.WrapperPnl.SerialGroundLbl.setText(serialHistory.get(0).get(hist));
+		GUI.WrapperPnl.SerialGroundAvailableLbl.setText(serialHistory.get(0).get(hist).length()+"");
+		int x = 1;
 		int i = 0;
 		while (i < GUI.WrapperPnl.SerialSatelliteLbls.length){
-			GUI.WrapperPnl.SerialSatelliteLbls[i].setText(stored[x]);
-			GUI.WrapperPnl.SerialSatelliteAvailableLbls[i].setText(stored[x].length()+"");
+			GUI.WrapperPnl.SerialSatelliteLbls[i].setText(serialHistory.get(x).get(hist));
+			GUI.WrapperPnl.SerialSatelliteAvailableLbls[i].setText(serialHistory.get(x).get(hist).length()+"");
 			i++;
 			x++;
 		}
 		i = 0;
 		while (i < GUI.WrapperPnl.SerialRoverLbls.length){
-			GUI.WrapperPnl.SerialRoverLbls[i].setText(stored[x]);
-			GUI.WrapperPnl.SerialRoverAvailableLbls[i].setText(stored[x].length()+"");
+			GUI.WrapperPnl.SerialRoverLbls[i].setText(serialHistory.get(x).get(hist));
+			GUI.WrapperPnl.SerialRoverAvailableLbls[i].setText(serialHistory.get(x).get(hist).length()+"");
 			i++;
 			x++;
 		}
