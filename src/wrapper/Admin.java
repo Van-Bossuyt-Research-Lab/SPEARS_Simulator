@@ -10,7 +10,7 @@ import objects.Queue;
 import rover.RoverAutonomusCode;
 import rover.RoverObject;
 import rover.RoverParametersList;
-import rover.autoCode.GenericRover;
+import rover.autoCode.*;
 import satellite.SatelliteAutonomusCode;
 import satellite.SatelliteObject;
 import satellite.SatelliteParametersList;
@@ -38,13 +38,13 @@ public class Admin {
 		GUI = Form.frame;
 	}
 	
+	//TODO Add items for rover and satellite option here using addItemToSelectionList
 	public Admin(){
-		roverParameters.add("Default", new RoverParametersList());
-		GUI.WrapperPnl.RovDriveModelList.addValue("Default");
-		roverLogics.add("Generic4", new GenericRover("Generic4", 4));
-		GUI.WrapperPnl.RovAutonomusCodeList.addValue("Generic4");
-		GUI.WrapperPnl.SatAutonomusCodeList.addValue("[null]");
-		GUI.WrapperPnl.SatDriveModelList.addValue("[null]");
+		//addItemToSelectionList(	name_on_list ,	object_to_add	);
+		addItemToSelectionList(		"Default", 		new RoverParametersList());
+		addItemToSelectionList(		"Generic4", 	new GenericRover("Generic4", 4));
+		addItemToSelectionList(		"[null]", 		(SatelliteAutonomusCode)null);
+		addItemToSelectionList(		"[null]", 		(SatelliteParametersList)null);
 	}
 	
 	public void beginSimulation(){
@@ -149,7 +149,10 @@ public class Admin {
 			}
 			//TODO change temp to map temp
 			GUI.WrapperPnl.RoverList.addValue(newName);
-			roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem()), this.roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()), new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
+			//if you're getting errors with rovers 'sharing' data it's the pass reference value here
+			RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()); 
+			RoverParametersList params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem());
+			roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
 		}
 	}
 	
@@ -167,6 +170,26 @@ public class Admin {
 			GUI.WrapperPnl.SatelliteList.addValue(newName);
 			this.satsToAdd.add(newName, new SatelliteObject(newName, "s"+GUI.WrapperPnl.SatelliteList.getItems().length, null, null, rnd.nextDouble()*100000+10000000, rnd.nextDouble()*90, rnd.nextDouble()*360));
 		}
+	}
+	
+	private void addItemToSelectionList(String name, RoverParametersList item){
+		roverParameters.add(name, item);
+		GUI.WrapperPnl.RovDriveModelList.addValue(name);
+	}
+	
+	private void addItemToSelectionList(String name, RoverAutonomusCode item){
+		roverLogics.add(name, (RoverAutonomusCode)item);
+		GUI.WrapperPnl.RovAutonomusCodeList.addValue(name);
+	}
+	
+	private void addItemToSelectionList(String name, SatelliteParametersList item){
+		satelliteParameters.add(name, item);
+		GUI.WrapperPnl.SatDriveModelList.addValue(name);
+	}
+	
+	private void addItemToSelectionList(String name, SatelliteAutonomusCode item){
+		satelliteLogics.add(name, item);
+		GUI.WrapperPnl.SatAutonomusCodeList.addValue(name);
 	}
 	
 	private boolean contains(Object[] array, String val){
