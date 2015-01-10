@@ -215,13 +215,13 @@ public class InterfaceCode {
 		connectionTime = 0;
 		connectedPort = (String)Access.CODE.GUI.InterfacePnl.PortSelectCombo.getSelectedItem();
 		Access.CODE.GUI.InterfacePnl.ConnectionLbl.setText("Connected for " + connectionTime + " min.");
-		// writeToLog("Connection Changed to " + connectedPort);
+		writeToLog("COM Port", "Connection Changed to " + connectedPort);
 		resetConnection();
 	}
 
 	public void writeToSerial(String msg){
 		if (Connected && !muted){
-			//writeToLog("Command sent: \'" + msg + "\'" + DateTime.toString());
+			writeToLog("Serial Writer", "Command sent: \'" + msg + "\'" + DateTime.toString());
 			//try {
             // 	outputStream.write(msg.getBytes());
         	//} catch (Exception e) {
@@ -240,7 +240,7 @@ public class InterfaceCode {
 	
 	public void writeToSerial(String msg, boolean override){
 		if ((Connected || override) && !muted){
-			//writeToLog("Command sent: \'" + msg + "\'" + DateTime.toString());
+			writeToLog("Serial Writer", "Command sent: \'" + msg + "\'" + DateTime.toString());
 			//try {
             // 	outputStream.write(msg.getBytes());
         	//} catch (Exception e) {
@@ -282,7 +282,7 @@ public class InterfaceCode {
 							x++;
 						}
 						Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Recieved: " + data + "\n");
-						// writeToLog("Recieved Note: " + data);
+						writeToLog("Serial Reader", "Recieved Note: " + data);
 					}
 					else if (input[2] == 'i'){
 						receivingFile = true;
@@ -846,7 +846,7 @@ public class InterfaceCode {
 				}
 				delay(20);
 				Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Receiving Image.\n");
-				//writeToLog("Receiving Image");
+				writeToLog("Photo Reciever", "Receiving Image");
 				String text = Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText();
 				byte[] bytes = new byte[length];
 				char[] progress = new char[length / 500 + 1];
@@ -914,7 +914,7 @@ public class InterfaceCode {
 				while (Globals.RFAvailable(IDcode) == 0) {}
 					delay(20);
 					Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Receiving Data.\n");
-					//writeToLog("Receiving Data File");
+					writeToLog("Date Reciever", "Receiving Data File");
 					String text = Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText();
 					byte[] bytes = new byte[length];
 					char[] progress = new char[length / 100 + 1];

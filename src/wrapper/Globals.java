@@ -115,7 +115,7 @@ public class Globals {
 	}
 	
 	public static void writeToLogFile(String from, String write){ // writes the message to the log genorated by the interface
-		//InterfaceEvents.addNoteToLog(from, write);
+		Access.INTERFACE.writeToLog(from, write);
 	}
 	
 	public static double addErrorToMeasurement(double measurement, double percentError){ // takes in a measurement an adds error by the given percent

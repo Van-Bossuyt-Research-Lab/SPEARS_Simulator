@@ -65,7 +65,7 @@ public class RoverObject {
 	private float averageCurrent = 0; // integral divided by time
 		
 	private DecimalPoint location; //m x m from center of map
-	private double direction; //rad
+	private double direction; //rad off of positive X
 	private double speed = 0; //m/s
 	private double angular_velocity = 0; //rad/s
 	private double acceleration = 0; //m/s^2
@@ -165,67 +165,67 @@ public class RoverObject {
 						data[index] = '\0'; // end of string
 						// switch through commands
 						if (strcmp(data, "move") == 0) {
-							sendSerial("s g %"); // confirm message reciet
+							sendSerial("s1 g %"); // confirm message reciet
 							driveForward();
 							moving = true;
 						} 
 						else if (strcmp(data, "stop") == 0) {
-							sendSerial("s g %");
+							sendSerial("s1 g %");
 							driveStop();
 							moving = true;
 						} 
 						else if (strcmp(data, "spin_ccw") == 0) {
-							sendSerial("s g %");
+							sendSerial("s1 g %");
 							driveSpinCCW();
 							moving = true;
 						} 
 						else if (strcmp(data, "spin_cw") == 0) {
-							sendSerial("s g %");
+							sendSerial("s1 g %");
 							driveSpinCW();
 							moving = true;
 						} 
 						else if (strcmp(data, "backward") == 0) {
-							sendSerial("s g %");
+							sendSerial("s1 g %");
 							driveBackward();
 							moving = true;
 						}
 						else if (strcmp(data, "turnFL") == 0){
-							sendSerial("s g %");
+							sendSerial("s1 g %");
 							driveTurnFL();
 							moving = true;
 						}
 						else if (strcmp(data, "turnFR") == 0){
-							sendSerial("s g %");
+							sendSerial("s1 g %");
 							driveTurnFR();
 							moving = true;
 						}
 						else if (strcmp(data, "turnBL") == 0){
-							sendSerial("s g %");
+							sendSerial("s1 g %");
 							driveTurnBL();
 							moving = true;
 						}
 						else if (strcmp(data, "turnBR") == 0){
-							sendSerial("s g %");
+							sendSerial("s1 g %");
 							driveTurnBR();
 							moving = true;
 						}
 						else if (strcmp(data, "getvolts") == 0) {
-							sendSerial("s g %");
+							sendSerial("s1 g %");
 							delay(2000);
-							sendSerial("s g Vrov=");
+							sendSerial("s1 g Vrov=");
 							sendSerial(boardVoltage);
 							setWaitForResponse('#', 2000);
 							delay(2500);
-							sendSerial("s g Vmtr=");
+							sendSerial("s1 g Vmtr=");
 							sendSerial(motorVoltage);
 							setWaitForResponse('#', 2000);
 							delay(2500);
-							sendSerial("s g Varm=");
+							sendSerial("s1 g Varm=");
 							sendSerial(armVoltage);
 							setWaitForResponse('#', 2000);
 						} 
 						else if (strcmp(data, "photo") == 0) {
-							sendSerial("s g %");
+							sendSerial("s1 g %");
 							delay(2000);
 							takePicture();
 						} 
@@ -241,9 +241,9 @@ public class RoverObject {
 								}
 								delay(2000); // continue syncopation, we want to avoid the incoming message running out of room in the buffer
 							}
-							sendSerial("s g {"); // unmute the ground station
+							sendSerial("s1 g {"); // unmute the ground station
 							delay(1500); // allow unmute to arrive
-							sendSerial("s g n Instructions Transfered"); // confirm received of instructions
+							sendSerial("s1 g n Instructions Transfered"); // confirm received of instructions
 							hasInstructions = true; // we now have instructions
 							instructsComplete = 0; // we haven't started them
 							System.out.print(instructions); // show console what they are so I can figure out why they don't work
@@ -255,11 +255,11 @@ public class RoverObject {
 								driveStop(); // stop the rover
 							}
 							delay(1000);
-							sendSerial("s g KillDone"); // confirm abort
+							sendSerial("s1 g KillDone"); // confirm abort
 						}
 						else if (strcmp(data, "auto") == 0){ // force into autonomous mode
 							run_auto = true;
-							sendSerial("s g %");
+							sendSerial("s1 g %");
 						}
 					} 
 					// if there isn't more to the message interpret the tag
@@ -270,7 +270,7 @@ public class RoverObject {
 					} 
 					else if (tag == '^') { // the ground pinged us
 						connected = true;
-						sendSerial("s g ^");
+						sendSerial("s1 g ^");
 						delay(2000);
 						pingGround(); // test the connection
 					} 
@@ -407,7 +407,7 @@ public class RoverObject {
 						    	temperatureData += Globals.TimeMillis + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
 						    }
 						    else if (strcmp(cmd, "sendTemp") == 0){ // report temperature
-						    	sendSerial("s g }"); // mute the ground so they can't interrupt
+						    	sendSerial("s1 g }"); // mute the ground so they can't interrupt
 						    	delay(2000);
 						    	sendSerial("s c CSV"); // tell the satellite a file is coming
 						    	delay(2000);
@@ -428,7 +428,7 @@ public class RoverObject {
 								cmdWaitTime = Globals.TimeMillis;
 							}
 							else if (strcmp(cmd, "report") == 0) { // report completion of instructions to ground
-								if (sendSerial("s g n Rover Instructs Done")) { // if we're not muted
+								if (sendSerial("s1 g n Rover Instructs Done")) { // if we're not muted
 									hasInstructions = false; // we no longer have instructions
 									instructsComplete = 0;
 								}
@@ -563,7 +563,7 @@ public class RoverObject {
 			    	temperatureData += Globals.TimeMillis + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
 			    }
 			    else if (strcmp(cmd, "sendTemp") == 0){ // report temperature
-			    	sendSerial("s g }"); // mute the ground so they can't interrupt
+			    	sendSerial("s1 g }"); // mute the ground so they can't interrupt
 			    	delay(2000);
 			    	sendSerial("s c CSV"); // tell the satellite a file is coming
 			    	delay(2000);
@@ -635,7 +635,7 @@ public class RoverObject {
 			 * if (distance1 < 50 || distance2 < 50) { tries = tries + 1; }
 			 * else tries = 0;
 			 * 
-			 * if (tries > 1) { //sendSerial("s g n" distance1);
+			 * if (tries > 1) { //sendSerial("s1 g n" distance1);
 			 * motor1->run(RELEASE); motor2->run(RELEASE);
 			 * motor3->run(RELEASE); motor4->run(RELEASE); delay(1000); }
 			 */
@@ -649,7 +649,7 @@ public class RoverObject {
 	
 	private void takePicture() { // take a picture
 		try {
-			sendSerial("s g }"); // mute the ground so it can't interrupt
+			sendSerial("s1 g }"); // mute the ground so it can't interrupt
 			InputStream data = RoverObject.class.getResourceAsStream("/Rover Sample.jpg"); // get the buffer from the "camera"
 			delay(2000);
 			sendSerial("s c [o]"); // tell the satellite a file is coming
@@ -672,7 +672,7 @@ public class RoverObject {
 	}
 	
 	private void pingGround(){ // ping the ground station and listen for a response
-		sendSerial("s g *");
+		sendSerial("s1 g *");
 		setWaitForResponse('*', 3000);
 	}
 	

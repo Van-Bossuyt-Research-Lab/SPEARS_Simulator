@@ -246,6 +246,10 @@ public class LandMapPanel extends Panel{
 	
 	// retrieve temperature from a coordinate, with interpolation
 	public double getTemperature(DecimalPoint loc){ 
+		//uniform temp map
+		return -30;
+		//variable temp map
+		/*
 		try {
 			Point mapSquare = getMapSquare(loc);
 			int x = (int) mapSquare.getX();
@@ -264,6 +268,7 @@ public class LandMapPanel extends Panel{
 			Globals.reportError("MapFrame", "getTempAtLoc", e);
 			return 0;
 		}
+		*/
 	}
 	
 	// interpolates between the corners of a square to find mid-range values
