@@ -60,6 +60,10 @@ public class Access {
 		return CODE.GUI.TerrainPnl.HeightMap.isPointOnTarget(loc);
 	}
 	
+	public static boolean isInHazard(DecimalPoint loc){
+		return CODE.GUI.TerrainPnl.HeightMap.isPointInHazard(loc);
+	}
+	
 	public static void updateRoverLocation(String name, DecimalPoint loc, double dir){
 		CODE.GUI.TerrainPnl.updateRover(name, loc, dir);
 	}

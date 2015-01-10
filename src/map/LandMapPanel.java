@@ -49,6 +49,7 @@ public class LandMapPanel extends Panel{
 		HeightMap = new PlasmaPanel();
 		HeightMap.genorateLandscape(mapSize, mapRough);
 		HeightMap.genorateTargets();
+		HeightMap.genorateHazards();
 		HeightMap.setResolution(53);
 		setFocusPoint(new DecimalPoint(HeightMap.getWidth()/HeightMap.getResolution()/2, HeightMap.getHeight()/HeightMap.getResolution()/2));
 		add(HeightMap);

@@ -32,10 +32,10 @@ public class RoverParametersList {
 	private double battery_heat_transfer = 1; //J/s/*c
 	private double battery_thermal_cap = 50;
 	
-	private double winding_heat_transfer = 1; //J/s/*c
-	private double winding_thermal_cap = 50; //J/*c
-	private double motor_surface_heat_transfer = 1; //J/s/*c
-	private double motor_thermal_cap = 50; //J/*c	
+	private double winding_heat_transfer = 2; //J/s/*c
+	private double winding_thermal_cap = 1.7; //J/*c
+	private double motor_surface_heat_transfer = 0.9; //J/s/*c
+	private double motor_thermal_cap = 0.8; //J/*c	
 	
 	public RoverParametersList() {}
 	

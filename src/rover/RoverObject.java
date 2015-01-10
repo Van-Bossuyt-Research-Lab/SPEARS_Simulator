@@ -946,7 +946,7 @@ public class RoverObject {
 			//Determining the temperature of the motor coils
 			winding_temp[FL] += ((params.getmotor_resistance()*Math.pow(motor_current[FL], 2) - params.getwinding_heat_transfer()*(winding_temp[FL] - motor_temp[FL])) / params.getwinding_thermal_cap()) * time_step;
 			winding_temp[FR] += ((params.getmotor_resistance()*Math.pow(motor_current[FR], 2) - params.getwinding_heat_transfer()*(winding_temp[FR] - motor_temp[FR])) / params.getwinding_thermal_cap()) * time_step;
-			winding_temp[BR] += ((params.getmotor_resistance()*Math.pow(motor_current[BR], 2) - params.getwinding_heat_transfer()*(winding_temp[BR] - motor_temp[BR])) / params.getwinding_thermal_cap()) * time_step;
+			winding_temp[BL] += ((params.getmotor_resistance()*Math.pow(motor_current[BL], 2) - params.getwinding_heat_transfer()*(winding_temp[BL] - motor_temp[BL])) / params.getwinding_thermal_cap()) * time_step;
 			winding_temp[BR] += ((params.getmotor_resistance()*Math.pow(motor_current[BR], 2) - params.getwinding_heat_transfer()*(winding_temp[BR] - motor_temp[BR])) / params.getwinding_thermal_cap()) * time_step;
 			//Determining the surface temperature of the motor
 			motor_temp[FL] += ((params.getwinding_heat_transfer()*(winding_temp[FL] - motor_temp[FL]) - params.getmotor_surface_heat_transfer()*(motor_temp[FL] - Access.getMapTemperatureAtPoint(location))) / params.getmotor_thermal_cap()) * time_step;

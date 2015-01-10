@@ -3,6 +3,7 @@ package visual;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import map.Hazard;
 import objects.DecimalPoint;
 
 import java.awt.Color;
@@ -19,6 +20,7 @@ public class PlasmaPanel extends JPanel {
 
 	private double[][] values;
 	private Point[] targets;
+	private Hazard[] hazards;
 	private double rough;
 	private double minval;
 	private double maxval;
@@ -190,15 +192,25 @@ public class PlasmaPanel extends JPanel {
 					while (y < yend){
 						try {
 							int z = 0;
-							while (z < targets.length){
-								if (x <= (int)targets[z].getX() && (int)targets[z].getX() < x + detail && y <= (int)targets[z].getY() && (int)targets[z].getY() < y+detail){
-									g.setColor(Color.MAGENTA);
+							while (z < hazards.length){
+								if (isPointInHazard(new DecimalPoint((x-values.length/2)/3., (y-values.length/2)/3.))){
+									g.setColor(Color.GRAY);
 									break;
 								}
 								z++;
 							}
-							if (z == targets.length){
-								z = 1/0; // Force Catch Statement
+							if (z == hazards.length){
+								z = 0;
+								while (z < targets.length){
+									if (x <= (int)targets[z].getX() && (int)targets[z].getX() < x + detail && y <= (int)targets[z].getY() && (int)targets[z].getY() < y+detail){
+										g.setColor(Color.MAGENTA);
+										break;
+									}
+									z++;
+								}
+								if (z == targets.length){
+									z = 1/0; // Force Catch Statement
+								}
 							}
 						}
 						catch (Exception e){
@@ -279,6 +291,35 @@ public class PlasmaPanel extends JPanel {
 		}
 		return false;
 	}
+	
+	//Generate random hazards
+	public void genorateHazards(){
+		Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)/500.0*(1+rnd.nextInt(5)))/40];
+		int x = 0;
+		while (x < hazards.length){
+			hazards[x] = new Hazard(new DecimalPoint(680*rnd.nextDouble()-340, 680*rnd.nextDouble()-340), 2*rnd.nextDouble()+1);
+			x++;
+		}
+		this.hazards = hazards;
+	}
+	
+	//get the hazard list
+	public Hazard[] getHazards(){
+		return hazards;
+	}
+	
+	//is the given point in a hazard
+	public boolean isPointInHazard(DecimalPoint loc){
+		int x = 0;
+		while (x < hazards.length){
+			if (hazards[x].isPointWithin(loc)){
+				return true;
+			}
+			x++;
+		}
+		return false;
+	}
+	
 	
 	//part of the plasma fractal generation, pushes the array from |x|x|x| to |x|_|x|_|x|
 	private double[][] expand(double[][] in){
@@ -491,7 +532,6 @@ public class PlasmaPanel extends JPanel {
 			e.printStackTrace();   
 		}
 	}
-	
 	
 	private Point getMapSquare(DecimalPoint loc){ // says which display square a given coordinate falls in
 		int shift = values.length / (detail * 2);
