@@ -43,6 +43,8 @@ public class Admin {
 		//addItemToSelectionList(	name_on_list ,	object_to_add	);
 		addItemToSelectionList(		"Default", 		new RoverParametersList());
 		addItemToSelectionList(		"Generic4", 	new GenericRover("Generic4", 4));
+		addItemToSelectionList(		"RAIR", 		new RAIRcode());
+		addItemToSelectionList(		"PIDAA",		new PIDAAcode());
 		addItemToSelectionList(		"[null]", 		(SatelliteAutonomusCode)null);
 		addItemToSelectionList(		"[null]", 		(SatelliteParametersList)null);
 	}

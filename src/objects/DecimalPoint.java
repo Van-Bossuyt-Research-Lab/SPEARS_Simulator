@@ -46,6 +46,10 @@ public class DecimalPoint {
 		return new DecimalPoint(this.x+x, this.y+y);
 	}
 	
+	public DecimalPoint offset(DecimalPoint pnt){
+		return new DecimalPoint(this.x+pnt.x, this.y+pnt.y);
+	}
+	
 	public DecimalPoint scale(double factor){
 		return new DecimalPoint(x*factor, y*factor);
 	}

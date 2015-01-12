@@ -328,7 +328,7 @@ public class RoverObject {
 					LEDs.set("Instructions", true);
 					LEDs.set("Autonomus", false);
 					run_auto = false; // don't run autonomously
-					if (!waiting || (Globals.TimeMillis - cmdWaitTime > 1000)) { // if we're not waiting or have waiting long enough
+					if (!waiting || (Globals.TimeMillis > cmdWaitTime)) { // if we're not waiting or have waiting long enough
 						waiting = false;
 						String cmd = ""; // the command
 						int x = 0;
@@ -425,7 +425,7 @@ public class RoverObject {
 						    }
 						    else if (strcmp(cmd, "delay1") == 0) { // wait a second
 						    	waiting = true;
-								cmdWaitTime = Globals.TimeMillis;
+								cmdWaitTime = Globals.TimeMillis + 1000;
 							}
 							else if (strcmp(cmd, "report") == 0) { // report completion of instructions to ground
 								if (sendSerial("s1 g n Rover Instructs Done")) { // if we're not muted
@@ -579,9 +579,9 @@ public class RoverObject {
 			    	}
 			    	temperatureData = ""; // delete existing "file"
 			    }
-			    else if (strcmp(cmd, "delay1") == 0) { // wait a second
+			    else if (strcmp(cmd.substring(0, 5), "delay") == 0) { // wait a second
 			    	waiting = true;
-					cmdWaitTime = Globals.TimeMillis;
+					cmdWaitTime = Globals.TimeMillis + Integer.parseInt(cmd.substring(5, cmd.length()));
 				}
 				
 				/*if (Globals.TimeMillis >= autoWaitUntil){
