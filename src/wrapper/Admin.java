@@ -52,7 +52,6 @@ public class Admin {
 		serialHistory = new List<List<String>>();
 		GUI.WrapperPnl.SerialHistorySlider.setValue(0);
 		GUI.WrapperPnl.SerialHistorySlider.setMaximum(0);
-		Globals.startTime();
 		Map<String, String> roverNames = new Map<String, String>();
 		RoverObject[] rovers = new RoverObject[roversToAdd.size()];
 		Map<String, String> satelliteNames = new Map<String, String>();
@@ -90,6 +89,7 @@ public class Admin {
 		InterfaceCode.start();
 		GUI.RoverHubPnl.start();
 		GUI.SatelliteHubPnl.start();
+		Globals.startTime();
 		
 		updateSerialDisplays();
 		

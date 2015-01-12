@@ -121,7 +121,7 @@ public class RoverObject {
 			}
 		},
 		ThreadTimer.FOREVER, name+"-code");
-		ThreadTimer physicsThread = new ThreadTimer(time_step*1000, new Runnable(){
+		ThreadTimer physicsThread = new ThreadTimer((int) (time_step*1000), new Runnable(){
 			public void run(){
 				excecutePhysics();
 			}
@@ -579,7 +579,7 @@ public class RoverObject {
 			    	}
 			    	temperatureData = ""; // delete existing "file"
 			    }
-			    else if (strcmp(cmd, "delay1") == 0) { // wait a second
+			    else if (strcmp(cmd.substring(0, 5), "delay") == 0) { // wait a second
 			    	waiting = true;
 					cmdWaitTime = Globals.TimeMillis;
 				}

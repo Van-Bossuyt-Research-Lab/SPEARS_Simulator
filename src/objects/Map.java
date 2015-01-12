@@ -54,7 +54,7 @@ public class Map < KeyType, ItemType >{
 	}
 	
 	public KeyType[] getKeys(){
-		return keys;
+		return (KeyType[])keys;
 	}
 	
 	public ItemType[] getValues(){

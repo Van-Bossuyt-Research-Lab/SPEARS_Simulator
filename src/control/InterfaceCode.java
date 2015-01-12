@@ -67,7 +67,7 @@ public class InterfaceCode {
 				DateTime.advanceClock();
 				if (Connected){
 					countSec++;
-					if (countSec == 60){
+					if (countSec == 0){
 						connectionTime++;
 						countSec = 0;
 						Access.CODE.GUI.InterfacePnl.ConnectionLbl.setText("Connected for " + connectionTime + " min.");

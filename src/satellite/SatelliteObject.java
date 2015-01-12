@@ -48,7 +48,7 @@ public class SatelliteObject {
 			}
 		},
 		ThreadTimer.FOREVER, name+"-code");
-		ThreadTimer physicsThread = new ThreadTimer(time_step*1000, new Runnable(){
+		ThreadTimer physicsThread = new ThreadTimer((int) (time_step*1000), new Runnable(){
 			public void run(){
 				excecutePhysics();
 			}

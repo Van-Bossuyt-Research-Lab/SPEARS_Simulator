@@ -2,7 +2,11 @@ package wrapper;
 
 import java.util.Random;
 
+import objects.List;
+import objects.Map;
+import objects.Pair;
 import objects.Queue;
+import objects.ThreadItem;
 import objects.ThreadTimer;
 
 public class Globals {
@@ -19,17 +23,36 @@ public class Globals {
 	private static Random rnd = new Random();
 	private static int access_key = "qwert".hashCode();
 	
+	private static boolean begun = false;
+	private static Map<String, ThreadItem> threads = new Map<String, ThreadItem>();
+	private static long lastSystemNanoTime; 
+	private static boolean ready = false;
+	
 	public static void startTime(){
-		milliTimer = new ThreadTimer(0, new Runnable(){
+		lastSystemNanoTime = System.nanoTime();
+		begun = true;
+		milliTimer = new ThreadTimer(1, new Runnable(){
 			public void run(){
 				long end = System.nanoTime() + (long)(1000000 / getTimeScale());
-				while (true){
-					while (System.nanoTime() < end) {}
-					TimeMillis++;
-					end += (long)(1000000 / getTimeScale());
-				}
+				while (System.nanoTime() < end) {}
 			}
-		}, 1, "milli-clock");
+		}, ThreadTimer.FOREVER, "milli-clock");
+		TimeMillis++;
+		String[] keys = threads.getKeys();
+		int x = 0;
+		while (x < keys.length){
+			System.out.println(keys[x]);
+			if (keys[x].equals(null)){
+				break;
+			}
+			threads.get(keys[x]).reset();
+			if (threads.get(keys[x]).getNext() == TimeMillis){
+				threads.get(keys[x]).grantPermission();
+			}
+			x++;
+		}
+		System.exit(0);
+		ready = true;
 	}
 	
 	public static void writeToSerial(char write, String from){
@@ -162,6 +185,52 @@ public class Globals {
 			e.printStackTrace();
 			return null;
 		}		
+	}
+	
+	public static void registerNewThread(String name, int delay){
+		threads.add(name, new ThreadItem(name, delay, TimeMillis));
+	}
+	
+	public static void checkOutThread(String name){
+		threads.remove(name);
+	}
+	
+	public static void threadCheckIn(String name){
+		//TODO figure out how to recover from something else taking longer than the milli-clock
+		threads.get(name).markFinished();
+		System.out.println("\n\nCheck In: " + name + "\nTime: " + TimeMillis);
+		if (System.nanoTime()-lastSystemNanoTime >= 1000000/timeScale){
+			System.out.println("Wait Elapsed");
+			for (String key : threads.getKeys()){
+				System.out.print(key + ".isFinished: ");
+				if (!threads.get(key).isFinished()){
+					System.out.println("false");
+					return;
+				}
+				System.out.println("true");
+			}
+			ready = false;
+			TimeMillis++;
+			for (String key : threads.getKeys()){
+				threads.get(key).reset();
+				if (threads.get(key).getNext() == TimeMillis){
+					threads.get(key).grantPermission();
+				}
+			}
+			ready = true;
+		}		
+	}
+	
+	public static boolean getThreadRunPermission(String name){
+		//System.out.print("\nRequesting: " + name + " - ");
+		if (threads.get(name).hasPermission() && ready && begun){
+			threads.get(name).revokePermission();
+			//System.out.println("approved");
+			return true;
+		}
+		//System.out.println("denied");
+		//System.out.println(threads.get(name).hasPermission() +", " + ready + ", " + begun);
+		return false;
 	}
 	
 }
