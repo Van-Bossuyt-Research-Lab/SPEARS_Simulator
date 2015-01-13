@@ -1,5 +1,6 @@
 package wrapper;
 
+import java.io.File;
 import java.util.Random;
 
 import control.InterfaceCode;
@@ -50,6 +51,20 @@ public class Admin {
 	}
 	
 	public void beginSimulation(){
+		
+		if (GUI.WrapperPnl.MapTypeCombo.getSelectedIndex() == 1){
+			try {
+				File mapFile = new File(GUI.WrapperPnl.FileLocTxt.getText());
+				if (!mapFile.exists()){
+					int a = 1/0;
+				}
+				GUI.TerrainPnl.HeightMap.loadMap(mapFile);
+			}
+			catch (Exception e){
+				System.out.println("Invalid Map File");
+				return;
+			}
+		}
 		
 		serialHistory = new List<List<String>>();
 		GUI.WrapperPnl.SerialHistorySlider.setValue(0);

@@ -12,10 +12,16 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+
+import control.InterfacePanel;
 import objects.DecimalPoint;
+import objects.FileNameFilter;
 import wrapper.Access;
 import wrapper.Globals;
 import rover.RoverObject;
+import visual.ImageButton;
 import visual.Panel;
 import visual.PlasmaPanel;
 
@@ -35,6 +41,8 @@ public class LandMapPanel extends Panel{
 	private double[][] PressureMap;
 	private double[][][][] WindMap;
 	
+	private ImageButton saveBtn;
+	
 	private RoverIcon[] roverIcons;
 	private DecimalPoint[][] roverTrails;
 
@@ -42,6 +50,26 @@ public class LandMapPanel extends Panel{
 		super(size, "Terrain View");
 		setBackground(Color.GRAY);
 		super.hasImage = false;
+		
+		saveBtn = new ImageButton();
+		saveBtn.setImage(new ImageIcon(LandMapPanel.class.getResource("/Save.png")));
+		saveBtn.setBorder(null);
+		saveBtn.setOpaque(false);
+		saveBtn.setMargin(1);
+		saveBtn.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				JFileChooser finder = new JFileChooser();
+				finder.setFileFilter(new FileNameFilter());
+				finder.setApproveButtonText("Save");
+				int option = finder.showSaveDialog(getParent());
+				if (option == JFileChooser.APPROVE_OPTION){
+					HeightMap.saveMap(finder.getSelectedFile());
+				}
+			}
+		});
+		saveBtn.setBounds(super.getVisibleRect().x + 20, (int) (super.getVisibleRect().getHeight() - 50), 35, 35);
+		this.add(saveBtn);
 		
 		roverIcons = new RoverIcon[0];
 		this.params = params;

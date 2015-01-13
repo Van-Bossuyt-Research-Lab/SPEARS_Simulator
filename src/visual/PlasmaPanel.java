@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 
 import map.Hazard;
 import objects.DecimalPoint;
+import wrapper.Globals;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -12,9 +13,13 @@ import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
+import java.util.Scanner;
 
 public class PlasmaPanel extends JPanel {
 
@@ -303,6 +308,11 @@ public class PlasmaPanel extends JPanel {
 		this.hazards = hazards;
 	}
 	
+	public void setHazards(Hazard[] hzds){
+		hazards = hzds;
+		repaint();
+	}
+	
 	//get the hazard list
 	public Hazard[] getHazards(){
 		return hazards;
@@ -318,8 +328,7 @@ public class PlasmaPanel extends JPanel {
 			x++;
 		}
 		return false;
-	}
-	
+	}	
 	
 	//part of the plasma fractal generation, pushes the array from |x|x|x| to |x|_|x|_|x|
 	private double[][] expand(double[][] in){
@@ -544,5 +553,76 @@ public class PlasmaPanel extends JPanel {
 	
 	public double getValueAtLocation(int x, int y){
 		return values[x][y];
+	}
+	
+	public void saveMap(File file){
+		try {
+			BufferedWriter write = new BufferedWriter(new FileWriter(file, true));
+			
+			write.write(values[0].length + "\n" + values.length + "\n\n");
+			for (int i = 0; i < values.length; i++){
+				for (int j = 0; j < values[i].length; j++){
+					write.write(values[i][j] + "\t");
+				}
+				write.write('\n');
+			}
+			
+			write.write("\n" + targets.length + "\n");
+			for (int i = 0; i < targets.length; i++){
+				write.write(targets[i].x + "\t" + targets[i].y + "\n");
+			}
+			
+			write.write("\n" + hazards.length + "\n");
+			for (int i = 0; i < hazards.length; i++){
+				write.write(hazards[i].getPosition().getX() + "\t" + hazards[i].getPosition().getY() + "\t" + hazards[i].getRadius() + "\n");
+			}
+			
+			write.flush();
+			write.close();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadMap(File file){
+		try {
+			Scanner data = new Scanner(file);
+			
+			int width = data.nextInt();
+			int height = data.nextInt();
+			
+			double[][] values = new double[height][width];
+			for (int i = 0; i < height; i++){
+				double[] row = new double[width];
+				for (int j = 0; j < width; j++){
+					row[j] = data.nextDouble();
+				}
+				values[i] = row;
+			}
+			this.setValues(values);
+			
+			int targs = data.nextInt();
+			Point[] targets = new Point[targs];
+			for (int i = 0; i < targs; i++){
+				int x = data.nextInt();
+				int y = data.nextInt();
+				targets[i] = new Point(x, y);
+			}
+			this.setTargets(targets);
+			
+			int hzdrs = data.nextInt();
+			Hazard[] hazards = new Hazard[hzdrs];
+			for (int i = 0; i < hzdrs; i++){
+				double x = data.nextDouble();
+				double y = data.nextDouble();
+				double r = data.nextDouble();
+				hazards[i] = new Hazard(new DecimalPoint(x, y), r);
+			}
+			this.setHazards(hazards);
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 }
