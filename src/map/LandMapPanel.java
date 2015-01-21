@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.File;
 import java.util.Random;
 
 import javax.swing.ImageIcon;
@@ -64,7 +65,7 @@ public class LandMapPanel extends Panel{
 				finder.setApproveButtonText("Save");
 				int option = finder.showSaveDialog(getParent());
 				if (option == JFileChooser.APPROVE_OPTION){
-					HeightMap.saveMap(finder.getSelectedFile());
+					HeightMap.saveMap(new File(finder.getSelectedFile().getAbsolutePath() + ".map"));
 				}
 			}
 		});
@@ -240,14 +241,27 @@ public class LandMapPanel extends Panel{
 		int outy = (int)(y*HeightMap.getDetail());
 		return new Point(outx, outy);
 	}
+	private Point getMapSquare(DecimalPoint loc, boolean offset){ // says which display square a given coordinate falls in
+		double x = loc.getX();
+		double y = loc.getY();
+		if (offset){
+			double shift = HeightMap.getWidth()/HeightMap.getResolution() / 2.0;
+			x = loc.getX() + shift;
+			y = shift - loc.getY();
+		}
+		int outx = (int)(x*HeightMap.getDetail());
+		int outy = (int)(y*HeightMap.getDetail());
+		return new Point(outx, outy);
+	}
 	
 	//returns the height of the map at the given point
 	public double getHeight(DecimalPoint loc){
 		Point mapSquare = getMapSquare(loc);
 		int x = (int) mapSquare.getX();
 		int y = (int) mapSquare.getY();
-		double locx = ((int)((loc.getX() - (int)loc.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
-		double locy = ((int)((loc.getY() - (int)loc.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
+		DecimalPoint lifePnt = new DecimalPoint(loc.getX() + HeightMap.getWidth()/HeightMap.getResolution() / 2.0, HeightMap.getWidth()/HeightMap.getResolution() / 2.0 - loc.getY());
+		double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
+		double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
 		return getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
 	}
 	
@@ -256,14 +270,15 @@ public class LandMapPanel extends Panel{
 		Point mapSquare = getMapSquare(loc);
 		int x = (int) mapSquare.getX();
 		int y = (int) mapSquare.getY();
-		double locx = ((int)((loc.getX() - (int)loc.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
-		double locy = ((int)((loc.getY() - (int)loc.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
+		DecimalPoint lifePnt = new DecimalPoint(loc.getX() + HeightMap.getWidth()/HeightMap.getResolution() / 2.0, HeightMap.getWidth()/HeightMap.getResolution() / 2.0 - loc.getY());
+		double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
+		double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
 		double h0 = getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
-		DecimalPoint point2 = loc.offset(Math.cos(dir), Math.sin(dir));
-		x = (int) getMapSquare(point2).getX();
-		y = (int) getMapSquare(point2).getY();
-		locx = ((int)((point2.getX() - (int)point2.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
-		locy = ((int)((point2.getY() - (int)point2.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
+		DecimalPoint point2 = lifePnt.offset(Math.cos(dir), -Math.sin(dir));
+		x = (int) getMapSquare(point2, false).getX();
+		y = (int) getMapSquare(point2, false).getY();
+		locx = (point2.getX() - (lifePnt.getX()-locx/HeightMap.getDetail())) * HeightMap.getDetail();
+		locy = (point2.getY() - (lifePnt.getY()-locy/HeightMap.getDetail())) * HeightMap.getDetail();
 		double hnew = getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
 		return Math.atan(hnew-h0);
 	}
@@ -302,13 +317,11 @@ public class LandMapPanel extends Panel{
 	
 	// interpolates between the corners of a square to find mid-range values
 		public double getIntermidiateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
-			relativex *= HeightMap.getDetail();
-			relativey *= HeightMap.getDetail();
 			if (relativex > relativey){ //top right triangle
-				return (topright - topleft) * relativex - (topright - bottomright) * relativey;
+				return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
 			}
 			else if (relativex < relativey){ //bottom left triangle
-				return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey;
+				return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey + topleft;
 			}
 			else { //center line
 				return ((bottomright - topleft) * relativex + topleft);

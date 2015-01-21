@@ -4,9 +4,9 @@ import objects.DecimalPoint;
 import rover.RoverAutonomusCode;
 import wrapper.Access;
 
-public class PIDAAcode extends RoverAutonomusCode {
+public class RAIRcodeControl extends RoverAutonomusCode {
 
-	public PIDAAcode(PIDAAcode in) {
+	public RAIRcodeControl(RAIRcodeControl in) {
 		super(in);
 		this.phiBound = in.phiBound;
 		this.tphi = in.tphi;
@@ -25,7 +25,7 @@ public class PIDAAcode extends RoverAutonomusCode {
 		D11=in.D11;
 		D12=in.D12;
 		D13=in.D13;
-		D14=in.D14;
+		D14=in.D14;	
 		D15=in.D15;
 		D16=in.D16;
 		S1 = in.S1;
@@ -55,8 +55,7 @@ public class PIDAAcode extends RoverAutonomusCode {
 		Trgt = in.Trgt;
 		this.lastActionTime = in.lastActionTime;
 		this.action = in.action;
-		this.seconds = seconds;	
-		
+		this.seconds = seconds;
 	}
 
 		//Declare any variables you want here
@@ -112,14 +111,15 @@ public class PIDAAcode extends RoverAutonomusCode {
 		int substate3=0;
 		
 		//Target location 
+		//DecimalPoint Trgt=new DecimalPoint(-100,-100);
 		DecimalPoint Trgt=new DecimalPoint(-100,-100);
 
 		private long lastActionTime = 0;
 		private int action = 0;
 		private int seconds = 1;
 		
-		public PIDAAcode(){
-			super("PIDAA", "PIDAA");
+		public RAIRcodeControl(){
+			super("RAIR", "RAIR");
 
 		}
 	
@@ -147,121 +147,135 @@ public class PIDAAcode extends RoverAutonomusCode {
 			double battery_temp,
 			double battery_charge
 	) {
-
+		
 		//Write processing code here
 		//log
 		boolean hazard=Access.isInHazard(location);
 		double elevation=Access.getMapHeightatPoint(location);
-		//Battery hazard rate
-		double HBatt=HazR(battery_temp,5,18);
-		//Wheels hazard rates
-		double HwFL=HazR(motor_temp_FL,35,33);
-		double HwFR=HazR(motor_temp_FR,35,33);
-		double HwBL=HazR(motor_temp_BL,35,33);
-		double HwBR=HazR(motor_temp_BR,35,33);
-		//Hazard hazard rate
-		double Hhzrd=0;
-		if (hazard){
-			Hhzrd=.95;
+		
+		writeToLog("RA" +","+state+","+ milliTime +","+ location+","+ elevation+","+direction+","+motor_temp_FL+","+motor_temp_FR+","+motor_temp_BL+","+motor_temp_BR+","+battery_temp+","+battery_charge+","+hazard);
+		
+			//determine variables: arc angle range theta, number of angle increments n, distance checked d, 
+				
+			//Begin loop
+				
+			//determine delta x,y,z
+
+		//double check this is the right way to call these out with Zach
+		double delta_X=Trgt.getX()-location.getX();
+		double delta_Y=Trgt.getY()-location.getY();
+		double delta_L=Math.sqrt(Math.pow(delta_X, 2)+Math.pow(delta_Y, 2));
+		double delta_Z=Access.getMapHeightatPoint(Trgt)-Access.getMapHeightatPoint(location);
+		
+			//determine angle between A and B 
+			//	arc tangent of opposite/adjacent set as phi
+		double phi=Math.atan(delta_X/delta_Y);
+			//optimal climb angle
+		double theta=Math.atan(delta_Z/delta_L);
+		
+//code break state 3
+		if (milliTime-checkTime>=600000){
+			//if distance travelled is greater than 10 meters
+			checkTime=milliTime;
+			if (pythagorean(location,checkPoint)>=10){
+				checkPoint=location;
+			} else {
+				//if distance travelled is less that 10 meters
+				//enter state 3
+				state=3;
+				substate3=1;
+			}
 		}
-		//Incline hazard rate
-		double Hinc=HazR(Access.getMapInclineAtPoint(location, direction),0,5.1);
-		//Total Hazard rate
-		double HRate=sumP(HBatt,HwFL,HwFR,HwBL,HwBR,Hhzrd,Hinc);
-		//Total Failure Rate
-		double FRate=FailR(HRate,1);
-		writeToLog("RA" +","+state+","+ milliTime +","+ location+","+ elevation+","+FRate+","+HRate+","+Hinc+","+Hhzrd+","+motor_temp_FL+","+HwFL+","+motor_temp_FR+","+HwFR+","+motor_temp_BL+","+HwBL+","+motor_temp_BR+","+HwBR+","+battery_temp+","+HBatt);
+//Goal Reached State 4 Break
+		if (pythagorean(location,Trgt)<=1.5){
+			state=4;
+		}
 		
-//This is where you should calculate the status of the system
-		
-//This is where you should set the Acceptable level of risk
-		
-//This is where you should determine if we have exceeded acceptable levels of risk
 		
 if (milliTime-rnTime>=500){
 //State 0 determines is the route selection state
 		if (state==0) {
 		//Look at 8 near points
-			//P1
-			DecimalPoint loc=location;
-			DecimalPoint P1;
-			P1=location.offset(D1);
-			S1=RouteChoice(P1,loc);
-			
-			//P2
-			DecimalPoint P2;
-			P2=location.offset(D2);
-			S2=RouteChoice(P2,loc);
-			
-			//P3
-			DecimalPoint P3;
-			P3=location.offset(D3);
-			S3=RouteChoice(P3,loc);
-			
-			//P4
-			DecimalPoint P4;
-			P4=location.offset(D4);
-			S4=RouteChoice(P4,loc);
-			
-			//P5
-			DecimalPoint P5;
-			P5=location.offset(D5);
-			S5=RouteChoice(P5,loc);
-			
-			//P6
-			DecimalPoint P6;
-			P6=location.offset(D6);
-			S6=RouteChoice(P6,loc);
-			
-			//P7
-			DecimalPoint P7;
-			P7=location.offset(D7);
-			S7=RouteChoice(P7,loc);
-			
-			//P8
-			DecimalPoint P8;
-			P8=location.offset(D8);
-			S8=RouteChoice(P8,loc);
-			
-			//P9
-			DecimalPoint P9;
-			P9=location.offset(D9);
-			S9=RouteChoice(P9,loc);
-			
-			//P10
-			DecimalPoint P10;
-			P10=location.offset(D10);
-			S10=RouteChoice(P10,loc);
-			
-			//P11
-			DecimalPoint P11;
-			P11=location.offset(D11);
-			S11=RouteChoice(P11,loc);
-			
-			//P12
-			DecimalPoint P12;
-			P12=location.offset(D12);
-			S12=RouteChoice(P12,loc);
-			
-			//P13
-			DecimalPoint P13;
-			P13=location.offset(D13);
-			S13=RouteChoice(P13,loc);
-			
-			//P14
-			DecimalPoint P14;
-			P14=location.offset(D14);
-			S14=RouteChoice(P14,loc);
-			
-			//P15
-			DecimalPoint P15;
-			P15=location.offset(D15);
-			S15=RouteChoice(P15,loc);
-			
-			//P16
-			DecimalPoint P16;
-			P16=location.offset(D16);
-			S16=RouteChoice(P16,loc);
+		//P1
+		DecimalPoint loc=location;
+		DecimalPoint P1;
+		P1=location.offset(D1);
+		S1=RouteChoice(P1,loc);
+		
+		//P2
+		DecimalPoint P2;
+		P2=location.offset(D2);
+		S2=RouteChoice(P2,loc);
+		
+		//P3
+		DecimalPoint P3;
+		P3=location.offset(D3);
+		S3=RouteChoice(P3,loc);
+		
+		//P4
+		DecimalPoint P4;
+		P4=location.offset(D4);
+		S4=RouteChoice(P4,loc);
+		
+		//P5
+		DecimalPoint P5;
+		P5=location.offset(D5);
+		S5=RouteChoice(P5,loc);
+		
+		//P6
+		DecimalPoint P6;
+		P6=location.offset(D6);
+		S6=RouteChoice(P6,loc);
+		
+		//P7
+		DecimalPoint P7;
+		P7=location.offset(D7);
+		S7=RouteChoice(P7,loc);
+		
+		//P8
+		DecimalPoint P8;
+		P8=location.offset(D8);
+		S8=RouteChoice(P8,loc);
+		
+		//P9
+		DecimalPoint P9;
+		P9=location.offset(D9);
+		S9=RouteChoice(P9,loc);
+		
+		//P10
+		DecimalPoint P10;
+		P10=location.offset(D10);
+		S10=RouteChoice(P10,loc);
+		
+		//P11
+		DecimalPoint P11;
+		P11=location.offset(D11);
+		S11=RouteChoice(P11,loc);
+		
+		//P12
+		DecimalPoint P12;
+		P12=location.offset(D12);
+		S12=RouteChoice(P12,loc);
+		
+		//P13
+		DecimalPoint P13;
+		P13=location.offset(D13);
+		S13=RouteChoice(P13,loc);
+		
+		//P14
+		DecimalPoint P14;
+		P14=location.offset(D14);
+		S14=RouteChoice(P14,loc);
+		
+		//P15
+		DecimalPoint P15;
+		P15=location.offset(D15);
+		S15=RouteChoice(P15,loc);
+		
+		//P16
+		DecimalPoint P16;
+		P16=location.offset(D16);
+		S16=RouteChoice(P16,loc);
 
 		//set appropriate next state
 		state=1;
@@ -293,16 +307,18 @@ if (milliTime-rnTime>=500){
 				state=0;
 				return "stop";
 			}
-//State 3 is the Mitigation State
+//State 3 Give up
 		} else if (state==3){
-			//determine which system is causing the largest problem 
-				//This could be similar in structure to the minscore section
-				//set largest failure cause to mitigation action
-			
+			//System.exit(0);
+			return "stop";
+//State 4 Goal Reached
+		} else if (state==4){
+			checkTime=milliTime;
+			return "stop";
 		}
 }
 
-		return "";
+		return "delay100";
 		//end line of code
 	}
 		
@@ -419,68 +435,65 @@ if (milliTime-rnTime>=500){
 		
 		return C;
 	}
-	
-//Hazard Rate (lambda)
-	private double HazR(double x,double mu,double sig){
-		double hr;
-		//Taken from the PDF of the normal distribution
-			//sig is sigma is sqrt(varience)
-			//x is value of interest
-		double r1=(x/10)*(1/(sig*Math.sqrt(2*Math.PI)))*Math.exp(-1*Math.pow(x*(1/20)-mu,2)/(2*Math.pow(sig, 2)));
-		double r2=(x/10)*(1/(sig*Math.sqrt(2*Math.PI)))*Math.exp(-1*Math.pow(x*(3/20)-mu,2)/(2*Math.pow(sig, 2)));
-		double r3=(x/10)*(1/(sig*Math.sqrt(2*Math.PI)))*Math.exp(-1*Math.pow(x*(5/20)-mu,2)/(2*Math.pow(sig, 2)));
-		double r4=(x/10)*(1/(sig*Math.sqrt(2*Math.PI)))*Math.exp(-1*Math.pow(x*(7/20)-mu,2)/(2*Math.pow(sig, 2)));
-		double r5=(x/10)*(1/(sig*Math.sqrt(2*Math.PI)))*Math.exp(-1*Math.pow(x*(9/20)-mu,2)/(2*Math.pow(sig, 2)));
-		double r6=(x/10)*(1/(sig*Math.sqrt(2*Math.PI)))*Math.exp(-1*Math.pow(x*(11/20)-mu,2)/(2*Math.pow(sig, 2)));
-		double r7=(x/10)*(1/(sig*Math.sqrt(2*Math.PI)))*Math.exp(-1*Math.pow(x*(13/20)-mu,2)/(2*Math.pow(sig, 2)));
-		double r8=(x/10)*(1/(sig*Math.sqrt(2*Math.PI)))*Math.exp(-1*Math.pow(x*(15/20)-mu,2)/(2*Math.pow(sig, 2)));
-		double r9=(x/10)*(1/(sig*Math.sqrt(2*Math.PI)))*Math.exp(-1*Math.pow(x*(17/20)-mu,2)/(2*Math.pow(sig, 2)));
-		double r10=(x/10)*(1/(sig*Math.sqrt(2*Math.PI)))*Math.exp(-1*Math.pow(x*(19/20)-mu,2)/(2*Math.pow(sig, 2)));
-		hr=2*(r1+r2+r3+r4+r5+r6+r7+r8+r9+r10);
-		
-		return hr;
-	}
-	
-//Failure rate
-	private double FailR(double lmb,double t){
-		double fr;
-		//This is the exponential failure distribution
-		fr=1-Math.exp(-1*lmb*t);
-		return fr;
-	}
-	
-//Sum Probabilities 
-	private double sumP(double p1,double p2, double p3, double p4, double p5, double p6,double p7){
-		double pt;
-		
-		double A=p1+p2-p1*p2;
-		double B=A+p3-A*p3;
-		double C=B+p4-B*p4;
-		double D=C+p5-C*-p5;
-		double E=D+p6-D*p6;
-		pt=E+p7-E*p7;
-		
-		return pt;
-	}
-//Method for determining Point Optimization Score for navigation
+//Method for determining Point Optimization Score
 	private double RouteChoice(DecimalPoint pnt,DecimalPoint loc){
 		double score;
+		double hzrds;
+		double slopehzrd;
+		double intslopehzrd;
 
 		double delta_X=Trgt.getX()-loc.getX();
 		double delta_Y=Trgt.getY()-loc.getY();
 		double delta_L=Math.sqrt(Math.pow(delta_X, 2)+Math.pow(delta_Y, 2));
+		double delta_Z=Access.getMapHeightatPoint(Trgt)-Access.getMapHeightatPoint(loc);
+				
+		//target climb angle
+		double theta=Math.atan(delta_Z/delta_L);
 		
 		double Pd_X=Trgt.getX()-pnt.getX();
 		double Pd_Y=Trgt.getY()-pnt.getY();
-		double Pd_L=Math.sqrt(Math.pow(Pd_X, 2)+Math.pow(Pd_Y, 2));		
-				
+		double Pt_X=pnt.getX()-loc.getX();
+		double Pt_Y=pnt.getY()-loc.getY();
+		double Pd_L=Math.sqrt(Math.pow(Pd_X, 2)+Math.pow(Pd_Y, 2));
+		double Pt_L=Math.sqrt(Math.pow(Pt_X, 2)+Math.pow(Pt_Y, 2));
+		double Pt_Z=Access.getMapHeightatPoint(pnt)-Access.getMapHeightatPoint(loc);
+		double thetaP=Math.atan(Pt_Z/Pt_L);
+		
+		//determine if ground cover is safe
+		boolean hzrd=Access.isInHazard(pnt);
+		if (hzrd){
+			hzrds=10;
+		} else{
+			hzrds=0;
+		}
+		
+		//determine if incline is too great
+		if (thetaP>=0.15){
+			slopehzrd=100;
+		} else{
+			slopehzrd=0;
+		}
+		
+		//intermediate point
+			//average of pnt and loc
+		DecimalPoint intpnt;
+		intpnt=loc.offset(Pt_X/10,Pt_Y/10);
+		double intPt_L=Math.sqrt(Math.pow(Pt_X/10, 2)+Math.pow(Pt_Y/10, 2));
+		double intPt_Z=Access.getMapHeightatPoint(intpnt)-Access.getMapHeightatPoint(loc);
+		double intTheta=Math.atan(intPt_Z/intPt_L);
+		if (intTheta>=0.15){
+			intslopehzrd=100;
+		} else{
+			intslopehzrd=0;
+		}
+		
 		//score point for optimality
 		score=Math.abs((delta_L-Pd_L-1)/((delta_L-Pd_L+3)/2));
 		return score;
 	}
 		
-		public PIDAAcode clone(){
-			return new PIDAAcode(this);
+		public RAIRcodeControl clone(){
+			return new RAIRcodeControl(this);
 		}
 
 }

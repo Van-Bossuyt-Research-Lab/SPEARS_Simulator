@@ -109,6 +109,11 @@ public class InterfaceCode {
 		}
 		try {
 			logFile = new File("Logs\\Log File " + DateTime.toString("MM-dd-yyyy hh-mm") + ".txt");
+			int ver = 0;
+			while (logFile.exists()){
+				ver++;
+				logFile = new File("Logs\\Log File " + DateTime.toString("MM-dd-yyyy hh-mm") + " (" + ver + ").txt");
+			}
 			logFile.createNewFile();
 			BufferedWriter write = new BufferedWriter(new FileWriter(logFile));
 			write.write("CSM PHM Rover System Simulator Log " + DateTime.toString("on MM-dd-yyyy at hh:mm") + "\r\n\r\n");
@@ -144,7 +149,7 @@ public class InterfaceCode {
 			}
 			in.close();
 		} 
-		catch (FileNotFoundException e){
+		catch (Exception e){
 			int x = 0;
 			while (x < actionCommands[0].length){
 				actionCommands[0][x] = "";
@@ -157,12 +162,6 @@ public class InterfaceCode {
 				SatelliteInstructions = new InstructionObj[0][0];
 				x++;
 			}
-		}
-		catch (IOException e) {
-			Globals.reportError("InterfaceCode", "initalize - CommandString", e);
-		} 
-		catch (ClassNotFoundException e) {
-			Globals.reportError("InterfaceCode", "initalize - CommandString", e);
 		}
 		confirmMessage = new Runnable(){
 			public void run(){

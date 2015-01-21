@@ -13,6 +13,11 @@ public abstract class RoverAutonomusCode {
 		roverName = rover;
 	}
 	
+	public RoverAutonomusCode(RoverAutonomusCode rac){
+		this.name = rac.name;
+		this.roverName = rac.roverName;
+	}
+	
 	abstract public String nextCommand(
 			long milliTime,
 			DecimalPoint location,
@@ -33,8 +38,13 @@ public abstract class RoverAutonomusCode {
 			double motor_temp_BR,
 			double battery_voltage,
 			double battery_current,
-			double battery_temp
+			double battery_temp,
+			double battery_charge
 	);
+	
+	public void setRoverName(String name){
+		roverName = name;
+	}
 	
 	public String getName(){
 		return name;
@@ -43,5 +53,7 @@ public abstract class RoverAutonomusCode {
 	protected void writeToLog(String message){
 		Globals.writeToLogFile(roverName + ":" + name + " - Autonomous Code", message);
 	}
+	
+	public abstract RoverAutonomusCode clone();
 	
 }

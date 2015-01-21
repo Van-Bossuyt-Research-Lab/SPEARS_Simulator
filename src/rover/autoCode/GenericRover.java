@@ -14,6 +14,15 @@ public class GenericRover extends RoverAutonomusCode {
 		seconds = sec;
 	}
 	
+	public GenericRover(GenericRover in) {
+		super(in);
+		this.lastActionTime = in.lastActionTime;
+		this.action = in.action;
+		this.seconds = in.seconds;
+	}
+
+
+
 	public String nextCommand(
 			long milliTime,
 			DecimalPoint location,
@@ -34,7 +43,8 @@ public class GenericRover extends RoverAutonomusCode {
 			double motor_temp_BR,
 			double battery_voltage,
 			double battery_current,
-			double battery_temp
+			double battery_temp,
+			double battery_charge
 	){
 		if (milliTime-lastActionTime > 1000*seconds){
 			lastActionTime = milliTime;
@@ -55,6 +65,10 @@ public class GenericRover extends RoverAutonomusCode {
 		else {
 			return "";
 		}
+	}
+	
+	public GenericRover clone(){
+		return new GenericRover(this);
 	}
 	
 }

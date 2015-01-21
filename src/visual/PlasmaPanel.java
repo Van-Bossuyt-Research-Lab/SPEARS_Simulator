@@ -198,7 +198,7 @@ public class PlasmaPanel extends JPanel {
 						try {
 							int z = 0;
 							while (z < hazards.length){
-								if (isPointInHazard(new DecimalPoint((x-values.length/2)/3., (y-values.length/2)/3.))){
+								if (isPointInHazard(new DecimalPoint((x-values.length/2)/3., -(y-values.length/2)/3.))){
 									g.setColor(Color.GRAY);
 									break;
 								}
@@ -274,7 +274,7 @@ public class PlasmaPanel extends JPanel {
 	
 	//Generate a target distribution
 	public void genorateTargets(){
-		Point[] targets = new Point[(int)(values.length*values[0].length/(detail*detail)/500.0*(1+rnd.nextInt(5)))];
+		Point[] targets = new Point[1];//(int)(values.length*values[0].length/(detail*detail)/500.0*(1+rnd.nextInt(5)))];
 		int x = 0;
 		while (x < targets.length){
 			targets[x] = new Point(rnd.nextInt(values.length/detail)*detail+detail/2, rnd.nextInt(values.length/detail)*detail+detail/2);
@@ -299,10 +299,10 @@ public class PlasmaPanel extends JPanel {
 	
 	//Generate random hazards
 	public void genorateHazards(){
-		Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)/500.0*(1+rnd.nextInt(5)))/40];
+		Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)/500.0*(1+rnd.nextInt(5)))/20];
 		int x = 0;
 		while (x < hazards.length){
-			hazards[x] = new Hazard(new DecimalPoint(680*rnd.nextDouble()-340, 680*rnd.nextDouble()-340), 2*rnd.nextDouble()+1);
+			hazards[x] = new Hazard(new DecimalPoint(680*rnd.nextDouble()-340, 680*rnd.nextDouble()-340), 5*rnd.nextDouble()+1);
 			x++;
 		}
 		this.hazards = hazards;

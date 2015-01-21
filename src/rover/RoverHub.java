@@ -176,7 +176,7 @@ public class RoverHub extends Panel {
 			tabbedPane[x].addTab("Movement", null, scrollPane_1[x], null);
 			
 			MovementStatsLbl[x] = new JTextArea();
-			MovementStatsLbl[x].setTabSize(14);
+			MovementStatsLbl[x].setTabSize(20);
 			MovementStatsLbl[x].setText("X:  m\tAngular Spin FL:  deg/s\r\nY:  m\tAngluar Spin FR:  deg/s\r\nAngle:  deg\tAngular Spin BL:  deg/s\r\n\tAngular Spin BR:  deg/s\r\nSpeed:  m/s\r\nVelocity X:  m/s\r\nVelocity Y:  m/s\r\nAngular Velocity:  deg/s\r\nSlip Velocity:  m/s\r\n\r\nAcceleration:  m/s^2\r\nAngular Acceleration:  deg/s^2\r\nSlip Acceleration:  m/s^2");
 			MovementStatsLbl[x].setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
 			MovementStatsLbl[x].setOpaque(false);
@@ -191,7 +191,7 @@ public class RoverHub extends Panel {
 			
 			ElectricalStatsLbl[x] = new JTextArea();
 			ElectricalStatsLbl[x].setText("SOC:  %\r\nBattery Charge:  C\r\nBattery CP Charge:  C\r\nBattery Voltage:  V\r\nBattery Current:  mA\r\n\r\nMotor Current FL:  mA\r\nMotor Current FR:  mA\r\nMotor Current BL:  mA\r\nMotor Current BR:  mA\r\n\r\nMotor Voltage FL:  V\r\nMotor Voltage FR:  V\r\nMotor Voltage BL:  V\r\nMotor Voltage BR:  V");
-			ElectricalStatsLbl[x].setTabSize(14);
+			ElectricalStatsLbl[x].setTabSize(20);
 			ElectricalStatsLbl[x].setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
 			ElectricalStatsLbl[x].setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			ElectricalStatsLbl[x].setEditable(false);
@@ -393,8 +393,10 @@ public class RoverHub extends Panel {
 							+ " deg/s\n\tAngular Spin BR: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getWheelSpeed(RoverObject.BR))) 
 							+ " deg/s\nSpeed: " + formatDouble(rovers[HUDDisplayLinks[x]].getSpeed()) 
 							+ " m/s\nVelocity X: " + formatDouble(Math.cos(rovers[HUDDisplayLinks[x]].getDirection()) * rovers[HUDDisplayLinks[x]].getSpeed()) 
-							+ " m/s\nVelocity Y: " + formatDouble(Math.sin(rovers[HUDDisplayLinks[x]].getDirection()) * rovers[HUDDisplayLinks[x]].getSpeed()) 
-							+ " m/s\nAngular Velocity: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getAngularVelocity())) 
+							+ " m/s\tIncline: " + formatDouble(Math.toDegrees(Access.getMapInclineAtPoint(rovers[HUDDisplayLinks[x]].getLocation(), rovers[HUDDisplayLinks[x]].getDirection())))
+							+ " Deg.\nVelocity Y: " + formatDouble(Math.sin(rovers[HUDDisplayLinks[x]].getDirection()) * rovers[HUDDisplayLinks[x]].getSpeed()) 
+							+ " m/s\tCross Slope: " + formatDouble(Math.toDegrees(Access.getMapCrossSlopeAtPoint(rovers[HUDDisplayLinks[x]].getLocation(), rovers[HUDDisplayLinks[x]].getDirection())))
+							+ " Deg.\nAngular Velocity: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getAngularVelocity())) 
 							+ " deg/s\nSlip Velocity: " + formatDouble(rovers[HUDDisplayLinks[x]].getSlipVelocity())
 							+ " m/s\n\nAcceleration: " + formatDouble(rovers[HUDDisplayLinks[x]].getAcceleration()) 
 							+ " m/s^2\nAngular Acceleration: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getAngularAcceleration()))
@@ -453,8 +455,10 @@ public class RoverHub extends Panel {
 							+ " deg/s\n\tAngular Spin BR: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getWheelSpeed(RoverObject.BR))) 
 							+ " deg/s\nSpeed: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getSpeed()) 
 							+ " m/s\nVelocity X: " + formatDouble(Math.cos(rovers[standardDisplayLinks[currentPage][x]].getDirection()) * rovers[standardDisplayLinks[currentPage][x]].getSpeed()) 
-							+ " m/s\nVelocity Y: " + formatDouble(Math.sin(rovers[standardDisplayLinks[currentPage][x]].getDirection()) * rovers[standardDisplayLinks[currentPage][x]].getSpeed()) 
-							+ " m/s\nAngular Velocity: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getAngularVelocity())) 
+							+ " m/s\tIncline: " + formatDouble(Math.toDegrees(Access.getMapInclineAtPoint(rovers[standardDisplayLinks[currentPage][x]].getLocation(), rovers[standardDisplayLinks[currentPage][x]].getDirection())))
+							+ " deg.\nVelocity Y: " + formatDouble(Math.sin(rovers[standardDisplayLinks[currentPage][x]].getDirection()) * rovers[standardDisplayLinks[currentPage][x]].getSpeed()) 
+							+ " m/s\tCross Slope: " + formatDouble(Math.toDegrees(Access.getMapCrossSlopeAtPoint(rovers[standardDisplayLinks[currentPage][x]].getLocation(), rovers[standardDisplayLinks[currentPage][x]].getDirection())))
+							+ " deg.\nAngular Velocity: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getAngularVelocity())) 
 							+ " deg/s\nSlip Velocity: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getSlipVelocity())
 							+ " m/s\n\nAcceleration: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getAcceleration()) 
 							+ " m/s^2\nAngular Acceleration: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getAngularAcceleration()))

@@ -45,6 +45,10 @@ public class Admin {
 		addItemToSelectionList(		"Default", 		new RoverParametersList());
 		addItemToSelectionList(		"Generic4", 	new GenericRover("Generic4", 4));
 		addItemToSelectionList(		"RAIR", 		new RAIRcode());
+		addItemToSelectionList(		"RAIR Control", new RAIRcodeControl());
+		addItemToSelectionList(		"RAIR Risk Averse", new RAIRcodeRA());
+		addItemToSelectionList(		"RAIR Risk Seeking", new RAIRcodeRS());
+		addItemToSelectionList(		"RAIR Risk Temper", new RAIRcodeRT());	
 		addItemToSelectionList(		"PIDAA",		new PIDAAcode());
 		addItemToSelectionList(		"[null]", 		(SatelliteAutonomusCode)null);
 		addItemToSelectionList(		"[null]", 		(SatelliteParametersList)null);
@@ -59,11 +63,15 @@ public class Admin {
 					int a = 1/0;
 				}
 				GUI.TerrainPnl.HeightMap.loadMap(mapFile);
+				Globals.writeToLogFile("Start Up", "Using Map File: " + mapFile.getName());
 			}
 			catch (Exception e){
 				System.out.println("Invalid Map File");
 				return;
 			}
+		}
+		else {
+			Globals.writeToLogFile("Start Up", "Using Random Map");
 		}
 		
 		serialHistory = new List<List<String>>();
@@ -166,8 +174,8 @@ public class Admin {
 			}
 			//TODO change temp to map temp
 			GUI.WrapperPnl.RoverList.addValue(newName);
-			//if you're getting errors with rovers 'sharing' data it's the pass reference value here
-			RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()); 
+			RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()).clone(); 
+			autoCode.setRoverName(newName);
 			RoverParametersList params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem());
 			// for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
 			roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(-170,-170), Math.PI/2, 0));		

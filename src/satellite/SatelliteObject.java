@@ -66,10 +66,10 @@ public class SatelliteObject {
 	
 	public void excecuteCode(){
 		try {
-			if (Globals.RFAvailable(IDcode) > 0){ // if there's a message
+			if (Globals.RFAvailable(IDcode) > 1) { // if there is a message
 				delay(500);
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
-				if (strcmp(id, IDcode) == 0){ // if the message is for us
+				if (strcmp(id, IDcode) == 0) { // if the message is for us and are we allowed to read it
 					delay(500);
 					Globals.ReadSerial(IDcode); // white space
 					tag[0] = (char) Globals.ReadSerial(IDcode); // message type tag
