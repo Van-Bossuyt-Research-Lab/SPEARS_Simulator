@@ -14,7 +14,7 @@ public class Globals {
 	private static Queue<Byte>[] SerialBuffers; // the buffer for messages
 	private static String[] SerialBufferCodes;
 	
-	private static double timeScale = 1.0;
+	private static double timeScale = 2.0;
 	public static long TimeMillis = 0;
 	private static ThreadTimer milliTimer;
 	
@@ -23,20 +23,19 @@ public class Globals {
 	
 	private static boolean begun = false;
 	private static Map<String, ThreadItem> threads = new Map<String, ThreadItem>();
-	private static long lastSystemNanoTime; 
 	private static boolean ready = false;
 	private static boolean milliDone = false;
 	
 	public static void startTime(){
-		lastSystemNanoTime = System.nanoTime();
 		begun = true;
 		Access.INTERFACE.clock.start();
-		milliTimer = new ThreadTimer(1, new Runnable(){
+		ThreadItem.offset = 0;
+		milliTimer = new ThreadTimer(0, new Runnable(){
 			public void run(){
 				long end = System.nanoTime() + (long)(1000000 / getTimeScale());
 				while (System.nanoTime() < end) {}
 			}
-		}, ThreadTimer.FOREVER, "milli-clock", true, true);
+		}, ThreadTimer.FOREVER, "milli-clock", true);
 		TimeMillis++;
 		Object[] keys = threads.getKeys();
 		String file = "";
@@ -234,9 +233,6 @@ public class Globals {
 	public static boolean getThreadRunPermission(String name){
 		String file = "";
 		if (name.equals("milli-clock")){
-			return true;
-		}
-		if (name.equals("Jumper 1-code")){
 			return true;
 		}
 		if (threads.get(name).hasPermission() && ready && begun){

@@ -77,7 +77,7 @@ public class InterfaceCode {
 					Access.CODE.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected");
 				}
 			}
-		}, ThreadTimer.FOREVER, "clock", false, true);
+		}, ThreadTimer.FOREVER, "clock", false);
 		initalize();
 	}
 	

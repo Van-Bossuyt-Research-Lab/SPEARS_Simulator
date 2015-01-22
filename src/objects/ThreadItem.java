@@ -9,11 +9,14 @@ public class ThreadItem {
 	private boolean permission;
 	private boolean running;
 	private boolean complete;
+	
+	public static int offset = 0;
 
 	public ThreadItem(String name, int delay, long start) {
 		this.name = name;
 		this.delay = delay;
-		next = start + delay;
+		next = start + delay + offset;
+		offset++;
 	}
 
 	public String getName() {

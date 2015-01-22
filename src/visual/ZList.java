@@ -117,7 +117,6 @@ public class ZList extends JPanel implements Cloneable{
 			while (x < items.length){
 				if (e.getComponent().equals(items[x])){
 					selectItem(x);
-					Globals.writeToLogFile("ZList", "Selected: " + items[x].getText() + "@" + x);
 					break;
 				}
 				x++;

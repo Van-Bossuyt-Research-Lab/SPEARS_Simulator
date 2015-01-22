@@ -20,16 +20,13 @@ public class ThreadTimer extends Thread {
 		this.start();
 	}
 	
-	public ThreadTimer(int interval, Runnable run, int times, String name, boolean start, boolean override){
+	public ThreadTimer(int interval, Runnable run, int times, String name, boolean start){
 		super.setName(name);
 		delay = interval;
 		action = run;
 		actions = times;
 		forever = (times == FOREVER);
 		Globals.registerNewThread(name, delay);
-		if (override){
-			delay++;
-		}
 		if (start){
 			this.start();
 		}
@@ -37,13 +34,15 @@ public class ThreadTimer extends Thread {
 
 	public void run(){
 		while (actions > 0 || forever){
-			try{
-				Thread.sleep((long)((delay-1)/Globals.getTimeScale()), (int)(((delay-1)/Globals.getTimeScale()-(int)((delay-1)/Globals.getTimeScale()))*1000000));
-			}
-			catch (Exception e) {
-				System.out.println(toString());
-				e.printStackTrace();
-				return;
+			if (delay > 0){
+				try{
+					Thread.sleep((long)((delay-1)/Globals.getTimeScale()), (int)(((delay-1)/Globals.getTimeScale()-(int)((delay-1)/Globals.getTimeScale()))*1000000));
+				}
+				catch (Exception e) {
+					System.out.println(toString());
+					e.printStackTrace();
+					return;
+				}
 			}
 			while (!Globals.getThreadRunPermission(getName())) {}
 			action.run();
