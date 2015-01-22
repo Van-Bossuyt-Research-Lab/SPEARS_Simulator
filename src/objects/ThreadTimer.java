@@ -19,6 +19,21 @@ public class ThreadTimer extends Thread {
 		Globals.registerNewThread(name, delay);
 		this.start();
 	}
+	
+	public ThreadTimer(int interval, Runnable run, int times, String name, boolean start, boolean override){
+		super.setName(name);
+		delay = interval;
+		action = run;
+		actions = times;
+		forever = (times == FOREVER);
+		Globals.registerNewThread(name, delay);
+		if (override){
+			delay++;
+		}
+		if (start){
+			this.start();
+		}
+	}
 
 	public void run(){
 		while (actions > 0 || forever){

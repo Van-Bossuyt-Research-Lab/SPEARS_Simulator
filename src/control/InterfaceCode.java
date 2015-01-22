@@ -20,7 +20,7 @@ public class InterfaceCode {
     private File logFile;
 	private String connectedPort = "COM13";
 	private ZDate DateTime;
-	private ThreadTimer clock;
+	public ThreadTimer clock;
 	private String IDcode = "g";
 	
 	private int connectionTime = 0;
@@ -77,7 +77,7 @@ public class InterfaceCode {
 					Access.CODE.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected");
 				}
 			}
-		}, ThreadTimer.FOREVER, "clock");
+		}, ThreadTimer.FOREVER, "clock", false, true);
 		initalize();
 	}
 	
@@ -144,7 +144,7 @@ public class InterfaceCode {
 			}
 			in.close();
 		} 
-		catch (FileNotFoundException e){
+		catch (Exception e){
 			int x = 0;
 			while (x < actionCommands[0].length){
 				actionCommands[0][x] = "";
@@ -157,12 +157,6 @@ public class InterfaceCode {
 				SatelliteInstructions = new InstructionObj[0][0];
 				x++;
 			}
-		}
-		catch (IOException e) {
-			Globals.reportError("InterfaceCode", "initalize - CommandString", e);
-		} 
-		catch (ClassNotFoundException e) {
-			Globals.reportError("InterfaceCode", "initalize - CommandString", e);
 		}
 		confirmMessage = new Runnable(){
 			public void run(){
@@ -1402,7 +1396,12 @@ public class InterfaceCode {
 	public void writeToLog(String from, String what){
 		try {
 			BufferedWriter write = new BufferedWriter(new FileWriter(logFile, true));
-			write.write(from + "\t\t" + what + "\t\t" + DateTime.toString("[MM/dd/yyyy hh:mm:ss.") + (Globals.TimeMillis%1000) + "]\r\n");
+			if (from.equals("Timing")){
+				write.write(what + "\n");
+			}
+			else {
+				write.write(from + "\t\t" + what + "\t\t" + DateTime.toString("[MM/dd/yyyy hh:mm:ss.") + (Globals.TimeMillis%1000) + "]\r\n");
+			}
 			write.flush();
 			write.close();
 		}

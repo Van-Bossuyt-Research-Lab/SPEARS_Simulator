@@ -2,9 +2,7 @@ package wrapper;
 
 import java.util.Random;
 
-import objects.List;
 import objects.Map;
-import objects.Pair;
 import objects.Queue;
 import objects.ThreadItem;
 import objects.ThreadTimer;
@@ -27,32 +25,36 @@ public class Globals {
 	private static Map<String, ThreadItem> threads = new Map<String, ThreadItem>();
 	private static long lastSystemNanoTime; 
 	private static boolean ready = false;
+	private static boolean milliDone = false;
 	
 	public static void startTime(){
 		lastSystemNanoTime = System.nanoTime();
 		begun = true;
+		Access.INTERFACE.clock.start();
 		milliTimer = new ThreadTimer(1, new Runnable(){
 			public void run(){
 				long end = System.nanoTime() + (long)(1000000 / getTimeScale());
 				while (System.nanoTime() < end) {}
 			}
-		}, ThreadTimer.FOREVER, "milli-clock");
+		}, ThreadTimer.FOREVER, "milli-clock", true, true);
 		TimeMillis++;
-		String[] keys = threads.getKeys();
+		Object[] keys = threads.getKeys();
+		String file = "";
 		int x = 0;
 		while (x < keys.length){
-			System.out.println(keys[x]);
 			if (keys[x].equals(null)){
 				break;
 			}
-			threads.get(keys[x]).reset();
-			if (threads.get(keys[x]).getNext() == TimeMillis){
-				threads.get(keys[x]).grantPermission();
+			String key = (String) keys[x];
+			threads.get(key).reset();
+			file += "\n" + key + ": " + threads.get(key).getNext() + " == " + TimeMillis;
+			if (threads.get(key).getNext() == TimeMillis){
+				threads.get(key).grantPermission();
 			}
 			x++;
 		}
-		System.exit(0);
 		ready = true;
+		writeToLogFile("Timing", file);
 	}
 	
 	public static void writeToSerial(char write, String from){
@@ -160,7 +162,7 @@ public class Globals {
 	private static void printBuffers(){
 		int x = 0;
 		while (x < SerialBuffers.length){
-			System.out.println(SerialBufferCodes[x] + ": " + SerialBuffers[x].toString());
+			writeToLogFile("Timing", SerialBufferCodes[x] + ": " + SerialBuffers[x].toString());
 			x++;
 		}
 	}
@@ -196,40 +198,55 @@ public class Globals {
 	}
 	
 	public static void threadCheckIn(String name){
-		//TODO figure out how to recover from something else taking longer than the milli-clock
 		threads.get(name).markFinished();
-		System.out.println("\n\nCheck In: " + name + "\nTime: " + TimeMillis);
-		if (System.nanoTime()-lastSystemNanoTime >= 1000000/timeScale){
-			System.out.println("Wait Elapsed");
-			for (String key : threads.getKeys()){
-				System.out.print(key + ".isFinished: ");
+		threads.get(name).advance();
+		String file = "\n\nCheck In: " + name + "\nTime: " + TimeMillis + "\t{" + System.currentTimeMillis() + "}";
+		if (name.equals("milli-clock") || milliDone){
+			file += "\nWait Elapsed";
+			for (Object o : threads.getKeys()){
+				String key = (String) o;
+				if (key.equals("milli-clock")){
+					continue;
+				}
 				if (!threads.get(key).isFinished()){
-					System.out.println("false");
+					file += "\n" + key + ".isFinished: false";
+					milliDone = true;
+					writeToLogFile("Timing", file);
 					return;
 				}
-				System.out.println("true");
+				file += "\n" + key + ".isFinished: true";
 			}
 			ready = false;
+			milliDone = false;
 			TimeMillis++;
-			for (String key : threads.getKeys()){
+			for (Object o : threads.getKeys()){
+				String key = (String) o;
 				threads.get(key).reset();
 				if (threads.get(key).getNext() == TimeMillis){
 					threads.get(key).grantPermission();
 				}
 			}
 			ready = true;
-		}		
+		}
+		writeToLogFile("Timing", file);
 	}
 	
 	public static boolean getThreadRunPermission(String name){
-		//System.out.print("\nRequesting: " + name + " - ");
-		if (threads.get(name).hasPermission() && ready && begun){
-			threads.get(name).revokePermission();
-			//System.out.println("approved");
+		String file = "";
+		if (name.equals("milli-clock")){
 			return true;
 		}
-		//System.out.println("denied");
-		//System.out.println(threads.get(name).hasPermission() +", " + ready + ", " + begun);
+		if (name.equals("Jumper 1-code")){
+			return true;
+		}
+		if (threads.get(name).hasPermission() && ready && begun){
+			threads.get(name).revokePermission();
+			file = "\nRequesting: " + name + " - approved" + "\t{" + System.currentTimeMillis() + "}";
+			writeToLogFile("Timing", file);
+			return true;
+		}
+		file = "\nRequesting: " + name + " - denied" + "\t{" + System.currentTimeMillis() + "}";
+		writeToLogFile("Timing", file);
 		return false;
 	}
 	

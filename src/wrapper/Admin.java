@@ -43,12 +43,13 @@ public class Admin {
 		//addItemToSelectionList(	name_on_list ,	object_to_add	);
 		addItemToSelectionList(		"Default", 		new RoverParametersList());
 		addItemToSelectionList(		"Generic4", 	new GenericRover("Generic4", 4));
+		addItemToSelectionList(		"Jumper",		new JumpingRover("Jumper"));
 		addItemToSelectionList(		"[null]", 		(SatelliteAutonomusCode)null);
 		addItemToSelectionList(		"[null]", 		(SatelliteParametersList)null);
 	}
 	
 	public void beginSimulation(){
-		
+		try {
 		serialHistory = new List<List<String>>();
 		GUI.WrapperPnl.SerialHistorySlider.setValue(0);
 		GUI.WrapperPnl.SerialHistorySlider.setMaximum(0);
@@ -94,6 +95,8 @@ public class Admin {
 		updateSerialDisplays();
 		
 		GUI.WrapperPnl.tabbedPane.setEnabled(true);
+		
+		} catch (Exception e) { Globals.reportError("Admin", "beginSimulation", e); }
 	}
 	
 	public void updateSerialDisplays(){
@@ -140,36 +143,52 @@ public class Admin {
 	}
 	
 	public void addRoverToList(){
-		if (GUI.WrapperPnl.RovAutonomusCodeList.getSelectedIndex() != -1 && GUI.WrapperPnl.RovDriveModelList.getSelectedIndex() != -1){
-			int numb = 1;
-			String newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
-			while (contains(GUI.WrapperPnl.RoverList.getItems(), newName)){
-				numb++;
-				newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
+		try {
+			if (GUI.WrapperPnl.RovAutonomusCodeList.getSelectedIndex() != -1 && GUI.WrapperPnl.RovDriveModelList.getSelectedIndex() != -1){
+				int numb = 1;
+				String newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
+				while (contains(GUI.WrapperPnl.RoverList.getItems(), newName)){
+					numb++;
+					newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
+				}
+				//TODO change temp to map temp
+				GUI.WrapperPnl.RoverList.addValue(newName);
+				//if you're getting errors with rovers 'sharing' data it's the pass reference value here
+				RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()); 
+				RoverParametersList params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem());
+				// for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
+				roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(-339,339), Math.PI/2, 0));		
 			}
-			//TODO change temp to map temp
-			GUI.WrapperPnl.RoverList.addValue(newName);
-			//if you're getting errors with rovers 'sharing' data it's the pass reference value here
-			RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()); 
-			RoverParametersList params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem());
-			// for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
-			roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(-170,-170), Math.PI/2, 0));		
+			else {
+				Globals.writeToLogFile("addRovers", GUI.WrapperPnl.RovAutonomusCodeList.getSelectedIndex() + " != -1 && " + GUI.WrapperPnl.RovDriveModelList.getSelectedIndex() + " != -1");
+			}
+		}
+		catch (Exception e){
+			Globals.reportError("Admin", "addRoverToList", e);
 		}
 	}
 	
 	public void addSatelliteToList(){
-		if (GUI.WrapperPnl.SatAutonomusCodeList.getSelectedIndex() != -1 && GUI.WrapperPnl.SatDriveModelList.getSelectedIndex() != -1){
-			int numb = 1;
-			//TODO change to code name
-			String newName = "Satellite " + numb;
-			//newName = (String)GUI.WrapperPnl.SatAutonomusCodeList.getSelectedItem() + " " + numb;
-			while (contains(GUI.WrapperPnl.SatelliteList.getItems(), newName)){
-				numb++;
-				newName = "Satellite " + numb;
+		try {
+			if (GUI.WrapperPnl.SatAutonomusCodeList.getSelectedIndex() != -1 && GUI.WrapperPnl.SatDriveModelList.getSelectedIndex() != -1){
+				int numb = 1;
+				//TODO change to code name
+				String newName = "Satellite " + numb;
 				//newName = (String)GUI.WrapperPnl.SatAutonomusCodeList.getSelectedItem() + " " + numb;
+				while (contains(GUI.WrapperPnl.SatelliteList.getItems(), newName)){
+					numb++;
+					newName = "Satellite " + numb;
+					//newName = (String)GUI.WrapperPnl.SatAutonomusCodeList.getSelectedItem() + " " + numb;
+				}
+				GUI.WrapperPnl.SatelliteList.addValue(newName);
+				this.satsToAdd.add(newName, new SatelliteObject(newName, "s"+GUI.WrapperPnl.SatelliteList.getItems().length, null, null, rnd.nextDouble()*100000+10000000, rnd.nextDouble()*90, rnd.nextDouble()*360));
 			}
-			GUI.WrapperPnl.SatelliteList.addValue(newName);
-			this.satsToAdd.add(newName, new SatelliteObject(newName, "s"+GUI.WrapperPnl.SatelliteList.getItems().length, null, null, rnd.nextDouble()*100000+10000000, rnd.nextDouble()*90, rnd.nextDouble()*360));
+			else {
+				Globals.writeToLogFile("addSats", GUI.WrapperPnl.SatAutonomusCodeList.getSelectedIndex() + " != -1 && " + GUI.WrapperPnl.SatDriveModelList.getSelectedIndex() + " != -1");
+			}
+		}
+		catch (Exception e){
+			Globals.reportError("Admin", "addSatellitetoList", e);
 		}
 	}
 	

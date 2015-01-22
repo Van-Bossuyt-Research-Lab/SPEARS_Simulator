@@ -89,7 +89,7 @@ public class Panel extends JPanel{
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if (hasImage){
+		if (false){//hasImage){
 			try {
 				BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TRANSLUCENT);
 			    Graphics2D g1 = bi.createGraphics();

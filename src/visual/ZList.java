@@ -13,6 +13,7 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import wrapper.Globals;
 import control.InstructionObj;
 
 public class ZList extends JPanel implements Cloneable{
@@ -116,6 +117,7 @@ public class ZList extends JPanel implements Cloneable{
 			while (x < items.length){
 				if (e.getComponent().equals(items[x])){
 					selectItem(x);
+					Globals.writeToLogFile("ZList", "Selected: " + items[x].getText() + "@" + x);
 					break;
 				}
 				x++;

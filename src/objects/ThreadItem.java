@@ -25,6 +25,7 @@ public class ThreadItem {
 	}
 
 	public void advance(){
+		//System.out.println(next + " -> " + (next+delay));
 		next += delay;
 	}
 	

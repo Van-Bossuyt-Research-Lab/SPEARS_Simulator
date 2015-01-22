@@ -27,6 +27,7 @@ import control.InterfacePanel;
 import rover.RoverHub;
 import satellite.SatelliteHub;
 import wrapper.Access;
+import wrapper.Globals;
 import wrapper.MainWrapper;
 
 import java.awt.event.ActionListener;
@@ -106,7 +107,7 @@ public class Form extends JFrame {
 				WrapperPnl.requestFocus();
 			}
 		});
-		WrapperPnl.setImage(new ImageIcon(Toolkit.getDefaultToolkit().getImage("C:\\Users\\PHM-Lab2\\Eclipse Workspace\\Simulator 2 Protype\\lib\\Texture Backgroun.jpg")));
+		//WrapperPnl.setImage(new ImageIcon(Toolkit.getDefaultToolkit().getImage("C:\\Users\\PHM-Lab2\\Eclipse Workspace\\Simulator 2 Protype\\lib\\Texture Backgroun.jpg")));
 		contentPane.add(WrapperPnl);
 		
 		OrbitalPnl = new Panel(screenSize, "Orbital View");
@@ -116,7 +117,7 @@ public class Form extends JFrame {
 				OrbitalPnl.requestFocus();
 			}
 		});
-		OrbitalPnl.setImage(new ImageIcon(Toolkit.getDefaultToolkit().getImage("C:\\Users\\PHM-Lab2\\Eclipse Workspace\\Simulator 2 Protype\\lib\\Texture Backgroun.jpg")));
+		//OrbitalPnl.setImage(new ImageIcon(Toolkit.getDefaultToolkit().getImage("C:\\Users\\PHM-Lab2\\Eclipse Workspace\\Simulator 2 Protype\\lib\\Texture Backgroun.jpg")));
 		OrbitalPnl.setVisible(false);
 		contentPane.add(OrbitalPnl);
 		
@@ -138,7 +139,7 @@ public class Form extends JFrame {
 				InterfacePnl.requestFocus();
 			}
 		});
-		InterfacePnl.setImage(new ImageIcon(Toolkit.getDefaultToolkit().getImage("C:\\Users\\PHM-Lab2\\Eclipse Workspace\\Simulator 2 Protype\\lib\\Texture Backgroun.jpg")));
+		//InterfacePnl.setImage(new ImageIcon(Toolkit.getDefaultToolkit().getImage("C:\\Users\\PHM-Lab2\\Eclipse Workspace\\Simulator 2 Protype\\lib\\Texture Backgroun.jpg")));
 		InterfacePnl.setVisible(false);
 		contentPane.add(InterfacePnl);
 		
@@ -149,7 +150,7 @@ public class Form extends JFrame {
 				RoverHubPnl.requestFocus();
 			}
 		});
-		RoverHubPnl.setImage(new ImageIcon(Toolkit.getDefaultToolkit().getImage("C:\\Users\\PHM-Lab2\\Eclipse Workspace\\Simulator 2 Protype\\lib\\Texture Backgroun.jpg")));
+		//RoverHubPnl.setImage(new ImageIcon(Toolkit.getDefaultToolkit().getImage("C:\\Users\\PHM-Lab2\\Eclipse Workspace\\Simulator 2 Protype\\lib\\Texture Backgroun.jpg")));
 		RoverHubPnl.setVisible(false);
 		contentPane.add(RoverHubPnl);
 		
@@ -160,7 +161,7 @@ public class Form extends JFrame {
 				SatelliteHubPnl.requestFocus();
 			}
 		});
-		SatelliteHubPnl.setImage(new ImageIcon(Toolkit.getDefaultToolkit().getImage("C:\\Users\\PHM-Lab2\\Eclipse Workspace\\Simulator 2 Protype\\lib\\Texture Backgroun.jpg")));
+		//SatelliteHubPnl.setImage(new ImageIcon(Toolkit.getDefaultToolkit().getImage("C:\\Users\\PHM-Lab2\\Eclipse Workspace\\Simulator 2 Protype\\lib\\Texture Backgroun.jpg")));
 		SatelliteHubPnl.setVisible(false);
 		contentPane.add(SatelliteHubPnl);
 	}
