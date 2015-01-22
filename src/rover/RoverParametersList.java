@@ -3,7 +3,7 @@ package rover;
 public class RoverParametersList {
 
 	private double wheel_radius = 0.0476; //m
-	private double wheel_mass = 0.034; //kg
+	private double wheel_mass = 0.064; //kg
 	private double rover_width = 0.438; //m
 	private double rover_length = 0.229; //m
 	private double motor_arm = Math.sqrt(Math.pow(rover_width, 2) + Math.pow(rover_length, 2)) / 2.0; //m
@@ -16,8 +16,8 @@ public class RoverParametersList {
 	private double motor_resistance = 3; //Ohm
 	private double motor_inductance = 0.11455; //H
 	private double friction_axle = 0.0002621;
-	private double friction_gr = 0.65;
-	private double friction_s = 0.35;
+	private double friction_gr = .65;
+	private double friction_s = 1.2;
 	private double gamma = Math.atan(1/rover_width);
 	
 	private double R_cp0 = 0.07; //Ohm
@@ -29,8 +29,8 @@ public class RoverParametersList {
 	private double resistance_parasite = 100000000; //Ohm
 	private double battery_max_charge = 140000; //C
 	
-	private double battery_heat_transfer = 1; //J/s/*c
-	private double battery_thermal_cap = 50;
+	private double battery_heat_transfer = 10; //J/s/*c
+	private double battery_thermal_cap = 170; //J/K
 	
 	private double winding_heat_transfer = 2; //J/s/*c
 	private double winding_thermal_cap = 1.7; //J/*c

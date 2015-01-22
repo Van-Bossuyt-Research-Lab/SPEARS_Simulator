@@ -1,5 +1,6 @@
 package wrapper;
 
+import java.io.File;
 import java.util.Random;
 
 import control.InterfaceCode;
@@ -44,12 +45,36 @@ public class Admin {
 		addItemToSelectionList(		"Default", 		new RoverParametersList());
 		addItemToSelectionList(		"Generic4", 	new GenericRover("Generic4", 4));
 		addItemToSelectionList(		"Jumper",		new JumpingRover("Jumper"));
+		addItemToSelectionList(		"RAIR", 		new RAIRcode());
+		addItemToSelectionList(		"RAIR Control", new RAIRcodeControl());
+		addItemToSelectionList(		"RAIR Risk Averse", new RAIRcodeRA());
+		addItemToSelectionList(		"RAIR Risk Seeking", new RAIRcodeRS());
+		addItemToSelectionList(		"RAIR Risk Temper", new RAIRcodeRT());	
+		addItemToSelectionList(		"PIDAA",		new PIDAAcode());
 		addItemToSelectionList(		"[null]", 		(SatelliteAutonomusCode)null);
 		addItemToSelectionList(		"[null]", 		(SatelliteParametersList)null);
 	}
 	
 	public void beginSimulation(){
-		try {
+	
+		if (GUI.WrapperPnl.MapTypeCombo.getSelectedIndex() == 1){
+			try {
+				File mapFile = new File(GUI.WrapperPnl.FileLocTxt.getText());
+				if (!mapFile.exists()){
+					int a = 1/0;
+				}
+				GUI.TerrainPnl.HeightMap.loadMap(mapFile);
+				Globals.writeToLogFile("Start Up", "Using Map File: " + mapFile.getName());
+			}
+			catch (Exception e){
+				System.out.println("Invalid Map File");
+				return;
+			}
+		}
+		else {
+			Globals.writeToLogFile("Start Up", "Using Random Map");
+		}
+		
 		serialHistory = new List<List<String>>();
 		GUI.WrapperPnl.SerialHistorySlider.setValue(0);
 		GUI.WrapperPnl.SerialHistorySlider.setMaximum(0);
@@ -95,8 +120,6 @@ public class Admin {
 		updateSerialDisplays();
 		
 		GUI.WrapperPnl.tabbedPane.setEnabled(true);
-		
-		} catch (Exception e) { Globals.reportError("Admin", "beginSimulation", e); }
 	}
 	
 	public void updateSerialDisplays(){
@@ -143,7 +166,6 @@ public class Admin {
 	}
 	
 	public void addRoverToList(){
-		try {
 			if (GUI.WrapperPnl.RovAutonomusCodeList.getSelectedIndex() != -1 && GUI.WrapperPnl.RovDriveModelList.getSelectedIndex() != -1){
 				int numb = 1;
 				String newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
@@ -159,12 +181,6 @@ public class Admin {
 				// for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
 				roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(-339,339), Math.PI/2, 0));		
 			}
-			else {
-				Globals.writeToLogFile("addRovers", GUI.WrapperPnl.RovAutonomusCodeList.getSelectedIndex() + " != -1 && " + GUI.WrapperPnl.RovDriveModelList.getSelectedIndex() + " != -1");
-			}
-		}
-		catch (Exception e){
-			Globals.reportError("Admin", "addRoverToList", e);
 		}
 	}
 	

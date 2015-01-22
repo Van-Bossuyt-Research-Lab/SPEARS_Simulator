@@ -76,7 +76,7 @@ public class RoverObject {
 	private double fric_gr_all = 0;
 	private double[] slip = { 0, 0, 0, 0 };		
 	
-	private int[] motor_power = new int[] { 150, 150, 150, 150 }; // assigned motor powers
+	private int[] motor_power = new int[] {  250, 250, 250, 250 }; // assigned motor powers
 	private int[] motor_states = new int[] { 0, 0, 0, 0 }; // assigned motor states
 	private double[] wheel_speed = { 0, 0, 0, 0 }; //rad/s	
 	private double[] motor_current = { 0, 0, 0, 0 }; //A
@@ -88,9 +88,9 @@ public class RoverObject {
 	private double SOC = 1;
 	
 	private boolean temp_initalized = false;
-	private double battery_temperature = 22; //*c
-	private double[] winding_temp = { 22, 22, 22, 22 }; //*c
-	private double[] motor_temp = { 22, 22, 22, 22 }; //*c
+	private double battery_temperature = 30; //*c
+	private double[] winding_temp = { 30, 30, 30, 30 }; //*c
+	private double[] motor_temp = { 30, 30, 30, 30 }; //*c
 	
 	
 	private String serialHistory = "";
@@ -147,7 +147,7 @@ public class RoverObject {
 				Globals.reportError("RoverCode", "runCode - voltage", e);
 			}
 			
-			if (Globals.RFAvailable(IDcode) > 0) { // if there is a message
+			if (Globals.RFAvailable(IDcode) > 1) { // if there is a message
 				delay(500);
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
@@ -328,7 +328,7 @@ public class RoverObject {
 					LEDs.set("Instructions", true);
 					LEDs.set("Autonomus", false);
 					run_auto = false; // don't run autonomously
-					if (!waiting || (Globals.TimeMillis - cmdWaitTime > 1000)) { // if we're not waiting or have waiting long enough
+					if (!waiting || (Globals.TimeMillis > cmdWaitTime)) { // if we're not waiting or have waiting long enough
 						waiting = false;
 						String cmd = ""; // the command
 						int x = 0;
@@ -425,7 +425,7 @@ public class RoverObject {
 						    }
 						    else if (strcmp(cmd, "delay1") == 0) { // wait a second
 						    	waiting = true;
-								cmdWaitTime = Globals.TimeMillis;
+								cmdWaitTime = Globals.TimeMillis + 1000;
 							}
 							else if (strcmp(cmd, "report") == 0) { // report completion of instructions to ground
 								if (sendSerial("s1 g n Rover Instructs Done")) { // if we're not muted
@@ -505,7 +505,8 @@ public class RoverObject {
 						getMotorTemp(BR),
 						getBatteryVoltage(),
 						getBatteryCurrent(),
-						getBatteryTemperature()
+						getBatteryTemperature(),
+						getBatteryCharge()
 				);
 				// switch all known commands
 				if (strcmp(cmd, "") == 0){ /*Do Nothing*/ }
@@ -581,7 +582,7 @@ public class RoverObject {
 			    }
 			    else if (strcmp(cmd.substring(0, 5), "delay") == 0) { // wait a second
 			    	waiting = true;
-					cmdWaitTime = Globals.TimeMillis;
+					cmdWaitTime = Globals.TimeMillis + Integer.parseInt(cmd.substring(5, cmd.length()));
 				}
 				
 				/*if (Globals.TimeMillis >= autoWaitUntil){
@@ -886,7 +887,7 @@ public class RoverObject {
 			motor_current[BL] += ( motor_power[BL]*motor_states[BL]/255.0*battery_voltage - params.getmotor_voltage_transform()*wheel_speed[BL] - motor_current[BL]*params.getmotor_resistance()) / params.getmotor_inductance() * time_step;
 			motor_current[BR] += ( motor_power[BR]*motor_states[BR]/255.0*battery_voltage - params.getmotor_voltage_transform()*wheel_speed[BR] - motor_current[BR]*params.getmotor_resistance()) / params.getmotor_inductance() * time_step;
 			// min currents at 0, motor cannot generate current
-			if (motor_current[FL]*motor_states[FL] <= 0){
+			/*if (motor_current[FL]*motor_states[FL] <= 0){
 				motor_current[FL] = 0;
 			}
 			if (motor_current[FR]*motor_states[FR] <= 0){
@@ -897,7 +898,7 @@ public class RoverObject {
 			}
 			if (motor_current[BR]*motor_states[BR] <= 0){
 				motor_current[BR] = 0;
-			}
+			}*/
 			// angular motor speeds, based on torques
 			wheel_speed[FL] += 1/params.getwheel_inertia() * ( params.getmotor_energy_transform()*motor_current[FL] - params.getwheel_radius()*slip[FL] + params.getwheel_radius()*fric_gr_all*Math.cos(params.getgamma()) - params.getfriction_axle()*wheel_speed[FL]/params.getwheel_radius()) * time_step;
 			wheel_speed[FR] += 1/params.getwheel_inertia() * ( params.getmotor_energy_transform()*motor_current[FR] - params.getwheel_radius()*slip[FR] - params.getwheel_radius()*fric_gr_all*Math.cos(params.getgamma()) - params.getfriction_axle()*wheel_speed[FR]/params.getwheel_radius()) * time_step;
@@ -932,6 +933,18 @@ public class RoverObject {
 			Access.updateRoverLocation(name, location, direction);
 			
 			//Determining the current of the battery and the change in the stored charge
+			if (motor_current[FL]*motor_states[FL] <= 0){
+				motor_current[FL] = 0;
+			}
+			if (motor_current[FR]*motor_states[FR] <= 0){
+				motor_current[FR] = 0;
+			}
+			if (motor_current[BL]*motor_states[BL] <= 0){
+				motor_current[BL] = 0;
+			}
+			if (motor_current[BR]*motor_states[BR] <= 0){
+				motor_current[BR] = 0;
+			}
 			battery_current = Math.abs(motor_current[FL]) + Math.abs(motor_current[FR]) + Math.abs(motor_current[BL]) + Math.abs(motor_current[BR]);
 			double battery_change = battery_charge / params.getcapacitance_battery() / params.getresistance_parasite() + battery_current;
 			double cp_change = battery_current - (battery_cp_charge / params.getcapacitance_cp() / resistance_cp());

@@ -15,6 +15,7 @@ import javax.swing.JTabbedPane;
 import java.awt.Font;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.DefaultComboBoxModel;
@@ -32,10 +33,19 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.io.File;
+import java.io.FilenameFilter;
+
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.filechooser.FileFilter;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import javax.swing.JTextField;
+
+import objects.FileNameFilter;
 
 public class MainWrapper extends Panel {
 
@@ -63,6 +73,9 @@ public class MainWrapper extends Panel {
 		private JLabel MapRoughLbl;
 		private JLabel MapTypeLbl;
 		JComboBox<String> MapTypeCombo;
+		private JLabel FileLocLbl;
+		JTextField FileLocTxt;
+		private JButton FileLocBtn;
 		JButton StartBtn;
 	JPanel RuntimePnl;
 		private JLabel SerialDisplayTitle;
@@ -81,6 +94,13 @@ public class MainWrapper extends Panel {
 		super(new Dimension(1920, 1080), "Wrapper Display");
 		
 		initalize();
+		MapTypeCombo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				FileLocLbl.setVisible(MapTypeCombo.getSelectedIndex() == 1);
+				FileLocTxt.setVisible(MapTypeCombo.getSelectedIndex() == 1);
+				FileLocBtn.setVisible(MapTypeCombo.getSelectedIndex() == 1);
+			}
+		});
 		align();
 	}
 	
@@ -187,16 +207,18 @@ public class MainWrapper extends Panel {
 		CreateNewPnl.add(SatelliteListLbl);
 		
 		MapRoughSlider = new JSlider();
+		MapRoughSlider.setEnabled(false);
 		MapRoughSlider.setMajorTickSpacing(10);
 		MapRoughSlider.setPaintTicks(true);
 		MapRoughSlider.setValue(70);
-		MapRoughSlider.setBounds(1404, 131, 400, 30);
+		MapRoughSlider.setBounds(1042, 179, 400, 30);
 		CreateNewPnl.add(MapRoughSlider);
 		
 		MapTypeCombo = new JComboBox<String>();
 		MapTypeCombo.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
-		MapTypeCombo.setModel(new DefaultComboBoxModel(new String[] {"Plasma Fractal"}));
-		MapTypeCombo.setBounds(1546, 41, 175, 25);
+		MapTypeCombo.setModel(new DefaultComboBoxModel(new String[] {"Plasma Fractal", "From File"}));
+		MapTypeCombo.setSelectedIndex(0);
+		MapTypeCombo.setBounds(1042, 41, 195, 25);
 		CreateNewPnl.add(MapTypeCombo);
 		
 		StartBtn = new JButton("Start Simulation");
@@ -210,27 +232,59 @@ public class MainWrapper extends Panel {
 		StartBtn.setBounds(1665, 874, 220, 55);
 		CreateNewPnl.add(StartBtn);
 		
-		MapRoughnessLbl = new JLabel("Map Roughness");
+		MapRoughnessLbl = new JLabel("Map Roughness:");
+		MapRoughnessLbl.setHorizontalAlignment(SwingConstants.RIGHT);
+		MapRoughnessLbl.setHorizontalTextPosition(SwingConstants.LEFT);
 		MapRoughnessLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
-		MapRoughnessLbl.setBounds(1404, 99, 142, 21);
+		MapRoughnessLbl.setBounds(890, 147, 142, 21);
 		CreateNewPnl.add(MapRoughnessLbl);
 		
 		MapSmoothLbl = new JLabel("Smooth");
 		MapSmoothLbl.setHorizontalAlignment(SwingConstants.TRAILING);
 		MapSmoothLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
-		MapSmoothLbl.setBounds(1333, 131, 61, 21);
+		MapSmoothLbl.setBounds(971, 179, 61, 21);
 		CreateNewPnl.add(MapSmoothLbl);
 		
 		MapRoughLbl = new JLabel("Rough");
 		MapRoughLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
-		MapRoughLbl.setBounds(1814, 131, 61, 21);
+		MapRoughLbl.setBounds(1452, 179, 43, 21);
 		CreateNewPnl.add(MapRoughLbl);
 		
 		MapTypeLbl = new JLabel("Map Type:");
 		MapTypeLbl.setHorizontalAlignment(SwingConstants.TRAILING);
 		MapTypeLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
-		MapTypeLbl.setBounds(1447, 43, 89, 21);
+		MapTypeLbl.setBounds(890, 43, 142, 21);
 		CreateNewPnl.add(MapTypeLbl);
+		
+		FileLocLbl = new JLabel("File Location:");
+		FileLocLbl.setVisible(false);
+		FileLocLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+		FileLocLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
+		FileLocLbl.setBounds(890, 97, 142, 21);
+		CreateNewPnl.add(FileLocLbl);
+		
+		FileLocTxt = new JTextField();
+		FileLocTxt.setVisible(false);
+		FileLocTxt.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
+		FileLocTxt.setBounds(1042, 95, 338, 25);
+		CreateNewPnl.add(FileLocTxt);
+		FileLocTxt.setColumns(10);
+		
+		FileLocBtn = new JButton("Browse...");
+		FileLocBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser finder = new JFileChooser();
+				finder.setFileFilter(new FileNameFilter());
+				finder.setApproveButtonText("Choose");
+				int option = finder.showOpenDialog(getParent());
+				if (option == JFileChooser.APPROVE_OPTION){
+					FileLocTxt.setText(finder.getSelectedFile().getAbsolutePath());
+				}
+			}
+		});
+		FileLocBtn.setVisible(false);
+		FileLocBtn.setBounds(1390, 93, 105, 25);
+		CreateNewPnl.add(FileLocBtn);
 		
 		RuntimePnl = new JPanel();
 		tabbedPane.addTab("Running Simulation", null, RuntimePnl, null);

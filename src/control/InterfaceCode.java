@@ -109,6 +109,11 @@ public class InterfaceCode {
 		}
 		try {
 			logFile = new File("Logs\\Log File " + DateTime.toString("MM-dd-yyyy hh-mm") + ".txt");
+			int ver = 0;
+			while (logFile.exists()){
+				ver++;
+				logFile = new File("Logs\\Log File " + DateTime.toString("MM-dd-yyyy hh-mm") + " (" + ver + ").txt");
+			}
 			logFile.createNewFile();
 			BufferedWriter write = new BufferedWriter(new FileWriter(logFile));
 			write.write("CSM PHM Rover System Simulator Log " + DateTime.toString("on MM-dd-yyyy at hh:mm") + "\r\n\r\n");

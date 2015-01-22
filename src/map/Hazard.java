@@ -20,5 +20,13 @@ public class Hazard {
 	public String toString() {
 		return "Hazard [position=" + position.toString() + ", radius=" + radius + "]";
 	}
+
+	public DecimalPoint getPosition() {
+		return position;
+	}
+
+	public double getRadius() {
+		return radius;
+	}
 	
 }

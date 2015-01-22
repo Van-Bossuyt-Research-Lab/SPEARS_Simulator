@@ -10,12 +10,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.File;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+
+import control.InterfacePanel;
 import objects.DecimalPoint;
+import objects.FileNameFilter;
 import wrapper.Access;
 import wrapper.Globals;
 import rover.RoverObject;
+import visual.ImageButton;
 import visual.Panel;
 import visual.PlasmaPanel;
 
@@ -35,6 +42,8 @@ public class LandMapPanel extends Panel{
 	private double[][] PressureMap;
 	private double[][][][] WindMap;
 	
+	private ImageButton saveBtn;
+	
 	private RoverIcon[] roverIcons;
 	private DecimalPoint[][] roverTrails;
 
@@ -42,6 +51,26 @@ public class LandMapPanel extends Panel{
 		super(size, "Terrain View");
 		setBackground(Color.GRAY);
 		super.hasImage = false;
+		
+		saveBtn = new ImageButton();
+		saveBtn.setImage(new ImageIcon(LandMapPanel.class.getResource("/Save.png")));
+		saveBtn.setBorder(null);
+		saveBtn.setOpaque(false);
+		saveBtn.setMargin(1);
+		saveBtn.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				JFileChooser finder = new JFileChooser();
+				finder.setFileFilter(new FileNameFilter());
+				finder.setApproveButtonText("Save");
+				int option = finder.showSaveDialog(getParent());
+				if (option == JFileChooser.APPROVE_OPTION){
+					HeightMap.saveMap(new File(finder.getSelectedFile().getAbsolutePath() + ".map"));
+				}
+			}
+		});
+		saveBtn.setBounds(super.getVisibleRect().x + 20, (int) (super.getVisibleRect().getHeight() - 50), 35, 35);
+		this.add(saveBtn);
 		
 		roverIcons = new RoverIcon[0];
 		this.params = params;
@@ -212,6 +241,18 @@ public class LandMapPanel extends Panel{
 		int outy = (int)(y*HeightMap.getDetail());
 		return new Point(outx, outy);
 	}
+	private Point getMapSquare(DecimalPoint loc, boolean offset){ // says which display square a given coordinate falls in
+		double x = loc.getX();
+		double y = loc.getY();
+		if (offset){
+			double shift = HeightMap.getWidth()/HeightMap.getResolution() / 2.0;
+			x = loc.getX() + shift;
+			y = shift - loc.getY();
+		}
+		int outx = (int)(x*HeightMap.getDetail());
+		int outy = (int)(y*HeightMap.getDetail());
+		return new Point(outx, outy);
+	}
 	
 	//returns the height of the map at the given point
 	public double getHeight(DecimalPoint loc){
@@ -221,9 +262,6 @@ public class LandMapPanel extends Panel{
 		DecimalPoint lifePnt = new DecimalPoint(loc.getX() + HeightMap.getWidth()/HeightMap.getResolution() / 2.0, HeightMap.getWidth()/HeightMap.getResolution() / 2.0 - loc.getY());
 		double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
 		double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
-		System.out.print(HeightMap.getValueAtLocation(x, y));// + "\t" + locx + "\t" + HeightMap.getValueAtLocation(x+1, y));
-		//System.out.println(locy);
-		//System.out.println(HeightMap.getValueAtLocation(x, y+1) + "\t\t" + HeightMap.getValueAtLocation(x, y+1) + "\n\n");
 		return getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
 	}
 	
@@ -232,14 +270,15 @@ public class LandMapPanel extends Panel{
 		Point mapSquare = getMapSquare(loc);
 		int x = (int) mapSquare.getX();
 		int y = (int) mapSquare.getY();
-		double locx = ((int)((loc.getX() - (int)loc.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
-		double locy = ((int)((loc.getY() - (int)loc.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
+		DecimalPoint lifePnt = new DecimalPoint(loc.getX() + HeightMap.getWidth()/HeightMap.getResolution() / 2.0, HeightMap.getWidth()/HeightMap.getResolution() / 2.0 - loc.getY());
+		double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
+		double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
 		double h0 = getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
-		DecimalPoint point2 = loc.offset(Math.cos(dir), Math.sin(dir));
-		x = (int) getMapSquare(point2).getX();
-		y = (int) getMapSquare(point2).getY();
-		locx = ((int)((point2.getX() - (int)point2.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
-		locy = ((int)((point2.getY() - (int)point2.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
+		DecimalPoint point2 = lifePnt.offset(Math.cos(dir), -Math.sin(dir));
+		x = (int) getMapSquare(point2, false).getX();
+		y = (int) getMapSquare(point2, false).getY();
+		locx = (point2.getX() - (lifePnt.getX()-locx/HeightMap.getDetail())) * HeightMap.getDetail();
+		locy = (point2.getY() - (lifePnt.getY()-locy/HeightMap.getDetail())) * HeightMap.getDetail();
 		double hnew = getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
 		return Math.atan(hnew-h0);
 	}
@@ -277,8 +316,7 @@ public class LandMapPanel extends Panel{
 	}
 	
 	// interpolates between the corners of a square to find mid-range values
-	//find the linear approximation of a value within a square where relative x and y are measured from top left
-	public double getIntermidiateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey){ 
+	public double getIntermidiateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
 		if (relativex > relativey){ //top right triangle
 			return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
 		}
