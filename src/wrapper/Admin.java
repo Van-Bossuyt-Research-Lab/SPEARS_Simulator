@@ -44,7 +44,6 @@ public class Admin {
 		//addItemToSelectionList(	name_on_list ,	object_to_add	);
 		addItemToSelectionList(		"Default", 		new RoverParametersList());
 		addItemToSelectionList(		"Generic4", 	new GenericRover("Generic4", 4));
-		addItemToSelectionList(		"Jumper",		new JumpingRover("Jumper"));
 		addItemToSelectionList(		"RAIR", 		new RAIRcode());
 		addItemToSelectionList(		"RAIR Control", new RAIRcodeControl());
 		addItemToSelectionList(		"RAIR Risk Averse", new RAIRcodeRA());
@@ -166,21 +165,20 @@ public class Admin {
 	}
 	
 	public void addRoverToList(){
-			if (GUI.WrapperPnl.RovAutonomusCodeList.getSelectedIndex() != -1 && GUI.WrapperPnl.RovDriveModelList.getSelectedIndex() != -1){
-				int numb = 1;
-				String newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
-				while (contains(GUI.WrapperPnl.RoverList.getItems(), newName)){
-					numb++;
-					newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
-				}
-				//TODO change temp to map temp
-				GUI.WrapperPnl.RoverList.addValue(newName);
-				//if you're getting errors with rovers 'sharing' data it's the pass reference value here
-				RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()); 
-				RoverParametersList params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem());
-				// for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
-				roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(-339,339), Math.PI/2, 0));		
+		if (GUI.WrapperPnl.RovAutonomusCodeList.getSelectedIndex() != -1 && GUI.WrapperPnl.RovDriveModelList.getSelectedIndex() != -1){
+			int numb = 1;
+			String newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
+			while (contains(GUI.WrapperPnl.RoverList.getItems(), newName)){
+				numb++;
+				newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
 			}
+			//TODO change temp to map temp
+			GUI.WrapperPnl.RoverList.addValue(newName);
+			//if you're getting errors with rovers 'sharing' data it's the pass reference value here
+			RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()); 
+			RoverParametersList params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem());
+			// for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
+			roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(-339,339), Math.PI/2, 0));		
 		}
 	}
 	
