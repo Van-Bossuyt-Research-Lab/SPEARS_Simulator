@@ -66,7 +66,9 @@ public class Map < KeyType, ItemType >{
 		try {
 			items = (ItemType[]) remove(items, get(key));
 			keys = (KeyType[]) remove(keys, key);
-		} catch (NullPointerException e) {}
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public int size(){

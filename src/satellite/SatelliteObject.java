@@ -67,9 +67,11 @@ public class SatelliteObject {
 	public void excecuteCode(){
 		try {
 			if (Globals.RFAvailable(IDcode) > 1) { // if there is a message
+				System.out.println("Sat has message.");
 				delay(500);
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0) { // if the message is for us and are we allowed to read it
+					System.out.println("Message is for Sat");
 					delay(500);
 					Globals.ReadSerial(IDcode); // white space
 					tag[0] = (char) Globals.ReadSerial(IDcode); // message type tag
@@ -88,21 +90,22 @@ public class SatelliteObject {
 						index++;
 					}
 					data[index] = '\0'; // end string
-					// switch tags
-					if (tag[0] == 'g'){ // from ground station - relay to rover
+					System.out.print("Sat Message: ");
+					System.out.println(data);
+					if (tag[0] == 'g'){ // forward to ground
 						data[0] = 'g';
 						sendSerial(data);
 						delay(1000);
-						if (data[2] != '^' && data[2] != '*' && data[2] != '}' && data[2] != '{'){ // don't confirm tags
+						if (data[3] != '^' && data[2] != '*' && data[2] != '}' && data[2] != '{'){ // don't confirm tags
 							sendSerial("g #"); // confirm
 						}
 					}
-					if (tag[0] == 'r'){ // from rover - relay to ground station
+					if (tag[0] == 'r'){ // forward to rover
 						data[0] = 'r';
 						data[1] = tag[1];
 						sendSerial(data);
 						delay(1000);
-						if (data[2] != '^' && data[2] != '*' && data[2] != '%' && data[2] != '}' && data[2] != '{'){ // don't confirm tags
+						if (data[3] != '^' && data[2] != '*' && data[2] != '%' && data[2] != '}' && data[2] != '{'){ // don't confirm tags
 							sendSerial("r #"); // confirm
 						}
 					}
@@ -279,7 +282,7 @@ public class SatelliteObject {
 		}
 		catch (Exception e){
 			System.out.println("Error in Satellite Code");
-			Globals.writeToLogFile("Satellite Run Code", e.toString());
+			Globals.reportError("SatObject", "run", e);
 		}
 	}
 		
@@ -311,14 +314,10 @@ public class SatelliteObject {
 		}
 	}
 	
-	private void delay(double length) { // sleep thread for a bit
-		try{
-			Thread.sleep((long)(length/Globals.getTimeScale()), (int)((length/Globals.getTimeScale()-(int)length/Globals.getTimeScale())*1000000));
-		} catch (Exception e) {
-			Globals.reportError("SatelliteCode", "delay", e);
-		}
-		//long start = System.nanoTime();
-		//while (((System.nanoTime()-start) < (length*1000000))) {}
+	private void delay(int length) { // sleep thread for a bit
+		String newname = Globals.delayThread(Thread.currentThread().getName(), length);
+		while (!Globals.getThreadRunPermission(newname)) {}
+		Globals.threadDelayComplete(Thread.currentThread().getName());
 	}
 
 	boolean sendSerial(String mess){

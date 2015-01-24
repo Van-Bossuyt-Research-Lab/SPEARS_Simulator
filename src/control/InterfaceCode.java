@@ -13,6 +13,7 @@ import objects.ThreadTimer;
 import objects.ZDate;
 import objects.Map;
 import wrapper.Access;
+import wrapper.Admin;
 import wrapper.Globals;
 
 public class InterfaceCode {
@@ -48,7 +49,7 @@ public class InterfaceCode {
 	private String[] receivedFiles = new String[0];
 	
 	private int[] currentActionPages = { 0, 0 };
-	private int pageLength = Access.CODE.GUI.InterfacePnl.RoverBtns.length;
+	private int pageLength = Admin.GUI.InterfacePnl.RoverBtns.length;
 	private int numberOfPages = 4;
 	private String[][] actionCommands = new String[2][pageLength*numberOfPages];
 	private String[][] actionTips = new String[2][pageLength*numberOfPages];
@@ -70,11 +71,11 @@ public class InterfaceCode {
 					if (countSec == 0){
 						connectionTime++;
 						countSec = 0;
-						Access.CODE.GUI.InterfacePnl.ConnectionLbl.setText("Connected for " + connectionTime + " min.");
+						Admin.GUI.InterfacePnl.ConnectionLbl.setText("Connected for " + connectionTime + " min.");
 					}
 				}
 				else {
-					Access.CODE.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected");
+					Admin.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected");
 				}
 			}
 		}, ThreadTimer.FOREVER, "clock", false);
@@ -82,6 +83,7 @@ public class InterfaceCode {
 	}
 	
 	public static void start(){
+		@SuppressWarnings("unused")
 		ThreadTimer serialCheck = new ThreadTimer(400, new Runnable(){
 			public void run(){
 				Access.INTERFACE.updateSerialCom();
@@ -133,7 +135,7 @@ public class InterfaceCode {
 			UpdateActionBtns();
 			try {
 				input.getRoverOptions().clone();
-				Access.CODE.GUI.InterfacePnl.RoverCommandsList.setValues(input.getRoverOptions());
+				Admin.GUI.InterfacePnl.RoverCommandsList.setValues(input.getRoverOptions());
 				RoverInstructions = input.getRoverInstructions();
 			}
 			catch (Exception e){
@@ -141,7 +143,7 @@ public class InterfaceCode {
 			}
 			try {
 				input.getSatelliteOptions().clone();
-				Access.CODE.GUI.InterfacePnl.SatelliteCommandList.setValues(input.getSatelliteOptions());
+				Admin.GUI.InterfacePnl.SatelliteCommandList.setValues(input.getSatelliteOptions());
 				SatelliteInstructions = input.getSatelliteInstructions();
 			}
 			catch (Exception e){
@@ -176,20 +178,20 @@ public class InterfaceCode {
 	}
 	
 	public void pingRover(){
-		Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Pinging Rover...\n");
+		Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Pinging Rover...\n");
 		writeToSerial(tagMessage("^", 'r'), true);
 		listenForSignal("g ^", new Runnable(){
 			public void run(){
 				Connected = true;
-				Access.CODE.GUI.InterfacePnl.ConnectionLbl.setText("Connected for 0 min.");
-				Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover Connected: " + DateTime.toString("hh:mm:ss") + "\n");
+				Admin.GUI.InterfacePnl.ConnectionLbl.setText("Connected for 0 min.");
+				Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover Connected: " + DateTime.toString("hh:mm:ss") + "\n");
 				(new PopUp()).showConfirmDialog("Rover connected.", "Ping Confirm", PopUp.DEFAULT_OPTIONS);
 			}
 		}, new Runnable(){
 			public void run(){
 				Connected = false;
-				Access.CODE.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected.");
-				Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover did not respond.\n");
+				Admin.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected.");
+				Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover did not respond.\n");
 				(new PopUp()).showConfirmDialog("No Rover found.", "Ping Failed", PopUp.DEFAULT_OPTIONS);
 			}
 		}, 
@@ -199,7 +201,7 @@ public class InterfaceCode {
 	public void setCallTags(Map<String, String> rover, Map<String, String> satellite){
 		roverNames = rover;
 		satelliteNames = satellite;
-		Access.CODE.GUI.InterfacePnl.setNamesLists(rover.getKeys(), satellite.getKeys());
+		Admin.GUI.InterfacePnl.setNamesLists(rover.getKeys(), satellite.getKeys());
 	}
 	
 	// COM CONNECTION STUFF
@@ -212,8 +214,8 @@ public class InterfaceCode {
 	
 	public void changeCOMPort(){
 		connectionTime = 0;
-		connectedPort = (String)Access.CODE.GUI.InterfacePnl.PortSelectCombo.getSelectedItem();
-		Access.CODE.GUI.InterfacePnl.ConnectionLbl.setText("Connected for " + connectionTime + " min.");
+		connectedPort = (String)Admin.GUI.InterfacePnl.PortSelectCombo.getSelectedItem();
+		Admin.GUI.InterfacePnl.ConnectionLbl.setText("Connected for " + connectionTime + " min.");
 		writeToLog("COM Port", "Connection Changed to " + connectedPort);
 		resetConnection();
 	}
@@ -258,10 +260,10 @@ public class InterfaceCode {
 	
 	private String tagMessage(String mess, char which){
 		if (which == 'r'){
-			return satelliteNames.get((String)Access.CODE.GUI.InterfacePnl.SatSelectionCombo.getSelectedItem()) + " " + roverNames.get((String)Access.CODE.GUI.InterfacePnl.RoverSelectionCombo.getSelectedItem()) + " " + mess;
+			return satelliteNames.get((String)Admin.GUI.InterfacePnl.SatSelectionCombo.getSelectedItem()) + " " + roverNames.get((String)Admin.GUI.InterfacePnl.RoverSelectionCombo.getSelectedItem()) + " " + mess;
 		}
 		else if (which == 's'){
-			return satelliteNames.get((String)Access.CODE.GUI.InterfacePnl.SatSelectionCombo.getSelectedItem()) + " c " + mess;
+			return satelliteNames.get((String)Admin.GUI.InterfacePnl.SatSelectionCombo.getSelectedItem()) + " c " + mess;
 		}
 		else {
 			return mess;
@@ -280,7 +282,7 @@ public class InterfaceCode {
 							data += input[x];
 							x++;
 						}
-						Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Recieved: " + data + "\n");
+						Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Recieved: " + data + "\n");
 						writeToLog("Serial Reader", "Recieved Note: " + data);
 					}
 					else if (input[2] == 'i'){
@@ -293,20 +295,20 @@ public class InterfaceCode {
 					}
 					else if (input[2] == '}'){
 						muted = true;
-						Access.CODE.GUI.InterfacePnl.MuteIcon.setVisible(true);
+						Admin.GUI.InterfacePnl.MuteIcon.setVisible(true);
 					}
 					else if (input[2] == '{'){
 						muted = false;
-						Access.CODE.GUI.InterfacePnl.MuteIcon.setVisible(false);
+						Admin.GUI.InterfacePnl.MuteIcon.setVisible(false);
 					}
 					else if (input[2] == '*'){
-						Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "The rover has pinged the ground station.\n");
+						Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "The rover has pinged the ground station.\n");
 						writeToSerial(tagMessage("*", 'r'));
 					}
 				}
 				else {
 					if (input.equals("Data Could Not be Parsed\n".toCharArray())){
-						Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Data Could Not be Parsed\n");
+						Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Data Could Not be Parsed\n");
 					}
 				}
 			}
@@ -403,7 +405,7 @@ public class InterfaceCode {
 		}
 		else {
 			if (!actionCommands[section][which].equals("")){
-	            Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + actionCommands[section][which] + "\"\n");
+	            Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + actionCommands[section][which] + "\"\n");
 				if (section == 0){
 					writeToSerial(tagMessage(actionCommands[section][which], 'r'));
 					listenForSignal("g #", new Runnable(){
@@ -441,13 +443,13 @@ public class InterfaceCode {
 	}
 	
 	public void sendRoverCommand(){
-		if (!Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText().equals("")){
+		if (!Admin.GUI.InterfacePnl.RoverSendTxt.getText().equals("")){
 			if (!Connected){
-				Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "You are not Connected.\n");
+				Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "You are not Connected.\n");
 			}
 			//writeToSerial(tagMessage(Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText(), 'r'));
-			writeToSerial(Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText(), true);
-            Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + Access.CODE.GUI.InterfacePnl.RoverSendTxt.getText() + "\"\n");
+			writeToSerial(Admin.GUI.InterfacePnl.RoverSendTxt.getText(), true);
+            Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + Admin.GUI.InterfacePnl.RoverSendTxt.getText() + "\"\n");
             listenForSignal("g #", new Runnable(){
 				public void run(){
 					listenForSignal("g %", new Runnable(){
@@ -465,7 +467,7 @@ public class InterfaceCode {
 					new ThreadTimer(0, failMessage, 1, "fail 3.1");
 				}
 			}, 4);
-			Access.CODE.GUI.InterfacePnl.RoverSendTxt.setText("");
+			Admin.GUI.InterfacePnl.RoverSendTxt.setText("");
 		}
 		else {
 			new ThreadTimer(0, new Runnable(){
@@ -477,9 +479,9 @@ public class InterfaceCode {
 	}
 	
 	public void sendSatCommand(){
-		if (!Access.CODE.GUI.InterfacePnl.SatSendTxt.getText().equals("")){
-			writeToSerial(tagMessage(Access.CODE.GUI.InterfacePnl.SatSendTxt.getText(), 's'));
-            Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + Access.CODE.GUI.InterfacePnl.SatSendTxt.getText() + "\"\n");
+		if (!Admin.GUI.InterfacePnl.SatSendTxt.getText().equals("")){
+			writeToSerial(tagMessage(Admin.GUI.InterfacePnl.SatSendTxt.getText(), 's'));
+            Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + Admin.GUI.InterfacePnl.SatSendTxt.getText() + "\"\n");
 			listenForSignal("g #", new Runnable(){
 				public void run(){
 					new ThreadTimer(0, confirmMessage, 1, "confirm 4");
@@ -489,7 +491,7 @@ public class InterfaceCode {
 					new ThreadTimer(0, failMessage, 1, "fail 4");
 				}
 			}, 4);
-			Access.CODE.GUI.InterfacePnl.SatSendTxt.setText("");
+			Admin.GUI.InterfacePnl.SatSendTxt.setText("");
 		}
 		else {
 			new ThreadTimer(0, new Runnable(){
@@ -504,29 +506,29 @@ public class InterfaceCode {
 		currentActionPages[section] += direction;
 		if (section == 0){
 			if (currentActionPages[section] == 0){
-				Access.CODE.GUI.InterfacePnl.RoverPageLeftBtn.setEnabled(false);
+				Admin.GUI.InterfacePnl.RoverPageLeftBtn.setEnabled(false);
 			}
 			else if (currentActionPages[section] == numberOfPages-1){
-				Access.CODE.GUI.InterfacePnl.RoverPageRightBtn.setEnabled(false);
+				Admin.GUI.InterfacePnl.RoverPageRightBtn.setEnabled(false);
 			}
 			else{
-				Access.CODE.GUI.InterfacePnl.RoverPageLeftBtn.setEnabled(true);
-				Access.CODE.GUI.InterfacePnl.RoverPageRightBtn.setEnabled(true);
+				Admin.GUI.InterfacePnl.RoverPageLeftBtn.setEnabled(true);
+				Admin.GUI.InterfacePnl.RoverPageRightBtn.setEnabled(true);
 			}
-			Access.CODE.GUI.InterfacePnl.RoverPageLbl.setText((currentActionPages[section]+1) + " / " + numberOfPages);
+			Admin.GUI.InterfacePnl.RoverPageLbl.setText((currentActionPages[section]+1) + " / " + numberOfPages);
 		}
 		else {
 			if (currentActionPages[section] == 0){
-				Access.CODE.GUI.InterfacePnl.SatPageLeftBtn.setEnabled(false);
+				Admin.GUI.InterfacePnl.SatPageLeftBtn.setEnabled(false);
 			}
 			else if (currentActionPages[section] == numberOfPages-1){
-				Access.CODE.GUI.InterfacePnl.SatPageRightBtn.setEnabled(false);
+				Admin.GUI.InterfacePnl.SatPageRightBtn.setEnabled(false);
 			}
 			else{
-				Access.CODE.GUI.InterfacePnl.SatPageLeftBtn.setEnabled(true);
-				Access.CODE.GUI.InterfacePnl.SatPageRightBtn.setEnabled(true);
+				Admin.GUI.InterfacePnl.SatPageLeftBtn.setEnabled(true);
+				Admin.GUI.InterfacePnl.SatPageRightBtn.setEnabled(true);
 			}
-			Access.CODE.GUI.InterfacePnl.SatPageLbl.setText((currentActionPages[section]+1) + " / " + numberOfPages);			
+			Admin.GUI.InterfacePnl.SatPageLbl.setText((currentActionPages[section]+1) + " / " + numberOfPages);			
 		}
 		UpdateActionBtns();
 	}
@@ -572,10 +574,10 @@ public class InterfaceCode {
 		deletingRover = false;
 		editingSat = false;
 		deletingSat = false;
-		Access.CODE.GUI.InterfacePnl.RoverDeleteLink.setText("<HTML><U>Cancel</U></HTML>");
+		Admin.GUI.InterfacePnl.RoverDeleteLink.setText("<HTML><U>Cancel</U></HTML>");
 		int x = 0;
-		while (x < Access.CODE.GUI.InterfacePnl.RoverBtns.length){
-			Access.CODE.GUI.InterfacePnl.RoverBtns[x].setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+		while (x < Admin.GUI.InterfacePnl.RoverBtns.length){
+			Admin.GUI.InterfacePnl.RoverBtns[x].setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
 			x++;
 		}
 	}
@@ -589,10 +591,10 @@ public class InterfaceCode {
 			deletingRover = true;
 			editingSat = false;
 			deletingSat = false;
-			Access.CODE.GUI.InterfacePnl.RoverDeleteLink.setText("<HTML><U>Cancel</U></HTML>");
+			Admin.GUI.InterfacePnl.RoverDeleteLink.setText("<HTML><U>Cancel</U></HTML>");
 			int x = 0;
-			while (x < Access.CODE.GUI.InterfacePnl.RoverBtns.length){
-				Access.CODE.GUI.InterfacePnl.RoverBtns[x].setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+			while (x < Admin.GUI.InterfacePnl.RoverBtns.length){
+				Admin.GUI.InterfacePnl.RoverBtns[x].setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
 				x++;
 			}
 		}
@@ -679,10 +681,10 @@ public class InterfaceCode {
 		deletingRover = false;
 		editingSat = true;
 		deletingSat = false;
-		Access.CODE.GUI.InterfacePnl.SatDeleteLink.setText("<HTML><U>Cancel</U></HTML>");
+		Admin.GUI.InterfacePnl.SatDeleteLink.setText("<HTML><U>Cancel</U></HTML>");
 		int x = 0;
-		while (x < Access.CODE.GUI.InterfacePnl.SatBtns.length){
-			Access.CODE.GUI.InterfacePnl.SatBtns[x].setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+		while (x < Admin.GUI.InterfacePnl.SatBtns.length){
+			Admin.GUI.InterfacePnl.SatBtns[x].setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
 			x++;
 		}
 	}
@@ -696,10 +698,10 @@ public class InterfaceCode {
 			deletingRover = false;
 			editingSat = false;
 			deletingSat = true;
-			Access.CODE.GUI.InterfacePnl.SatDeleteLink.setText("<HTML><U>Cancel</U></HTML>");
+			Admin.GUI.InterfacePnl.SatDeleteLink.setText("<HTML><U>Cancel</U></HTML>");
 			int x = 0;
-			while (x < Access.CODE.GUI.InterfacePnl.SatBtns.length){
-				Access.CODE.GUI.InterfacePnl.SatBtns[x].setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+			while (x < Admin.GUI.InterfacePnl.SatBtns.length){
+				Admin.GUI.InterfacePnl.SatBtns[x].setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
 				x++;
 			}
 		}		
@@ -753,12 +755,12 @@ public class InterfaceCode {
 		deletingRover = false;
 		editingSat = false;
 		deletingSat = false;
-		Access.CODE.GUI.InterfacePnl.RoverDeleteLink.setText("<HTML><U>Delete</U></HTML>");
-		Access.CODE.GUI.InterfacePnl.SatDeleteLink.setText("<HTML><U>Delete</U></HTML>");
+		Admin.GUI.InterfacePnl.RoverDeleteLink.setText("<HTML><U>Delete</U></HTML>");
+		Admin.GUI.InterfacePnl.SatDeleteLink.setText("<HTML><U>Delete</U></HTML>");
 		int x = 0;
-		while (x < Access.CODE.GUI.InterfacePnl.RoverBtns.length){
-			Access.CODE.GUI.InterfacePnl.RoverBtns[x].setCursor(new Cursor(Cursor.HAND_CURSOR));
-			Access.CODE.GUI.InterfacePnl.SatBtns[x].setCursor(new Cursor(Cursor.HAND_CURSOR));
+		while (x < Admin.GUI.InterfacePnl.RoverBtns.length){
+			Admin.GUI.InterfacePnl.RoverBtns[x].setCursor(new Cursor(Cursor.HAND_CURSOR));
+			Admin.GUI.InterfacePnl.SatBtns[x].setCursor(new Cursor(Cursor.HAND_CURSOR));
 			x++;
 		}
 	}
@@ -767,31 +769,31 @@ public class InterfaceCode {
 		int x = 0;
 		while (x < pageLength){
 			if (!actionCommands[0][x].equals("")){
-				Access.CODE.GUI.InterfacePnl.RoverBtns[x].setToolTipText(actionTips[0][x+currentActionPages[0]*pageLength]);
+				Admin.GUI.InterfacePnl.RoverBtns[x].setToolTipText(actionTips[0][x+currentActionPages[0]*pageLength]);
 			}
 			else {
-				Access.CODE.GUI.InterfacePnl.RoverBtns[x].setToolTipText("Unassigned");
+				Admin.GUI.InterfacePnl.RoverBtns[x].setToolTipText("Unassigned");
 			}
 			if (!actionCommands[1][x].equals("")){
-				Access.CODE.GUI.InterfacePnl.SatBtns[x].setToolTipText(actionTips[1][x+currentActionPages[1]*pageLength]);
+				Admin.GUI.InterfacePnl.SatBtns[x].setToolTipText(actionTips[1][x+currentActionPages[1]*pageLength]);
 			}
 			else {
-				Access.CODE.GUI.InterfacePnl.SatBtns[x].setToolTipText("Unassigned");
+				Admin.GUI.InterfacePnl.SatBtns[x].setToolTipText("Unassigned");
 			}
 			try {
-				Access.CODE.GUI.InterfacePnl.RoverBtns[x].setImage(new ImageIcon(InterfaceCode.class.getResource("/" + actionIcons[0][x+currentActionPages[0]*pageLength])));
+				Admin.GUI.InterfacePnl.RoverBtns[x].setImage(new ImageIcon(InterfaceCode.class.getResource("/" + actionIcons[0][x+currentActionPages[0]*pageLength])));
 			}
 			catch (Exception e) {
-				Access.CODE.GUI.InterfacePnl.RoverBtns[x].setImage(null);
+				Admin.GUI.InterfacePnl.RoverBtns[x].setImage(null);
 			}
-			Access.CODE.GUI.InterfacePnl.RoverBtns[x].setEnabled(!actionCommands[0][x+currentActionPages[0]*pageLength].equals(""));
+			Admin.GUI.InterfacePnl.RoverBtns[x].setEnabled(!actionCommands[0][x+currentActionPages[0]*pageLength].equals(""));
 			try {
-				Access.CODE.GUI.InterfacePnl.SatBtns[x].setImage(new ImageIcon(InterfaceCode.class.getResource("/" + actionIcons[1][x+currentActionPages[1]*pageLength])));
+				Admin.GUI.InterfacePnl.SatBtns[x].setImage(new ImageIcon(InterfaceCode.class.getResource("/" + actionIcons[1][x+currentActionPages[1]*pageLength])));
 			}
 			catch (Exception e){
-				Access.CODE.GUI.InterfacePnl.SatBtns[x].setImage(null);
+				Admin.GUI.InterfacePnl.SatBtns[x].setImage(null);
 			}
-			Access.CODE.GUI.InterfacePnl.SatBtns[x].setEnabled(!actionCommands[1][x+currentActionPages[1]*pageLength].equals(""));
+			Admin.GUI.InterfacePnl.SatBtns[x].setEnabled(!actionCommands[1][x+currentActionPages[1]*pageLength].equals(""));
 			x++;
 		}
 	}
@@ -800,26 +802,26 @@ public class InterfaceCode {
 	
 	public void setRoverPower(double voltage){
 		int precent = (int)Math.round((voltage / 9.0)*100);
-		Access.CODE.GUI.InterfacePnl.StatusRoverPower.setValue(precent);
-		Access.CODE.GUI.InterfacePnl.StatusRoverPower.setForeground(getPowerColor(precent));
+		Admin.GUI.InterfacePnl.StatusRoverPower.setValue(precent);
+		Admin.GUI.InterfacePnl.StatusRoverPower.setForeground(getPowerColor(precent));
 	}
 	
 	public void setSatellitePower(double voltage){
 		int precent = (int)Math.round((voltage / 9.0)*100);
-		Access.CODE.GUI.InterfacePnl.StatusSatPower.setValue(precent);
-		Access.CODE.GUI.InterfacePnl.StatusSatPower.setForeground(getPowerColor(precent));
+		Admin.GUI.InterfacePnl.StatusSatPower.setValue(precent);
+		Admin.GUI.InterfacePnl.StatusSatPower.setForeground(getPowerColor(precent));
 	}
 	
 	public void setMotorPower(double voltage){
 		int precent = (int)Math.round((voltage / 12.0)*100);
-		Access.CODE.GUI.InterfacePnl.StatusMotorPower.setValue(precent);
-		Access.CODE.GUI.InterfacePnl.StatusMotorPower.setForeground(getPowerColor(precent));
+		Admin.GUI.InterfacePnl.StatusMotorPower.setValue(precent);
+		Admin.GUI.InterfacePnl.StatusMotorPower.setForeground(getPowerColor(precent));
 	}
 	
 	public void setArmPower(double voltage){
 		int precent = (int)Math.round((voltage / 6.0)*100);
-		Access.CODE.GUI.InterfacePnl.StatusArmPower.setValue(precent);
-		Access.CODE.GUI.InterfacePnl.StatusArmPower.setForeground(getPowerColor(precent));
+		Admin.GUI.InterfacePnl.StatusArmPower.setValue(precent);
+		Admin.GUI.InterfacePnl.StatusArmPower.setForeground(getPowerColor(precent));
 	}
 		
 	private Color getPowerColor(int power){
@@ -844,9 +846,9 @@ public class InterfaceCode {
 					delay(5);
 				}
 				delay(20);
-				Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Receiving Image.\n");
+				Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Receiving Image.\n");
 				writeToLog("Photo Reciever", "Receiving Image");
-				String text = Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText();
+				String text = Admin.GUI.InterfacePnl.SerialDisplayLbl.getText();
 				byte[] bytes = new byte[length];
 				char[] progress = new char[length / 500 + 1];
 				int index = 0;
@@ -855,7 +857,7 @@ public class InterfaceCode {
 					index++;
 				}
 				progress[0] = '>';
-				Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(text + buildString(progress, 0, progress.length - 1));
+				Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + buildString(progress, 0, progress.length - 1));
 				index = 0;
 				int i = 0;
 				//int escape = 0;
@@ -873,7 +875,7 @@ public class InterfaceCode {
 						if (index % 500 == 0 && index != 0){
 							progress[index / 500 - 1] = '-';
 							progress[index / 500] = '>';
-							Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(text + buildString(progress, 0, progress.length - 1));
+							Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + buildString(progress, 0, progress.length - 1));
 						}
 						index++;
 						i++;
@@ -893,11 +895,11 @@ public class InterfaceCode {
 					fos.close();
 					writeToLog("Interface", "Recieved Image.  Stored in: " + image.getAbsolutePath());
 					receivingFile = false;
-					Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Done.\n");
-					Access.CODE.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail_Message.png")));
+					Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Done.\n");
+					Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail_Message.png")));
 				}
 				else {
-					Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Image transfer failed, incomplete size requirement.\n");
+					Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Image transfer failed, incomplete size requirement.\n");
 					writeToLog("Interface", "Image transfer failed due to incomplete size requirement.");
 				}
 			}	
@@ -912,9 +914,9 @@ public class InterfaceCode {
 			try {
 				while (Globals.RFAvailable(IDcode) == 0) {}
 					delay(20);
-					Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Receiving Data.\n");
+					Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Receiving Data.\n");
 					writeToLog("Date Reciever", "Receiving Data File");
-					String text = Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText();
+					String text = Admin.GUI.InterfacePnl.SerialDisplayLbl.getText();
 					byte[] bytes = new byte[length];
 					char[] progress = new char[length / 100 + 1];
 					int index = 0;
@@ -923,7 +925,7 @@ public class InterfaceCode {
 						index++;
 					}
 					progress[0] = '>';
-					Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(text + buildString(progress, 0, progress.length - 1));
+					Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + buildString(progress, 0, progress.length - 1));
 					index = 0;
 					//int escape = 0;
 					while (index < length){
@@ -939,7 +941,7 @@ public class InterfaceCode {
 							if (index % 100 == 0 && index != 0){
 								progress[index / 100 - 1] = '-';
 								progress[index / 100] = '>';
-								Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(text + buildString(progress, 0, progress.length - 1));
+								Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + buildString(progress, 0, progress.length - 1));
 							}
 							index++;
 						}
@@ -957,11 +959,11 @@ public class InterfaceCode {
 						fos.close();
 						writeToLog("Interface", "Recieved Data File.  Stored in: " + image.getAbsolutePath());
 						receivingFile = false;
-						Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Done.\n");
-						Access.CODE.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail_Message.png")));
+						Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Done.\n");
+						Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail_Message.png")));
 					}
 					else {
-						Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Data File transfer failed, incomplete size requirement.\n");
+						Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Data File transfer failed, incomplete size requirement.\n");
 						writeToLog("Interface", "Data File transfer failed due to incomplete size requirement.");
 					}
 			}	
@@ -996,7 +998,7 @@ public class InterfaceCode {
 										if (choice == 0){
 											javax.swing.JFileChooser browse = new javax.swing.JFileChooser();
 											browse.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("JPEG file", "jpg", "jpeg"));
-											browse.showSaveDialog(Access.CODE.GUI.InterfacePnl);
+											browse.showSaveDialog(Admin.GUI.InterfacePnl);
 											try {
 												String filepath = browse.getSelectedFile().getAbsolutePath() + ".jpeg";
 												File imageOut = new File(filepath);
@@ -1016,7 +1018,7 @@ public class InterfaceCode {
 								}, 1, "open file 1");
 								receivedFiles = Remove(receivedFiles, choice);
 								if (receivedFiles.length == 0){
-									Access.CODE.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail.png")));
+									Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail.png")));
 								}
 							} catch (Exception e3) {
 								Globals.reportError("InterfaceCode", "OpenRecievedFiles - e3", e3);
@@ -1030,7 +1032,7 @@ public class InterfaceCode {
 									if (choice == 1){
 										javax.swing.JFileChooser browse = new javax.swing.JFileChooser();
 										browse.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Comma Seperated Value", "CSV"));
-										browse.showSaveDialog(Access.CODE.GUI.InterfacePnl);
+										browse.showSaveDialog(Admin.GUI.InterfacePnl);
 										try {
 											String filepath = browse.getSelectedFile().getAbsolutePath() + ".CSV";
 											try {
@@ -1057,7 +1059,7 @@ public class InterfaceCode {
 							}, 1, "open file 2");
 							receivedFiles = Remove(receivedFiles, choice);
 							if (receivedFiles.length == 0){
-								Access.CODE.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail.png")));
+								Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail.png")));
 							}
 							break;
 						}
@@ -1112,102 +1114,102 @@ public class InterfaceCode {
 	
 	public void cancelInstructions(){
 		writeToSerial(tagMessage("!instructs", 's'));
-        Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Canceling Instructions...");
+        Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Canceling Instructions...");
 		listenForSignal("g KillDone", new Runnable(){
 			public void run(){
 				new ThreadTimer(0, new Runnable(){
 					public void run(){
 						(new PopUp()).showConfirmDialog("All Instructions Canceled.", "Action Confirmed", PopUp.DEFAULT_OPTIONS);
 					}}, 1, "cancel instructions");
-				Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Done.\n");
+				Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Done.\n");
 			}
 		}, new Runnable(){
 			public void run(){
-				Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Failed.\n");
+				Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Failed.\n");
 			}
 		}, 3);
 	}
 	
 	public void SalelliteCommandChanged(){
-		if (Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex() != -1){
-			Access.CODE.GUI.InterfacePnl.RoverCommandsList.clearSelection();
-			setParametersList(SatelliteInstructions[Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex()]);
-			Access.CODE.GUI.InterfacePnl.EditInstructionLink.setEnabled(true);
+		if (Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex() != -1){
+			Admin.GUI.InterfacePnl.RoverCommandsList.clearSelection();
+			setParametersList(SatelliteInstructions[Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex()]);
+			Admin.GUI.InterfacePnl.EditInstructionLink.setEnabled(true);
 		}
 		else {
-			Access.CODE.GUI.InterfacePnl.EditInstructionLink.setEnabled(false);
+			Admin.GUI.InterfacePnl.EditInstructionLink.setEnabled(false);
 		}
 	}
 	
 	public void RoverCommandChanged(){
-		if (Access.CODE.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex() != -1){
-			Access.CODE.GUI.InterfacePnl.SatelliteCommandList.clearSelection();
-			setParametersList(RoverInstructions[Access.CODE.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex()]);
-			Access.CODE.GUI.InterfacePnl.EditInstructionLink.setEnabled(true);
+		if (Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex() != -1){
+			Admin.GUI.InterfacePnl.SatelliteCommandList.clearSelection();
+			setParametersList(RoverInstructions[Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex()]);
+			Admin.GUI.InterfacePnl.EditInstructionLink.setEnabled(true);
 		}	
 		else {
-			Access.CODE.GUI.InterfacePnl.EditInstructionLink.setEnabled(false);
+			Admin.GUI.InterfacePnl.EditInstructionLink.setEnabled(false);
 		}
 	}
 	
 	private void setParametersList(InstructionObj[] instrcts){
-		Access.CODE.GUI.InterfacePnl.ParameterTxt.setVisible(false);
-		Access.CODE.GUI.InterfacePnl.ParameterList.setValues(instrcts);
+		Admin.GUI.InterfacePnl.ParameterTxt.setVisible(false);
+		Admin.GUI.InterfacePnl.ParameterList.setValues(instrcts);
 	}
 	
 	public void ParametersChanged(){
-		if (Access.CODE.GUI.InterfacePnl.ParameterList.getSelectedIndex() != -1){
-			Access.CODE.GUI.InterfacePnl.ParameterTxt.setVisible(((InstructionObj) Access.CODE.GUI.InterfacePnl.ParameterList.getItemAt(Access.CODE.GUI.InterfacePnl.ParameterList.getSelectedIndex())).getRequiresText());
-			Access.CODE.GUI.InterfacePnl.InstructionAddBtn.setEnabled(true);
+		if (Admin.GUI.InterfacePnl.ParameterList.getSelectedIndex() != -1){
+			Admin.GUI.InterfacePnl.ParameterTxt.setVisible(((InstructionObj) Admin.GUI.InterfacePnl.ParameterList.getItemAt(Admin.GUI.InterfacePnl.ParameterList.getSelectedIndex())).getRequiresText());
+			Admin.GUI.InterfacePnl.InstructionAddBtn.setEnabled(true);
 		}
 		else {
-			Access.CODE.GUI.InterfacePnl.ParameterTxt.setVisible(false);
-			Access.CODE.GUI.InterfacePnl.InstructionAddBtn.setEnabled(false);
+			Admin.GUI.InterfacePnl.ParameterTxt.setVisible(false);
+			Admin.GUI.InterfacePnl.InstructionAddBtn.setEnabled(false);
 		}
 	}
 	
 	public void AddInstruction(){
 		int where = -1;
 		if (editingInstruction){
-			where = Access.CODE.GUI.InterfacePnl.InstructionsList.getSelectedIndex();
-			Access.CODE.GUI.InterfacePnl.InstructionsList.removeValue(where);
+			where = Admin.GUI.InterfacePnl.InstructionsList.getSelectedIndex();
+			Admin.GUI.InterfacePnl.InstructionsList.removeValue(where);
 		}
-		if (!Access.CODE.GUI.InterfacePnl.ParameterTxt.isVisible() || !Access.CODE.GUI.InterfacePnl.ParameterTxt.getText().equals("")){
-			Access.CODE.GUI.InterfacePnl.InstructionAddBtn.setEnabled(false);
-			InstructionObj newCmd = (InstructionObj) Access.CODE.GUI.InterfacePnl.ParameterList.getSelectedItem();
-			if (Access.CODE.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex() != -1){
+		if (!Admin.GUI.InterfacePnl.ParameterTxt.isVisible() || !Admin.GUI.InterfacePnl.ParameterTxt.getText().equals("")){
+			Admin.GUI.InterfacePnl.InstructionAddBtn.setEnabled(false);
+			InstructionObj newCmd = (InstructionObj) Admin.GUI.InterfacePnl.ParameterList.getSelectedItem();
+			if (Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex() != -1){
 				newCmd.setDestination('r');
-				newCmd.setTitle("R-" + (String)Access.CODE.GUI.InterfacePnl.RoverCommandsList.getSelectedItem() + "-" + Access.CODE.GUI.InterfacePnl.ParameterList.getSelectedItem().toString());
-				newCmd.setEditIndexies(Access.CODE.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex(), Access.CODE.GUI.InterfacePnl.ParameterList.getSelectedIndex());
+				newCmd.setTitle("R-" + (String)Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedItem() + "-" + Admin.GUI.InterfacePnl.ParameterList.getSelectedItem().toString());
+				newCmd.setEditIndexies(Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex(), Admin.GUI.InterfacePnl.ParameterList.getSelectedIndex());
 			}
 			else {
 				newCmd.setDestination('s'); // Add a 'c' for command?
-				newCmd.setTitle("S-" + (String)Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getSelectedItem() + "-" + Access.CODE.GUI.InterfacePnl.ParameterList.getSelectedItem().toString());
-				newCmd.setEditIndexies(Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex(), Access.CODE.GUI.InterfacePnl.ParameterList.getSelectedIndex());
+				newCmd.setTitle("S-" + (String)Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedItem() + "-" + Admin.GUI.InterfacePnl.ParameterList.getSelectedItem().toString());
+				newCmd.setEditIndexies(Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex(), Admin.GUI.InterfacePnl.ParameterList.getSelectedIndex());
 			}
-			if (Access.CODE.GUI.InterfacePnl.ParameterTxt.isVisible()){
-				newCmd.fillParameter(Access.CODE.GUI.InterfacePnl.ParameterTxt.getText());
-				newCmd.setTitle(newCmd.toString() + ":" + Access.CODE.GUI.InterfacePnl.ParameterTxt.getText());
+			if (Admin.GUI.InterfacePnl.ParameterTxt.isVisible()){
+				newCmd.fillParameter(Admin.GUI.InterfacePnl.ParameterTxt.getText());
+				newCmd.setTitle(newCmd.toString() + ":" + Admin.GUI.InterfacePnl.ParameterTxt.getText());
 			}
 			if (editingInstruction){
-				Access.CODE.GUI.InterfacePnl.InstructionsList.addValue(newCmd, where);
-				Access.CODE.GUI.InterfacePnl.SatelliteCommandList.clearSelection();
-				Access.CODE.GUI.InterfacePnl.RoverCommandsList.clearSelection();
-				Access.CODE.GUI.InterfacePnl.ParameterList.setValues(new String[0]);
-				Access.CODE.GUI.InterfacePnl.InstructionsSubmitBtn.setEnabled(true);
-				Access.CODE.GUI.InterfacePnl.InstructionsEditBtn.setEnabled(true);
-				Access.CODE.GUI.InterfacePnl.InstructionsDeleteBtn.setEnabled(true);
-				Access.CODE.GUI.InterfacePnl.InstructionsUpBtn.setEnabled(true);
-				Access.CODE.GUI.InterfacePnl.InstructionsDownBtn.setEnabled(true);
-				Access.CODE.GUI.InterfacePnl.InstructionsList.setEnabled(true);
+				Admin.GUI.InterfacePnl.InstructionsList.addValue(newCmd, where);
+				Admin.GUI.InterfacePnl.SatelliteCommandList.clearSelection();
+				Admin.GUI.InterfacePnl.RoverCommandsList.clearSelection();
+				Admin.GUI.InterfacePnl.ParameterList.setValues(new String[0]);
+				Admin.GUI.InterfacePnl.InstructionsSubmitBtn.setEnabled(true);
+				Admin.GUI.InterfacePnl.InstructionsEditBtn.setEnabled(true);
+				Admin.GUI.InterfacePnl.InstructionsDeleteBtn.setEnabled(true);
+				Admin.GUI.InterfacePnl.InstructionsUpBtn.setEnabled(true);
+				Admin.GUI.InterfacePnl.InstructionsDownBtn.setEnabled(true);
+				Admin.GUI.InterfacePnl.InstructionsList.setEnabled(true);
 				editingInstruction = false;
 			}
 			else {
-				Access.CODE.GUI.InterfacePnl.InstructionsList.addValue(newCmd);
-				Access.CODE.GUI.InterfacePnl.SatelliteCommandList.clearSelection();
-				Access.CODE.GUI.InterfacePnl.RoverCommandsList.clearSelection();
-				Access.CODE.GUI.InterfacePnl.ParameterList.setValues(new String[0]);
-				Access.CODE.GUI.InterfacePnl.InstructionsSubmitBtn.setEnabled(true);
+				Admin.GUI.InterfacePnl.InstructionsList.addValue(newCmd);
+				Admin.GUI.InterfacePnl.SatelliteCommandList.clearSelection();
+				Admin.GUI.InterfacePnl.RoverCommandsList.clearSelection();
+				Admin.GUI.InterfacePnl.ParameterList.setValues(new String[0]);
+				Admin.GUI.InterfacePnl.InstructionsSubmitBtn.setEnabled(true);
 			}
 		}
 		else {
@@ -1221,16 +1223,16 @@ public class InterfaceCode {
 	
 	public void SendInstructions(){
 		String out = "";
-		for (Object val : Access.CODE.GUI.InterfacePnl.InstructionsList.getItems()){
+		for (Object val : Admin.GUI.InterfacePnl.InstructionsList.getItems()){
 			out += ((InstructionObj) val).buildCommand() + "\n";
 		}
 		out += "s report\nr report\n";
-		Access.CODE.GUI.InterfacePnl.SatelliteCommandList.clearSelection();
-		Access.CODE.GUI.InterfacePnl.RoverCommandsList.clearSelection();
-		Access.CODE.GUI.InterfacePnl.ParameterList.setValues(new String[0]);
-		Access.CODE.GUI.InterfacePnl.InstructionsList.setValues(new String[0]);
-		Access.CODE.GUI.InterfacePnl.InstructionsSubmitBtn.setEnabled(false);
-		Access.CODE.GUI.InterfacePnl.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+		Admin.GUI.InterfacePnl.SatelliteCommandList.clearSelection();
+		Admin.GUI.InterfacePnl.RoverCommandsList.clearSelection();
+		Admin.GUI.InterfacePnl.ParameterList.setValues(new String[0]);
+		Admin.GUI.InterfacePnl.InstructionsList.setValues(new String[0]);
+		Admin.GUI.InterfacePnl.InstructionsSubmitBtn.setEnabled(false);
+		Admin.GUI.InterfacePnl.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		writeToSerial(tagMessage("}", 'r'));
 		delay(2000);
 		writeToSerial(tagMessage("instructions", 's'));
@@ -1243,8 +1245,8 @@ public class InterfaceCode {
 			x += 60;
 		}
 		writeToSerial(buildString(instructChars, x, instructChars.length - 1));
-		Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Done Sending Instructions\n");
-		Access.CODE.GUI.InterfacePnl.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Done Sending Instructions\n");
+		Admin.GUI.InterfacePnl.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 	}
 	
 	
@@ -1253,39 +1255,39 @@ public class InterfaceCode {
 	public void editInstructionSendList(int how){
 		switch (how){
 		case 0:
-			Access.CODE.GUI.InterfacePnl.InstructionsList.removeValue(Access.CODE.GUI.InterfacePnl.InstructionsList.getSelectedIndex());
-			Access.CODE.GUI.InterfacePnl.InstructionsList.clearSelection();
+			Admin.GUI.InterfacePnl.InstructionsList.removeValue(Admin.GUI.InterfacePnl.InstructionsList.getSelectedIndex());
+			Admin.GUI.InterfacePnl.InstructionsList.clearSelection();
 			break;
 		case 1:
-			Access.CODE.GUI.InterfacePnl.InstructionsSubmitBtn.setEnabled(false);
-			Access.CODE.GUI.InterfacePnl.InstructionsEditBtn.setEnabled(false);
-			Access.CODE.GUI.InterfacePnl.InstructionsDeleteBtn.setEnabled(false);
-			Access.CODE.GUI.InterfacePnl.InstructionsUpBtn.setEnabled(false);
-			Access.CODE.GUI.InterfacePnl.InstructionsDownBtn.setEnabled(false);
-			Access.CODE.GUI.InterfacePnl.InstructionsList.setEnabled(false);
+			Admin.GUI.InterfacePnl.InstructionsSubmitBtn.setEnabled(false);
+			Admin.GUI.InterfacePnl.InstructionsEditBtn.setEnabled(false);
+			Admin.GUI.InterfacePnl.InstructionsDeleteBtn.setEnabled(false);
+			Admin.GUI.InterfacePnl.InstructionsUpBtn.setEnabled(false);
+			Admin.GUI.InterfacePnl.InstructionsDownBtn.setEnabled(false);
+			Admin.GUI.InterfacePnl.InstructionsList.setEnabled(false);
 			editingInstruction = true;
-			if (((InstructionObj) Access.CODE.GUI.InterfacePnl.InstructionsList.getSelectedItem()).getDestination() == 'r'){
-				Access.CODE.GUI.InterfacePnl.RoverCommandsList.setSelection(((InstructionObj) Access.CODE.GUI.InterfacePnl.InstructionsList.getSelectedItem()).getEditIndexies()[0]);
+			if (((InstructionObj) Admin.GUI.InterfacePnl.InstructionsList.getSelectedItem()).getDestination() == 'r'){
+				Admin.GUI.InterfacePnl.RoverCommandsList.setSelection(((InstructionObj) Admin.GUI.InterfacePnl.InstructionsList.getSelectedItem()).getEditIndexies()[0]);
 			}
 			else {
-				Access.CODE.GUI.InterfacePnl.SatelliteCommandList.setSelection(((InstructionObj) Access.CODE.GUI.InterfacePnl.InstructionsList.getSelectedItem()).getEditIndexies()[0]);
+				Admin.GUI.InterfacePnl.SatelliteCommandList.setSelection(((InstructionObj) Admin.GUI.InterfacePnl.InstructionsList.getSelectedItem()).getEditIndexies()[0]);
 			}
-			Access.CODE.GUI.InterfacePnl.ParameterList.setSelection(((InstructionObj) Access.CODE.GUI.InterfacePnl.InstructionsList.getSelectedItem()).getEditIndexies()[1]);
-			Access.CODE.GUI.InterfacePnl.ParameterTxt.setText(((InstructionObj) Access.CODE.GUI.InterfacePnl.InstructionsList.getSelectedItem()).getParameter());
+			Admin.GUI.InterfacePnl.ParameterList.setSelection(((InstructionObj) Admin.GUI.InterfacePnl.InstructionsList.getSelectedItem()).getEditIndexies()[1]);
+			Admin.GUI.InterfacePnl.ParameterTxt.setText(((InstructionObj) Admin.GUI.InterfacePnl.InstructionsList.getSelectedItem()).getParameter());
 			break;
 		case 2:
-			Object hold = Access.CODE.GUI.InterfacePnl.InstructionsList.getSelectedItem();
-			int where = Access.CODE.GUI.InterfacePnl.InstructionsList.getSelectedIndex();
-			Access.CODE.GUI.InterfacePnl.InstructionsList.removeValue(where);
-			Access.CODE.GUI.InterfacePnl.InstructionsList.addValue(hold, where - 1);
-			Access.CODE.GUI.InterfacePnl.InstructionsList.setSelection(where - 1);
+			Object hold = Admin.GUI.InterfacePnl.InstructionsList.getSelectedItem();
+			int where = Admin.GUI.InterfacePnl.InstructionsList.getSelectedIndex();
+			Admin.GUI.InterfacePnl.InstructionsList.removeValue(where);
+			Admin.GUI.InterfacePnl.InstructionsList.addValue(hold, where - 1);
+			Admin.GUI.InterfacePnl.InstructionsList.setSelection(where - 1);
 			break;
 		case 3:
-			Object hold1 = Access.CODE.GUI.InterfacePnl.InstructionsList.getSelectedItem();
-			int where1 = Access.CODE.GUI.InterfacePnl.InstructionsList.getSelectedIndex();
-			Access.CODE.GUI.InterfacePnl.InstructionsList.removeValue(where1);
-			Access.CODE.GUI.InterfacePnl.InstructionsList.addValue(hold1, where1 + 1);
-			Access.CODE.GUI.InterfacePnl.InstructionsList.setSelection(where1 + 1);
+			Object hold1 = Admin.GUI.InterfacePnl.InstructionsList.getSelectedItem();
+			int where1 = Admin.GUI.InterfacePnl.InstructionsList.getSelectedIndex();
+			Admin.GUI.InterfacePnl.InstructionsList.removeValue(where1);
+			Admin.GUI.InterfacePnl.InstructionsList.addValue(hold1, where1 + 1);
+			Admin.GUI.InterfacePnl.InstructionsList.setSelection(where1 + 1);
 			break;
 		}
 	}
@@ -1301,34 +1303,34 @@ public class InterfaceCode {
 	public void addInstructionsToList2(boolean addRover, boolean addSat, String title, InstructionObj[] instruct){
 		if (editingCommand == -1){
 			if (addRover){
-				Access.CODE.GUI.InterfacePnl.RoverCommandsList.addValue(title);
+				Admin.GUI.InterfacePnl.RoverCommandsList.addValue(title);
 				RoverInstructions = Augment(RoverInstructions, instruct.clone());
 			}
 			if (addSat){
-				Access.CODE.GUI.InterfacePnl.SatelliteCommandList.addValue(title);
+				Admin.GUI.InterfacePnl.SatelliteCommandList.addValue(title);
 				SatelliteInstructions = Augment(SatelliteInstructions, instruct.clone());
 			}
 		}
 		else {
 			if (addRover){
-				Access.CODE.GUI.InterfacePnl.RoverCommandsList.removeValue(editingCommand);
-				Access.CODE.GUI.InterfacePnl.RoverCommandsList.addValue(title, editingCommand);
+				Admin.GUI.InterfacePnl.RoverCommandsList.removeValue(editingCommand);
+				Admin.GUI.InterfacePnl.RoverCommandsList.addValue(title, editingCommand);
 				RoverInstructions[editingCommand] = instruct.clone();
 			}
 			if (addSat){
-				Access.CODE.GUI.InterfacePnl.SatelliteCommandList.removeValue(editingCommand);
-				Access.CODE.GUI.InterfacePnl.SatelliteCommandList.addValue(title, editingCommand);
+				Admin.GUI.InterfacePnl.SatelliteCommandList.removeValue(editingCommand);
+				Admin.GUI.InterfacePnl.SatelliteCommandList.addValue(title, editingCommand);
 				SatelliteInstructions[editingCommand] = instruct.clone();
 			}
 			editingCommand = -1;
 		}
-		Access.CODE.GUI.InterfacePnl.ParameterList.setValues(new String[0]);
+		Admin.GUI.InterfacePnl.ParameterList.setValues(new String[0]);
 		SaveProgrammer();
 	}
 	
 	public void editInstructionInList(){
-		if (Access.CODE.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex() != -1){
-			int selected = Access.CODE.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex();
+		if (Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex() != -1){
+			int selected = Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex();
 			String[] parameters = new String[RoverInstructions[selected].length];
 			String[][] commands = new String[parameters.length][];
 			boolean[] bools = new boolean[parameters.length];
@@ -1345,13 +1347,13 @@ public class InterfaceCode {
 			final boolean[] finBools = bools;
 			new ThreadTimer(0, new Runnable(){
 				public void run(){
-					(new InstrucitonEditor(true, false, (String)Access.CODE.GUI.InterfacePnl.RoverCommandsList.getSelectedItem(), finParam, finCommands, finBools)).open();
+					(new InstrucitonEditor(true, false, (String)Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedItem(), finParam, finCommands, finBools)).open();
 				}
 			}, 1, "edit instructions");
 		}
-		if (Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex() != -1){
-			int selected = Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex();
-			String[] parameters = new String[Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getItems().length];
+		if (Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex() != -1){
+			int selected = Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex();
+			String[] parameters = new String[Admin.GUI.InterfacePnl.SatelliteCommandList.getItems().length];
 			String[][] commands = new String[parameters.length][];
 			boolean[] bools = new boolean[parameters.length];
 			int x = 0;
@@ -1367,7 +1369,7 @@ public class InterfaceCode {
 			final boolean[] finBools = bools;
 			new ThreadTimer(0, new Runnable(){
 				public void run(){
-					(new InstrucitonEditor(true, false, (String)Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getSelectedItem(), finParam, finCommands, finBools)).open();
+					(new InstrucitonEditor(true, false, (String)Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedItem(), finParam, finCommands, finBools)).open();
 				}
 			}, 1, "edit instructions 2");
 		}
@@ -1390,7 +1392,7 @@ public class InterfaceCode {
 		try {
 			fos = new FileOutputStream(filename);
 			out = new ObjectOutputStream(fos);
-			out.writeObject(new SaveFile(actionCommands, actionTips, actionIcons, Access.CODE.GUI.InterfacePnl.RoverCommandsList.getListItems(), RoverInstructions, Access.CODE.GUI.InterfacePnl.SatelliteCommandList.getListItems(), SatelliteInstructions));
+			out.writeObject(new SaveFile(actionCommands, actionTips, actionIcons, Admin.GUI.InterfacePnl.RoverCommandsList.getListItems(), RoverInstructions, Admin.GUI.InterfacePnl.SatelliteCommandList.getListItems(), SatelliteInstructions));
 			out.close();
 		}
 		catch (Exception ex) {
@@ -1473,13 +1475,12 @@ public class InterfaceCode {
 		return out;
 	}
 	
-	private void delay(double length) {
-		try{
-			Thread.sleep((long)(length/Globals.getTimeScale()), (int)((length/Globals.getTimeScale()-(int)length/Globals.getTimeScale())*1000000));
-		} catch (Exception e) {
-			Globals.reportError("InterfaceCode", "delay", e);
+	private void delay(int length) {
+		String newname = Globals.delayThread(Thread.currentThread().getName(), length);
+		if (newname.equals("pass")){
+			return;
 		}
-		//long start = System.nanoTime();
-		//while (((System.nanoTime()-start) < (length*1000000))) {}
+		while (!Globals.getThreadRunPermission(newname)) {}
+		Globals.threadDelayComplete(Thread.currentThread().getName());
 	}
 }

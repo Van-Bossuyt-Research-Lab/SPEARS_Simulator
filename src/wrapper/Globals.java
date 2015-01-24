@@ -38,7 +38,6 @@ public class Globals {
 		}, ThreadTimer.FOREVER, "milli-clock", true);
 		TimeMillis++;
 		Object[] keys = threads.getKeys();
-		String file = "";
 		int x = 0;
 		while (x < keys.length){
 			if (keys[x].equals(null)){
@@ -46,14 +45,12 @@ public class Globals {
 			}
 			String key = (String) keys[x];
 			threads.get(key).reset();
-			file += "\n" + key + ": " + threads.get(key).getNext() + " == " + TimeMillis;
 			if (threads.get(key).getNext() == TimeMillis){
 				threads.get(key).grantPermission();
 			}
 			x++;
 		}
 		ready = true;
-		writeToLogFile("Timing", file);
 	}
 	
 	public static void writeToSerial(char write, String from){
@@ -199,21 +196,16 @@ public class Globals {
 	public static void threadCheckIn(String name){
 		threads.get(name).markFinished();
 		threads.get(name).advance();
-		String file = "\n\nCheck In: " + name + "\nTime: " + TimeMillis + "\t{" + System.currentTimeMillis() + "}";
 		if (name.equals("milli-clock") || milliDone){
-			file += "\nWait Elapsed";
 			for (Object o : threads.getKeys()){
 				String key = (String) o;
 				if (key.equals("milli-clock")){
 					continue;
 				}
 				if (!threads.get(key).isFinished()){
-					file += "\n" + key + ".isFinished: false";
 					milliDone = true;
-					writeToLogFile("Timing", file);
 					return;
 				}
-				file += "\n" + key + ".isFinished: true";
 			}
 			ready = false;
 			milliDone = false;
@@ -227,22 +219,44 @@ public class Globals {
 			}
 			ready = true;
 		}
-		writeToLogFile("Timing", file);
+	}
+	
+	public static String delayThread(String name, int time){
+		try {
+			threads.get(name).equals(null);
+			String rtnname = name +"-delay";
+			ThreadItem.offset = 0;
+			registerNewThread(rtnname, time);
+			threads.get(name).suspend();
+			return rtnname;
+		}
+		catch (Exception e){
+			try{
+				double length = time;
+				Thread.sleep((long)(length/Globals.getTimeScale()), (int)((length/Globals.getTimeScale()-(int)length/Globals.getTimeScale())*1000000));
+			} catch (Exception ex) {
+				Globals.reportError("InterfaceCode", "delay", ex);
+			}
+			return "pass";
+		}
+	}
+	
+	public static void threadDelayComplete(String name){
+		threads.get(name).unSuspend();
+		checkOutThread(name+"-delay");
 	}
 	
 	public static boolean getThreadRunPermission(String name){
-		String file = "";
 		if (name.equals("milli-clock")){
 			return true;
 		}
+		if (name.equals("RAIR Risk Seeking 1-code-delay")){
+			//System.out.println(threads.get(name).toString());
+		}
 		if (threads.get(name).hasPermission() && ready && begun){
 			threads.get(name).revokePermission();
-			file = "\nRequesting: " + name + " - approved" + "\t{" + System.currentTimeMillis() + "}";
-			writeToLogFile("Timing", file);
 			return true;
 		}
-		file = "\nRequesting: " + name + " - denied" + "\t{" + System.currentTimeMillis() + "}";
-		writeToLogFile("Timing", file);
 		return false;
 	}
 	

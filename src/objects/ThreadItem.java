@@ -1,5 +1,7 @@
 package objects;
 
+import wrapper.Globals;
+
 public class ThreadItem {
 	
 	private String name;
@@ -9,6 +11,7 @@ public class ThreadItem {
 	private boolean permission;
 	private boolean running;
 	private boolean complete;
+	private boolean suspended = false;
 	
 	public static int offset = 0;
 
@@ -28,8 +31,7 @@ public class ThreadItem {
 	}
 
 	public void advance(){
-		//System.out.println(next + " -> " + (next+delay));
-		next += delay;
+		next = Globals.TimeMillis + delay;
 	}
 	
 	public long getNext() {
@@ -54,8 +56,19 @@ public class ThreadItem {
 		return permission;
 	}
 	
+	public void suspend(){
+		suspended = true;
+	}
+	
+	public void unSuspend(){
+		suspended = false;
+	}
+	
 	public boolean isFinished(){
-		if (running){
+		if (suspended){
+			return true;
+		}
+		else if (running){
 			return complete;
 		}
 		else {
@@ -66,6 +79,13 @@ public class ThreadItem {
 	public void reset(){
 		running = false;
 		complete = false;
+	}
+
+	@Override
+	public String toString() {
+		return "ThreadItem [name=" + name + ", delay=" + delay + ", next="
+				+ next + ", permission=" + permission + ", running=" + running
+				+ ", complete=" + complete + ", suspended=" + suspended + "]";
 	}
 	
 }

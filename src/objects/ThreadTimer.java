@@ -44,7 +44,12 @@ public class ThreadTimer extends Thread {
 					return;
 				}
 			}
-			while (!Globals.getThreadRunPermission(getName())) {}
+			while (!Globals.getThreadRunPermission(getName())) {
+				if (super.isInterrupted()){
+					Globals.checkOutThread(getName());
+					return;
+				}
+			}
 			action.run();
 			Globals.threadCheckIn(getName());
 			if (!forever){
