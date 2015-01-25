@@ -4,6 +4,8 @@ public class Queue < Type extends Object >{
 
 	private Type[] array;
 	
+	private boolean editing = false;
+	
 	@SuppressWarnings("unchecked")
 	public Queue(){
 		array =  (Type[]) new Object[0];
@@ -15,6 +17,7 @@ public class Queue < Type extends Object >{
 	
 	@Override
 	public Queue<Type> clone(){
+		while (editing) {}
 		Queue<Type> out = new Queue<Type>();
 		int x = 0;
 		while (x < array.length){
@@ -24,32 +27,45 @@ public class Queue < Type extends Object >{
 		return out;
 	}
 	
-	public void push(Type a){
+	public synchronized void push(Type a){
+		while (editing) {}
+		editing = true;
 		array = augment(array, a);
+		editing = false;
 	}
 	
-	public Type peek(){
-		if (isEmpty()){
+	public synchronized Type peek(){
+		while (editing) {}
+		if (isEmpty(true)){
 			return null;
 		}
 		return array[0];
 	}
 	
-	public Type pop(){
-		if (isEmpty()){
+	public synchronized Type pop(){
+		while (editing) {}
+		editing = true;
+		if (isEmpty(true)){
 			return null;
 		}
 		Type out = array[0];
 		array = diminish(array);
+		editing = false;
 		return out;
 	}
 
-	public int size(){
+	public synchronized int size(){
+		while (editing) {}
 		return array.length;
 	}
 	
-	public boolean isEmpty(){
+	private boolean isEmpty(boolean override){
+		while (editing && !override) {}
 		return (array.length == 0);
+	}
+	
+	public synchronized boolean isEmpty(){
+		return isEmpty(false);
 	}
 	
 	@Override

@@ -52,9 +52,6 @@ public class Form extends JFrame {
 	
 	private int currentPage = WRAPPER;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -74,9 +71,6 @@ public class Form extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public Form() {
 		addWindowListener(new WindowAdapter() {
 			@Override

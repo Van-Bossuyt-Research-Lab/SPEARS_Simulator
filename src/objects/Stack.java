@@ -4,30 +4,41 @@ public class Stack < Type extends Object > {
 
 	private Type[] array;
 	
+	private boolean editing = false;
+	
 	@SuppressWarnings("unchecked")
 	public Stack(){
 		array =  (Type[]) new Object[0];
 	}
 	
-	public void push(Type a){
+	public synchronized void push(Type a){
+		while (editing) {}
+		editing = true;
 		array = augment(array, a);
+		editing = false;
 	}
 	
-	public Type peek(){
+	public synchronized Type peek(){
+		while (editing) {}
 		return array[array.length-1];
 	}
 	
-	public Type pop(){
+	public synchronized Type pop(){
+		while (editing) {}
+		editing = true;
 		Type out = array[array.length-1];
 		array = diminish(array);
+		editing = false;
 		return out;
 	}
 	
-	public int size(){
+	public synchronized int size(){
+		while (editing) {}
 		return array.length;
 	}
 	
-	public boolean isEmpty(){
+	public synchronized boolean isEmpty(){
+		while (editing) {}
 		return (array.length == 0);
 	}
 	

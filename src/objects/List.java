@@ -5,13 +5,16 @@ public class List <Type> {
 	private Type[] array;
 	public int length;
 	
+	private boolean editing = false;
+	
 	@SuppressWarnings("unchecked")
 	public List(){
 		array = (Type[]) new Object[0];
 		length = 0;
 	}
 	
-	public Type get(int index){
+	public synchronized Type get(int index){
+		while (editing) {}
 		if (index >= 0 && index < array.length){
 			return array[index];
 		}
@@ -20,22 +23,35 @@ public class List <Type> {
 		}
 	}
 	
-	public void set(int index, Type val){
+	public synchronized void set(int index, Type val){
+		while (editing) {}
+		editing = true;
 		if (index >= 0 && index < array.length){
 			array[index] = val;
 		}
 		else if (index >= array.length){
-			add(val);
+			add(val, true);
 		}
+		editing = false;
 	}
 	
-	public void add(Type val){
+	private void add(Type val, boolean override){
+		while (editing && !override) {}
+		editing = true;
 		array = Augment(array, val);
 		length++;
+		editing = override;
 	}
 	
-	public void remove(Type val){
+	public synchronized void add(Type val){
+		add(val, false);
+	}
+	
+	public synchronized void remove(Type val){
+		while (editing) {}
+		editing = true;
 		array = remove(array, val);
+		editing = false;
 	}
 	
 	@SuppressWarnings("unchecked")

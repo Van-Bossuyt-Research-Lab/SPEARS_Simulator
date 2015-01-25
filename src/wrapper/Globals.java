@@ -135,7 +135,7 @@ public class Globals {
 		error.printStackTrace();
 	}
 	
-	public static void writeToLogFile(String from, String write){ // writes the message to the log genorated by the interface
+	public synchronized static void writeToLogFile(String from, String write){ // writes the message to the log genorated by the interface
 		Access.INTERFACE.writeToLog(from, write);
 	}
 	
@@ -191,6 +191,13 @@ public class Globals {
 	
 	public static void checkOutThread(String name){
 		threads.remove(name);
+		try {
+		for (Object o : threads.getKeys()){
+			String key = (String) o;
+		}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void threadCheckIn(String name){
@@ -199,6 +206,9 @@ public class Globals {
 		if (name.equals("milli-clock") || milliDone){
 			for (Object o : threads.getKeys()){
 				String key = (String) o;
+				try {
+					threads.get(key).equals(null);
+				} catch (NullPointerException e) { continue; }
 				if (key.equals("milli-clock")){
 					continue;
 				}
@@ -242,8 +252,8 @@ public class Globals {
 	}
 	
 	public static void threadDelayComplete(String name){
-		threads.get(name).unSuspend();
 		checkOutThread(name+"-delay");
+		threads.get(name).unSuspend();
 	}
 	
 	public static boolean getThreadRunPermission(String name){

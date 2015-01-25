@@ -222,7 +222,7 @@ public class InterfaceCode {
 
 	public void writeToSerial(String msg){
 		if (Connected && !muted){
-			writeToLog("Serial Writer", "Command sent: \'" + msg + "\'" + DateTime.toString());
+			writeToLog("Interface Serial", "Command sent: \'" + msg + "\'");
 			//try {
             // 	outputStream.write(msg.getBytes());
         	//} catch (Exception e) {
@@ -241,7 +241,7 @@ public class InterfaceCode {
 	
 	public void writeToSerial(String msg, boolean override){
 		if ((Connected || override) && !muted){
-			writeToLog("Serial Writer", "Command sent: \'" + msg + "\'" + DateTime.toString());
+			writeToLog("Interface Serial", "Command sent: \'" + msg + "\'");
 			//try {
             // 	outputStream.write(msg.getBytes());
         	//} catch (Exception e) {

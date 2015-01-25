@@ -758,19 +758,16 @@ public class RoverObject {
 					break;
 				}
 				Globals.writeToSerial(message[x], IDcode); // Write to Serial one char at a time
-				try {
-					Thread.sleep((int) (5 / Globals.getTimeScale())); // Pause for sending
-				} 
-				catch (InterruptedException e) {
-					Globals.reportError("RoverCode", "sendSerial", e);
-				}
+				delay(1);
 				x++;
 			}
 			addToSerialHistory(mess);
+			Globals.writeToLogFile(name+" Serial", "Message Sent: \'" + mess + "\'");
 			return true;
 		} 
 		else {
 			addToSerialHistory("Surpressed: " + mess);
+			Globals.writeToLogFile(name+" Serial", "Message Surpressed: \'" + mess + "\'");
 			return false;
 		}
 	}
@@ -782,10 +779,12 @@ public class RoverObject {
 	private boolean sendSerial(char mess) {
 		if (!mute) {
 			Globals.writeToSerial(mess, IDcode);
-			addToSerialHistory(mess + "");		
+			addToSerialHistory(mess + "");
+			Globals.writeToLogFile(name+" Serial", "Message Sent: \'" + mess + "\'");
 			return true;
 		} else {
 			addToSerialHistory("Supressed: " + mess);
+			Globals.writeToLogFile(name+" Serial", "Message Sent: \'" + mess + "\'");
 			return false;
 		}
 	}

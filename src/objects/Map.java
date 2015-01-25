@@ -5,6 +5,8 @@ public class Map < KeyType, ItemType >{
 	private KeyType[] keys;
 	private ItemType[] items;
 	
+	private boolean editing = false;
+	
 	@SuppressWarnings("unchecked")
 	public Map(){
 		keys =  (KeyType[]) new Object[0];
@@ -12,17 +14,21 @@ public class Map < KeyType, ItemType >{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void add(KeyType key, ItemType item){
-		if (!contains(key)){
+	public synchronized void add(KeyType key, ItemType item){
+		while (editing) {}
+		editing = true;
+		if (!contains(key, true)){
 			keys = (KeyType[]) augment(keys, key);
 			items = (ItemType[]) augment(items, item);
 		}
 		else {
-			set(key, item);
+			set(key, item, true);
 		}
+		editing = false;
 	}
 	
-	public ItemType get(KeyType key){
+	private ItemType get(KeyType key, boolean override){
+		while (editing && !override) {}
 		for (int x = 0; x < keys.length; x++){
 			if (key.equals(keys[x])){
 				return items[x];
@@ -31,7 +37,13 @@ public class Map < KeyType, ItemType >{
 		return null;
 	}
 	
-	public void set(KeyType key, ItemType item){
+	public synchronized ItemType get(KeyType key){
+		return get(key, false);
+	}
+	
+	private void set(KeyType key, ItemType item, boolean override){
+		while (editing && !override) {}
+		editing = true;
 		int x = 0;
 		while (x < keys.length){
 			if (keys[x].equals(key)){
@@ -40,9 +52,15 @@ public class Map < KeyType, ItemType >{
 			}
 			x++;
 		}
+		editing = override;
 	}
 	
-	public boolean contains(KeyType key){
+	public synchronized void set(KeyType key, ItemType item){
+		set(key, item, false);
+	}
+	
+	private boolean contains(KeyType key, boolean override){
+		while (editing && !override) {}
 		int x = 0;
 		while (x < keys.length){
 			if (keys[x].equals(key)){
@@ -53,29 +71,40 @@ public class Map < KeyType, ItemType >{
 		return false;
 	}
 	
-	public KeyType[] getKeys(){
-		return (KeyType[])keys;
+	public synchronized boolean contains(KeyType key){
+		return contains(key, false);
 	}
 	
-	public ItemType[] getValues(){
+	public synchronized KeyType[] getKeys(){
+		while (editing) {}
+		return keys;
+	}
+	
+	public synchronized ItemType[] getValues(){
+		while (editing) {}
 		return items;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void remove(KeyType key){
+	public synchronized void remove(KeyType key){
+		while (editing) {}
+		editing = true;
 		try {
-			items = (ItemType[]) remove(items, get(key));
-			keys = (KeyType[]) remove(keys, key);
-		} catch (NullPointerException e) {
+			items = (ItemType[]) diminish(items, get(key, true));
+			keys = (KeyType[]) diminish(keys, key);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		editing = false;
 	}
 	
-	public int size(){
+	public synchronized int size(){
+		while (editing) {}
 		return items.length;
 	}
 	
-	public boolean isEmpty(){
+	public synchronized boolean isEmpty(){
+		while (editing) {}
 		return (items.length == 0);
 	}
 	
@@ -88,21 +117,23 @@ public class Map < KeyType, ItemType >{
 		return out;
 	}
 	
-	private Object[] remove(Object[] array, Object val) {
+	private Object[] diminish(Object[] array, Object val) {
 		Object[] out = new Object[array.length - 1];
 		int x = 0;
 		while (x < out.length && !array[x].equals(val)){
 			out[x] = array[x];
 			x++;
 		}
-		if (x != out.length){
+		if (x == out.length){
+			if (!array[x].equals(val)){
+				return array;
+			}
+		}
+		else {
 			while (x < out.length){
 				out[x] = array[x+1];
 				x++;
 			}
-		}
-		else {
-			return array;
 		}
 		return out;
 	}

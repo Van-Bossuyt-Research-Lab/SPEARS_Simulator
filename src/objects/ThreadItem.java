@@ -80,12 +80,31 @@ public class ThreadItem {
 		running = false;
 		complete = false;
 	}
+	
+	public char getState(){
+		if (suspended){
+			return 's';
+		}
+		else if (running){
+			return 'r';
+		}
+		else if (complete){
+			return 'c';
+		}
+		else if (permission){
+			return 'p';
+		}
+		else {
+			return 'w';
+		}
+	}
 
 	@Override
 	public String toString() {
-		return "ThreadItem [name=" + name + ", delay=" + delay + ", next="
-				+ next + ", permission=" + permission + ", running=" + running
-				+ ", complete=" + complete + ", suspended=" + suspended + "]";
+		return "";
+		//return "ThreadItem [name=" + name + ", delay=" + delay + ", next="
+		//		+ next + ", permission=" + permission + ", running=" + running
+		//		+ ", complete=" + complete + ", suspended=" + suspended + "]";
 	}
 	
 }

@@ -4,11 +4,14 @@ public class Set <Type> {
 
 	private Type[] array;
 	
+	private boolean editing = false;
+	
 	public Set(){
 		array = (Type[]) new Object[0];
 	}
 	
-	public boolean containts(Type val){
+	public synchronized boolean containts(Type val){
+		while (editing) {}
 		int layer = 1;
 		int loc = array.length / 2;
 		while (true){
@@ -25,7 +28,9 @@ public class Set <Type> {
 		}
 	}
 	
-	public void push(Type val){
+	public synchronized void push(Type val){
+		while (editing) {}
+		editing = true;
 		Type[] out = (Type[]) new Object[array.length + 1];
 		int x = 0;
 		while (compare(val.toString(), array[x].toString()) < 0){
@@ -39,6 +44,7 @@ public class Set <Type> {
 			x++;
 		}
 		array = out;
+		editing = false;
 	}
 	
 	private int compare(String a, String b){

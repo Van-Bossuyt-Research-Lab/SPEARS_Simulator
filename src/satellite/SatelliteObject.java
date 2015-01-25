@@ -333,20 +333,18 @@ public class SatelliteObject {
 			}
 			Globals.writeToSerial(message[x], IDcode); // Write to Serial one char at a time
 			print += message[x];
-			try {
-				Thread.sleep((int)(5 / Globals.getTimeScale())); // Pause for sending
-			} catch (InterruptedException e) {
-				Globals.reportError("SatelliteCode", "sendSerial", e);
-			}
+			delay(1);
 			x++;
 		}
 		addToSerialHistory(print);
+		Globals.writeToLogFile(name+" Serial", "Message Sent: \'" + print + "\'");
 		return true;
 	}
 
 	boolean sendSerial(char mess){
 		Globals.writeToSerial(mess, IDcode);
 		addToSerialHistory(mess + "");
+		Globals.writeToLogFile(name+" Serial", "Message Sent: \'" + mess + "\'");
 		return true;
 	}
 	
