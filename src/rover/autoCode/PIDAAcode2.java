@@ -4,9 +4,9 @@ import objects.DecimalPoint;
 import rover.RoverAutonomusCode;
 import wrapper.Access;
 
-public class PIDAAcode extends RoverAutonomusCode {
+public class PIDAAcode2 extends RoverAutonomusCode {
 
-	public PIDAAcode(PIDAAcode in) {
+	public PIDAAcode2(PIDAAcode2 in) {
 		super(in);
 		this.phiBound = in.phiBound;
 		this.tphi = in.tphi;
@@ -147,7 +147,7 @@ public class PIDAAcode extends RoverAutonomusCode {
 		private int action = 0;
 		private int seconds = 1;
 		
-		public PIDAAcode(){
+		public PIDAAcode2(){
 			super("PIDAA", "PIDAA");
 
 		}
@@ -184,7 +184,7 @@ public class PIDAAcode extends RoverAutonomusCode {
 		hazard=Access.isInHazard(location);
 		elevation=Access.getMapHeightatPoint(location);
 		//Battery hazard rate
-		HBatt=HazR(battery_temp,5,18);
+		HBatt=HazR(battery_temp,-30,5);
 		//Wheels hazard rates
 		HwFL=.12*HazR(motor_temp_FL,15,33);
 		HwFR=.12*HazR(motor_temp_FR,15,33);
@@ -688,8 +688,8 @@ if (milliTime-rnTime>=500){
 		score=Math.abs((theta-thetaP)/((theta+thetaP)/2))+5*Math.abs((delta_L-Pd_L-1)/((delta_L-Pd_L+3)/2))+hzrds+slopehzrd+intslopehzrd;
 		return score;
 	}
-		public PIDAAcode clone(){
-			return new PIDAAcode(this);
+		public PIDAAcode2 clone(){
+			return new PIDAAcode2(this);
 		}
 
 }
