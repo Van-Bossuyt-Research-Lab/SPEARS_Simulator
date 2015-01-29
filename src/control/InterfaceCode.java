@@ -180,19 +180,28 @@ public class InterfaceCode {
 	public void pingRover(){
 		Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Pinging Rover...\n");
 		writeToSerial(tagMessage("^", 'r'), true);
-		listenForSignal("g ^", new Runnable(){
-			public void run(){
-				Connected = true;
-				Admin.GUI.InterfacePnl.ConnectionLbl.setText("Connected for 0 min.");
-				Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover Connected: " + DateTime.toString("hh:mm:ss") + "\n");
-				(new PopUp()).showConfirmDialog("Rover connected.", "Ping Confirm", PopUp.DEFAULT_OPTIONS);
-			}
-		}, new Runnable(){
-			public void run(){
-				Connected = false;
-				Admin.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected.");
-				Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover did not respond.\n");
-				(new PopUp()).showConfirmDialog("No Rover found.", "Ping Failed", PopUp.DEFAULT_OPTIONS);
+		listenForSignal("g ^", 
+			new Runnable(){
+				public void run(){
+					runThreadOutOfSync(new Runnable(){
+						public void run(){
+							Connected = true;
+							Admin.GUI.InterfacePnl.ConnectionLbl.setText("Connected for 0 min.");
+							Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover Connected: " + DateTime.toString("hh:mm:ss") + "\n");
+							(new PopUp()).showConfirmDialog("Rover connected.", "Ping Confirm", PopUp.DEFAULT_OPTIONS);
+						}
+					}, "ping-return");
+				}
+			}, new Runnable(){
+				public void run(){
+					runThreadOutOfSync(new Runnable(){
+						public void run(){
+							Connected = false;
+							Admin.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected.");
+							Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover did not respond.\n");
+							(new PopUp()).showConfirmDialog("No Rover found.", "Ping Failed", PopUp.DEFAULT_OPTIONS);
+						}
+					}, "ping-return");
 			}
 		}, 
 		10);
@@ -412,17 +421,17 @@ public class InterfaceCode {
 						public void run(){
 							listenForSignal("g %", new Runnable(){
 								public void run(){
-									new ThreadTimer(0, confirmMessage, 1, "confirm 1");
+									runThreadOutOfSync(confirmMessage, "confirm 1");
 								}
 							}, new Runnable(){
 								public void run(){
-									new ThreadTimer(0, failMessage, 1, "fail 1");
+									runThreadOutOfSync(failMessage, "fail 1");
 								}
 							}, 5);
 						}
 					}, new Runnable(){
 						public void run(){
-							new ThreadTimer(0, failMessage, 1, "fail 1.1");
+							runThreadOutOfSync(failMessage, "fail 1.1");
 						}
 					}, 4);
 				}
@@ -430,11 +439,11 @@ public class InterfaceCode {
 					writeToSerial(tagMessage(actionCommands[section][which], 's'));
 					listenForSignal("g #", new Runnable(){
 						public void run(){
-							new ThreadTimer(0, confirmMessage, 1, "confirm 2");
+							runThreadOutOfSync(confirmMessage, "confirm 2");
 						}
 					}, new Runnable(){
 						public void run(){
-							new ThreadTimer(0, failMessage, 1, "fail 2");
+							runThreadOutOfSync(failMessage, "fail 2");
 						}
 					}, 4);
 				}
@@ -454,17 +463,17 @@ public class InterfaceCode {
 				public void run(){
 					listenForSignal("g %", new Runnable(){
 						public void run(){
-							new ThreadTimer(0, confirmMessage, 1, "confirm 3");
+							runThreadOutOfSync(confirmMessage, "confirm 3");
 						}
 					}, new Runnable(){
 						public void run(){
-							new ThreadTimer(0, failMessage, 1, "fail 3");
+							runThreadOutOfSync(failMessage, "fail 3");
 						}
 					}, 5);
 				}
 			}, new Runnable(){
 				public void run(){
-					new ThreadTimer(0, failMessage, 1, "fail 3.1");
+					runThreadOutOfSync(failMessage, "fail 3.1");
 				}
 			}, 4);
 			Admin.GUI.InterfacePnl.RoverSendTxt.setText("");
@@ -484,21 +493,21 @@ public class InterfaceCode {
             Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + Admin.GUI.InterfacePnl.SatSendTxt.getText() + "\"\n");
 			listenForSignal("g #", new Runnable(){
 				public void run(){
-					new ThreadTimer(0, confirmMessage, 1, "confirm 4");
+					runThreadOutOfSync(confirmMessage, "confirm 4");
 				}
 			}, new Runnable(){
 				public void run(){
-					new ThreadTimer(0, failMessage, 1, "fail 4");
+					runThreadOutOfSync(failMessage, "fail 4");
 				}
 			}, 4);
 			Admin.GUI.InterfacePnl.SatSendTxt.setText("");
 		}
 		else {
-			new ThreadTimer(0, new Runnable(){
+			runThreadOutOfSync(new Runnable(){
 				public void run(){
 					(new PopUp()).showConfirmDialog("You must enter a message into the field.", "Message Failed", PopUp.DEFAULT_OPTIONS);
 				}
-			}, 1, "invalid message 2");
+			}, "invalid message 2");
 		}
 	}
 	
@@ -1117,10 +1126,10 @@ public class InterfaceCode {
         Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Canceling Instructions...");
 		listenForSignal("g KillDone", new Runnable(){
 			public void run(){
-				new ThreadTimer(0, new Runnable(){
+				runThreadOutOfSync(new Runnable(){
 					public void run(){
 						(new PopUp()).showConfirmDialog("All Instructions Canceled.", "Action Confirmed", PopUp.DEFAULT_OPTIONS);
-					}}, 1, "cancel instructions");
+					}}, "cancel instructions");
 				Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Done.\n");
 			}
 		}, new Runnable(){
@@ -1422,6 +1431,12 @@ public class InterfaceCode {
 	}
 	
 	// SUPPORTING METHODS
+	
+	private void runThreadOutOfSync(Runnable action, String name){
+		ThreadTimer todo = new ThreadTimer(0, action, 1, name, false);
+		todo.deSync();
+		todo.start();
+	}
 	
 	private String buildString(char[] array, int start, int end){
 		String out = "";

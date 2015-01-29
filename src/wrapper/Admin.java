@@ -101,9 +101,9 @@ public class Admin {
 			String key = (String)GUI.WrapperPnl.RoverList.getItemAt(x);
 			rovers[x] = roversToAdd.get(key);
 			roverNames.add(key, rovers[x].getIDTag());
-			tags[x+1+roversToAdd.size()] = rovers[x].getIDTag();
+			tags[x+1+satsToAdd.size()] = rovers[x].getIDTag();
 			serialHistory.add(new List<String>());
-			serialHistory.get(x+1+roversToAdd.size()).add("");
+			serialHistory.get(x+1+satsToAdd.size()).add("");
 			x++;
 		}
 		Globals.initalizeLists(tags);
@@ -198,9 +198,6 @@ public class Admin {
 				}
 				GUI.WrapperPnl.SatelliteList.addValue(newName);
 				this.satsToAdd.add(newName, new SatelliteObject(newName, "s"+GUI.WrapperPnl.SatelliteList.getItems().length, null, null, rnd.nextDouble()*100000+10000000, rnd.nextDouble()*90, rnd.nextDouble()*360));
-			}
-			else {
-				Globals.writeToLogFile("addSats", GUI.WrapperPnl.SatAutonomusCodeList.getSelectedIndex() + " != -1 && " + GUI.WrapperPnl.SatDriveModelList.getSelectedIndex() + " != -1");
 			}
 		}
 		catch (Exception e){

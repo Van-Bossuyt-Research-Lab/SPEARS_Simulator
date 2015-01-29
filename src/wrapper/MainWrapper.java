@@ -45,7 +45,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JTextField;
 
-import objects.FileNameFilter;
+import objects.MapFileFilter;
 
 public class MainWrapper extends Panel {
 
@@ -274,7 +274,7 @@ public class MainWrapper extends Panel {
 		FileLocBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser finder = new JFileChooser();
-				finder.setFileFilter(new FileNameFilter());
+				finder.setFileFilter(new MapFileFilter());
 				finder.setApproveButtonText("Choose");
 				int option = finder.showOpenDialog(getParent());
 				if (option == JFileChooser.APPROVE_OPTION){

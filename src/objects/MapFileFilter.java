@@ -3,7 +3,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
-public class FileNameFilter extends FileFilter{
+public class MapFileFilter extends FileFilter{
 	
 	@Override
 	public boolean accept(File arg0) {

@@ -9,7 +9,7 @@ import objects.ThreadTimer;
 
 public class Globals {
 
-	public static String vrsionNumber = "2.0";
+	public static String vrsionNumber = "2.0.3";
 	
 	private static Queue<Byte>[] SerialBuffers; // the buffer for messages
 	private static String[] SerialBufferCodes;
@@ -131,7 +131,8 @@ public class Globals {
 	}
 	
 	public static void reportError(String obj, String method, Exception error){
-		writeToLogFile("ERROR - " + obj + ": " + method, error.toString());
+		writeToLogFile("ERROR - " + Thread.currentThread().getName() + ": " + obj + ": " + method, error.toString());
+		System.err.println(Thread.currentThread().getName());
 		error.printStackTrace();
 	}
 	
@@ -191,18 +192,14 @@ public class Globals {
 	
 	public static void checkOutThread(String name){
 		threads.remove(name);
-		try {
-		for (Object o : threads.getKeys()){
-			String key = (String) o;
-		}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		threadCheckIn(name);
 	}
 	
 	public static void threadCheckIn(String name){
-		threads.get(name).markFinished();
-		threads.get(name).advance();
+		try {
+			threads.get(name).markFinished();
+			threads.get(name).advance();
+		} catch (Exception e) {}
 		if (name.equals("milli-clock") || milliDone){
 			for (Object o : threads.getKeys()){
 				String key = (String) o;
@@ -221,10 +218,15 @@ public class Globals {
 			milliDone = false;
 			TimeMillis++;
 			for (Object o : threads.getKeys()){
-				String key = (String) o;
-				threads.get(key).reset();
-				if (threads.get(key).getNext() == TimeMillis){
-					threads.get(key).grantPermission();
+				try {
+					String key = (String) o;
+					threads.get(key).reset();
+					if (threads.get(key).getNext() == TimeMillis){
+						threads.get(key).grantPermission();
+					}
+				}
+				catch (NullPointerException e){
+					continue;
 				}
 			}
 			ready = true;
@@ -260,11 +262,14 @@ public class Globals {
 		if (name.equals("milli-clock")){
 			return true;
 		}
-		if (name.equals("RAIR Risk Seeking 1-code-delay")){
-			//System.out.println(threads.get(name).toString());
+		try {
+			if (threads.get(name).hasPermission() && ready && begun){
+				threads.get(name).revokePermission();
+				return true;
+			}
 		}
-		if (threads.get(name).hasPermission() && ready && begun){
-			threads.get(name).revokePermission();
+		catch (NullPointerException e){
+			// If not on the list don't hold it up
 			return true;
 		}
 		return false;

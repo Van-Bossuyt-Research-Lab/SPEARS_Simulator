@@ -38,10 +38,12 @@ public class ThreadTimer extends Thread {
 				try{
 					Thread.sleep((long)((delay-1)/Globals.getTimeScale()), (int)(((delay-1)/Globals.getTimeScale()-(int)((delay-1)/Globals.getTimeScale()))*1000000));
 				}
-				catch (Exception e) {
-					System.out.println(toString());
-					e.printStackTrace();
+				catch (InterruptedException e) {
 					return;
+				}
+				catch (Exception e){
+					System.err.println(toString());
+					e.printStackTrace();
 				}
 			}
 			while (!Globals.getThreadRunPermission(getName())) {
@@ -62,6 +64,11 @@ public class ThreadTimer extends Thread {
 	
 	public void Stop(){
 		this.interrupt();
+	}
+	
+	public void deSync(){
+		delay++;
+		Globals.checkOutThread(getName());
 	}
 	
 	@Override

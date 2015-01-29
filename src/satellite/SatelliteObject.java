@@ -42,13 +42,13 @@ public class SatelliteObject {
 	}
 	
 	public void start(){
-		ThreadTimer codeThread = new ThreadTimer(100, new Runnable(){
+		new ThreadTimer(100, new Runnable(){
 			public void run(){
 				excecuteCode();
 			}
 		},
 		ThreadTimer.FOREVER, name+"-code");
-		ThreadTimer physicsThread = new ThreadTimer((int) (time_step*1000), new Runnable(){
+		new ThreadTimer((int) (time_step*1000), new Runnable(){
 			public void run(){
 				excecutePhysics();
 			}
@@ -67,11 +67,9 @@ public class SatelliteObject {
 	public void excecuteCode(){
 		try {
 			if (Globals.RFAvailable(IDcode) > 1) { // if there is a message
-				System.out.println("Sat has message.");
 				delay(500);
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0) { // if the message is for us and are we allowed to read it
-					System.out.println("Message is for Sat");
 					delay(500);
 					Globals.ReadSerial(IDcode); // white space
 					tag[0] = (char) Globals.ReadSerial(IDcode); // message type tag
@@ -90,13 +88,11 @@ public class SatelliteObject {
 						index++;
 					}
 					data[index] = '\0'; // end string
-					System.out.print("Sat Message: ");
-					System.out.println(data);
 					if (tag[0] == 'g'){ // forward to ground
 						data[0] = 'g';
 						sendSerial(data);
 						delay(1000);
-						if (data[3] != '^' && data[2] != '*' && data[2] != '}' && data[2] != '{'){ // don't confirm tags
+						if (data[2] != '^' && data[2] != '*' && data[2] != '%' && data[2] != '}' && data[2] != '{'){ // don't confirm tags
 							sendSerial("g #"); // confirm
 						}
 					}
@@ -105,7 +101,7 @@ public class SatelliteObject {
 						data[1] = tag[1];
 						sendSerial(data);
 						delay(1000);
-						if (data[3] != '^' && data[2] != '*' && data[2] != '%' && data[2] != '}' && data[2] != '{'){ // don't confirm tags
+						if (data[3] != '^' && data[3] != '*' && data[3] != '%' && data[3] != '}' && data[3] != '{'){ // don't confirm tags
 							sendSerial("r #"); // confirm
 						}
 					}
@@ -310,7 +306,7 @@ public class SatelliteObject {
 		  sendSerial("r {"); // unmute ground
 		}
 		catch (Exception e){
-			Globals.writeToLogFile("Satellite takePicture()", e.toString());
+			Globals.reportError("Satellite", "takePicture()", e);
 		}
 	}
 	

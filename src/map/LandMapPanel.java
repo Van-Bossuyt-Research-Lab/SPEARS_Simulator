@@ -18,7 +18,8 @@ import javax.swing.JFileChooser;
 
 import control.InterfacePanel;
 import objects.DecimalPoint;
-import objects.FileNameFilter;
+import objects.ImageFileFilter;
+import objects.MapFileFilter;
 import wrapper.Access;
 import wrapper.Globals;
 import rover.RoverObject;
@@ -26,12 +27,22 @@ import visual.ImageButton;
 import visual.Panel;
 import visual.PlasmaPanel;
 
+import javax.swing.JPopupMenu;
+
+import java.awt.Component;
+
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
 public class LandMapPanel extends Panel{
 	
 	private PlanetParametersList params;
 	
 	private int mapSize = 7;
-	private double mapRough = 0.06;
+	private double mapRough = 0.03;
 	
 	private DecimalPoint focusPoint; //the center point of the display stored as a grid point, not a location point
 	private int focusedRover;
@@ -42,26 +53,46 @@ public class LandMapPanel extends Panel{
 	private double[][] PressureMap;
 	private double[][][][] WindMap;
 	
-	private ImageButton saveBtn;
+	private JPopupMenu MapOptionsPopMenu;
+	private JMenuItem mntmShowFocusedRover;
+	private JMenuItem mntmSaveMapFile;
+	private JMenuItem mntmSaveMapImage;
+	private JRadioButtonMenuItem rdbtnmntmShowTargets;
+	private JRadioButtonMenuItem rdbtnmntmShowHazards;
 	
 	private RoverIcon[] roverIcons;
 	private DecimalPoint[][] roverTrails;
 
 	public LandMapPanel(Dimension size, PlanetParametersList params){
-		super(size, "Terrain View");
+		super(size /*new Dimension(700, 500)*/, "Terrain View");
 		setBackground(Color.GRAY);
 		super.hasImage = false;
 		
-		saveBtn = new ImageButton();
-		saveBtn.setImage(new ImageIcon(LandMapPanel.class.getResource("/Save.png")));
-		saveBtn.setBorder(null);
-		saveBtn.setOpaque(false);
-		saveBtn.setMargin(1);
-		saveBtn.addMouseListener(new MouseAdapter() {
+		MapOptionsPopMenu = new JPopupMenu();
+		MapOptionsPopMenu.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mouseExited(MouseEvent e) {
+				MapOptionsPopMenu.setVisible(false);
+			}
+		});
+		addPopup(this, MapOptionsPopMenu);
+		
+		mntmShowFocusedRover = new JMenuItem("Show Focused Rover");
+		mntmShowFocusedRover.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					setFocusPoint(roverIcons[focusedRover].getMapLocation());
+					focusEngauged = !focusEngauged;
+				} catch (Exception ex) {}
+			}
+		});
+		MapOptionsPopMenu.add(mntmShowFocusedRover);
+		
+		mntmSaveMapFile = new JMenuItem("Save Map File");
+		mntmSaveMapFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				JFileChooser finder = new JFileChooser();
-				finder.setFileFilter(new FileNameFilter());
+				finder.setFileFilter(new MapFileFilter());
 				finder.setApproveButtonText("Save");
 				int option = finder.showSaveDialog(getParent());
 				if (option == JFileChooser.APPROVE_OPTION){
@@ -69,13 +100,52 @@ public class LandMapPanel extends Panel{
 				}
 			}
 		});
-		saveBtn.setBounds(super.getVisibleRect().x + 20, (int) (super.getVisibleRect().getHeight() - 50), 35, 35);
-		this.add(saveBtn);
+		MapOptionsPopMenu.add(mntmSaveMapFile);
+		
+		mntmSaveMapImage = new JMenuItem("Save Map Image");
+		mntmSaveMapImage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser finder = new JFileChooser();
+				finder.setFileFilter(new ImageFileFilter());
+				finder.setApproveButtonText("Save");
+				int option = finder.showSaveDialog(getParent());
+				if (option == JFileChooser.APPROVE_OPTION){
+					HeightMap.SaveImage(HeightMap.getValues(), HeightMap.getDetail(), PlasmaPanel.REDtoGREEN, finder.getSelectedFile().getAbsolutePath());
+				}
+			}
+		});
+		MapOptionsPopMenu.add(mntmSaveMapImage);
+		
+		rdbtnmntmShowTargets = new JRadioButtonMenuItem("Show Targets");
+		rdbtnmntmShowTargets.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				HeightMap.setTargetsVisible(rdbtnmntmShowTargets.isSelected());
+			}
+		});
+		rdbtnmntmShowTargets.setSelected(true);
+		MapOptionsPopMenu.add(rdbtnmntmShowTargets);
+		
+		rdbtnmntmShowHazards = new JRadioButtonMenuItem("Show Hazards");
+		rdbtnmntmShowHazards.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				HeightMap.setHazardsVisible(rdbtnmntmShowHazards.isSelected());
+			}
+		});
+		rdbtnmntmShowHazards.setSelected(true);
+		MapOptionsPopMenu.add(rdbtnmntmShowHazards);
 		
 		roverIcons = new RoverIcon[0];
 		this.params = params;
 		
 		HeightMap = new PlasmaPanel();
+		HeightMap.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if (arg0.getButton() == MouseEvent.BUTTON3){
+					MapOptionsPopMenu.show(HeightMap, arg0.getX()-5, arg0.getY()-5);
+				}
+			}
+		});
 		HeightMap.genorateLandscape(mapSize, mapRough);
 		HeightMap.genorateTargets();
 		HeightMap.genorateHazards();
@@ -326,5 +396,22 @@ public class LandMapPanel extends Panel{
 		else { //center line
 			return ((bottomright - topleft) * relativex + topleft);
 		}
+	}
+	private static void addPopup(Component component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			private void showMenu(MouseEvent e) {
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
 	}
 }

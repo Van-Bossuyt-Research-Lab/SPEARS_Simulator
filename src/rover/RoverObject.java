@@ -109,15 +109,14 @@ public class RoverObject {
 		LEDs.add("Autonomus", false);
 	}
 	
-	@SuppressWarnings("unused")
 	public void start(){
-		ThreadTimer codeThread = new ThreadTimer(100, new Runnable(){
+		new ThreadTimer(100, new Runnable(){
 			public void run(){
 				excecuteCode();
 			}
 		},
 		ThreadTimer.FOREVER, name+"-code");
-		ThreadTimer physicsThread = new ThreadTimer((int) (time_step*1000), new Runnable(){
+		new ThreadTimer((int) (time_step*1000), new Runnable(){
 			public void run(){
 				excecutePhysics();
 			}
@@ -144,13 +143,12 @@ public class RoverObject {
 			}
 			
 			if (Globals.RFAvailable(IDcode) > 1) { // if there is a message
-				System.out.println("Rover has Message");
 				delay(500);
-				System.out.println("Rover Delay");
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
-															// go is set to false if the first read is not IDcode to prevent starting a message not intened for the rover from within the body of another message
-					System.out.println("Message is for Rover");
+															// go is set to false if the first read is not IDcode 
+															// to prevent starting a message not intended for the rover 
+															// from within the body of another message
 					Globals.ReadSerial(IDcode); // white space
 					tag = (char) Globals.ReadSerial(IDcode); // get type tag
 					if (Globals.RFAvailable(IDcode) > 0) { // if there is more to the message
@@ -162,8 +160,6 @@ public class RoverObject {
 							index++;
 						}
 						data[index] = '\0'; // end of string
-						System.out.print("Rover Message: ");
-						System.out.println(data);
 						// switch through commands
 						if (strcmp(data, "move") == 0) {
 							sendSerial("s1 g %"); // confirm message reciet
@@ -795,9 +791,7 @@ public class RoverObject {
 
 	private void delay(int length) { //put the thread to sleep for a bit
 		String newname = Globals.delayThread(Thread.currentThread().getName(), length);
-		System.out.println(newname);
 		while (!Globals.getThreadRunPermission(newname)) {}
-		System.out.println("permission granted");
 		Globals.threadDelayComplete(Thread.currentThread().getName());
 	}
 	

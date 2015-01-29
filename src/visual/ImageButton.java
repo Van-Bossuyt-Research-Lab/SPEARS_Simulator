@@ -62,7 +62,9 @@ public class ImageButton extends ImageDisplay {
 			public void run(){
 				setBackground(new Color(240, 240, 240));
 			}
-		}, 1, "button anitamion");
+		}, 1, "button anitamion", false);
+		animation.deSync();
+		animation.start();
 	}
 	
 	public void setHoverImage(ImageIcon img){

@@ -26,10 +26,12 @@ public class PlasmaPanel extends JPanel {
 	private double[][] values;
 	private Point[] targets;
 	private Hazard[] hazards;
+	private boolean viewTargets = true;
+	private boolean viewHazards = true;
 	private double rough;
 	private double minval;
 	private double maxval;
-	private double maxHeight = 13;
+	private double maxHeight = 5;
 	private Random rnd = new Random();
 	private int squareResolution = 50;
 	
@@ -167,6 +169,10 @@ public class PlasmaPanel extends JPanel {
 		this.repaint();
 	}
 	
+	public double[][] getValues(){
+		return values;
+	}
+	
 	//paint
 	@Override
 	public void paintComponent(Graphics g) {
@@ -197,6 +203,9 @@ public class PlasmaPanel extends JPanel {
 					while (y < yend){
 						try {
 							int z = 0;
+							if (!viewHazards){
+								z = hazards.length;
+							}
 							while (z < hazards.length){
 								if (isPointInHazard(new DecimalPoint((x-values.length/2)/3., -(y-values.length/2)/3.))){
 									g.setColor(Color.GRAY);
@@ -206,6 +215,9 @@ public class PlasmaPanel extends JPanel {
 							}
 							if (z == hazards.length){
 								z = 0;
+								if (!viewTargets){
+									z = targets.length;
+								}
 								while (z < targets.length){
 									if (x <= (int)targets[z].getX() && (int)targets[z].getX() < x + detail && y <= (int)targets[z].getY() && (int)targets[z].getY() < y+detail){
 										g.setColor(Color.MAGENTA);
@@ -297,6 +309,15 @@ public class PlasmaPanel extends JPanel {
 		return false;
 	}
 	
+	public void setTargetsVisible(boolean b){
+		viewTargets = b;
+		repaint();
+	}
+	
+	public boolean areTargetsVisible(){
+		return viewTargets;
+	}
+	
 	//Generate random hazards
 	public void genorateHazards(){
 		Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)/500.0*(1+rnd.nextInt(5)))/20];
@@ -328,7 +349,16 @@ public class PlasmaPanel extends JPanel {
 			x++;
 		}
 		return false;
-	}	
+	}
+	
+	public void setHazardsVisible(boolean b){
+		viewHazards = b;
+		repaint();
+	}
+	
+	public boolean areHazardsVisible(){
+		return viewHazards;
+	}
 	
 	//part of the plasma fractal generation, pushes the array from |x|x|x| to |x|_|x|_|x|
 	private double[][] expand(double[][] in){
@@ -469,7 +499,7 @@ public class PlasmaPanel extends JPanel {
 		return detail;
 	}
 	
-	public void SaveImage(double[][] values, int detail, int scheme, String name){
+	public void SaveImage(double[][] values, int detail, int scheme, String filepath){
 		BufferedImage image = new BufferedImage(15*values.length/detail, 15*values.length/detail, BufferedImage.TYPE_INT_RGB);
 		Graphics g = image.getGraphics();   
 		double maxval = Double.MIN_VALUE;
@@ -532,7 +562,7 @@ public class PlasmaPanel extends JPanel {
 		}
 		//g.drawString("Hello World!!!", 10, 20);
 		try {    
-			File output = new File("c:\\Users\\Zac\\Desktop\\" + name + ".png");
+			File output = new File(filepath + ".PNG");
 			output.createNewFile();
 			ImageIO.write(image, "png", output);
 			//System.out.println("Save Done");
