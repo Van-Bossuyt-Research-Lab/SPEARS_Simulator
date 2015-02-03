@@ -50,7 +50,7 @@ public class Admin {
 		addItemToSelectionList(		"RAIR Risk Seeking", new RAIRcodeRS());
 		addItemToSelectionList(		"RAIR Risk Temper", new RAIRcodeRT());	
 		addItemToSelectionList(		"PIDAA",		new PIDAAcode());
-		addItemToSelectionList(		"PIDAA 2",		new PIDAAcode2());
+		//addItemToSelectionList(		"PIDAA 2",		new PIDAAcode2());
 		addItemToSelectionList(		"[null]", 		(SatelliteAutonomusCode)null);
 		addItemToSelectionList(		"[null]", 		(SatelliteParametersList)null);
 	}
