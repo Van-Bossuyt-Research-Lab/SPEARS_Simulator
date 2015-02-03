@@ -14,7 +14,7 @@ public class Globals {
 	private static Queue<Byte>[] SerialBuffers; // the buffer for messages
 	private static String[] SerialBufferCodes;
 	
-	private static double timeScale = 2.0;
+	private static double timeScale = 1.0;
 	public static long TimeMillis = 0;
 	private static ThreadTimer milliTimer;
 	

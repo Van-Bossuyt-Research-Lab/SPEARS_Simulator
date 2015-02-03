@@ -8,6 +8,7 @@ public class GenericRover extends RoverAutonomusCode {
 	private long lastActionTime = 0;
 	private int action = 0;
 	private int seconds = 1;
+	private int power = 250;
 	
 	public GenericRover(String roverName, int sec){
 		super("Generic", roverName);
@@ -20,7 +21,6 @@ public class GenericRover extends RoverAutonomusCode {
 		this.action = in.action;
 		this.seconds = in.seconds;
 	}
-
 
 
 	public String nextCommand(
@@ -50,7 +50,8 @@ public class GenericRover extends RoverAutonomusCode {
 			lastActionTime = milliTime;
 			action++;
 			if (action%11 == 0){
-				return "photo";
+				power -= 50;
+				return "chngmtr0" + power;
 			}
 			if (action%5 < 2){
 				return "move";

@@ -581,6 +581,19 @@ public class RoverObject {
 			    	waiting = true;
 					cmdWaitTime = Globals.TimeMillis + Integer.parseInt(cmd.substring(5, cmd.length()));
 				}
+			    else if (strcmp(cmd.substring(0, 7), "chngmtr") == 0){ //to change motor speed "chngmtr*###" where *=motorID and ###=new power
+			    	int motor = cmd.charAt(7);
+			    	int power = Integer.parseInt(cmd.substring(8, cmd.length()));
+			    	if (power < 0){
+			    		power = 0;
+			    	}
+			    	else if (power > 255){
+			    		power = 255;
+			    	}
+			    	if (motor >= 0 && motor < 4){
+			    		motor_power[motor] = power;
+			    	}
+			    }
 				
 				/*if (Globals.TimeMillis >= autoWaitUntil){
 					driveSpinCCW();

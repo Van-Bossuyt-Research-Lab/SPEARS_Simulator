@@ -34,8 +34,6 @@ public class PlasmaPanel extends JPanel {
 	private double maxHeight = 5;
 	private Random rnd = new Random();
 	private int squareResolution = 50;
-	
-	private boolean painting = false;
 	private int detail = 3;
 	
 	private int currentColorScheme = 0;
@@ -177,7 +175,6 @@ public class PlasmaPanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		painting = true;
 		try { 
 			int xstart = -(this.getLocation().x / squareResolution * detail) - detail;
 			if (xstart < 0){
@@ -270,7 +267,6 @@ public class PlasmaPanel extends JPanel {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		painting = false;
 	}
 
 	//force a target distribution
@@ -286,7 +282,7 @@ public class PlasmaPanel extends JPanel {
 	
 	//Generate a target distribution
 	public void genorateTargets(){
-		Point[] targets = new Point[1];//(int)(values.length*values[0].length/(detail*detail)/500.0*(1+rnd.nextInt(5)))];
+		Point[] targets = new Point[(int)(values.length*values[0].length/(detail*detail)/500.0*(1+rnd.nextInt(5)))];
 		int x = 0;
 		while (x < targets.length){
 			targets[x] = new Point(rnd.nextInt(values.length/detail)*detail+detail/2, rnd.nextInt(values.length/detail)*detail+detail/2);

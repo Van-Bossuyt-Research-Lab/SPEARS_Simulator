@@ -27,7 +27,7 @@ public class RoverHub extends Panel {
 	private RoverObject[] rovers;
 	private boolean inHUDmode = false;
 	private int[][] standardDisplayLinks;
-	int currentPage = 0;
+	private int currentPage = 0;
 	
 	private int[] HUDDisplayLinks;
 	private int numberOfHUDDisplays;
