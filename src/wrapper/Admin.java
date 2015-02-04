@@ -184,6 +184,16 @@ public class Admin {
 		}
 	}
 	
+	public void removeRoverFromList(){
+		try {
+			roversToAdd.remove(GUI.WrapperPnl.RoverList.getSelectedItem().toString());
+			GUI.WrapperPnl.RoverList.removeValue(GUI.WrapperPnl.RoverList.getSelectedIndex());
+		} 
+		catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 	public void addSatelliteToList(){
 		try {
 			if (GUI.WrapperPnl.SatAutonomusCodeList.getSelectedIndex() != -1 && GUI.WrapperPnl.SatDriveModelList.getSelectedIndex() != -1){
@@ -202,6 +212,16 @@ public class Admin {
 		}
 		catch (Exception e){
 			Globals.reportError("Admin", "addSatellitetoList", e);
+		}
+	}
+	
+	public void removeSatelliteFromList(){
+		try {
+			satsToAdd.remove(GUI.WrapperPnl.SatelliteList.getSelectedItem().toString());
+			GUI.WrapperPnl.SatelliteList.removeValue(GUI.WrapperPnl.SatelliteList.getSelectedIndex());
+		}
+		catch (Exception e){
+			e.printStackTrace();
 		}
 	}
 	

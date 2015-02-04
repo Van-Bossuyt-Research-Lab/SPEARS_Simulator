@@ -25,7 +25,6 @@ import wrapper.Globals;
 import rover.RoverObject;
 import visual.ImageButton;
 import visual.Panel;
-import visual.PlasmaPanel;
 
 import javax.swing.JPopupMenu;
 

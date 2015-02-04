@@ -1,9 +1,8 @@
-package visual;
+package map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import map.Hazard;
 import objects.DecimalPoint;
 import wrapper.Globals;
 
