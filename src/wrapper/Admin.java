@@ -145,8 +145,8 @@ public class Admin {
 			double mapRough = GUI.WrapperPnl.MapRoughSlider.getValue()/1000.0;
 			int mapSize = (int) GUI.WrapperPnl.MapSizeSpnr.getValue();
 			int mapDetail = (int) GUI.WrapperPnl.MapDetailSpnr.getValue();
-			double targetDensity = (double) GUI.WrapperPnl.TargetDensitySpnr.getValue();
-			double hazardDensity = (double) GUI.WrapperPnl.HazardDensitySpnr.getValue();
+			double targetDensity = (double) GUI.WrapperPnl.TargetDensitySpnr.getValue()/1000.;
+			double hazardDensity = (double) GUI.WrapperPnl.HazardDensitySpnr.getValue()/1000.;
 			return new RunConfiguration(roverNames, rovers, satelliteNames,	satellites, tags, mapRough,
 					mapSize, mapDetail, targetDensity, hazardDensity);
 		}

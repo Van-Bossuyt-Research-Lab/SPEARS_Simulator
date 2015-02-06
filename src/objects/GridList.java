@@ -9,8 +9,6 @@ public class GridList<T> {
 	private int size;
 	private int stored;
 	
-	private boolean expanding = false;
-	
 	public GridList(){
 		size = 10;
 		data = new ArrayList<TreeMap<Integer, ArrayList<TreeMap<Integer, T>>>>();
@@ -55,7 +53,7 @@ public class GridList<T> {
 	
 	public T get(int x, int y){
 		try {
-			return data.get(x%size).get(x).get(y%size).get(y);			
+			return data.get(x%size).get(x).get(y%size).get(y);
 		}
 		catch (NullPointerException e){
 			return null;

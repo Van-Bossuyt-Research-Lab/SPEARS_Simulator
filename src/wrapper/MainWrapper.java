@@ -310,13 +310,13 @@ public class MainWrapper extends Panel {
 		HazardDensitySpnr = new JSpinner();
 		HazardDensitySpnr.setBounds(462, 154, 80, 25);
 		SelectionPlasmaPnl.add(HazardDensitySpnr);
-		HazardDensitySpnr.setModel(new SpinnerNumberModel(0.006, 0.0, 100.0, 0.0001));
+		HazardDensitySpnr.setModel(new SpinnerNumberModel(0.4, 0.0, 100.0, 0.01));
 		HazardDensitySpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		
 		TargetDensitySpnr = new JSpinner();
 		TargetDensitySpnr.setBounds(162, 154, 80, 25);
 		SelectionPlasmaPnl.add(TargetDensitySpnr);
-		TargetDensitySpnr.setModel(new SpinnerNumberModel(0.05, 0.0, 100.0, 0.001));
+		TargetDensitySpnr.setModel(new SpinnerNumberModel(6., 0.0, 100.0, 0.1));
 		TargetDensitySpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		
 		TargetDensityLbl = new JLabel("Target Density:");

@@ -25,7 +25,7 @@ public class PlasmaPanel extends JPanel {
 
 	private double[][] values;
 	private GridList<Boolean> targets;
-	private Hazard[] hazards;
+	private GridList<Boolean> hazards;
 	private boolean viewTargets = true;
 	private boolean viewHazards = true;
 	private double rough;
@@ -200,25 +200,24 @@ public class PlasmaPanel extends JPanel {
 					int y = ystart;
 					while (y < yend){
 						try {
-							int z = 0;
-							if (!viewHazards){
-								z = hazards.length;
-							}
-							while (z < hazards.length){
-								if (isPointInHazard(new DecimalPoint((x-values.length/2)/3., -(y-values.length/2)/3.))){
-									g.setColor(Color.GRAY);
-									break;
-								}
-								z++;
-							}
-							if (z == hazards.length){
-								if (viewTargets){
-									if (targets.get(x, y)){
-										g.setColor(Color.MAGENTA);
+							try {
+								if (viewHazards){
+									if (hazards.get(x/detail, y/detail)){
+										g.setColor(Color.GRAY);
 									}
 								}
 								else {
-									z = 1/0; // Force Catch Statement
+									int a = 1/0; // Force Catch Statement
+								}
+							}
+							catch (NullPointerException e){
+								if (viewTargets){
+									if (targets.get(x/detail, y/detail)){
+										g.setColor(Color.MAGENTA);										
+									}
+								}
+								else {
+									int a = 1/0; // Force Catch Statement
 								}
 							}
 						}
@@ -228,11 +227,6 @@ public class PlasmaPanel extends JPanel {
 							} catch (Exception i){
 								i.printStackTrace();
 								g.setColor(getColor(values[x][y]));
-							}
-						}
-						finally {
-							if (x == values.length/2 && y == values.length/2){
-								g.setColor(Color.CYAN);
 							}
 						}
 						g.fillRect(x * squareResolution / detail, y * squareResolution / detail, squareResolution, squareResolution);
@@ -284,7 +278,7 @@ public class PlasmaPanel extends JPanel {
 		int size = (int)(values.length*values[0].length/(detail*detail)*density);
 		int x = 0;
 		while (x < size){
-			targets.put(true, rnd.nextInt(values.length/detail)*detail+detail/2, rnd.nextInt(values.length/detail)*detail+detail/2);
+			targets.put(true, rnd.nextInt(values.length/detail), rnd.nextInt(values.length/detail));
 			x++;
 		}
 	}
@@ -302,7 +296,6 @@ public class PlasmaPanel extends JPanel {
 			}
 		}
 		catch (NullPointerException e){
-			e.printStackTrace();
 			return false;
 		}
 	}
@@ -318,35 +311,53 @@ public class PlasmaPanel extends JPanel {
 	
 	//Generate random hazards
 	public void genorateHazards(double density){
-		Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)*density)/20];
-		int x = 0;
-		while (x < hazards.length){
-			hazards[x] = new Hazard(new DecimalPoint(680*rnd.nextDouble()-340, 680*rnd.nextDouble()-340), 5*rnd.nextDouble()+1);
-			x++;
+		this.hazards = new GridList<Boolean>();
+		Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)*density)];
+		for (int x = 0; x < hazards.length; x++){
+			hazards[x] = new Hazard(new DecimalPoint(values.length/detail*rnd.nextDouble()-values.length/detail/2, values.length/detail*rnd.nextDouble()-values.length/detail/2), 5*rnd.nextDouble()+1);
 		}
-		this.hazards = hazards;
+		for (int i = 0; i < values.length/detail; i++){
+			for (int j = 0; j < values[0].length/detail; j++){
+				int x = i - values.length/detail/2;
+				int y = values.length/detail/2 - j;
+				for (int z = 0; z < hazards.length; z++){
+					if (hazards[z].isPointWithin(new DecimalPoint(x, y))){
+						this.hazards.put(true, i, j);
+						break;
+					}
+				}
+			}
+		}
 	}
 	
-	public void setHazards(Hazard[] hzds){
-		hazards = hzds;
-		repaint();
+	public void setHazards(Point[] hzds){
+		hazards = new GridList<Boolean>();
+		for (Point p : hzds){
+			hazards.put(true, p.x, p.y);
+		}
+		this.repaint();
 	}
 	
 	//get the hazard list
-	public Hazard[] getHazards(){
+	public GridList<Boolean> getHazards(){
 		return hazards;
 	}
 	
 	//is the given point in a hazard
 	public boolean isPointInHazard(DecimalPoint loc){
-		int x = 0;
-		while (x < hazards.length){
-			if (hazards[x].isPointWithin(loc)){
+		int x = (int) getMapSquare(loc).getX();
+		int y = (int) getMapSquare(loc).getY();
+		try {
+			if (hazards.get(x, y).equals(true)){
 				return true;
 			}
-			x++;
+			else {
+				return false;
+			}
 		}
-		return false;
+		catch (NullPointerException e){
+			return false;
+		}
 	}
 	
 	public void setHazardsVisible(boolean b){
@@ -587,6 +598,8 @@ public class PlasmaPanel extends JPanel {
 		try {
 			BufferedWriter write = new BufferedWriter(new FileWriter(file, true));
 			
+			write.write("v2\n");
+			
 			write.write(values[0].length + "\n" + values.length + "\n\n");
 			for (int i = 0; i < values.length; i++){
 				for (int j = 0; j < values[i].length; j++){
@@ -597,10 +610,7 @@ public class PlasmaPanel extends JPanel {
 			
 			write.write("\n" + targets.genorateList() + "\n");
 			
-			write.write("\n" + hazards.length + "\n");
-			for (int i = 0; i < hazards.length; i++){
-				write.write(hazards[i].getPosition().getX() + "\t" + hazards[i].getPosition().getY() + "\t" + hazards[i].getRadius() + "\n");
-			}
+			write.write("\n" + hazards.genorateList() + "\n");
 			
 			write.flush();
 			write.close();
@@ -610,9 +620,14 @@ public class PlasmaPanel extends JPanel {
 		}
 	}
 	
-	public void loadMap(File file){
+	public void loadMap(File file) throws Exception {
 		try {
 			Scanner data = new Scanner(file);
+			
+			String ver = data.next();
+			if (!ver.equals("v2")){
+				throw new Exception("Invalid File Version");
+			}
 			
 			int width = data.nextInt();
 			int height = data.nextInt();
@@ -637,12 +652,11 @@ public class PlasmaPanel extends JPanel {
 			this.setTargets(targets);
 			
 			int hzdrs = data.nextInt();
-			Hazard[] hazards = new Hazard[hzdrs];
-			for (int i = 0; i < hzdrs; i++){
-				double x = data.nextDouble();
-				double y = data.nextDouble();
-				double r = data.nextDouble();
-				hazards[i] = new Hazard(new DecimalPoint(x, y), r);
+			Point[] hazards = new Point[hzdrs];
+			for (int i = 0; i < targs; i++){
+				int x = data.nextInt();
+				int y = data.nextInt();
+				hazards[i] = new Point(x, y);
 			}
 			this.setHazards(hazards);
 			
