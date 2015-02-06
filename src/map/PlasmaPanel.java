@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import objects.DecimalPoint;
+import objects.GridList;
 import wrapper.Globals;
 
 import java.awt.Color;
@@ -23,7 +24,7 @@ import java.util.Scanner;
 public class PlasmaPanel extends JPanel {
 
 	private double[][] values;
-	private Point[] targets;
+	private GridList<Boolean> targets;
 	private Hazard[] hazards;
 	private boolean viewTargets = true;
 	private boolean viewHazards = true;
@@ -58,9 +59,10 @@ public class PlasmaPanel extends JPanel {
 	}
 	
 	//Generates the height map using a plasma fractal
-	public void genorateLandscape(int size, double roughFactor){
+	public void genorateLandscape(int size, int det, double roughFactor){
 		double rough = size * roughFactor;
 		this.rough = rough;
+		this.detail = det;
 		size += detail;
 		double seed = System.currentTimeMillis() / 10000.0;
 		while (seed > 30){
@@ -210,18 +212,12 @@ public class PlasmaPanel extends JPanel {
 								z++;
 							}
 							if (z == hazards.length){
-								z = 0;
-								if (!viewTargets){
-									z = targets.length;
-								}
-								while (z < targets.length){
-									if (x <= (int)targets[z].getX() && (int)targets[z].getX() < x + detail && y <= (int)targets[z].getY() && (int)targets[z].getY() < y+detail){
+								if (viewTargets){
+									if (targets.get(x, y)){
 										g.setColor(Color.MAGENTA);
-										break;
 									}
-									z++;
 								}
-								if (z == targets.length){
+								else {
 									z = 1/0; // Force Catch Statement
 								}
 							}
@@ -270,38 +266,45 @@ public class PlasmaPanel extends JPanel {
 
 	//force a target distribution
 	public void setTargets(Point[] targs){
-		targets = targs;
+		targets = new GridList<Boolean>();
+		for (Point p : targs){
+			targets.put(true, p.x, p.y);
+		}
 		this.repaint();
 	}
 	
 	//get the target distribution
-	public Point[] getTargets(){
+	public GridList<Boolean> getTargets(){
 		return targets;
 	}
 	
 	//Generate a target distribution
-	public void genorateTargets(){
-		Point[] targets = new Point[(int)(values.length*values[0].length/(detail*detail)/500.0*(1+rnd.nextInt(5)))];
+	public void genorateTargets(double density){
+		targets = new GridList<Boolean>();
+		int size = (int)(values.length*values[0].length/(detail*detail)*density);
 		int x = 0;
-		while (x < targets.length){
-			targets[x] = new Point(rnd.nextInt(values.length/detail)*detail+detail/2, rnd.nextInt(values.length/detail)*detail+detail/2);
+		while (x < size){
+			targets.put(true, rnd.nextInt(values.length/detail)*detail+detail/2, rnd.nextInt(values.length/detail)*detail+detail/2);
 			x++;
 		}
-		this.targets = targets;
 	}
 	
 	//is the given point a target
 	public boolean isPointOnTarget(DecimalPoint loc){
 		int x = (int) getMapSquare(loc).getX();
 		int y = (int) getMapSquare(loc).getY();
-		int i = 0;
-		while (i < targets.length){
-			if (Math.abs(targets[i].getX() - x) <= detail/2 && Math.abs(targets[i].getY() - y) <= detail/2){
+		try {
+			if (targets.get(x, y).equals(true)){
 				return true;
 			}
-			i++;
+			else {
+				return false;
+			}
 		}
-		return false;
+		catch (NullPointerException e){
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	public void setTargetsVisible(boolean b){
@@ -314,8 +317,8 @@ public class PlasmaPanel extends JPanel {
 	}
 	
 	//Generate random hazards
-	public void genorateHazards(){
-		Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)/500.0*(1+rnd.nextInt(5)))/20];
+	public void genorateHazards(double density){
+		Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)*density)/20];
 		int x = 0;
 		while (x < hazards.length){
 			hazards[x] = new Hazard(new DecimalPoint(680*rnd.nextDouble()-340, 680*rnd.nextDouble()-340), 5*rnd.nextDouble()+1);
@@ -592,10 +595,7 @@ public class PlasmaPanel extends JPanel {
 				write.write('\n');
 			}
 			
-			write.write("\n" + targets.length + "\n");
-			for (int i = 0; i < targets.length; i++){
-				write.write(targets[i].x + "\t" + targets[i].y + "\n");
-			}
+			write.write("\n" + targets.genorateList() + "\n");
 			
 			write.write("\n" + hazards.length + "\n");
 			for (int i = 0; i < hazards.length; i++){

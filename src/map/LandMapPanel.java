@@ -41,6 +41,7 @@ public class LandMapPanel extends Panel{
 	private PlanetParametersList params;
 	
 	private int mapSize = 7;
+	private int mapDetail = 3;
 	private double mapRough = 0.03;
 	
 	private DecimalPoint focusPoint; //the center point of the display stored as a grid point, not a location point
@@ -145,9 +146,7 @@ public class LandMapPanel extends Panel{
 				}
 			}
 		});
-		HeightMap.genorateLandscape(mapSize, mapRough);
-		HeightMap.genorateTargets();
-		HeightMap.genorateHazards();
+		HeightMap.genorateLandscape(mapSize, mapDetail, mapRough);
 		HeightMap.setResolution(53);
 		setFocusPoint(new DecimalPoint(HeightMap.getWidth()/HeightMap.getResolution()/2, HeightMap.getHeight()/HeightMap.getResolution()/2));
 		add(HeightMap);
@@ -196,7 +195,7 @@ public class LandMapPanel extends Panel{
 						setFocusPoint(roverIcons[focusedRover].getMapLocation());
 						focusEngauged = true;
 					} catch (Exception ex) {}
-					break;
+				break;
 				case KeyEvent.VK_SPACE:
 					try {
 						setFocusPoint(roverIcons[focusedRover].getMapLocation());

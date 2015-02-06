@@ -14,10 +14,6 @@ public class Access {
 	public static Admin CODE = new Admin();
 	public static InterfaceCode INTERFACE = new InterfaceCode();
 	
-	public static void beginSimulation(){
-		CODE.beginSimulation();
-	}
-	
 	public static void addRoversToMap(RoverObject[] rovs){ 
 		CODE.GUI.TerrainPnl.setRoverSwarm(rovs);
 	}

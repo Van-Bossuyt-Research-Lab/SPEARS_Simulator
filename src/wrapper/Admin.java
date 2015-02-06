@@ -8,6 +8,7 @@ import objects.DecimalPoint;
 import objects.List;
 import objects.Map;
 import objects.Queue;
+import objects.RunConfiguration;
 import rover.RoverAutonomusCode;
 import rover.RoverObject;
 import rover.RoverParametersList;
@@ -55,16 +56,15 @@ public class Admin {
 		addItemToSelectionList(		"[null]", 		(SatelliteParametersList)null);
 	}
 	
-	public void beginSimulation(){
+	public void beginSimulation(RunConfiguration config){
 	
-		if (GUI.WrapperPnl.MapTypeCombo.getSelectedIndex() == 1){
+		if (config.mapFromFile){
 			try {
-				File mapFile = new File(GUI.WrapperPnl.FileLocTxt.getText());
-				if (!mapFile.exists()){
+				if (!config.mapFile.exists()){
 					int a = 1/0;
 				}
-				GUI.TerrainPnl.HeightMap.loadMap(mapFile);
-				Globals.writeToLogFile("Start Up", "Using Map File: " + mapFile.getName());
+				GUI.TerrainPnl.HeightMap.loadMap(config.mapFile);
+				Globals.writeToLogFile("Start Up", "Using Map File: " + config.mapFile.getName());
 			}
 			catch (Exception e){
 				System.out.println("Invalid Map File");
@@ -72,26 +72,18 @@ public class Admin {
 			}
 		}
 		else {
+			GUI.TerrainPnl.HeightMap.genorateLandscape(config.mapSize, config.mapDetail, config.mapRough);
+			GUI.TerrainPnl.HeightMap.genorateTargets(config.targetDensity);
+			GUI.TerrainPnl.HeightMap.genorateHazards(config.hazardDensity);
 			Globals.writeToLogFile("Start Up", "Using Random Map");
 		}
 		
 		serialHistory = new List<List<String>>();
-		GUI.WrapperPnl.SerialHistorySlider.setValue(0);
-		GUI.WrapperPnl.SerialHistorySlider.setMaximum(0);
-		Map<String, String> roverNames = new Map<String, String>();
-		RoverObject[] rovers = new RoverObject[roversToAdd.size()];
-		Map<String, String> satelliteNames = new Map<String, String>();
-		SatelliteObject[] satellites = new SatelliteObject[satsToAdd.size()];
-		String[] tags = new String[roversToAdd.size()+satsToAdd.size()+1];
-		tags[0] = "g";
 		serialHistory.add(new List<String>());
 		serialHistory.get(0).add("");
 		int x = 0;
 		while (x < GUI.WrapperPnl.SatelliteList.getItems().length){
 			String key = (String)GUI.WrapperPnl.SatelliteList.getItemAt(x);
-			satellites[x] = satsToAdd.get(key);
-			satelliteNames.add(key, satellites[x].getIDCode());
-			tags[x+1] = satellites[x].getIDCode();
 			serialHistory.add(new List<String>());
 			serialHistory.get(x+1).add("");
 			x++;
@@ -99,19 +91,18 @@ public class Admin {
 		x = 0;
 		while (x < GUI.WrapperPnl.RoverList.getItems().length){
 			String key = (String)GUI.WrapperPnl.RoverList.getItemAt(x);
-			rovers[x] = roversToAdd.get(key);
-			roverNames.add(key, rovers[x].getIDTag());
-			tags[x+1+satsToAdd.size()] = rovers[x].getIDTag();
 			serialHistory.add(new List<String>());
 			serialHistory.get(x+1+satsToAdd.size()).add("");
 			x++;
 		}
-		Globals.initalizeLists(tags);
+		GUI.WrapperPnl.SerialHistorySlider.setValue(0);
+		GUI.WrapperPnl.SerialHistorySlider.setMaximum(0);
+		Globals.initalizeLists(config.tags);
 		
-		GUI.WrapperPnl.genorateSerialDisplays(rovers, satellites);
-		GUI.RoverHubPnl.setRovers(rovers);
-		GUI.SatelliteHubPnl.setSatellites(satellites);
-		Access.INTERFACE.setCallTags(roverNames, satelliteNames);
+		GUI.WrapperPnl.genorateSerialDisplays(config.rovers, config.satellites);
+		GUI.RoverHubPnl.setRovers(config.rovers);
+		GUI.SatelliteHubPnl.setSatellites(config.satellites);
+		Access.INTERFACE.setCallTags(config.roverNames, config.satelliteNames);
 		InterfaceCode.start();
 		GUI.RoverHubPnl.start();
 		GUI.SatelliteHubPnl.start();
@@ -120,6 +111,45 @@ public class Admin {
 		updateSerialDisplays();
 		
 		GUI.WrapperPnl.tabbedPane.setEnabled(true);
+	}
+	
+	public RunConfiguration getConfigurationFromForm(){
+		Map<String, String> roverNames = new Map<String, String>();
+		RoverObject[] rovers = new RoverObject[roversToAdd.size()];
+		Map<String, String> satelliteNames = new Map<String, String>();
+		SatelliteObject[] satellites = new SatelliteObject[satsToAdd.size()];
+		String[] tags = new String[roversToAdd.size()+satsToAdd.size()+1];
+		tags[0] = "g";
+		int x = 0;
+		while (x < GUI.WrapperPnl.SatelliteList.getItems().length){
+			String key = (String)GUI.WrapperPnl.SatelliteList.getItemAt(x);
+			satellites[x] = satsToAdd.get(key);
+			satelliteNames.add(key, satellites[x].getIDCode());
+			tags[x+1] = satellites[x].getIDCode();
+			x++;
+		}
+		x = 0;
+		while (x < GUI.WrapperPnl.RoverList.getItems().length){
+			String key = (String)GUI.WrapperPnl.RoverList.getItemAt(x);
+			rovers[x] = roversToAdd.get(key);
+			roverNames.add(key, rovers[x].getIDTag());
+			tags[x+1+satsToAdd.size()] = rovers[x].getIDTag();
+			x++;
+		}
+		if (GUI.WrapperPnl.TypeSelector.getSelectedIndex() == 1){
+			File mapFile = new File(GUI.WrapperPnl.FileLocTxt.getText());
+			return new RunConfiguration(roverNames,	rovers, satelliteNames,
+					satellites, tags, mapFile);
+		}
+		else {
+			double mapRough = GUI.WrapperPnl.MapRoughSlider.getValue()/1000.0;
+			int mapSize = (int) GUI.WrapperPnl.MapSizeSpnr.getValue();
+			int mapDetail = (int) GUI.WrapperPnl.MapDetailSpnr.getValue();
+			double targetDensity = (double) GUI.WrapperPnl.TargetDensitySpnr.getValue();
+			double hazardDensity = (double) GUI.WrapperPnl.HazardDensitySpnr.getValue();
+			return new RunConfiguration(roverNames, rovers, satelliteNames,	satellites, tags, mapRough,
+					mapSize, mapDetail, targetDensity, hazardDensity);
+		}
 	}
 	
 	public void updateSerialDisplays(){
