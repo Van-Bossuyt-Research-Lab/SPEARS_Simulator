@@ -1,8 +1,9 @@
 package objects;
 
 import java.awt.Point;
+import java.io.Serializable;
 
-public class DecimalPoint {
+public class DecimalPoint implements Serializable {
 
 	private double x, y;
 	

@@ -1,7 +1,11 @@
 package rover;
 
-public class RoverParametersList {
+import java.io.Serializable;
 
+public class RoverParametersList implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
 	private double wheel_radius = 0.0476; //m
 	private double wheel_mass = 0.064; //kg
 	private double rover_width = 0.438; //m

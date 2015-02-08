@@ -1,6 +1,7 @@
 package rover;
 
 import java.io.InputStream;
+import java.io.Serializable;
 
 import objects.DecimalPoint;
 import objects.Map;
@@ -8,7 +9,9 @@ import objects.ThreadTimer;
 import wrapper.Access;
 import wrapper.Globals;
 
-public class RoverObject {
+public class RoverObject implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	public static final int FORWARD = 1, BACKWARD = -1, RELEASE = 0; // possible motor states
 	public static final int FL = 0, BL = 1, BR = 2, FR = 3; // identifiers on wheels

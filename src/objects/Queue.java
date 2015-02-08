@@ -1,6 +1,8 @@
 package objects;
 
-public class Queue < Type extends Object >{
+import java.io.Serializable;
+
+public class Queue < Type extends Object > implements Serializable {
 
 	private Type[] array;
 	

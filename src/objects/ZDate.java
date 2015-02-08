@@ -1,9 +1,10 @@
 package objects;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
-public class ZDate {
+public class ZDate implements Serializable {
     
     public int year;
     public int month;

@@ -1,9 +1,10 @@
 package objects;
 import java.io.File;
+import java.io.Serializable;
 
 import javax.swing.filechooser.FileFilter;
 
-public class MapFileFilter extends FileFilter{
+public class MapFileFilter extends FileFilter implements Serializable {
 	
 	@Override
 	public boolean accept(File arg0) {

@@ -36,6 +36,8 @@ public class PlasmaPanel extends JPanel {
 	private int squareResolution = 50;
 	private int detail = 3;
 	
+	private String fileID = "^v<>";
+	
 	private int currentColorScheme = 0;
 	public static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
 	
@@ -598,7 +600,7 @@ public class PlasmaPanel extends JPanel {
 		try {
 			BufferedWriter write = new BufferedWriter(new FileWriter(file, true));
 			
-			write.write("v2\n");
+			write.write(fileID + "\n");
 			
 			write.write(values[0].length + "\n" + values.length + "\n\n");
 			for (int i = 0; i < values.length; i++){
@@ -625,7 +627,7 @@ public class PlasmaPanel extends JPanel {
 			Scanner data = new Scanner(file);
 			
 			String ver = data.next();
-			if (!ver.equals("v2")){
+			if (!ver.equals(fileID)){
 				throw new Exception("Invalid File Version");
 			}
 			

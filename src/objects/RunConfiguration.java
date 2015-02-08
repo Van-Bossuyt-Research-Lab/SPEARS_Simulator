@@ -1,11 +1,17 @@
 package objects;
 
 import java.io.File;
-
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import rover.RoverObject;
 import satellite.SatelliteObject;
 
-public class RunConfiguration {
+public class RunConfiguration implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	public boolean mapFromFile;
 	public Map<String, String> roverNames;
@@ -49,5 +55,28 @@ public class RunConfiguration {
 		this.targetDensity = targetDensity;
 		this.hazardDensity = hazardDensity;
 	}
+	
+	public RunConfiguration(File save) throws Exception {
+		ObjectInputStream in = new ObjectInputStream(new FileInputStream(save.getAbsolutePath()));
+		RunConfiguration input = (RunConfiguration) in.readObject();
+		this.mapFromFile = input.mapFromFile;
+		this.roverNames = input.roverNames;
+		this.rovers = input.rovers;
+		this.satelliteNames = input.satelliteNames;
+		this.satellites = input.satellites;
+		this.tags = input.tags;
+		this.mapFile = input.mapFile;
+		this.mapRough = input.mapRough;
+		this.mapSize = input.mapSize;
+		this.mapDetail = input.mapDetail;
+		this.targetDensity = input.targetDensity;
+		this.hazardDensity = input.hazardDensity;
+	}
 
+	public void Save(File file) throws Exception {
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file.getAbsolutePath()));
+		out.writeObject(this);
+		out.close();
+	}
+	
 }

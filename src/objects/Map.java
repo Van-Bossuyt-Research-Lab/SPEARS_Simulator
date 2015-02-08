@@ -1,6 +1,8 @@
 package objects;
 
-public class Map < KeyType, ItemType >{
+import java.io.Serializable;
+
+public class Map < KeyType, ItemType > implements Serializable {
 	
 	private KeyType[] keys;
 	private ItemType[] items;

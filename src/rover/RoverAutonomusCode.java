@@ -1,10 +1,14 @@
 package rover;
 
+import java.io.Serializable;
+
 import objects.DecimalPoint;
 import wrapper.Globals;
 
-public abstract class RoverAutonomusCode {
+public abstract class RoverAutonomusCode implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private String name;
 	private String roverName;
 	

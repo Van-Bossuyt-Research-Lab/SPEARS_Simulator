@@ -206,7 +206,7 @@ public class PopUp extends JDialog {
 		}
 	}
 	
-	public String showInpuDialog(String text, String title, int options){
+	public String showInputDialog(String text, String title, int options){
 		buttonClicked = -1;
 		this.setTitle(title);
 		currentConfig = options;

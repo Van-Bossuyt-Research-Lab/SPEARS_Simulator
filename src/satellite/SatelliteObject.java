@@ -2,13 +2,16 @@ package satellite;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.Serializable;
 
 import wrapper.Globals;
 import objects.Map;
 import objects.ThreadTimer;
 
-public class SatelliteObject {
+public class SatelliteObject implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private String name;
 	private String IDcode;
 	private SatelliteParametersList params;

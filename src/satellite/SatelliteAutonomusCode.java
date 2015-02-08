@@ -1,9 +1,13 @@
 package satellite;
 
+import java.io.Serializable;
+
 import objects.DecimalPoint;
 import wrapper.Globals;
 
-public abstract class SatelliteAutonomusCode {
+public abstract class SatelliteAutonomusCode implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private String name;
 	private String satelliteName;

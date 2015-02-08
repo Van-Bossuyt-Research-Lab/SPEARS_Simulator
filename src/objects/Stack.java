@@ -1,6 +1,8 @@
 package objects;
 
-public class Stack < Type extends Object > {
+import java.io.Serializable;
+
+public class Stack < Type extends Object > implements Serializable {
 
 	private Type[] array;
 	

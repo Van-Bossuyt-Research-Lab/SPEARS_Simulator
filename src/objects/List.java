@@ -1,6 +1,8 @@
 package objects;
 
-public class List <Type> {
+import java.io.Serializable;
+
+public class List <Type> implements Serializable {
 
 	private Type[] array;
 	public int length;

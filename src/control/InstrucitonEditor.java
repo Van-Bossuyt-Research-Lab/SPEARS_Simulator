@@ -235,7 +235,7 @@ public class InstrucitonEditor extends JDialog {
 	private void AddParameter_Clicked(){
 		new objects.ThreadTimer(0, new Runnable(){
 			public void run(){
-				String name = (new PopUp()).showInpuDialog("Parameter Name:", "Add Parameter", PopUp.OK_CANCEL_OPTIONS);
+				String name = (new PopUp()).showInputDialog("Parameter Name:", "Add Parameter", PopUp.OK_CANCEL_OPTIONS);
 				if (!name.equals("")){
 					tableStrings = Augment(tableStrings);
 					parameterBools = Augment(parameterBools);

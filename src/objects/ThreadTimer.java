@@ -1,8 +1,10 @@
 package objects;
 
+import java.io.Serializable;
+
 import wrapper.Globals;
 
-public class ThreadTimer extends Thread {
+public class ThreadTimer extends Thread implements Serializable {
 
 	private int delay;
 	private Runnable action;

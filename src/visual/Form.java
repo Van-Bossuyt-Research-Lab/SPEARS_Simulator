@@ -23,7 +23,9 @@ import map.PlanetParametersList;
 
 import javax.swing.JButton;
 
+import objects.RunConfiguration;
 import control.InterfacePanel;
+import control.PopUp;
 import rover.RoverHub;
 import satellite.SatelliteHub;
 import wrapper.Access;
@@ -34,6 +36,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 public class Form extends JFrame {
 	
@@ -53,6 +56,14 @@ public class Form extends JFrame {
 	private int currentPage = WRAPPER;
 
 	public static void main(String[] args) {
+		boolean go = false;
+		File config = new File("default.cfg");
+		if (config.exists()){
+			if ((new PopUp()).showConfirmDialog("A quick run configuration file has been found.  Would you like to run the simulator from the file?", "Quick Run", PopUp.YES_NO_OPTIONS) == PopUp.YES_OPTION){
+				go = true;
+			}
+		}
+		final boolean goFin = go;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -64,6 +75,9 @@ public class Form extends JFrame {
 				    frame.setVisible(true);
 				    frame.setResizable(false);
 				    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				    if (goFin){
+				    	Access.CODE.beginSimulation(new RunConfiguration(new File("default.cfg")));
+				    }
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

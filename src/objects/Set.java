@@ -1,6 +1,8 @@
 package objects;
 
-public class Set <Type> {
+import java.io.Serializable;
+
+public class Set <Type>  implements Serializable {
 
 	private Type[] array;
 	

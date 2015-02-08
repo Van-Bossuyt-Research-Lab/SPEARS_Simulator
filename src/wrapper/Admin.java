@@ -4,11 +4,13 @@ import java.io.File;
 import java.util.Random;
 
 import control.InterfaceCode;
+import control.PopUp;
 import objects.DecimalPoint;
 import objects.List;
 import objects.Map;
 import objects.Queue;
 import objects.RunConfiguration;
+import objects.ThreadTimer;
 import rover.RoverAutonomusCode;
 import rover.RoverObject;
 import rover.RoverParametersList;
@@ -79,20 +81,10 @@ public class Admin {
 		}
 		
 		serialHistory = new List<List<String>>();
-		serialHistory.add(new List<String>());
-		serialHistory.get(0).add("");
 		int x = 0;
-		while (x < GUI.WrapperPnl.SatelliteList.getItems().length){
-			String key = (String)GUI.WrapperPnl.SatelliteList.getItemAt(x);
+		while (x < 1+config.satellites.length+config.rovers.length){
 			serialHistory.add(new List<String>());
-			serialHistory.get(x+1).add("");
-			x++;
-		}
-		x = 0;
-		while (x < GUI.WrapperPnl.RoverList.getItems().length){
-			String key = (String)GUI.WrapperPnl.RoverList.getItemAt(x);
-			serialHistory.add(new List<String>());
-			serialHistory.get(x+1+satsToAdd.size()).add("");
+			serialHistory.get(x).add("");
 			x++;
 		}
 		GUI.WrapperPnl.SerialHistorySlider.setValue(0);
@@ -111,6 +103,28 @@ public class Admin {
 		updateSerialDisplays();
 		
 		GUI.WrapperPnl.tabbedPane.setEnabled(true);
+		GUI.WrapperPnl.tabbedPane.setSelectedIndex(1);
+	}
+	
+	public void saveCurrentconfiguration(){
+		ThreadTimer saver = new ThreadTimer(0, new Runnable(){
+			public void run(){
+				File config = new File("default.cfg");
+				if (config.exists()){
+					if ((new PopUp()).showConfirmDialog("There is already a quick run file saved would you like to overwrite it?", "Save Configuration", PopUp.YES_NO_OPTIONS) == PopUp.YES_OPTION){
+						try {
+							getConfigurationFromForm().Save(config);
+						}
+						catch (Exception e){
+							e.printStackTrace();
+							(new PopUp()).showConfirmDialog("Something went wrong and the operation was aborted.", "Save Configuration", PopUp.OK_OPTION);
+						}
+					}
+				}
+			}
+		}, 1, "ConfigSave", false);
+		saver.deSync();
+		saver.start();
 	}
 	
 	public RunConfiguration getConfigurationFromForm(){

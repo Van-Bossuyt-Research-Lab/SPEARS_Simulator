@@ -1,8 +1,10 @@
 package objects;
 
+import java.io.Serializable;
+
 import wrapper.Globals;
 
-public class ThreadItem {
+public class ThreadItem implements Serializable {
 	
 	private String name;
 	private int delay;

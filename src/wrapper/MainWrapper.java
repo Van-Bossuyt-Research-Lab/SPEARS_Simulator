@@ -50,6 +50,10 @@ import objects.MapFileFilter;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import java.awt.Color;
+import java.awt.Cursor;
+import javax.swing.UIManager;
+
 public class MainWrapper extends Panel {
 
 	static final int MAX_MAP_LAYERS = 10;
@@ -93,6 +97,7 @@ public class MainWrapper extends Panel {
 				private JLabel FileLocLbl;
 				JTextField FileLocTxt;
 				private JButton FileLocBtn;
+		private JLabel SaveConfigLbl;
 		JButton StartBtn;
 	JPanel RuntimePnl;
 		private JLabel SerialDisplayTitle;
@@ -108,7 +113,7 @@ public class MainWrapper extends Panel {
 		JLabel[] SerialSatelliteAvailableLbls;
 	
 	public MainWrapper(Dimension size) {
-		super(/*size*/new Dimension(1920, 1080), "Wrapper Display");
+		super(size, "Wrapper Display");
 		
 		initalize();
 		align();
@@ -246,7 +251,6 @@ public class MainWrapper extends Panel {
 		StartBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Access.CODE.beginSimulation(Access.CODE.getConfigurationFromForm());
-				tabbedPane.setSelectedIndex(1);
 			}
 		});
 		StartBtn.setFont(new Font("Tahoma", Font.PLAIN, 16));
@@ -255,7 +259,7 @@ public class MainWrapper extends Panel {
 		
 		TypeSelector = new JTabbedPane(JTabbedPane.TOP);
 		TypeSelector.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
-		TypeSelector.setBounds(912, 36, 628, 229);
+		TypeSelector.setBounds(740, 41, 636, 229);
 		CreateNewPnl.add(TypeSelector);
 		
 		SelectionPlasmaPnl = new JPanel();
@@ -360,6 +364,20 @@ public class MainWrapper extends Panel {
 		FileLocBtn = new JButton("Browse...");
 		FileLocBtn.setBounds(510, 13, 105, 25);
 		SelectionFilePnl.add(FileLocBtn);
+		
+		SaveConfigLbl = new JLabel("<HTML><U>Save Run Configuration</U></HTML>");
+		SaveConfigLbl.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Access.CODE.saveCurrentconfiguration();
+			}
+		});
+		SaveConfigLbl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		SaveConfigLbl.setForeground(UIManager.getColor("TabbedPane.darkShadow"));
+		SaveConfigLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
+		SaveConfigLbl.setHorizontalAlignment(SwingConstants.RIGHT);
+		SaveConfigLbl.setBounds(1729, 842, 156, 21);
+		CreateNewPnl.add(SaveConfigLbl);
 		FileLocBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser finder = new JFileChooser();
@@ -417,8 +435,9 @@ public class MainWrapper extends Panel {
 	private void align(){
 		
 		int spacing = 10;
-		int listWidth = ((this.getWidth() / 2) - spacing*4 - RovAddBtn.getWidth()) / 3 - 50;
-		int listHeight = (this.getWorkingHeight() - 60 - spacing*6 - RovAddLbl.getHeight() - RovDriveModelLbl.getHeight() - SatAddLbl.getHeight() - SatDriveModelLbl.getHeight()) / 2;
+		Dimension panelSize = new Dimension(tabbedPane.getWidth()-6, tabbedPane.getHeight()-40);
+		int listWidth = (int) (((panelSize.getWidth() / 2) - spacing*4 - RovAddBtn.getWidth()) / 3 - 50);
+		int listHeight = (int) ((panelSize.getHeight() - spacing*6 - RovAddLbl.getHeight() - RovDriveModelLbl.getHeight() - SatAddLbl.getHeight() - SatDriveModelLbl.getHeight()) / 2);
 		this.RovAddLbl.setLocation(10, 10);
 		this.RovDriveModelLbl.setLocation(RovAddLbl.getX(), RovAddLbl.getY() + RovAddLbl.getHeight() + spacing);
 		this.RovDriveModelList.setBounds(RovDriveModelLbl.getX(), RovDriveModelLbl.getY()+RovDriveModelLbl.getHeight(), listWidth, listHeight);
@@ -438,6 +457,12 @@ public class MainWrapper extends Panel {
 		this.SatRemoveBtn.setLocation(SatAddBtn.getX(), SatAddBtn.getY()+SatAddBtn.getHeight()+spacing);
 		this.SatelliteList.setBounds(SatAddBtn.getX()+SatAddBtn.getWidth()+spacing, this.SatAutonomusCodeList.getY(), listWidth, listHeight);
 		this.SatelliteListLbl.setLocation(SatelliteList.getX(), this.SatAutonomusCodeLbl.getY());
+		
+		this.MapConfigLbl.setLocation(RoverList.getX()+RoverList.getWidth()+spacing*3, this.RovAddLbl.getY());
+		this.TypeSelector.setLocation(MapConfigLbl.getX(), MapConfigLbl.getY()+MapConfigLbl.getHeight()+spacing);
+		
+		this.StartBtn.setLocation((int)panelSize.getWidth()-StartBtn.getWidth()-spacing, (int)panelSize.getHeight()-StartBtn.getHeight()-spacing);
+		this.SaveConfigLbl.setLocation((int)panelSize.getWidth()-SaveConfigLbl.getWidth()-spacing, StartBtn.getY()-spacing-SaveConfigLbl.getHeight());
 		
 		this.SerialDisplayTitle.setLocation(spacing, spacing);
 		this.SerialDisplayScroll.setBounds(SerialDisplayTitle.getX(), SerialDisplayTitle.getY()+SerialDisplayTitle.getHeight()+spacing, (this.tabbedPane.getWidth()-spacing*4)/3, (this.tabbedPane.getHeight()-spacing*3-SerialDisplayTitle.getHeight()-40)/2);
