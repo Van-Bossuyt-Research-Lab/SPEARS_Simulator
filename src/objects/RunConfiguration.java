@@ -25,10 +25,13 @@ public class RunConfiguration implements Serializable {
 	public int mapDetail;
 	public double targetDensity;
 	public double hazardDensity;
+	public boolean accelerated;
+	public int runtime;
 	
 	public RunConfiguration(Map<String, String> roverNames,
 			RoverObject[] rovers, Map<String, String> satelliteNames,
-			SatelliteObject[] satellites, String[] tags, File mapFile) {
+			SatelliteObject[] satellites, String[] tags, File mapFile,
+			boolean accelerated, int runtime) {
 		mapFromFile = true;
 		this.roverNames = roverNames;
 		this.rovers = rovers;
@@ -36,13 +39,15 @@ public class RunConfiguration implements Serializable {
 		this.satellites = satellites;
 		this.tags = tags;
 		this.mapFile = mapFile;
+		this.accelerated = accelerated;
+		this.runtime = runtime;
 	}
 
 	public RunConfiguration(Map<String, String> roverNames,
 			RoverObject[] rovers, Map<String, String> satelliteNames,
 			SatelliteObject[] satellites, String[] tags, double mapRough,
 			int mapSize, int mapDetail, double targetDensity,
-			double hazardDensity) {
+			double hazardDensity, boolean accelerated, int runtime) {
 		mapFromFile = false;
 		this.roverNames = roverNames;
 		this.rovers = rovers;
@@ -54,6 +59,8 @@ public class RunConfiguration implements Serializable {
 		this.mapDetail = mapDetail;
 		this.targetDensity = targetDensity;
 		this.hazardDensity = hazardDensity;
+		this.accelerated = accelerated;
+		this.runtime = runtime;
 	}
 	
 	public RunConfiguration(File save) throws Exception {
@@ -71,6 +78,8 @@ public class RunConfiguration implements Serializable {
 		this.mapDetail = input.mapDetail;
 		this.targetDensity = input.targetDensity;
 		this.hazardDensity = input.hazardDensity;
+		this.accelerated = input.accelerated;
+		this.runtime = input.runtime;
 	}
 
 	public void Save(File file) throws Exception {

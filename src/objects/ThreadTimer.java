@@ -12,6 +12,8 @@ public class ThreadTimer extends Thread implements Serializable {
 	private boolean forever = false;
 	public static int FOREVER = -1;
 	
+	
+	
 	public ThreadTimer(int interval, Runnable run, int times, String name){
 		super.setName(name);
 		delay = interval;

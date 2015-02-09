@@ -13,7 +13,7 @@ import objects.RunConfiguration;
 import objects.ThreadTimer;
 import rover.RoverAutonomusCode;
 import rover.RoverObject;
-import rover.RoverParametersList;
+import rover.RoverPhysicsModel;
 import rover.autoCode.*;
 import satellite.SatelliteAutonomusCode;
 import satellite.SatelliteObject;
@@ -27,7 +27,7 @@ public class Admin {
 	Random rnd = new Random();
 	private int queue_key = "qwert".hashCode();
 	
-	private Map<String, RoverParametersList> roverParameters = new Map<String, RoverParametersList>();
+	private Map<String, RoverPhysicsModel> roverParameters = new Map<String, RoverPhysicsModel>();
 	private Map<String, RoverAutonomusCode> roverLogics = new Map<String, RoverAutonomusCode>();
 	private Map<String, SatelliteParametersList> satelliteParameters = new Map<String, SatelliteParametersList>();
 	private Map<String, SatelliteAutonomusCode> satelliteLogics = new Map<String, SatelliteAutonomusCode>();
@@ -45,7 +45,7 @@ public class Admin {
 	//TODO Add items for rover and satellite option here using addItemToSelectionList
 	public Admin(){
 		//addItemToSelectionList(	name_on_list ,	object_to_add	);
-		addItemToSelectionList(		"Default", 		new RoverParametersList());
+		addItemToSelectionList(		"Default", 		new RoverPhysicsModel());
 		addItemToSelectionList(		"Generic4", 	new GenericRover("Generic4", 4));
 		addItemToSelectionList(		"RAIR", 		new RAIRcode());
 		addItemToSelectionList(		"RAIR Control", new RAIRcodeControl());
@@ -80,6 +80,23 @@ public class Admin {
 			Globals.writeToLogFile("Start Up", "Using Random Map");
 		}
 		
+		if (config.accelerated){
+			Globals.writeToLogFile("Start Up", "Accelerating Simulation");
+			new ThreadTimer(config.runtime*3600000, new Runnable(){
+				public void run(){
+					GUI.exit();
+				}
+			}, 1, "exit timer");
+			GUI.setVisible(false);
+			ThreadTimer inform = new ThreadTimer(1500, new Runnable(){
+				public void run(){
+					(new PopUp()).showConfirmDialog("The System has been accelerated and is still running.\nSimulation will complete in ~"+GUI.WrapperPnl.RunAltLbl.getText().substring(1, GUI.WrapperPnl.RunAltLbl.getText().length()-1), "Form Hidden", PopUp.OK_OPTION);
+				}
+			}, 1, "inform", false);
+			inform.deSync();
+			inform.start();
+		}
+		
 		serialHistory = new List<List<String>>();
 		int x = 0;
 		while (x < 1+config.satellites.length+config.rovers.length){
@@ -98,7 +115,7 @@ public class Admin {
 		InterfaceCode.start();
 		GUI.RoverHubPnl.start();
 		GUI.SatelliteHubPnl.start();
-		Globals.startTime();
+		Globals.startTime(config.accelerated);
 		
 		updateSerialDisplays();
 		
@@ -119,6 +136,16 @@ public class Admin {
 							e.printStackTrace();
 							(new PopUp()).showConfirmDialog("Something went wrong and the operation was aborted.", "Save Configuration", PopUp.OK_OPTION);
 						}
+					}
+				}
+				else {
+					try {
+						getConfigurationFromForm().Save(config);
+						(new PopUp()).showConfirmDialog("Startup configuration was successfully saved.", "Save Configuration", PopUp.OK_OPTION);
+					}
+					catch (Exception e){
+						e.printStackTrace();
+						(new PopUp()).showConfirmDialog("Something went wrong and the operation was aborted.", "Save Configuration", PopUp.OK_OPTION);
 					}
 				}
 			}
@@ -153,7 +180,8 @@ public class Admin {
 		if (GUI.WrapperPnl.TypeSelector.getSelectedIndex() == 1){
 			File mapFile = new File(GUI.WrapperPnl.FileLocTxt.getText());
 			return new RunConfiguration(roverNames,	rovers, satelliteNames,
-					satellites, tags, mapFile);
+					satellites, tags, mapFile, GUI.WrapperPnl.AccelChk.isSelected(), 
+					(int)GUI.WrapperPnl.RuntimeSpnr.getValue());
 		}
 		else {
 			double mapRough = GUI.WrapperPnl.MapRoughSlider.getValue()/1000.0;
@@ -162,7 +190,8 @@ public class Admin {
 			double targetDensity = (double) GUI.WrapperPnl.TargetDensitySpnr.getValue()/1000.;
 			double hazardDensity = (double) GUI.WrapperPnl.HazardDensitySpnr.getValue()/1000.;
 			return new RunConfiguration(roverNames, rovers, satelliteNames,	satellites, tags, mapRough,
-					mapSize, mapDetail, targetDensity, hazardDensity);
+					mapSize, mapDetail, targetDensity, hazardDensity, GUI.WrapperPnl.AccelChk.isSelected(), 
+					(int)GUI.WrapperPnl.RuntimeSpnr.getValue());
 		}
 	}
 	
@@ -221,7 +250,7 @@ public class Admin {
 			GUI.WrapperPnl.RoverList.addValue(newName);
 			//if you're getting errors with rovers 'sharing' data it's the pass reference value here
 			RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()); 
-			RoverParametersList params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem());
+			RoverPhysicsModel params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem());
 			// for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
 			DecimalPoint location = new DecimalPoint(-170, -170);
 			roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, location, Math.PI/2, GUI.TerrainPnl.getTemperature(location)));		
@@ -269,7 +298,7 @@ public class Admin {
 		}
 	}
 	
-	private void addItemToSelectionList(String name, RoverParametersList item){
+	private void addItemToSelectionList(String name, RoverPhysicsModel item){
 		roverParameters.add(name, item);
 		GUI.WrapperPnl.RovDriveModelList.addValue(name);
 	}

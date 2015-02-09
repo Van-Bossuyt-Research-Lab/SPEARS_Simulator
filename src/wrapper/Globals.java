@@ -14,6 +14,7 @@ public class Globals {
 	private static Queue<Byte>[] SerialBuffers; // the buffer for messages
 	private static String[] SerialBufferCodes;
 	
+	private static final double time_accelerant = 10;
 	private static double timeScale = 1.0;
 	public static long TimeMillis = 0;
 	private static ThreadTimer milliTimer;
@@ -26,8 +27,11 @@ public class Globals {
 	private static boolean ready = false;
 	private static boolean milliDone = false;
 	
-	public static void startTime(){
+	public static void startTime(boolean accel){
 		begun = true;
+		if (accel){
+			timeScale = time_accelerant;
+		}
 		Access.INTERFACE.clock.start();
 		ThreadItem.offset = 0;
 		milliTimer = new ThreadTimer(0, new Runnable(){
@@ -122,12 +126,12 @@ public class Globals {
 		return out;
 	}
 	
+	public static double getTimeAccelerant() {
+		return time_accelerant;
+	}
+
 	public static double getTimeScale(){
 		return timeScale;
-	}
-	
-	public static void setTimeScale(double time){ // changes the multiplier for time stepping (shows up in the delay funcions)
-		timeScale = time;
 	}
 	
 	public static void reportError(String obj, String method, Exception error){

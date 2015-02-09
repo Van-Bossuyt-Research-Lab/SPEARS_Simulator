@@ -31,6 +31,8 @@ import com.jgoodies.forms.factories.FormFactory;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
@@ -52,7 +54,9 @@ import javax.swing.SpinnerNumberModel;
 
 import java.awt.Color;
 import java.awt.Cursor;
+
 import javax.swing.UIManager;
+import javax.swing.JCheckBox;
 
 public class MainWrapper extends Panel {
 
@@ -60,7 +64,7 @@ public class MainWrapper extends Panel {
 	
 	JTabbedPane tabbedPane;
 	JPanel CreateNewPnl;
-		private JLabel RovAddLbl;
+		private JLabel RovAddTtl;
 			private JLabel RovDriveModelLbl;
 			ZList RovDriveModelList;
 			private JLabel RovAutonomusCodeLbl;
@@ -69,7 +73,7 @@ public class MainWrapper extends Panel {
 			private JButton RovRemoveBtn;
 			private JLabel RoversListLbl;
 			ZList RoverList;
-		private JLabel SatAddLbl;
+		private JLabel SatAddTtl;
 			private JLabel SatDriveModelLbl;
 			ZList SatDriveModelList;
 			private JLabel SatAutonomusCodeLbl;
@@ -78,7 +82,7 @@ public class MainWrapper extends Panel {
 			private JButton SatRemoveBtn;
 			private JLabel SatelliteListLbl;
 			ZList SatelliteList;
-		private JLabel MapConfigLbl;
+		private JLabel MapConfigTtl;
 			JTabbedPane TypeSelector;
 			private JPanel SelectionPlasmaPnl;
 				JSlider MapRoughSlider;
@@ -97,6 +101,12 @@ public class MainWrapper extends Panel {
 				private JLabel FileLocLbl;
 				JTextField FileLocTxt;
 				private JButton FileLocBtn;
+		private JLabel TimingOptionsTtl;
+			JCheckBox AccelChk;
+			private JLabel RuntimeLbl;
+			JSpinner RuntimeSpnr;
+			private JLabel RunUnitsLbl;
+			JLabel RunAltLbl;
 		private JLabel SaveConfigLbl;
 		JButton StartBtn;
 	JPanel RuntimePnl;
@@ -113,7 +123,7 @@ public class MainWrapper extends Panel {
 		JLabel[] SerialSatelliteAvailableLbls;
 	
 	public MainWrapper(Dimension size) {
-		super(size, "Wrapper Display");
+		super(size /*new Dimension(1024, 800)*/, "Wrapper Display");
 		
 		initalize();
 		align();
@@ -131,10 +141,10 @@ public class MainWrapper extends Panel {
 		tabbedPane.addTab("New Simulation", null, CreateNewPnl, null);
 		CreateNewPnl.setLayout(null);
 		
-		RovAddLbl = new JLabel("Adding Rovers");
-		RovAddLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
-		RovAddLbl.setBounds(10, 11, 118, 21);
-		CreateNewPnl.add(RovAddLbl);
+		RovAddTtl = new JLabel("Adding Rovers");
+		RovAddTtl.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
+		RovAddTtl.setBounds(10, 11, 118, 21);
+		CreateNewPnl.add(RovAddTtl);
 		
 		RovDriveModelLbl = new JLabel("Physics Model");
 		RovDriveModelLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
@@ -186,10 +196,10 @@ public class MainWrapper extends Panel {
 		RoverList.setBounds(510, 63, 200, 250);
 		CreateNewPnl.add(RoverList);
 		
-		SatAddLbl = new JLabel("Adding Satellites");
-		SatAddLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
-		SatAddLbl.setBounds(10, 460, 142, 21);
-		CreateNewPnl.add(SatAddLbl);
+		SatAddTtl = new JLabel("Adding Satellites");
+		SatAddTtl.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
+		SatAddTtl.setBounds(10, 460, 142, 21);
+		CreateNewPnl.add(SatAddTtl);
 		
 		SatDriveModelLbl = new JLabel("Physics Model");
 		SatDriveModelLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
@@ -242,10 +252,10 @@ public class MainWrapper extends Panel {
 		SatelliteListLbl.setBounds(510, 492, 142, 21);
 		CreateNewPnl.add(SatelliteListLbl);
 		
-		MapConfigLbl = new JLabel("Congiure Map");
-		MapConfigLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
-		MapConfigLbl.setBounds(912, 10, 118, 21);
-		CreateNewPnl.add(MapConfigLbl);
+		MapConfigTtl = new JLabel("Congiure Map");
+		MapConfigTtl.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
+		MapConfigTtl.setBounds(912, 10, 118, 21);
+		CreateNewPnl.add(MapConfigTtl);
 		
 		StartBtn = new JButton("Start Simulation");
 		StartBtn.addActionListener(new ActionListener() {
@@ -277,19 +287,19 @@ public class MainWrapper extends Panel {
 		MapSmoothLbl.setBounds(91, 43, 61, 21);
 		SelectionPlasmaPnl.add(MapSmoothLbl);
 		MapSmoothLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-		MapSmoothLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+		MapSmoothLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
 		
 		MapRoughnessLbl = new JLabel("Map Roughness:");
 		MapRoughnessLbl.setBounds(10, 11, 142, 21);
 		SelectionPlasmaPnl.add(MapRoughnessLbl);
 		MapRoughnessLbl.setHorizontalAlignment(SwingConstants.RIGHT);
 		MapRoughnessLbl.setHorizontalTextPosition(SwingConstants.LEFT);
-		MapRoughnessLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
+		MapRoughnessLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		
 		MapRoughLbl = new JLabel("Rough");
 		MapRoughLbl.setBounds(572, 43, 43, 21);
 		SelectionPlasmaPnl.add(MapRoughLbl);
-		MapRoughLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+		MapRoughLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
 		
 		MapDetailSpnr = new JSpinner();
 		MapDetailSpnr.setBounds(462, 105, 80, 25);
@@ -302,14 +312,14 @@ public class MainWrapper extends Panel {
 		SelectionPlasmaPnl.add(MapDetailLbl);
 		MapDetailLbl.setHorizontalTextPosition(SwingConstants.LEFT);
 		MapDetailLbl.setHorizontalAlignment(SwingConstants.RIGHT);
-		MapDetailLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
+		MapDetailLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		
 		HazardDensityLbl = new JLabel("Hazard Density:");
 		HazardDensityLbl.setBounds(310, 156, 142, 21);
 		SelectionPlasmaPnl.add(HazardDensityLbl);
 		HazardDensityLbl.setHorizontalTextPosition(SwingConstants.LEFT);
 		HazardDensityLbl.setHorizontalAlignment(SwingConstants.RIGHT);
-		HazardDensityLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
+		HazardDensityLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		
 		HazardDensitySpnr = new JSpinner();
 		HazardDensitySpnr.setBounds(462, 154, 80, 25);
@@ -328,14 +338,14 @@ public class MainWrapper extends Panel {
 		SelectionPlasmaPnl.add(TargetDensityLbl);
 		TargetDensityLbl.setHorizontalTextPosition(SwingConstants.LEFT);
 		TargetDensityLbl.setHorizontalAlignment(SwingConstants.RIGHT);
-		TargetDensityLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
+		TargetDensityLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		
 		MapSizeLbl = new JLabel("Map Size:");
 		MapSizeLbl.setBounds(10, 107, 142, 21);
 		SelectionPlasmaPnl.add(MapSizeLbl);
 		MapSizeLbl.setHorizontalTextPosition(SwingConstants.LEFT);
 		MapSizeLbl.setHorizontalAlignment(SwingConstants.RIGHT);
-		MapSizeLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
+		MapSizeLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		
 		MapSizeSpnr = new JSpinner();
 		MapSizeSpnr.setBounds(162, 105, 80, 25);
@@ -350,20 +360,29 @@ public class MainWrapper extends Panel {
 		FileLocLbl = new JLabel("File Location:");
 		FileLocLbl.setBounds(10, 13, 142, 21);
 		SelectionFilePnl.add(FileLocLbl);
-		FileLocLbl.setVisible(false);
 		FileLocLbl.setHorizontalAlignment(SwingConstants.TRAILING);
 		FileLocLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
 		
 		FileLocTxt = new JTextField();
 		FileLocTxt.setBounds(162, 11, 338, 25);
 		SelectionFilePnl.add(FileLocTxt);
-		FileLocTxt.setVisible(false);
 		FileLocTxt.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		FileLocTxt.setColumns(10);
 		
 		FileLocBtn = new JButton("Browse...");
 		FileLocBtn.setBounds(510, 13, 105, 25);
 		SelectionFilePnl.add(FileLocBtn);
+		FileLocBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser finder = new JFileChooser();
+				finder.setFileFilter(new MapFileFilter());
+				finder.setApproveButtonText("Choose");
+				int option = finder.showOpenDialog(getParent());
+				if (option == JFileChooser.APPROVE_OPTION){
+					FileLocTxt.setText(finder.getSelectedFile().getAbsolutePath());
+				}
+			}
+		});
 		
 		SaveConfigLbl = new JLabel("<HTML><U>Save Run Configuration</U></HTML>");
 		SaveConfigLbl.addMouseListener(new MouseAdapter() {
@@ -378,18 +397,68 @@ public class MainWrapper extends Panel {
 		SaveConfigLbl.setHorizontalAlignment(SwingConstants.RIGHT);
 		SaveConfigLbl.setBounds(1729, 842, 156, 21);
 		CreateNewPnl.add(SaveConfigLbl);
-		FileLocBtn.addActionListener(new ActionListener() {
+		
+		TimingOptionsTtl = new JLabel("Timing Options");
+		TimingOptionsTtl.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
+		TimingOptionsTtl.setBounds(740, 369, 125, 21);
+		CreateNewPnl.add(TimingOptionsTtl);
+		
+		AccelChk = new JCheckBox("Accelerate Simulation");
+		AccelChk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser finder = new JFileChooser();
-				finder.setFileFilter(new MapFileFilter());
-				finder.setApproveButtonText("Choose");
-				int option = finder.showOpenDialog(getParent());
-				if (option == JFileChooser.APPROVE_OPTION){
-					FileLocTxt.setText(finder.getSelectedFile().getAbsolutePath());
+				RuntimeLbl.setEnabled(AccelChk.isSelected());
+				RuntimeSpnr.setEnabled(AccelChk.isSelected());
+				RunUnitsLbl.setEnabled(AccelChk.isSelected());
+				RunAltLbl.setEnabled(AccelChk.isSelected());
+			}
+		});
+		AccelChk.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+		AccelChk.setBounds(750, 397, 181, 23);
+		CreateNewPnl.add(AccelChk);
+		
+		RuntimeLbl = new JLabel("Run Time:");
+		RuntimeLbl.setEnabled(false);
+		RuntimeLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+		RuntimeLbl.setHorizontalTextPosition(SwingConstants.LEADING);
+		RuntimeLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+		RuntimeLbl.setBounds(740, 427, 90, 21);
+		CreateNewPnl.add(RuntimeLbl);
+		
+		RuntimeSpnr = new JSpinner();
+		RuntimeSpnr.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				RunAltLbl.setText("(" + (int)((int)RuntimeSpnr.getValue()*60/Globals.getTimeAccelerant()) + " min)");
+			}
+		});
+		RuntimeSpnr.addKeyListener(new KeyAdapter(){
+			@Override
+			public void keyPressed(KeyEvent e){
+				if (e.getKeyCode() == KeyEvent.VK_ENTER){
+					SaveConfigLbl.requestFocus();
 				}
 			}
 		});
-		FileLocBtn.setVisible(false);
+		RuntimeSpnr.setEnabled(false);
+		RuntimeSpnr.setModel(new SpinnerNumberModel(24, 1, 555, 8));
+		RuntimeSpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
+		RuntimeSpnr.setBounds(840, 425, 91, 25);
+		CreateNewPnl.add(RuntimeSpnr);
+		
+		RunUnitsLbl = new JLabel("Hours");
+		RunUnitsLbl.setEnabled(false);
+		RunUnitsLbl.setHorizontalTextPosition(SwingConstants.LEADING);
+		RunUnitsLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 14));
+		RunUnitsLbl.setBounds(937, 427, 44, 21);
+		CreateNewPnl.add(RunUnitsLbl);
+		
+		RunAltLbl = new JLabel("( min)");
+		RunAltLbl.setEnabled(false);
+		RunAltLbl.setHorizontalTextPosition(SwingConstants.LEADING);
+		RunAltLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+		RunAltLbl.setBounds(991, 427, 149, 21);
+		CreateNewPnl.add(RunAltLbl);
+		RuntimeSpnr.setValue((int)RuntimeSpnr.getValue()+1);
+		RuntimeSpnr.setValue((int)RuntimeSpnr.getValue()-1);
 		
 		RuntimePnl = new JPanel();
 		tabbedPane.addTab("Running Simulation", null, RuntimePnl, null);
@@ -437,9 +506,9 @@ public class MainWrapper extends Panel {
 		int spacing = 10;
 		Dimension panelSize = new Dimension(tabbedPane.getWidth()-6, tabbedPane.getHeight()-40);
 		int listWidth = (int) (((panelSize.getWidth() / 2) - spacing*4 - RovAddBtn.getWidth()) / 3 - 50);
-		int listHeight = (int) ((panelSize.getHeight() - spacing*6 - RovAddLbl.getHeight() - RovDriveModelLbl.getHeight() - SatAddLbl.getHeight() - SatDriveModelLbl.getHeight()) / 2);
-		this.RovAddLbl.setLocation(10, 10);
-		this.RovDriveModelLbl.setLocation(RovAddLbl.getX(), RovAddLbl.getY() + RovAddLbl.getHeight() + spacing);
+		int listHeight = (int) ((panelSize.getHeight() - spacing*6 - RovAddTtl.getHeight() - RovDriveModelLbl.getHeight() - SatAddTtl.getHeight() - SatDriveModelLbl.getHeight()) / 2);
+		this.RovAddTtl.setLocation(10, 10);
+		this.RovDriveModelLbl.setLocation(RovAddTtl.getX(), RovAddTtl.getY() + RovAddTtl.getHeight() + spacing);
 		this.RovDriveModelList.setBounds(RovDriveModelLbl.getX(), RovDriveModelLbl.getY()+RovDriveModelLbl.getHeight(), listWidth, listHeight);
 		this.RovAutonomusCodeList.setBounds(RovDriveModelList.getX()+RovDriveModelList.getWidth()+spacing, RovDriveModelList.getY(), listWidth, listHeight);
 		this.RovAutonomusCodeLbl.setLocation(RovAutonomusCodeList.getX(), RovAutonomusCodeList.getY()-RovAutonomusCodeLbl.getHeight());
@@ -448,8 +517,8 @@ public class MainWrapper extends Panel {
 		this.RoverList.setBounds(RovAddBtn.getX()+RovAddBtn.getWidth()+spacing, this.RovAutonomusCodeList.getY(), listWidth, listHeight);
 		this.RoversListLbl.setLocation(RoverList.getX(), this.RovAutonomusCodeLbl.getY());
 		
-		this.SatAddLbl.setLocation(RovAddLbl.getX(), RovDriveModelList.getY()+RovDriveModelList.getHeight()+spacing*2);
-		this.SatDriveModelLbl.setLocation(SatAddLbl.getX(), SatAddLbl.getY()+SatAddLbl.getHeight()+spacing);
+		this.SatAddTtl.setLocation(RovAddTtl.getX(), RovDriveModelList.getY()+RovDriveModelList.getHeight()+spacing*2);
+		this.SatDriveModelLbl.setLocation(SatAddTtl.getX(), SatAddTtl.getY()+SatAddTtl.getHeight()+spacing);
 		this.SatDriveModelList.setBounds(SatDriveModelLbl.getX(), SatDriveModelLbl.getY()+SatDriveModelLbl.getHeight(), listWidth, listHeight);
 		this.SatAutonomusCodeList.setBounds(SatDriveModelList.getX()+SatDriveModelList.getWidth()+spacing, SatDriveModelList.getY(), listWidth, listHeight);
 		this.SatAutonomusCodeLbl.setLocation(SatAutonomusCodeList.getX(), SatAutonomusCodeList.getY()-SatAutonomusCodeLbl.getHeight());
@@ -458,8 +527,15 @@ public class MainWrapper extends Panel {
 		this.SatelliteList.setBounds(SatAddBtn.getX()+SatAddBtn.getWidth()+spacing, this.SatAutonomusCodeList.getY(), listWidth, listHeight);
 		this.SatelliteListLbl.setLocation(SatelliteList.getX(), this.SatAutonomusCodeLbl.getY());
 		
-		this.MapConfigLbl.setLocation(RoverList.getX()+RoverList.getWidth()+spacing*3, this.RovAddLbl.getY());
-		this.TypeSelector.setLocation(MapConfigLbl.getX(), MapConfigLbl.getY()+MapConfigLbl.getHeight()+spacing);
+		this.MapConfigTtl.setLocation(RoverList.getX()+RoverList.getWidth()+spacing*3, this.RovAddTtl.getY());
+		this.TypeSelector.setLocation(MapConfigTtl.getX(), MapConfigTtl.getY()+MapConfigTtl.getHeight()+spacing);
+		
+		this.TimingOptionsTtl.setLocation(MapConfigTtl.getX(), TypeSelector.getY()+TypeSelector.getHeight()+spacing*4);
+		this.AccelChk.setLocation(TimingOptionsTtl.getX(), TimingOptionsTtl.getY()+TimingOptionsTtl.getHeight()+spacing);
+		this.RuntimeLbl.setLocation(AccelChk.getX(), AccelChk.getY()+AccelChk.getHeight()+spacing);
+		this.RuntimeSpnr.setLocation(RuntimeLbl.getX()+RuntimeLbl.getWidth()+spacing, RuntimeLbl.getY()-2);
+		this.RunUnitsLbl.setLocation(RuntimeSpnr.getX()+RuntimeSpnr.getWidth()+spacing, RuntimeLbl.getY());
+		this.RunAltLbl.setLocation(RunUnitsLbl.getX()+RunUnitsLbl.getWidth()+spacing, RuntimeLbl.getY());
 		
 		this.StartBtn.setLocation((int)panelSize.getWidth()-StartBtn.getWidth()-spacing, (int)panelSize.getHeight()-StartBtn.getHeight()-spacing);
 		this.SaveConfigLbl.setLocation((int)panelSize.getWidth()-SaveConfigLbl.getWidth()-spacing, StartBtn.getY()-spacing-SaveConfigLbl.getHeight());
