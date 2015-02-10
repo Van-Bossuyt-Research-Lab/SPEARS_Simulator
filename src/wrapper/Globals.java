@@ -205,6 +205,9 @@ public class Globals {
 			threads.get(name).advance();
 		} catch (Exception e) {}
 		if (name.equals("milli-clock") || milliDone){
+			if (TimeMillis%10000 == 0){
+				System.out.println(TimeMillis + "\t-\t" + System.currentTimeMillis());
+			}
 			for (Object o : threads.getKeys()){
 				String key = (String) o;
 				try {
