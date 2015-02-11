@@ -90,6 +90,7 @@ public class Admin {
 			GUI.setVisible(false);
 			ThreadTimer inform = new ThreadTimer(1500, new Runnable(){
 				public void run(){
+					GUI.WrapperPnl.RuntimeSpnr.setValue(config.runtime);
 					(new PopUp()).showConfirmDialog("The System has been accelerated and is still running.\nSimulation will complete in ~"+GUI.WrapperPnl.RunAltLbl.getText().substring(1, GUI.WrapperPnl.RunAltLbl.getText().length()-1), "Form Hidden", PopUp.OK_OPTION);
 				}
 			}, 1, "inform", false);
@@ -249,7 +250,8 @@ public class Admin {
 			//TODO change temp to map temp
 			GUI.WrapperPnl.RoverList.addValue(newName);
 			//if you're getting errors with rovers 'sharing' data it's the pass reference value here
-			RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()); 
+			RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem());
+			autoCode.setRoverName(newName);
 			RoverPhysicsModel params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem());
 			// for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
 			DecimalPoint location = new DecimalPoint(-170, -170);

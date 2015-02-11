@@ -427,7 +427,7 @@ public class MainWrapper extends Panel {
 		RuntimeSpnr = new JSpinner();
 		RuntimeSpnr.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-				RunAltLbl.setText("(" + (int)((int)RuntimeSpnr.getValue()*60/Globals.getTimeAccelerant()) + " min)");
+				RunAltLbl.setText("(" + (int)((int)RuntimeSpnr.getValue()*60/Globals.getTimeAccelerant()*3) + " min)");
 			}
 		});
 		RuntimeSpnr.addKeyListener(new KeyAdapter(){

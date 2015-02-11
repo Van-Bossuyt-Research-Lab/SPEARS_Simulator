@@ -176,6 +176,7 @@ public class Form extends JFrame {
 	
 	public void exit(){
 		//TODO exit procedures
+		System.out.println("bye");
 		System.exit(0);
 	}
 	

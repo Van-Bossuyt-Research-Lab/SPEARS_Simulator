@@ -119,7 +119,7 @@ public class RAIRcodeRS extends RoverAutonomusCode {
 		private int seconds = 1;
 		
 		public RAIRcodeRS(){
-			super("RAIR", "RAIR");
+			super("RAIR RS", "RAIR");
 
 		}
 	

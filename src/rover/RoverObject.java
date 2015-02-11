@@ -29,7 +29,7 @@ public class RoverObject implements Serializable {
 	boolean hasInstructions = false; // has a list of instructions on file
 	private String instructions = ""; // the list of instructions
 	private int instructsComplete = 0; // how many items on the list have we done
-	private long timeOfLastCmd = Globals.TimeMillis+3600000; // how long since the ground station talked last
+	private long timeOfLastCmd = Globals.TimeMillis; // how long since the ground station talked last
 	private boolean waiting = false; // are we waiting
 	private long cmdWaitTime = 0; // how long to wait
 	private boolean run_auto = false; // are we running autonomously
@@ -100,6 +100,7 @@ public class RoverObject implements Serializable {
 			}
 		},
 		ThreadTimer.FOREVER, name+"-physics");
+		timeOfLastCmd = Globals.TimeMillis;
 	}
 	
 	private void excecuteCode(){
@@ -299,6 +300,7 @@ public class RoverObject implements Serializable {
 
 			// Autonomous and Instruction handling
 			if (Globals.TimeMillis - timeOfLastCmd > 60000){ // if it has been a minute since we heard from them
+				//System.out.println(this.name);
 				if (hasInstructions && !mute) { // if we have instructions, can send things
 					LEDs.set("Instructions", true);
 					LEDs.set("Autonomus", false);
