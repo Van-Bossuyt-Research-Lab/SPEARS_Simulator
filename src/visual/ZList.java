@@ -250,7 +250,7 @@ public class ZList extends JPanel implements Cloneable{
 	public Object getItemAt(int loc){
 		try {
 			try {
-				return ((InstructionObj) values[loc]).clone();
+				return ((InstructionObj) values[loc]);
 			}
 			catch (Exception e){
 				return values[loc];

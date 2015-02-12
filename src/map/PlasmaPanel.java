@@ -24,8 +24,8 @@ import java.util.Scanner;
 public class PlasmaPanel extends JPanel {
 
 	private double[][] values;
-	private GridList<Boolean> targets;
-	private GridList<Boolean> hazards;
+	private GridList<Integer> targets;
+	private GridList<Integer> hazards;
 	private boolean viewTargets = true;
 	private boolean viewHazards = true;
 	private double rough;
@@ -204,7 +204,7 @@ public class PlasmaPanel extends JPanel {
 						try {
 							try {
 								if (viewHazards){
-									if (hazards.get(x/detail, y/detail)){
+									if (hazards.get(x/detail, y/detail) > 0){
 										g.setColor(Color.GRAY);
 									}
 								}
@@ -214,7 +214,7 @@ public class PlasmaPanel extends JPanel {
 							}
 							catch (NullPointerException e){
 								if (viewTargets){
-									if (targets.get(x/detail, y/detail)){
+									if (targets.get(x/detail, y/detail) > 0){
 										g.setColor(Color.MAGENTA);										
 									}
 								}
@@ -262,25 +262,25 @@ public class PlasmaPanel extends JPanel {
 
 	//force a target distribution
 	public void setTargets(Point[] targs){
-		targets = new GridList<Boolean>();
+		targets = new GridList<Integer>();
 		for (Point p : targs){
-			targets.put(true, p.x, p.y);
+			targets.put(1, p.x, p.y);
 		}
 		this.repaint();
 	}
 	
 	//get the target distribution
-	public GridList<Boolean> getTargets(){
+	public GridList<Integer> getTargets(){
 		return targets;
 	}
 	
 	//Generate a target distribution
 	public void genorateTargets(double density){
-		targets = new GridList<Boolean>();
+		targets = new GridList<Integer>();
 		int size = (int)(values.length*values[0].length/(detail*detail)*density);
 		int x = 0;
 		while (x < size){
-			targets.put(true, rnd.nextInt(values.length/detail), rnd.nextInt(values.length/detail));
+			targets.put(1, rnd.nextInt(values.length/detail), rnd.nextInt(values.length/detail));
 			x++;
 		}
 	}
@@ -313,7 +313,7 @@ public class PlasmaPanel extends JPanel {
 	
 	//Generate random hazards
 	public void genorateHazards(double density){
-		this.hazards = new GridList<Boolean>();
+		this.hazards = new GridList<Integer>();
 		Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)*density)];
 		for (int x = 0; x < hazards.length; x++){
 			hazards[x] = new Hazard(new DecimalPoint(values.length/detail*rnd.nextDouble()-values.length/detail/2, values.length/detail*rnd.nextDouble()-values.length/detail/2), 5*rnd.nextDouble()+1);
@@ -324,7 +324,7 @@ public class PlasmaPanel extends JPanel {
 				int y = values.length/detail/2 - j;
 				for (int z = 0; z < hazards.length; z++){
 					if (hazards[z].isPointWithin(new DecimalPoint(x, y))){
-						this.hazards.put(true, i, j);
+						this.hazards.put(1, i, j);
 						break;
 					}
 				}
@@ -333,15 +333,15 @@ public class PlasmaPanel extends JPanel {
 	}
 	
 	public void setHazards(Point[] hzds){
-		hazards = new GridList<Boolean>();
+		hazards = new GridList<Integer>();
 		for (Point p : hzds){
-			hazards.put(true, p.x, p.y);
+			hazards.put(1, p.x, p.y);
 		}
 		this.repaint();
 	}
 	
 	//get the hazard list
-	public GridList<Boolean> getHazards(){
+	public GridList<Integer> getHazards(){
 		return hazards;
 	}
 	
@@ -610,9 +610,11 @@ public class PlasmaPanel extends JPanel {
 				write.write('\n');
 			}
 			
-			write.write("\n" + targets.genorateList() + "\n");
+			write.write("\n" + targets.size() + "\n");
+			write.write(targets.genorateList() + "\n");
 			
-			write.write("\n" + hazards.genorateList() + "\n");
+			write.write("\n" + hazards.size() + "\n");
+			write.write(hazards.genorateList() + "\n");
 			
 			write.flush();
 			write.close();
@@ -645,22 +647,26 @@ public class PlasmaPanel extends JPanel {
 			this.setValues(values);
 			
 			int targs = data.nextInt();
-			Point[] targets = new Point[targs];
-			for (int i = 0; i < targs; i++){
-				int x = data.nextInt();
-				int y = data.nextInt();
-				targets[i] = new Point(x, y);
+			if (targs > 0){
+				Point[] targets = new Point[targs];
+				for (int i = 0; i < targets.length; i++){
+					int x = data.nextInt();
+					int y = data.nextInt();
+					targets[i] = new Point(x, y);
+				}
+				this.setTargets(targets);
 			}
-			this.setTargets(targets);
 			
 			int hzdrs = data.nextInt();
-			Point[] hazards = new Point[hzdrs];
-			for (int i = 0; i < targs; i++){
-				int x = data.nextInt();
-				int y = data.nextInt();
-				hazards[i] = new Point(x, y);
+			if (hzdrs > 0){
+				Point[] hazards = new Point[hzdrs];
+				for (int i = 0; i < hazards.length; i++){
+					int x = data.nextInt();
+					int y = data.nextInt();
+					hazards[i] = new Point(x, y);
+				}
+				this.setHazards(hazards);
 			}
-			this.setHazards(hazards);
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

@@ -5,7 +5,7 @@ import java.io.Serializable;
 import objects.DecimalPoint;
 import wrapper.Globals;
 
-public abstract class RoverAutonomusCode implements Serializable {
+public abstract class RoverAutonomusCode implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 	

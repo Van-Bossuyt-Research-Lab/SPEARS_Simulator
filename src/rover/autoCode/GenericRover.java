@@ -67,7 +67,7 @@ public class GenericRover extends RoverAutonomusCode {
 			return "";
 		}
 	}
-	
+
 	public GenericRover clone(){
 		return new GenericRover(this);
 	}

@@ -37,13 +37,18 @@ public class GridList<T> implements Serializable {
 				}
 			}
 			finally{
-				if (!data.get(x%size).get(x).get(y%size).keySet().contains(y)){
+				try {
+					if (data.get(x%size).get(x).get(y%size).get(y).equals(null)){
+						((Integer)null).byteValue();
+					}				
+				}
+				catch (NullPointerException e){
 					stored++;
 				}
 				data.get(x%size).get(x).get(y%size).put(y, val);
 				if (stored/(double)(size*size) > 5 && allowExpand){
 					expand();
-				}				
+				}
 			}
 		}
 	}
@@ -69,6 +74,7 @@ public class GridList<T> implements Serializable {
 		GridList<T> org = clone();
 		data = new ArrayList<TreeMap<Integer, ArrayList<TreeMap<Integer, T>>>>();
 		size *= 2;
+		stored = 0;
 		for (int i = 0; i < size; i++){
 			data.add(new TreeMap<Integer, ArrayList<TreeMap<Integer, T>>>());
 		}

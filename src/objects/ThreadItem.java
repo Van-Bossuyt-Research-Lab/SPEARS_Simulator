@@ -103,10 +103,9 @@ public class ThreadItem implements Serializable {
 
 	@Override
 	public String toString() {
-		return "";
-		//return "ThreadItem [name=" + name + ", delay=" + delay + ", next="
-		//		+ next + ", permission=" + permission + ", running=" + running
-		//		+ ", complete=" + complete + ", suspended=" + suspended + "]";
+		return "ThreadItem [name=" + name + ", delay=" + delay + ", next="
+				+ next + ", permission=" + permission + ", running=" + running
+				+ ", complete=" + complete + ", suspended=" + suspended + "]";
 	}
 	
 }

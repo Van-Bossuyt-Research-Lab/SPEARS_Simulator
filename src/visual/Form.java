@@ -27,6 +27,7 @@ import objects.RunConfiguration;
 import control.InterfacePanel;
 import control.PopUp;
 import rover.RoverHub;
+import rover.autoCode.GenericRover;
 import satellite.SatelliteHub;
 import wrapper.Access;
 import wrapper.Globals;

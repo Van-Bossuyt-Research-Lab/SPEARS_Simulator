@@ -5,7 +5,7 @@ import java.io.Serializable;
 import objects.DecimalPoint;
 import wrapper.Access;
 
-public class RoverPhysicsModel implements Serializable {
+public class RoverPhysicsModel implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -200,6 +200,15 @@ public class RoverPhysicsModel implements Serializable {
 		motor_temp[FR] += ((winding_heat_transfer*(winding_temp[FR] - motor_temp[FR]) - motor_surface_heat_transfer*(motor_temp[FR] - Access.getMapTemperatureAtPoint(location))) / motor_thermal_cap) * time_step;
 		motor_temp[BL] += ((winding_heat_transfer*(winding_temp[BL] - motor_temp[BL]) - motor_surface_heat_transfer*(motor_temp[BL] - Access.getMapTemperatureAtPoint(location))) / motor_thermal_cap) * time_step;
 		motor_temp[BR] += ((winding_heat_transfer*(winding_temp[BR] - motor_temp[BR]) - motor_surface_heat_transfer*(motor_temp[BR] - Access.getMapTemperatureAtPoint(location))) / motor_thermal_cap) * time_step;				
+	}
+	
+	@Override
+	public RoverPhysicsModel clone(){
+		return new RoverPhysicsModel(wheel_radius, wheel_mass, rover_width, rover_length, rover_mass,
+				rover_inertia, wheel_inertia, motor_energy_transform, motor_voltage_transform, motor_resistance,
+				motor_inductance, friction_axle, friction_gr, friction_s, R_cp0, R_cp1, R_cp2,
+				capacitance_battery, capacitance_cp, resistance_s, resistance_parasite, battery_max_charge, battery_heat_transfer,
+				battery_thermal_cap, winding_heat_transfer, winding_thermal_cap, motor_surface_heat_transfer, motor_thermal_cap);
 	}
 	
 	private double resistance_cp(){ // get the resistance of the CP resistor as a function of SOC

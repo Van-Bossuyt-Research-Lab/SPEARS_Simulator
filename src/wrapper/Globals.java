@@ -191,11 +191,13 @@ public class Globals {
 	}
 	
 	public static void registerNewThread(String name, int delay){
+		System.out.println(name);
 		threads.add(name, new ThreadItem(name, delay, TimeMillis));
 	}
 	
 	public static void checkOutThread(String name){
 		threads.remove(name);
+		System.out.println("--- " + name);
 		threadCheckIn(name);
 	}
 	
@@ -208,6 +210,10 @@ public class Globals {
 			if (TimeMillis%10000 == 0){
 				System.out.println(TimeMillis + "\t-\t" + System.currentTimeMillis());
 			}
+			//System.out.println("\n\n");
+			//for (Object o : threads.getValues()){
+			//	System.out.println(o);
+			//}
 			for (Object o : threads.getKeys()){
 				String key = (String) o;
 				try {
@@ -228,7 +234,7 @@ public class Globals {
 				try {
 					String key = (String) o;
 					threads.get(key).reset();
-					if (threads.get(key).getNext() == TimeMillis){
+					if (threads.get(key).getNext() <= TimeMillis){
 						threads.get(key).grantPermission();
 					}
 				}

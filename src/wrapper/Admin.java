@@ -60,6 +60,11 @@ public class Admin {
 	
 	public void beginSimulation(RunConfiguration config){
 	
+		if (config.rovers.length == 0 ||config.satellites.length == 0){
+			System.err.println("Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
+			return;
+		}
+		
 		if (config.mapFromFile){
 			try {
 				if (!config.mapFile.exists()){
@@ -69,7 +74,8 @@ public class Admin {
 				Globals.writeToLogFile("Start Up", "Using Map File: " + config.mapFile.getName());
 			}
 			catch (Exception e){
-				System.out.println("Invalid Map File");
+				System.err.println("Invalid Map File");
+				e.printStackTrace();
 				return;
 			}
 		}
@@ -250,11 +256,11 @@ public class Admin {
 			//TODO change temp to map temp
 			GUI.WrapperPnl.RoverList.addValue(newName);
 			//if you're getting errors with rovers 'sharing' data it's the pass reference value here
-			RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem());
+			RoverAutonomusCode autoCode = roverLogics.get((String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem()).clone();
 			autoCode.setRoverName(newName);
-			RoverPhysicsModel params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem());
+			RoverPhysicsModel params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem()).clone();
 			// for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
-			DecimalPoint location = new DecimalPoint(-170, -170);
+			DecimalPoint location = new DecimalPoint(0, 0);
 			roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, location, Math.PI/2, GUI.TerrainPnl.getTemperature(location)));		
 		}
 	}
