@@ -6,10 +6,12 @@ import objects.Map;
 import objects.Queue;
 import objects.ThreadItem;
 import objects.ThreadTimer;
+import visual.AccelPopUp;
+import visual.Form;
 
 public class Globals {
 
-	public static String vrsionNumber = "2.0.3";
+	public static String vrsionNumber = "2.2";
 	
 	private static Queue<Byte>[] SerialBuffers; // the buffer for messages
 	private static String[] SerialBufferCodes;
@@ -26,6 +28,9 @@ public class Globals {
 	private static Map<String, ThreadItem> threads = new Map<String, ThreadItem>();
 	private static boolean ready = false;
 	private static boolean milliDone = false;
+	
+	private static int exitTime = -1;
+	private static AccelPopUp informer;
 	
 	public static void startTime(boolean accel){
 		begun = true;
@@ -190,14 +195,27 @@ public class Globals {
 		}		
 	}
 	
+	public static void setUpAcceleratedRun(int runtime){
+		exitTime = runtime;
+		informer = new AccelPopUp(exitTime, (int) (exitTime/time_accelerant*3/60000));
+		ThreadTimer update = new ThreadTimer(1000, new Runnable(){
+			public void run(){
+				informer.update((int)TimeMillis);
+				if (TimeMillis >= exitTime){
+					Access.CODE.GUI.exit();
+				}
+			}
+		}, ThreadTimer.FOREVER, "popup-update", false);
+		update.deSync();
+		update.start();
+	}
+	
 	public static void registerNewThread(String name, int delay){
-		System.out.println(name);
 		threads.add(name, new ThreadItem(name, delay, TimeMillis));
 	}
 	
 	public static void checkOutThread(String name){
 		threads.remove(name);
-		System.out.println("--- " + name);
 		threadCheckIn(name);
 	}
 	
@@ -207,13 +225,6 @@ public class Globals {
 			threads.get(name).advance();
 		} catch (Exception e) {}
 		if (name.equals("milli-clock") || milliDone){
-			if (TimeMillis%10000 == 0){
-				System.out.println(TimeMillis + "\t-\t" + System.currentTimeMillis());
-			}
-			//System.out.println("\n\n");
-			//for (Object o : threads.getValues()){
-			//	System.out.println(o);
-			//}
 			for (Object o : threads.getKeys()){
 				String key = (String) o;
 				try {

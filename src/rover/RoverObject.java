@@ -84,7 +84,7 @@ public class RoverObject implements Serializable {
 	public void start(){
 		new ThreadTimer(100, new Runnable(){
 			public void run(){
-				System.out.println(name + "-CODE\t" + Globals.TimeMillis);
+				//System.out.println(name + "-CODE\t" + Globals.TimeMillis);
 				excecuteCode();
 			}
 		},
@@ -93,7 +93,7 @@ public class RoverObject implements Serializable {
 			public void run(){
 				try {
 					params.excecute(name);
-					System.out.println(name + "-physics\t" + Globals.TimeMillis);
+					//System.out.println(name + "-physics\t" + Globals.TimeMillis);
 					//RoverEvents.updateStats();
 				}
 				catch (Exception e){

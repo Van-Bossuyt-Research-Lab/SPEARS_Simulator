@@ -78,7 +78,7 @@ public class PopUp extends JDialog {
 		buttonClicked = -1;
 		this.setTitle(title);
 		currentConfig = options;
-		defaultText.setText("<html>" + message.replaceAll("\n", "<br>") + "</html>");
+		defaultText.setText("<html><center>" + message.replaceAll("\n", "<br>") + "</center></html>");
 		this.setSize((int)(defaultText.getPreferredSize().getWidth() + 50), (int)(defaultText.getPreferredSize().getHeight() + 100));
 		defaultText.setVisible(true);
 		defaultText.setBounds(0, 0, this.getWidth(), (this.getHeight() - 30 - 2*optionBtns[0].getHeight()));
@@ -210,7 +210,7 @@ public class PopUp extends JDialog {
 		buttonClicked = -1;
 		this.setTitle(title);
 		currentConfig = options;
-		defaultText.setText("<html>" + text.replaceAll("\n", "<br>") + "</html>");
+		defaultText.setText("<html><center>" + text.replaceAll("\n", "<br>") + "</center></html>");
 		int width = (int)(defaultText.getPreferredSize().getWidth() + 50);
 		if (width < 250){
 			width = 250;

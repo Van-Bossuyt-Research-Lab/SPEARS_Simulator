@@ -88,20 +88,8 @@ public class Admin {
 		
 		if (config.accelerated){
 			Globals.writeToLogFile("Start Up", "Accelerating Simulation");
-			new ThreadTimer(config.runtime*3600000, new Runnable(){
-				public void run(){
-					GUI.exit();
-				}
-			}, 1, "exit timer");
 			GUI.setVisible(false);
-			ThreadTimer inform = new ThreadTimer(1500, new Runnable(){
-				public void run(){
-					GUI.WrapperPnl.RuntimeSpnr.setValue(config.runtime);
-					(new PopUp()).showConfirmDialog("The System has been accelerated and is still running.\nSimulation will complete in ~"+GUI.WrapperPnl.RunAltLbl.getText().substring(1, GUI.WrapperPnl.RunAltLbl.getText().length()-1), "Form Hidden", PopUp.OK_OPTION);
-				}
-			}, 1, "inform", false);
-			inform.deSync();
-			inform.start();
+			Globals.setUpAcceleratedRun(3600000*config.runtime);
 		}
 		
 		serialHistory = new List<List<String>>();
