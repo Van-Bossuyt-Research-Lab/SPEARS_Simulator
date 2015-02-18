@@ -344,6 +344,12 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	}
 
 	public void setMotor_power(int motor, int motor_power) {
+		if (motor_power < 0){
+			motor_power = 0;
+		}
+		else if (motor_power > 255){
+			motor_power = 255;
+		}
 		this.motor_power[motor] = motor_power;
 	}
 

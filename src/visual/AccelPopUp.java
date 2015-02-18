@@ -87,7 +87,7 @@ public class AccelPopUp extends JDialog {
 	public void update(int progress){
 		ProgressBar.setValue(progress);
 		long elapsed = System.currentTimeMillis() - timeStarted;
-		int remaining = (int) (elapsed * (ProgressBar.getMaximum() / progress - 1));
+		int remaining = (int) (elapsed * (ProgressBar.getMaximum() / (double)progress - 1));
 		TimeLeftLbl.setText("Estimated Time Remaining: " + (remaining/60000) + " min");
 	}
 }

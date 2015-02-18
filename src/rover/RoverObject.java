@@ -23,10 +23,10 @@ public class RoverObject implements Serializable {
 	
 	private boolean connected = false; // Can the ground station hear/talk to us
 	private boolean mute = false; // Can we talk at all
-	boolean moving = false; // are we moving
+	private boolean moving = false; // are we moving
 	private String motorState = ""; // how are we moving
 
-	boolean hasInstructions = false; // has a list of instructions on file
+	private boolean hasInstructions = false; // has a list of instructions on file
 	private String instructions = ""; // the list of instructions
 	private int instructsComplete = 0; // how many items on the list have we done
 	private long timeOfLastCmd = Globals.TimeMillis; // how long since the ground station talked last
@@ -865,9 +865,7 @@ public class RoverObject implements Serializable {
 //TODO PHYSCIS STARTS HERE *****************************************************************************************************************************************************************************************************
 	
 	private void setMotorPower(int which, int power){ // set power to a motor
-		if (power >= 0 && power <= 255){
-			params.setMotor_power(which, power);
-		}
+		params.setMotor_power(which, power);
 	}
 	
 	private void setMotorState(int which, int state){ // set a state to a motor
