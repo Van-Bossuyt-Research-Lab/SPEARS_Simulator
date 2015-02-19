@@ -43,8 +43,6 @@ public class ThreadTimer extends Thread implements Serializable {
 					Thread.sleep((long)((delay-1)/Globals.getTimeScale()), (int)(((delay-1)/Globals.getTimeScale()-(int)((delay-1)/Globals.getTimeScale()))*1000000));
 				}
 				catch (InterruptedException e) {
-					System.out.println("INTERRUPTED");
-					e.printStackTrace();
 					return;
 				}
 				catch (Exception e){
