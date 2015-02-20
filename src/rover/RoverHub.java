@@ -385,12 +385,12 @@ public class RoverHub extends Panel {
 					RoverNameLbl[x].setText(rovers[HUDDisplayLinks[x]].getName());
 					SerialHistoryLbl[x].setText(rovers[HUDDisplayLinks[x]].getSerialHistory());
 					MovementStatsLbl[x].setText("X: " + formatDouble(rovers[HUDDisplayLinks[x]].getLocation().getX()) 
-							+ " m\tAngular Spin FL: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getWheelSpeed(RoverObject.FL))) 
+							+ " m\tAngular Spin FL: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getWheelSpeed(RoverWheels.FL))) 
 							+ " deg/s\nY: " + formatDouble(rovers[HUDDisplayLinks[x]].getLocation().getY()) 
-							+ " m\tAngluar Spin FR: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getWheelSpeed(RoverObject.FR))) 
+							+ " m\tAngluar Spin FR: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getWheelSpeed(RoverWheels.FR))) 
 							+ " deg/s\nAngle: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getDirection())) 
-							+ " deg\tAngular Spin BL: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getWheelSpeed(RoverObject.BL))) 
-							+ " deg/s\n\tAngular Spin BR: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getWheelSpeed(RoverObject.BR))) 
+							+ " deg\tAngular Spin BL: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getWheelSpeed(RoverWheels.BL))) 
+							+ " deg/s\n\tAngular Spin BR: " + formatDouble(Math.toDegrees(rovers[HUDDisplayLinks[x]].getWheelSpeed(RoverWheels.BR))) 
 							+ " deg/s\nSpeed: " + formatDouble(rovers[HUDDisplayLinks[x]].getSpeed()) 
 							+ " m/s\nVelocity X: " + formatDouble(Math.cos(rovers[HUDDisplayLinks[x]].getDirection()) * rovers[HUDDisplayLinks[x]].getSpeed()) 
 							+ " m/s\tIncline: " + formatDouble(Math.toDegrees(Access.getMapInclineAtPoint(rovers[HUDDisplayLinks[x]].getLocation(), rovers[HUDDisplayLinks[x]].getDirection())))
@@ -406,18 +406,18 @@ public class RoverHub extends Panel {
 							+ " C\nBattery CP Charge: " + formatDouble(rovers[HUDDisplayLinks[x]].getBatterCPCharge())
 							+ " C\nBattery Voltage: " + formatDouble(rovers[HUDDisplayLinks[x]].getBatteryVoltage()) 
 							+ " V\nBattery Current: " + formatDouble(rovers[HUDDisplayLinks[x]].getBatteryCurrent()) 
-							+ " A\n\nMotor Current FL: " + formatDouble(Math.abs(rovers[HUDDisplayLinks[x]].getMotorCurrent(RoverObject.FL))) 
-							+ " A\nMotor Current FR: " + formatDouble(Math.abs(rovers[HUDDisplayLinks[x]].getMotorCurrent(RoverObject.FR))) 
-							+ " A\nMotor Current BL: " + formatDouble(Math.abs(rovers[HUDDisplayLinks[x]].getMotorCurrent(RoverObject.BL))) 
-							+ " A\nMotor Current BR: " + formatDouble(Math.abs(rovers[HUDDisplayLinks[x]].getMotorCurrent(RoverObject.BR)))
-							+ " A\n\nMotor Voltage FL: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorVoltage(RoverObject.FL))
-							+ " V\nMotor Voltage FR: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorVoltage(RoverObject.FR))
-							+ " V\nMotor Voltage BL: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorVoltage(RoverObject.BL))
-							+ " V\nMotor Voltage BR: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorVoltage(RoverObject.BR)) + " V");
-					TemperatureStatsLbl[x].setText("Motor Temperature FL: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorTemp(RoverObject.FL)) + " *c\n" +
-							"Motor Temperature FR: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorTemp(RoverObject.FR)) +" *c\n" +
-							"Motor Temperature BL: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorTemp(RoverObject.BL)) + " *c\n" +
-							"Motor Temperature BR: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorTemp(RoverObject.BR)) + " *c\n\n" +
+							+ " A\n\nMotor Current FL: " + formatDouble(Math.abs(rovers[HUDDisplayLinks[x]].getMotorCurrent(RoverWheels.FL))) 
+							+ " A\nMotor Current FR: " + formatDouble(Math.abs(rovers[HUDDisplayLinks[x]].getMotorCurrent(RoverWheels.FR))) 
+							+ " A\nMotor Current BL: " + formatDouble(Math.abs(rovers[HUDDisplayLinks[x]].getMotorCurrent(RoverWheels.BL))) 
+							+ " A\nMotor Current BR: " + formatDouble(Math.abs(rovers[HUDDisplayLinks[x]].getMotorCurrent(RoverWheels.BR)))
+							+ " A\n\nMotor Voltage FL: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorVoltage(RoverWheels.FL))
+							+ " V\nMotor Voltage FR: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorVoltage(RoverWheels.FR))
+							+ " V\nMotor Voltage BL: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorVoltage(RoverWheels.BL))
+							+ " V\nMotor Voltage BR: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorVoltage(RoverWheels.BR)) + " V");
+					TemperatureStatsLbl[x].setText("Motor Temperature FL: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorTemp(RoverWheels.FL)) + " *c\n" +
+							"Motor Temperature FR: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorTemp(RoverWheels.FR)) +" *c\n" +
+							"Motor Temperature BL: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorTemp(RoverWheels.BL)) + " *c\n" +
+							"Motor Temperature BR: " + formatDouble(rovers[HUDDisplayLinks[x]].getMotorTemp(RoverWheels.BR)) + " *c\n\n" +
 							"Battery Temperature: " + formatDouble(rovers[HUDDisplayLinks[x]].getBatteryTemperature()) + " *c\n\n" +
 							"Air Temperature: " + formatDouble(Access.getMapTemperatureAtPoint(rovers[HUDDisplayLinks[x]].getLocation())) + "*c");
 					MuteLED[x].setSelected(rovers[HUDDisplayLinks[x]].getLEDisLit("Mute"));
@@ -447,12 +447,12 @@ public class RoverHub extends Panel {
 					RoverNameLbl[x].setText(rovers[standardDisplayLinks[currentPage][x]].getName());
 					SerialHistoryLbl[x].setText(rovers[standardDisplayLinks[currentPage][x]].getSerialHistory());
 					MovementStatsLbl[x].setText("X: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getLocation().getX()) 
-							+ " m\tAngular Spin FL: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getWheelSpeed(RoverObject.FL))) 
+							+ " m\tAngular Spin FL: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getWheelSpeed(RoverWheels.FL))) 
 							+ " deg/s\nY: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getLocation().getY()) 
-							+ " m\tAngluar Spin FR: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getWheelSpeed(RoverObject.FR))) 
+							+ " m\tAngluar Spin FR: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getWheelSpeed(RoverWheels.FR))) 
 							+ " deg/s\nAngle: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getDirection())) 
-							+ " deg\tAngular Spin BL: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getWheelSpeed(RoverObject.BL))) 
-							+ " deg/s\n\tAngular Spin BR: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getWheelSpeed(RoverObject.BR))) 
+							+ " deg\tAngular Spin BL: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getWheelSpeed(RoverWheels.BL))) 
+							+ " deg/s\n\tAngular Spin BR: " + formatDouble(Math.toDegrees(rovers[standardDisplayLinks[currentPage][x]].getWheelSpeed(RoverWheels.BR))) 
 							+ " deg/s\nSpeed: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getSpeed()) 
 							+ " m/s\nVelocity X: " + formatDouble(Math.cos(rovers[standardDisplayLinks[currentPage][x]].getDirection()) * rovers[standardDisplayLinks[currentPage][x]].getSpeed()) 
 							+ " m/s\tIncline: " + formatDouble(Math.toDegrees(Access.getMapInclineAtPoint(rovers[standardDisplayLinks[currentPage][x]].getLocation(), rovers[standardDisplayLinks[currentPage][x]].getDirection())))
@@ -468,18 +468,18 @@ public class RoverHub extends Panel {
 							+ " C\nBattery CP Charge: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getBatterCPCharge())
 							+ " C\nBattery Voltage: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getBatteryVoltage()) 
 							+ " V\nBattery Current: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getBatteryCurrent()) 
-							+ " A\n\nMotor Current FL: " + formatDouble(Math.abs(rovers[standardDisplayLinks[currentPage][x]].getMotorCurrent(RoverObject.FL))) 
-							+ " A\nMotor Current FR: " + formatDouble(Math.abs(rovers[standardDisplayLinks[currentPage][x]].getMotorCurrent(RoverObject.FR))) 
-							+ " A\nMotor Current BL: " + formatDouble(Math.abs(rovers[standardDisplayLinks[currentPage][x]].getMotorCurrent(RoverObject.BL))) 
-							+ " A\nMotor Current BR: " + formatDouble(Math.abs(rovers[standardDisplayLinks[currentPage][x]].getMotorCurrent(RoverObject.BR)))
-							+ " A\n\nMotor Voltage FL: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorVoltage(RoverObject.FL))
-							+ " V\nMotor Voltage FR: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorVoltage(RoverObject.FR))
-							+ " V\nMotor Voltage BL: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorVoltage(RoverObject.BL))
-							+ " V\nMotor Voltage BR: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorVoltage(RoverObject.BR)) + " V");
-					TemperatureStatsLbl[x].setText("Motor Temperature FL: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorTemp(RoverObject.FL)) + " *c\n" +
-							"Motor Temperature FR: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorTemp(RoverObject.FR)) +" *c\n" +
-							"Motor Temperature BL: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorTemp(RoverObject.BL)) + " *c\n" +
-							"Motor Temperature BR: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorTemp(RoverObject.BR)) + " *c\n\n" +
+							+ " A\n\nMotor Current FL: " + formatDouble(Math.abs(rovers[standardDisplayLinks[currentPage][x]].getMotorCurrent(RoverWheels.FL))) 
+							+ " A\nMotor Current FR: " + formatDouble(Math.abs(rovers[standardDisplayLinks[currentPage][x]].getMotorCurrent(RoverWheels.FR))) 
+							+ " A\nMotor Current BL: " + formatDouble(Math.abs(rovers[standardDisplayLinks[currentPage][x]].getMotorCurrent(RoverWheels.BL))) 
+							+ " A\nMotor Current BR: " + formatDouble(Math.abs(rovers[standardDisplayLinks[currentPage][x]].getMotorCurrent(RoverWheels.BR)))
+							+ " A\n\nMotor Voltage FL: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorVoltage(RoverWheels.FL))
+							+ " V\nMotor Voltage FR: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorVoltage(RoverWheels.FR))
+							+ " V\nMotor Voltage BL: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorVoltage(RoverWheels.BL))
+							+ " V\nMotor Voltage BR: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorVoltage(RoverWheels.BR)) + " V");
+					TemperatureStatsLbl[x].setText("Motor Temperature FL: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorTemp(RoverWheels.FL)) + " *c\n" +
+							"Motor Temperature FR: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorTemp(RoverWheels.FR)) +" *c\n" +
+							"Motor Temperature BL: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorTemp(RoverWheels.BL)) + " *c\n" +
+							"Motor Temperature BR: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getMotorTemp(RoverWheels.BR)) + " *c\n\n" +
 							"Battery Temperature: " + formatDouble(rovers[standardDisplayLinks[currentPage][x]].getBatteryTemperature()) + " *c\n\n" +
 							"Air Temperature: " + formatDouble(Access.getMapTemperatureAtPoint(rovers[standardDisplayLinks[currentPage][x]].getLocation())) + "*c");
 					MuteLED[x].setSelected(rovers[standardDisplayLinks[currentPage][x]].getLEDisLit("Mute"));

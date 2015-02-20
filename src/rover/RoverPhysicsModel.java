@@ -3,14 +3,17 @@ package rover;
 import java.io.Serializable;
 
 import objects.DecimalPoint;
+import objects.ThreadTimer;
 import wrapper.Access;
+import wrapper.Globals;
 
 public class RoverPhysicsModel implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final int FL = 0, BL = 1, BR = 2, FR = 3; // identifiers on wheels
-
+	private final int FL = 0, FR = 1, BL = 2, BR = 3;
+	
+	private String roverName;
 	public final double time_step = 0.01; // time step of physics, in seconds
 	
 	private final double wheel_radius = 0.0476; //m
@@ -38,7 +41,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	private final double capacitance_cp = 0.2; //F
 	private final double resistance_s = 0.01; //Ohm
 	private final double resistance_parasite = 100000000; //Ohm
-	private final double battery_max_charge = 140000; //C
+	private double battery_max_charge = 140000; //C
 	
 	private final double battery_heat_transfer = 10; //J/s/*c
 	private final double battery_thermal_cap = 170; //J/K
@@ -77,7 +80,32 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	
 	public RoverPhysicsModel() {}
 	
-	public void excecute(String name) throws Exception {
+	public void initalizeConditions(String name, double bat_charge, double temp){
+		roverName = name;
+		battery_charge = bat_charge;
+		battery_max_charge = bat_charge;
+		battery_temperature = temp;
+		winding_temp = new double[] { temp, temp, temp, temp };
+		motor_temp = new double[] { temp, temp, temp, temp };
+	}
+	
+	public void start(){
+		new ThreadTimer((int) (time_step*1000), new Runnable(){
+			public void run(){
+				try {
+					excecute();
+					//System.out.println(name + "-physics\t" + Globals.TimeMillis);
+					//RoverEvents.updateStats();
+				}
+				catch (Exception e){
+					Globals.reportError("RoverDriveModel", "execute", e);
+				}
+			}
+		},
+		ThreadTimer.FOREVER, roverName+"-physics");
+	}
+	
+	public void excecute() throws Exception {
 		// Motor Currents, based on voltage
 		motor_current[FL] += ( motor_power[FL]*motor_states[FL]/255.0*battery_voltage - motor_voltage_transform*wheel_speed[FL] - motor_current[FL]*motor_resistance) / motor_inductance * time_step;
 		motor_current[FR] += ( motor_power[FR]*motor_states[FR]/255.0*battery_voltage - motor_voltage_transform*wheel_speed[FR] - motor_current[FR]*motor_resistance) / motor_inductance * time_step;
@@ -127,7 +155,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
 		direction += angular_velocity*time_step;
 		// report new location to map
-		Access.updateRoverLocation(name, location, direction);
+		Access.updateRoverLocation(roverName, location, direction);
 		
 		//Determining the current of the battery and the change in the stored charge
 		if (motor_current[FL]*motor_states[FL] <= 0){
@@ -302,30 +330,30 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		return motor_power[motor];
 	}
 
-	public void setMotor_power(int motor, int motor_power) {
+	public void setMotorPower(RoverWheels motor, int motor_power) {
 		if (motor_power < 0){
 			motor_power = 0;
 		}
 		else if (motor_power > 255){
 			motor_power = 255;
 		}
-		this.motor_power[motor] = motor_power;
+		this.motor_power[motor.getValue()] = motor_power;
 	}
 
-	public int[] getMotor_states() {
+	public int[] getMotorStates() {
 		return motor_states;
 	}
 
-	public void setMotor_states(int wheel, int motor_states) {
-		this.motor_states[wheel] = motor_states;
+	public void setMotorState(RoverWheels wheel, MotorState state) {
+		this.motor_states[wheel.getValue()] = state.getValue();
 	}
 
 	public double[] getMotor_current() {
 		return motor_current;
 	}
 	
-	public double getMotor_current(int wheel) {
-		return motor_current[wheel];
+	public double getMotorCurrent(RoverWheels wheel) {
+		return motor_current[wheel.getValue()];
 	}
 
 	public DecimalPoint getLocation() {
@@ -344,7 +372,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		this.direction = direction;
 	}
 
-	public double getFriction_axle() {
+	public double getFrictionAxle() {
 		return friction_axle;
 	}
 
@@ -356,12 +384,12 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		return friction_s;
 	}
 
-	public double[] getWheel_speed() {
+	public double[] getWheelSpeed() {
 		return wheel_speed;
 	}
 	
-	public double getWheel_speed(int wheel) {
-		return wheel_speed[wheel];
+	public double getWheelSpeed(RoverWheels wheel) {
+		return wheel_speed[wheel.getValue()];
 	}
 
 	public double getSOC() {
@@ -376,51 +404,39 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		return slip_acceleration;
 	}
 
-	public double getSlip_velocity() {
+	public double getSlipVelocity() {
 		return slip_velocity;
 	}
 
-	public void setBattery_charge(double battery_charge) {
+	public void setBatteryCharge(double battery_charge) {
 		this.battery_charge = battery_charge;
 	}
-
-	public void setBattery_temperature(double battery_temperature) {
-		this.battery_temperature = battery_temperature;
-	}
-
-	public void setMotor_temp(int motor, double motor_temp) {
-		this.motor_temp[motor] = motor_temp;
-	}
 	
-	public double getMotor_temp(int motor){
-		return this.motor_temp[motor];
+	public double getMotorTemp(RoverWheels motor){
+		return this.motor_temp[motor.getValue()];
 	}
 
-	public double getBattery_voltage() {
+	public double getBatteryVoltage() {
 		return battery_voltage;
 	}
 
-	public double[] getWinding_temp() {
+	public double[] getWindingTemp() {
 		return winding_temp;
 	}
 
-	public void setWinding_temp(double[] winding_temp) {
-		this.winding_temp = winding_temp;
-	}
-
-	public double[] getMotor_temp() {
+	public double[] getMotorTemp() {
 		return motor_temp;
 	}
 
-	public double getBattery_charge() {
+	public double getBatteryCharge() {
 		return battery_charge;
 	}
 
-	public double getBattery_current() {
+	public double getBatteryCurrent() {
 		return battery_current;
 	}
 
-	public double getAngular_velocity() {
+	public double getAngularVelocity() {
 		return angular_velocity;
 	}
 
@@ -428,15 +444,15 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		return acceleration;
 	}
 
-	public double getAngular_acceleration() {
+	public double getAngularAcceleration() {
 		return angular_acceleration;
 	}
 
-	public void setMotor_power(int[] motor_power) {
+	public void setMotorPower(int[] motor_power) {
 		this.motor_power = motor_power;
 	}
 
-	public double getBattery_temperature() {
+	public double getBatteryTemperature() {
 		return battery_temperature;
 	}
 

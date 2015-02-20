@@ -6,19 +6,15 @@ import java.io.Serializable;
 import objects.DecimalPoint;
 import objects.Map;
 import objects.ThreadTimer;
-import wrapper.Access;
 import wrapper.Globals;
 
 public class RoverObject implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	
-	public static final int FORWARD = 1, BACKWARD = -1, RELEASE = 0; // possible motor states
-	public static final int FL = 0, BL = 1, BR = 2, FR = 3; // identifiers on wheels
 
 	private String name;
 	private String IDcode;
-	private RoverPhysicsModel params;
+	private RoverPhysicsModel physics;
 	private RoverAutonomusCode autoCode;
 	
 	private boolean connected = false; // Can the ground station hear/talk to us
@@ -66,16 +62,11 @@ public class RoverObject implements Serializable {
 	public RoverObject(String name, String ID, RoverPhysicsModel param, RoverAutonomusCode code, DecimalPoint loc, double dir, double temp){
 		this.name = name;
 		IDcode = ID;
-		params = param;
-		params.setBattery_charge(params.getbattery_max_charge());
+		physics = param;
 		autoCode = code;
-		params.setLocation(loc);
-		params.setDirection(dir);
-		params.setBattery_temperature(temp);
-		params.setWinding_temp(new double[] { temp, temp, temp, temp });
-		for (int i = 0; i < 4; i++){
-			params.setMotor_temp(i, temp);
-		}
+		physics.initalizeConditions(name, physics.getbattery_max_charge(), temp);
+		physics.setLocation(loc);
+		physics.setDirection(dir);
 		LEDs.add("Mute", false);
 		LEDs.add("Instructions", false);
 		LEDs.add("Autonomus", false);
@@ -89,19 +80,7 @@ public class RoverObject implements Serializable {
 			}
 		},
 		ThreadTimer.FOREVER, name+"-code");
-		new ThreadTimer((int) (params.time_step*1000), new Runnable(){
-			public void run(){
-				try {
-					params.excecute(name);
-					//System.out.println(name + "-physics\t" + Globals.TimeMillis);
-					//RoverEvents.updateStats();
-				}
-				catch (Exception e){
-					Globals.reportError("RoverDriveModel", "execute", e);
-				}
-			}
-		},
-		ThreadTimer.FOREVER, name+"-physics");
+		physics.start();
 		timeOfLastCmd = Globals.TimeMillis;
 	}
 	
@@ -466,26 +445,26 @@ public class RoverObject implements Serializable {
 				
 				String cmd = autoCode.nextCommand(
 						Globals.TimeMillis,
-						params.getLocation(),
-						params.getDirection(),
-						getAcceleration(),
-						getAngularAcceleration(),
-						getWheelSpeed(FL),
-						getWheelSpeed(FR),
-						getWheelSpeed(BL),
-						getWheelSpeed(BR),
-						getMotorCurrent(FL),
-						getMotorCurrent(FR),
-						getMotorCurrent(BL),
-						getMotorCurrent(BR),
-						getMotorTemp(FL),
-						getMotorTemp(FR),
-						getMotorTemp(BL),
-						getMotorTemp(BR),
-						getBatteryVoltage(),
-						getBatteryCurrent(),
-						getBatteryTemperature(),
-						getBatteryCharge()
+						physics.getLocation(),
+						physics.getDirection(),
+						physics.getAcceleration(),
+						physics.getAngularAcceleration(),
+						physics.getWheelSpeed(RoverWheels.FL),
+						physics.getWheelSpeed(RoverWheels.FR),
+						physics.getWheelSpeed(RoverWheels.BL),
+						physics.getWheelSpeed(RoverWheels.BR),
+						physics.getMotorCurrent(RoverWheels.FL),
+						physics.getMotorCurrent(RoverWheels.FR),
+						physics.getMotorCurrent(RoverWheels.BL),
+						physics.getMotorCurrent(RoverWheels.BR),
+						physics.getMotorTemp(RoverWheels.FL),
+						physics.getMotorTemp(RoverWheels.FR),
+						physics.getMotorTemp(RoverWheels.BL),
+						physics.getMotorTemp(RoverWheels.BR),
+						physics.getBatteryVoltage(),
+						physics.getBatteryCurrent(),
+						physics.getBatteryTemperature(),
+						physics.getBatteryCharge()
 				);
 				// switch all known commands
 				if (strcmp(cmd, "") == 0){ /*Do Nothing*/ }
@@ -573,7 +552,23 @@ public class RoverObject implements Serializable {
 			    		power = 255;
 			    	}
 			    	if (motor >= 0 && motor < 4){
-			    		params.setMotor_power(motor, power);
+			    		RoverWheels wheel;
+			    		switch (motor){
+			    		case 0:
+			    			wheel = RoverWheels.FL;
+			    			break;
+			    		case 1:
+			    			wheel = RoverWheels.FR;
+			    			break;
+			    		case 2:
+			    			wheel = RoverWheels.BL;
+			    			break;
+			    		case 3:
+			    		default:
+			    			wheel = RoverWheels.BR;
+			    			break;
+			    		}
+			    		physics.setMotorPower(wheel, power);
 			    	}
 			    }
 				
@@ -670,66 +665,66 @@ public class RoverObject implements Serializable {
 	
 	// how to move the motors for driving
 	private void driveForward(){
-		setMotorState(FL, FORWARD);
-		setMotorState(BL, FORWARD);
-		setMotorState(BR, FORWARD);
-		setMotorState(FR, FORWARD);
+		physics.setMotorState(RoverWheels.FL, MotorState.FORWARD);
+		physics.setMotorState(RoverWheels.BL, MotorState.FORWARD);
+		physics.setMotorState(RoverWheels.BR, MotorState.FORWARD);
+		physics.setMotorState(RoverWheels.FR, MotorState.FORWARD);
 	}
 	
 	private void driveBackward(){
-		setMotorState(FL, BACKWARD);
-		setMotorState(BL, BACKWARD);
-		setMotorState(BR, BACKWARD);
-		setMotorState(FR, BACKWARD);
+		physics.setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+		physics.setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+		physics.setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+		physics.setMotorState(RoverWheels.FR, MotorState.BACKWARD);
 	}
 	
 	private void driveSpinCW(){
-		setMotorState(FL, FORWARD);
-		setMotorState(BL, FORWARD);
-		setMotorState(BR, BACKWARD);
-		setMotorState(FR, BACKWARD);
+		physics.setMotorState(RoverWheels.FL, MotorState.FORWARD);
+		physics.setMotorState(RoverWheels.BL, MotorState.FORWARD);
+		physics.setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+		physics.setMotorState(RoverWheels.FR, MotorState.BACKWARD);
 	}
 	
 	private void driveSpinCCW(){
-		setMotorState(FL, BACKWARD);
-		setMotorState(BL, BACKWARD);
-		setMotorState(BR, FORWARD);
-		setMotorState(FR, FORWARD);
+		physics.setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+		physics.setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+		physics.setMotorState(RoverWheels.BR, MotorState.FORWARD);
+		physics.setMotorState(RoverWheels.FR, MotorState.FORWARD);
 	}
 	
 	private void driveStop(){
-		setMotorState(FL, RELEASE);
-		setMotorState(BL, RELEASE);
-		setMotorState(BR, RELEASE);
-		setMotorState(FR, RELEASE);
+		physics.setMotorState(RoverWheels.FL, MotorState.RELEASE);
+		physics.setMotorState(RoverWheels.BL, MotorState.RELEASE);
+		physics.setMotorState(RoverWheels.BR, MotorState.RELEASE);
+		physics.setMotorState(RoverWheels.FR, MotorState.RELEASE);
 	}
 	
 	private void driveTurnFL(){
-		setMotorState(FL, RELEASE);
-		setMotorState(BL, RELEASE);
-		setMotorState(BR, FORWARD);
-		setMotorState(FR, FORWARD);
+		physics.setMotorState(RoverWheels.FL, MotorState.RELEASE);
+		physics.setMotorState(RoverWheels.BL, MotorState.RELEASE);
+		physics.setMotorState(RoverWheels.BR, MotorState.FORWARD);
+		physics.setMotorState(RoverWheels.FR, MotorState.FORWARD);
 	}
 	
 	private void driveTurnFR(){
-		setMotorState(FL, FORWARD);
-		setMotorState(BL, FORWARD);
-		setMotorState(BR, RELEASE);
-		setMotorState(FR, RELEASE);
+		physics.setMotorState(RoverWheels.FL, MotorState.FORWARD);
+		physics.setMotorState(RoverWheels.BL, MotorState.FORWARD);
+		physics.setMotorState(RoverWheels.BR, MotorState.RELEASE);
+		physics.setMotorState(RoverWheels.FR, MotorState.RELEASE);
 	}
 	
 	private void driveTurnBL(){
-		setMotorState(FL, RELEASE);
-		setMotorState(BL, RELEASE);
-		setMotorState(BR, BACKWARD);
-		setMotorState(FR, BACKWARD);
+		physics.setMotorState(RoverWheels.FL, MotorState.RELEASE);
+		physics.setMotorState(RoverWheels.BL, MotorState.RELEASE);
+		physics.setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+		physics.setMotorState(RoverWheels.FR, MotorState.BACKWARD);
 	}
 	
 	private void driveTurnBR(){
-		setMotorState(FL, BACKWARD);
-		setMotorState(BL, BACKWARD);
-		setMotorState(BR, RELEASE);
-		setMotorState(FR, RELEASE);
+		physics.setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+		physics.setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+		physics.setMotorState(RoverWheels.BR, MotorState.RELEASE);
+		physics.setMotorState(RoverWheels.FR, MotorState.RELEASE);
 	}
 	
 	// set up waiting for a response
@@ -864,14 +859,8 @@ public class RoverObject implements Serializable {
 	
 //TODO PHYSCIS STARTS HERE *****************************************************************************************************************************************************************************************************
 	
-	private void setMotorPower(int which, int power){ // set power to a motor
-		params.setMotor_power(which, power);
-	}
-	
-	private void setMotorState(int which, int state){ // set a state to a motor
-		if (Math.abs(state) <= 1){
-			params.setMotor_states(which, state);
-		}
+	private void setMotorPower(RoverWheels which, int power){ // set power to a motor
+		physics.setMotorPower(which, power);
 	}
 	
 	public void addToSerialHistory(String out){
@@ -895,91 +884,79 @@ public class RoverObject implements Serializable {
 	}
 	
 	public RoverPhysicsModel getParameters(){
-		return params;
+		return physics;
 	}
 	
 	public DecimalPoint getLocation(){
-		return params.getLocation();
+		return physics.getLocation();
 	}
 	
 	public double getDirection(){
-		return params.getDirection();
+		return physics.getDirection();
 	}
 	
 	public double getBatteryVoltage(){
-		return params.getBattery_voltage();
+		return physics.getBatteryVoltage();
 	}
 
 	public double getBatteryCharge(){
-		return params.getBattery_charge();
+		return physics.getBatteryCharge();
 	}
 	
 	public double getBatterCPCharge(){
-		return params.getBattery_cp_charge();
+		return physics.getBattery_cp_charge();
 	}
 	
 	public double getSOC(){
-		return params.getSOC();
+		return physics.getSOC();
 	}
 	
 	public double getBatteryCurrent(){
-		return params.getBattery_current();
+		return physics.getBatteryCurrent();
 	}
 
 	public double getSpeed(){
-		return params.getSpeed();
+		return physics.getSpeed();
 	}
 
 	public double getAngularVelocity(){
-		return params.getAngular_velocity();
+		return physics.getAngularVelocity();
 	}
 	
 	public double getSlipVelocity(){
-		return params.getSlip_velocity();
+		return physics.getSlipVelocity();
 	}
 
 	public double getAcceleration(){
-		return params.getAcceleration();
+		return physics.getAcceleration();
 	}
 
 	public double getAngularAcceleration(){
-		return params.getAngular_acceleration();
+		return physics.getAngularAcceleration();
 	}
 	
 	public double getSlipAcceleration(){
-		return params.getSlip_acceleration();
+		return physics.getSlip_acceleration();
 	}
 
-	public double getWheelSpeed(int which){
-		if (0 <= which && which < 4){
-			return params.getWheel_speed()[which];
-		}
-		return 0;
+	public double getWheelSpeed(RoverWheels which){
+		return physics.getWheelSpeed()[which.getValue()];
 	}
 	
-	public double getMotorCurrent(int which){
-		if (0 <= which && which < 4){
-			return params.getMotor_current()[which];
-		}
-		return 0;
+	public double getMotorCurrent(RoverWheels which){
+		return physics.getMotor_current()[which.getValue()];
 	}
 	
-	public double getMotorVoltage(int which){
-		if (0 <= which && which < 4){
-			return (params.getMotor_power()[which]/255.0)*params.getBattery_voltage()*params.getMotor_states()[which];
-		}
-		return 0;
+	public double getMotorVoltage(RoverWheels which){
+		return (physics.getMotor_power()[which.getValue()]/255.0)*physics.getBatteryVoltage()*physics.getMotorStates()[which.getValue()];
 	}
 	
 	public double getBatteryTemperature(){
-		return params.getBattery_temperature();
+		return physics.getBatteryTemperature();
 	}
 	
-	public double getMotorTemp(int which){
-		if (0 <= which && which < 4){
-			return params.getMotor_temp(which);
-		}
-		return 0;
+	public double getMotorTemp(RoverWheels which){
+		return physics.getMotorTemp(which);
 	}
 	
 }
