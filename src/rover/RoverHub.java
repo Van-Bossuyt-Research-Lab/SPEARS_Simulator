@@ -17,7 +17,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
-import objects.ThreadTimer;
+import objects.SyncronousThread;
 import visual.LEDIndicator;
 import visual.Panel;
 import wrapper.Access;
@@ -329,11 +329,11 @@ public class RoverHub extends Panel {
 	}
 	
 	public void start(){
-		ThreadTimer updateTimer = new ThreadTimer(500, new Runnable(){
+		SyncronousThread updateTimer = new SyncronousThread(500, new Runnable(){
 			public void run(){
 				updateDisplays();
 			}
-		}, ThreadTimer.FOREVER, "Rover Hub Update");
+		}, SyncronousThread.FOREVER, "Rover Hub Update");
 		int x = 0;
 		while (x < rovers.length){
 			rovers[x].start();

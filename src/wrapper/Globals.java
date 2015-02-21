@@ -1,13 +1,12 @@
 package wrapper;
 
 import java.util.Random;
-
+import objects.FreeThread;
 import objects.Map;
 import objects.Queue;
 import objects.ThreadItem;
-import objects.ThreadTimer;
+import objects.SyncronousThread;
 import visual.AccelPopUp;
-import visual.Form;
 
 public class Globals {
 
@@ -19,7 +18,6 @@ public class Globals {
 	private static final double time_accelerant = 10;
 	private static double timeScale = 1.0;
 	public static long TimeMillis = 0;
-	private static ThreadTimer milliTimer;
 	
 	private static Random rnd = new Random();
 	private static int access_key = "qwert".hashCode();
@@ -39,12 +37,13 @@ public class Globals {
 		}
 		Access.INTERFACE.clock.start();
 		ThreadItem.offset = 0;
-		milliTimer = new ThreadTimer(0, new Runnable(){
+		new FreeThread(0, new Runnable(){
 			public void run(){
 				long end = System.nanoTime() + (long)(1000000 / getTimeScale());
 				while (System.nanoTime() < end) {}
+				threadCheckIn("milli-clock");
 			}
-		}, ThreadTimer.FOREVER, "milli-clock", true);
+		}, SyncronousThread.FOREVER, "milli-clock", true);
 		TimeMillis++;
 		Object[] keys = threads.getKeys();
 		int x = 0;
@@ -165,6 +164,7 @@ public class Globals {
 		return Math.round((measurement + deviation)*1000)/1000;
 	}
 	
+	@SuppressWarnings("unused")
 	private static void printBuffers(){
 		int x = 0;
 		while (x < SerialBuffers.length){
@@ -198,20 +198,18 @@ public class Globals {
 	public static void setUpAcceleratedRun(int runtime){
 		exitTime = runtime;
 		informer = new AccelPopUp(exitTime, (int) (exitTime/time_accelerant*3/60000));
-		ThreadTimer update = new ThreadTimer(1000, new Runnable(){
+		new FreeThread(1000, new Runnable(){
 			public void run(){
 				informer.update((int)TimeMillis);
 				if (TimeMillis >= exitTime){
-					Access.CODE.GUI.exit();
+					Admin.GUI.exit();
 				}
 			}
-		}, ThreadTimer.FOREVER, "popup-update", false);
-		update.deSync();
-		update.start();
+		}, FreeThread.FOREVER, "accel-pop-up");
 	}
 	
-	public static void registerNewThread(String name, int delay){
-		threads.add(name, new ThreadItem(name, delay, TimeMillis));
+	public static void registerNewThread(String name, int delay, SyncronousThread thread){
+		threads.add(name, new ThreadItem(name, delay, TimeMillis, thread));
 	}
 	
 	public static void checkOutThread(String name){
@@ -234,7 +232,9 @@ public class Globals {
 					continue;
 				}
 				if (!threads.get(key).isFinished()){
+					System.out.println(key + " - " + threads.get(key).getState());
 					milliDone = true;
+					//threads.get(key).shakeThread();
 					return;
 				}
 			}
@@ -262,7 +262,7 @@ public class Globals {
 			threads.get(name).equals(null);
 			String rtnname = name +"-delay";
 			ThreadItem.offset = 0;
-			registerNewThread(rtnname, time);
+			registerNewThread(rtnname, time, null);
 			threads.get(name).suspend();
 			return rtnname;
 		}
@@ -277,15 +277,18 @@ public class Globals {
 		}
 	}
 	
+	public static void threadIsRunning(String name){
+		try {
+			threads.get(name).setRunning(true);
+		} catch (NullPointerException e) {}
+	} 
+	
 	public static void threadDelayComplete(String name){
 		checkOutThread(name+"-delay");
 		threads.get(name).unSuspend();
 	}
 	
 	public static boolean getThreadRunPermission(String name){
-		if (name.equals("milli-clock")){
-			return true;
-		}
 		try {
 			if (threads.get(name).hasPermission() && ready && begun){
 				threads.get(name).revokePermission();

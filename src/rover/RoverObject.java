@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 import objects.DecimalPoint;
 import objects.Map;
-import objects.ThreadTimer;
+import objects.SyncronousThread;
 import wrapper.Globals;
 
 public class RoverObject implements Serializable {
@@ -73,13 +73,13 @@ public class RoverObject implements Serializable {
 	}
 	
 	public void start(){
-		new ThreadTimer(100, new Runnable(){
+		new SyncronousThread(100, new Runnable(){
 			public void run(){
 				//System.out.println(name + "-CODE\t" + Globals.TimeMillis);
 				excecuteCode();
 			}
 		},
-		ThreadTimer.FOREVER, name+"-code");
+		SyncronousThread.FOREVER, name+"-code");
 		physics.start();
 		timeOfLastCmd = Globals.TimeMillis;
 	}
@@ -103,7 +103,9 @@ public class RoverObject implements Serializable {
 			}
 			
 			if (Globals.RFAvailable(IDcode) > 1) { // if there is a message
+				System.out.println("available!");
 				delay(500);
+				System.out.println("done waiting!");
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
 															// go is set to false if the first read is not IDcode 
@@ -774,10 +776,6 @@ public class RoverObject implements Serializable {
 			return false;
 		}
 	}
-	
-	private float ln(float a){ // natural log of a+1
-		return (float) (a - (a*a)/2.0 + (a*a*a)/3.0 - (a*a*a*a)/4.0 + (a*a*a*a*a)/5.0 - (a*a*a*a*a*a)/6);
-	}
 
 	private void delay(int length) { //put the thread to sleep for a bit
 		String newname = Globals.delayThread(Thread.currentThread().getName(), length);
@@ -806,44 +804,6 @@ public class RoverObject implements Serializable {
 		return 1;
 	}
 	
-	private char[] strcat(char[] first, char[] second){
-		char[] out = new char[first.length + second.length - 1];
-		int x = 0;
-		while (x < first.length - 1){
-			out[x] = first[x];
-			x++;
-		}
-		while (x < out.length){
-			out[x] = second[x-first.length];
-			x++;
-		}
-		return out;
-	}
-	
-	private char[] strcat(char first, char[] second){
-		char[] out = new char[second.length + 1];
-		out[0] = first;
-		int x = 1;
-		while (x < out.length){
-			out[x] = second[x-1];
-			x++;
-		}
-		return out;
-	}
-	
-	private char[] strcat(char[] first, char second){
-		char[] out = new char[first.length + 1];
-		int x = 0;
-		while (x < first.length-1){
-			out[x] = first[x];
-			x++;
-		}
-		out[x] = second;
-		x++;
-		out[x] = '\0';
-		return out;
-	}
-	
 	private char[] strcat(char first, char second){
 		return new char[] { first, second, '\0' };
 	}
@@ -858,10 +818,6 @@ public class RoverObject implements Serializable {
 	}
 	
 //TODO PHYSCIS STARTS HERE *****************************************************************************************************************************************************************************************************
-	
-	private void setMotorPower(RoverWheels which, int power){ // set power to a motor
-		physics.setMotorPower(which, power);
-	}
 	
 	public void addToSerialHistory(String out){
 		serialHistory += out + "\t\t\t" + Globals.TimeMillis + "\n";

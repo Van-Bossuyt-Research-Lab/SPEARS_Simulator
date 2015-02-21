@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 import wrapper.Globals;
 import objects.Map;
-import objects.ThreadTimer;
+import objects.SyncronousThread;
 
 public class SatelliteObject implements Serializable {
 
@@ -45,18 +45,19 @@ public class SatelliteObject implements Serializable {
 	}
 	
 	public void start(){
-		new ThreadTimer(100, new Runnable(){
+		new SyncronousThread(100, new Runnable(){
 			public void run(){
 				excecuteCode();
 			}
 		},
-		ThreadTimer.FOREVER, name+"-code");
-		new ThreadTimer((int) (time_step*1000), new Runnable(){
-			public void run(){
-				excecutePhysics();
-			}
-		},
-		ThreadTimer.FOREVER, name+"-physics");
+		SyncronousThread.FOREVER, name+"-code");
+		//TODO Satellite Physics
+		//new SyncronousThread((int) (time_step*1000), new Runnable(){
+		//	public void run(){
+		//		excecutePhysics();
+		//	}
+		//},
+		//SyncronousThread.FOREVER, name+"-physics");
 	}
 	
 	public String getName(){
@@ -70,7 +71,9 @@ public class SatelliteObject implements Serializable {
 	public void excecuteCode(){
 		try {
 			if (Globals.RFAvailable(IDcode) > 1) { // if there is a message
+				System.out.println("Available - SAT");
 				delay(500);
+				System.out.println("Done delaying!");
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0) { // if the message is for us and are we allowed to read it
 					delay(500);
@@ -294,14 +297,12 @@ public class SatelliteObject implements Serializable {
 		  delay(2000);
 		  int hold = data.read();
 		  int index;
-		  int x = 0;
 		  while (hold != -1) { // while there still is data
 			  index = 0;
 			  while (index < 60 && hold != -1) {
 				  Globals.writeToSerial((byte) hold, IDcode); // send data in 60 byte chunks
 				  hold = data.read();
 				  index++;
-				  x++;
 			  }  
 			  delay(1000);
 		  }
@@ -315,7 +316,9 @@ public class SatelliteObject implements Serializable {
 	
 	private void delay(int length) { // sleep thread for a bit
 		String newname = Globals.delayThread(Thread.currentThread().getName(), length);
-		while (!Globals.getThreadRunPermission(newname)) {}
+		while (!Globals.getThreadRunPermission(newname)) {
+			System.out.println("delaying");
+		}
 		Globals.threadDelayComplete(Thread.currentThread().getName());
 	}
 
@@ -350,7 +353,6 @@ public class SatelliteObject implements Serializable {
 	private int strcmp(char[] first, String second){ // compare to strings/char[]
 		try {
 			char[] sec = second.toCharArray();
-			int count = 0;
 			int x = 0;
 			while (first[x] != '\0'){
 				if (first[x] != sec[x]){
@@ -377,44 +379,6 @@ public class SatelliteObject implements Serializable {
 		return out;
 	}
 	
-	private char[] strcat(char[] first, char[] second){
-		char[] out = new char[first.length + second.length - 1];
-		int x = 0;
-		while (x < first.length - 1){
-			out[x] = first[x];
-			x++;
-		}
-		while (x < out.length){
-			out[x] = second[x-first.length];
-			x++;
-		}
-		return out;
-	}
-	
-	private char[] strcat(char first, char[] second){
-		char[] out = new char[second.length + 1];
-		out[0] = first;
-		int x = 1;
-		while (x < out.length){
-			out[x] = second[x-1];
-			x++;
-		}
-		return out;
-	}
-	
-	private char[] strcat(char[] first, char second){
-		char[] out = new char[first.length + 1];
-		int x = 0;
-		while (x < first.length-1){
-			out[x] = first[x];
-			x++;
-		}
-		out[x] = second;
-		x++;
-		out[x] = '\0';
-		return out;
-	}
-	
 	private char[] strcat(char first, char second){
 		return new char[] { first, second, '\0' };
 	}
@@ -425,8 +389,7 @@ public class SatelliteObject implements Serializable {
 	
 	public String getSerialHistory(){
 		return serialHistory;
-	}
-	
+	}	
 	
 	private void excecutePhysics(){
 		//TODO don't fall out of the sky

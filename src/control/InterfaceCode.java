@@ -9,7 +9,8 @@ import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-import objects.ThreadTimer;
+import objects.FreeThread;
+import objects.SyncronousThread;
 import objects.ZDate;
 import objects.Map;
 import wrapper.Access;
@@ -21,7 +22,7 @@ public class InterfaceCode {
     private File logFile;
 	private String connectedPort = "COM13";
 	private ZDate DateTime;
-	public ThreadTimer clock;
+	public SyncronousThread clock;
 	private String IDcode = "g";
 	
 	private int connectionTime = 0;
@@ -43,7 +44,7 @@ public class InterfaceCode {
 	
 	private boolean listening = false;
 	private String listenFor;
-	private ThreadTimer listenTimer;
+	private SyncronousThread listenTimer;
 	private Runnable listenAction;
 	private Runnable listenFail;
 	private String[] receivedFiles = new String[0];
@@ -63,7 +64,7 @@ public class InterfaceCode {
 	public InterfaceCode(){
 		DateTime = new ZDate();
 		DateTime.setFormat("[hh:mm:ss]");
-		clock = new ThreadTimer(1000, new Runnable(){
+		clock = new SyncronousThread(1000, new Runnable(){
 			public void run(){
 				DateTime.advanceClock();
 				if (Connected){
@@ -78,17 +79,17 @@ public class InterfaceCode {
 					Admin.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected");
 				}
 			}
-		}, ThreadTimer.FOREVER, "clock", false);
+		}, SyncronousThread.FOREVER, "clock", false);
 		initalize();
 	}
 	
 	public static void start(){
 		@SuppressWarnings("unused")
-		ThreadTimer serialCheck = new ThreadTimer(400, new Runnable(){
+		SyncronousThread serialCheck = new SyncronousThread(400, new Runnable(){
 			public void run(){
 				Access.INTERFACE.updateSerialCom();
 			}
-		}, ThreadTimer.FOREVER, "Interface serial");
+		}, SyncronousThread.FOREVER, "Interface serial");
 	}
 	
 	public void initalize(){
@@ -342,7 +343,7 @@ public class InterfaceCode {
 				}
 				if (listening){
 					if (out.equals(listenFor)){
-						new ThreadTimer(0, listenAction, 1, "interface listening");
+						new SyncronousThread(0, listenAction, 1, "interface listening");
 					}
 				}
 				return out;
@@ -372,7 +373,7 @@ public class InterfaceCode {
 				failaction.run();
 			}
 		};
-		listenTimer = new ThreadTimer((secs*1000), listenFail, 1, "listening timer");
+		listenTimer = new SyncronousThread((secs*1000), listenFail, 1, "listening timer");
 	}
 	
 	
@@ -479,7 +480,7 @@ public class InterfaceCode {
 			Admin.GUI.InterfacePnl.RoverSendTxt.setText("");
 		}
 		else {
-			new ThreadTimer(0, new Runnable(){
+			new SyncronousThread(0, new Runnable(){
 				public void run(){
 					(new PopUp()).showConfirmDialog("You must enter a message into the field.", "Message Failed", PopUp.DEFAULT_OPTIONS);
 				}
@@ -546,7 +547,7 @@ public class InterfaceCode {
 	// ACTION BUTTON EDITING
 	
 	public void addRoverBtn(){
-		new ThreadTimer(0, new Runnable(){
+		new SyncronousThread(0, new Runnable(){
 			public void run(){
 				String[] data;
 				boolean go = true;
@@ -610,7 +611,7 @@ public class InterfaceCode {
 	}
 	
 	private void editRover2(final int which){
-		new ThreadTimer(0, new Runnable(){
+		new SyncronousThread(0, new Runnable(){
 			public void run(){
 				String[] data;
 				boolean go = true;
@@ -653,7 +654,7 @@ public class InterfaceCode {
 	}
 	
 	public void addSatBtn(){
-		new ThreadTimer(0, new Runnable(){
+		new SyncronousThread(0, new Runnable(){
 			public void run(){
 				String[] data;
 				boolean go = true;
@@ -717,7 +718,7 @@ public class InterfaceCode {
 	}
 	
 	private void editSat2(final int which){
-		new ThreadTimer(0, new Runnable(){
+		new SyncronousThread(0, new Runnable(){
 			public void run(){
 				String[] data;
 				boolean go = true;
@@ -918,6 +919,7 @@ public class InterfaceCode {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void ReadDataFile(int length){
 		if (receivingFile){
 			try {
@@ -984,7 +986,7 @@ public class InterfaceCode {
 	
 	public void OpenRecievedFiles(){
 		if (receivedFiles.length > 0){
-			new ThreadTimer(0, new Runnable(){
+			new SyncronousThread(0, new Runnable(){
 				public void run(){
 					String[] choices = new String[receivedFiles.length];
 					int x = 0;
@@ -999,7 +1001,7 @@ public class InterfaceCode {
 							File image = new File(receivedFiles[choice]);
 							try {
 								final BufferedImage img = ImageIO.read(image);
-								new ThreadTimer(0, new Runnable(){
+								new SyncronousThread(0, new Runnable(){
 									public void run(){
 										PopUp opane = new PopUp();
 										opane.setCustomButtonOptions(new String[] { "Save", "Close" }, new int[] { 0, 1 });
@@ -1035,7 +1037,7 @@ public class InterfaceCode {
 							break;
 						case "CSV":
 							final String file = receivedFiles[choice];
-							new ThreadTimer(0, new Runnable(){
+							new SyncronousThread(0, new Runnable(){
 								public void run(){
 									int choice = new CSVFrame().OpenCSVFile(file);
 									if (choice == 1){
@@ -1047,6 +1049,7 @@ public class InterfaceCode {
 											try {
 												String data = "";
 												FileReader input = new FileReader(file);
+												@SuppressWarnings("resource")
 												Scanner dataIn = new Scanner(input);
 												while (dataIn.hasNextLine()){
 													data += dataIn.nextLine() + "\n";
@@ -1077,7 +1080,7 @@ public class InterfaceCode {
 			}, 1, "open file 3");
 		}
 		else {
-			new ThreadTimer(0, new Runnable() {
+			new SyncronousThread(0, new Runnable() {
 				public void run(){
 					(new PopUp()).showConfirmDialog("There are no unread files.", "Received Files", PopUp.DEFAULT_OPTIONS);
 				}
@@ -1222,7 +1225,7 @@ public class InterfaceCode {
 			}
 		}
 		else {
-			new ThreadTimer(0, new Runnable(){
+			new SyncronousThread(0, new Runnable(){
 				public void run(){
 					(new PopUp()).showConfirmDialog("You must enter a typed value for the selected parameter parameter.", "Instruction Failed", PopUp.DEFAULT_OPTIONS);
 				}
@@ -1302,7 +1305,7 @@ public class InterfaceCode {
 	}
 	
 	public void addInstructionToList(){
-		new ThreadTimer(0, new Runnable(){
+		new SyncronousThread(0, new Runnable(){
 			public void run(){
 				(new InstrucitonEditor()).open();
 			}
@@ -1354,7 +1357,7 @@ public class InterfaceCode {
 			final String[] finParam = parameters;
 			final String[][] finCommands = commands;
 			final boolean[] finBools = bools;
-			new ThreadTimer(0, new Runnable(){
+			new SyncronousThread(0, new Runnable(){
 				public void run(){
 					(new InstrucitonEditor(true, false, (String)Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedItem(), finParam, finCommands, finBools)).open();
 				}
@@ -1376,7 +1379,7 @@ public class InterfaceCode {
 			final String[] finParam = parameters;
 			final String[][] finCommands = commands;
 			final boolean[] finBools = bools;
-			new ThreadTimer(0, new Runnable(){
+			new SyncronousThread(0, new Runnable(){
 				public void run(){
 					(new InstrucitonEditor(true, false, (String)Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedItem(), finParam, finCommands, finBools)).open();
 				}
@@ -1433,9 +1436,7 @@ public class InterfaceCode {
 	// SUPPORTING METHODS
 	
 	private void runThreadOutOfSync(Runnable action, String name){
-		ThreadTimer todo = new ThreadTimer(0, action, 1, name, false);
-		todo.deSync();
-		todo.start();
+		new FreeThread(0, action, 1, name);
 	}
 	
 	private String buildString(char[] array, int start, int end){

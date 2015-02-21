@@ -16,7 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
-import objects.ThreadTimer;
+import objects.SyncronousThread;
 import rover.RoverObject;
 import visual.LEDIndicator;
 import visual.Panel;
@@ -309,11 +309,11 @@ public class SatelliteHub extends Panel{
 	}
 	
 	public void start(){
-		ThreadTimer updateTimer = new ThreadTimer(500, new Runnable(){
+		SyncronousThread updateTimer = new SyncronousThread(500, new Runnable(){
 			public void run(){
 				updateDisplays();
 			}
-		}, ThreadTimer.FOREVER, "Satellite Hub Update");
+		}, SyncronousThread.FOREVER, "Satellite Hub Update");
 		int x = 0;
 		while (x < satellites.length){
 			satellites[x].start();

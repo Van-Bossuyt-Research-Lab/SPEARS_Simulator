@@ -35,7 +35,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import objects.ThreadTimer;
+import objects.SyncronousThread;
 import visual.ImageButton;
 import visual.Panel;
 import visual.ZList;
@@ -132,7 +132,7 @@ public class InterfacePanel extends Panel{
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				CursorInMuteOptn = false;
-				new ThreadTimer(400, new Runnable(){
+				new SyncronousThread(400, new Runnable(){
 					public void run(){
 						OverrideMuteOptn.setVisible(CursorInMuteOptn);
 					}

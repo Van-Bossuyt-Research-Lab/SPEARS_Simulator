@@ -3,7 +3,7 @@ package rover;
 import java.io.Serializable;
 
 import objects.DecimalPoint;
-import objects.ThreadTimer;
+import objects.SyncronousThread;
 import wrapper.Access;
 import wrapper.Globals;
 
@@ -90,7 +90,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	}
 	
 	public void start(){
-		new ThreadTimer((int) (time_step*1000), new Runnable(){
+		new SyncronousThread((int) (time_step*1000), new Runnable(){
 			public void run(){
 				try {
 					excecute();
@@ -102,7 +102,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 				}
 			}
 		},
-		ThreadTimer.FOREVER, roverName+"-physics");
+		SyncronousThread.FOREVER, roverName+"-physics");
 	}
 	
 	public void excecute() throws Exception {

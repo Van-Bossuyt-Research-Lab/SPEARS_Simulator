@@ -220,7 +220,7 @@ public class InstrucitonEditor extends JDialog {
 			this.setVisible(false);
 		}
 		else {
-			new objects.ThreadTimer( 0, new Runnable(){
+			new objects.SyncronousThread( 0, new Runnable(){
 				public void run(){
 					(new PopUp()).showConfirmDialog("You are missing required information.", "Submit Failed", PopUp.DEFAULT_OPTIONS);
 				}
@@ -233,7 +233,7 @@ public class InstrucitonEditor extends JDialog {
 	}
 	
 	private void AddParameter_Clicked(){
-		new objects.ThreadTimer(0, new Runnable(){
+		new objects.SyncronousThread(0, new Runnable(){
 			public void run(){
 				String name = (new PopUp()).showInputDialog("Parameter Name:", "Add Parameter", PopUp.OK_CANCEL_OPTIONS);
 				if (!name.equals("")){

@@ -6,6 +6,8 @@ import wrapper.Globals;
 
 public class ThreadItem implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+	
 	private String name;
 	private int delay;
 	private long next;
@@ -15,9 +17,12 @@ public class ThreadItem implements Serializable {
 	private boolean complete;
 	private boolean suspended = false;
 	
+	private SyncronousThread thread;
+	
 	public static int offset = 0;
 
-	public ThreadItem(String name, int delay, long start) {
+	public ThreadItem(String name, int delay, long start, SyncronousThread thread) {
+		this.thread = thread;
 		this.name = name;
 		this.delay = delay;
 		next = start + delay + offset;
@@ -42,8 +47,10 @@ public class ThreadItem implements Serializable {
 	
 	public void grantPermission(){
 		permission = true;
-		running = true;
 		complete = false;
+		try {
+			thread.Shake();
+		} catch (Exception e) {}
 	}
 	
 	public void revokePermission(){
@@ -64,6 +71,10 @@ public class ThreadItem implements Serializable {
 	
 	public void unSuspend(){
 		suspended = false;
+	}
+	
+	public void setRunning(boolean b){
+		running = b;
 	}
 	
 	public boolean isFinished(){
@@ -99,6 +110,10 @@ public class ThreadItem implements Serializable {
 		else {
 			return 'w';
 		}
+	}
+
+	public void shakeThread() {
+		thread.Shake();
 	}
 
 	@Override

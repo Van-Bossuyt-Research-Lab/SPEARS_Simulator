@@ -2,15 +2,14 @@ package wrapper;
 
 import java.io.File;
 import java.util.Random;
-
 import control.InterfaceCode;
 import control.PopUp;
 import objects.DecimalPoint;
+import objects.FreeThread;
 import objects.List;
 import objects.Map;
 import objects.Queue;
 import objects.RunConfiguration;
-import objects.ThreadTimer;
 import rover.RoverAutonomusCode;
 import rover.RoverObject;
 import rover.RoverPhysicsModel;
@@ -68,7 +67,7 @@ public class Admin {
 		if (config.mapFromFile){
 			try {
 				if (!config.mapFile.exists()){
-					int a = 1/0;
+					throw new Exception();
 				}
 				GUI.TerrainPnl.HeightMap.loadMap(config.mapFile);
 				Globals.writeToLogFile("Start Up", "Using Map File: " + config.mapFile.getName());
@@ -119,7 +118,7 @@ public class Admin {
 	}
 	
 	public void saveCurrentconfiguration(){
-		ThreadTimer saver = new ThreadTimer(0, new Runnable(){
+		new FreeThread(0, new Runnable(){
 			public void run(){
 				File config = new File("default.cfg");
 				if (config.exists()){
@@ -144,9 +143,7 @@ public class Admin {
 					}
 				}
 			}
-		}, 1, "ConfigSave", false);
-		saver.deSync();
-		saver.start();
+		}, 1, "config-save");
 	}
 	
 	public RunConfiguration getConfigurationFromForm(){
@@ -323,19 +320,5 @@ public class Admin {
 			x++;
 		}
 		return false;
-	}
-	
-	private String[] add(Object[] one, Object[] two){
-		String[] out = new String[one.length + two.length];
-		int x = 0;
-		while (x < one.length){
-			out[x] = one[x].toString();
-			x++;
-		}
-		while (x < out.length){
-			out[x] = two[x-one.length].toString();
-			x++;
-		}
-		return out;
 	}
 }

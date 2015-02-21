@@ -15,7 +15,7 @@ public class Access {
 	public static InterfaceCode INTERFACE = new InterfaceCode();
 	
 	public static void addRoversToMap(RoverObject[] rovs){ 
-		CODE.GUI.TerrainPnl.setRoverSwarm(rovs);
+		Admin.GUI.TerrainPnl.setRoverSwarm(rovs);
 	}
 	
 	private static long lastEvent = 0;
@@ -24,7 +24,7 @@ public class Access {
 		if (System.currentTimeMillis()-lastEvent > 300 || lastCode != arg.getKeyCode()){
 			lastEvent = System.currentTimeMillis();
 			lastCode = arg.getKeyCode();
-			CODE.GUI.MasterKeyHandler(arg);
+			Admin.GUI.MasterKeyHandler(arg);
 		}
 		else {
 			lastEvent = System.currentTimeMillis();
@@ -33,48 +33,48 @@ public class Access {
 	}
 	
 	public static PlanetParametersList getPlanetParameters(){
-		return CODE.GUI.TerrainPnl.getParameters();
+		return Admin.GUI.TerrainPnl.getParameters();
 	}
 	
 	public static double getMapInclineAtPoint(DecimalPoint loc, double dir){
-		return CODE.GUI.TerrainPnl.getIncline(loc, dir);
+		return Admin.GUI.TerrainPnl.getIncline(loc, dir);
 	}
 	
 	public static double getMapCrossSlopeAtPoint(DecimalPoint loc, double dir){
-		return CODE.GUI.TerrainPnl.getCrossSlope(loc, dir);
+		return Admin.GUI.TerrainPnl.getCrossSlope(loc, dir);
 	}
 	
 	public static double getMapHeightatPoint(DecimalPoint loc){
-		return CODE.GUI.TerrainPnl.getHeight(loc);
+		return Admin.GUI.TerrainPnl.getHeight(loc);
 	}
 	
 	public static double getMapTemperatureAtPoint(DecimalPoint loc){
-		return CODE.GUI.TerrainPnl.getTemperature(loc);
+		return Admin.GUI.TerrainPnl.getTemperature(loc);
 	}
 	
 	public static boolean isAtTarget(DecimalPoint loc){
-		return CODE.GUI.TerrainPnl.HeightMap.isPointOnTarget(loc);
+		return Admin.GUI.TerrainPnl.HeightMap.isPointOnTarget(loc);
 	}
 	
 	public static boolean isInHazard(DecimalPoint loc){
-		return CODE.GUI.TerrainPnl.HeightMap.isPointInHazard(loc);
+		return Admin.GUI.TerrainPnl.HeightMap.isPointInHazard(loc);
 	}
 	
 	public static void updateRoverLocation(String name, DecimalPoint loc, double dir){
-		CODE.GUI.TerrainPnl.updateRover(name, loc, dir);
+		Admin.GUI.TerrainPnl.updateRover(name, loc, dir);
 	}
 	
 	public static void requestFocusToMap(){
-		CODE.GUI.TerrainPnl.requestFocus();
+		Admin.GUI.TerrainPnl.requestFocus();
 	}
 	
 	public static void toggleHUDonMap(){
-		CODE.GUI.RoverHubPnl.setInHUDMode(!CODE.GUI.RoverHubPnl.isInHUDMode());
-		CODE.GUI.RoverHubPnl.setVisible(!CODE.GUI.RoverHubPnl.isVisible());
+		Admin.GUI.RoverHubPnl.setInHUDMode(!Admin.GUI.RoverHubPnl.isInHUDMode());
+		Admin.GUI.RoverHubPnl.setVisible(!Admin.GUI.RoverHubPnl.isVisible());
 	}
 	
 	public static void setFocusDisplayHUD(int which){
-		CODE.GUI.RoverHubPnl.setfocusedRover(which);
+		Admin.GUI.RoverHubPnl.setfocusedRover(which);
 	}
 	
 	public static void COMPortChanged(){
@@ -166,17 +166,17 @@ public class Access {
 	}
 	
 	public static void InstructionListChanged(){
-		if (CODE.GUI.InterfacePnl.InstructionsList.getSelectedIndex() != -1){
-			CODE.GUI.InterfacePnl.InstructionsDeleteBtn.setEnabled(true);
-			CODE.GUI.InterfacePnl.InstructionsEditBtn.setEnabled(true);
-			CODE.GUI.InterfacePnl.InstructionsUpBtn.setEnabled(CODE.GUI.InterfacePnl.InstructionsList.getSelectedIndex() != 0);
-			CODE.GUI.InterfacePnl.InstructionsDownBtn.setEnabled(CODE.GUI.InterfacePnl.InstructionsList.getSelectedIndex() != CODE.GUI.InterfacePnl.InstructionsList.getItems().length-1);
+		if (Admin.GUI.InterfacePnl.InstructionsList.getSelectedIndex() != -1){
+			Admin.GUI.InterfacePnl.InstructionsDeleteBtn.setEnabled(true);
+			Admin.GUI.InterfacePnl.InstructionsEditBtn.setEnabled(true);
+			Admin.GUI.InterfacePnl.InstructionsUpBtn.setEnabled(Admin.GUI.InterfacePnl.InstructionsList.getSelectedIndex() != 0);
+			Admin.GUI.InterfacePnl.InstructionsDownBtn.setEnabled(Admin.GUI.InterfacePnl.InstructionsList.getSelectedIndex() != Admin.GUI.InterfacePnl.InstructionsList.getItems().length-1);
 		}
 		else {
-			CODE.GUI.InterfacePnl.InstructionsDeleteBtn.setEnabled(false);
-			CODE.GUI.InterfacePnl.InstructionsEditBtn.setEnabled(false);
-			CODE.GUI.InterfacePnl.InstructionsUpBtn.setEnabled(false);
-			CODE.GUI.InterfacePnl.InstructionsDownBtn.setEnabled(false);
+			Admin.GUI.InterfacePnl.InstructionsDeleteBtn.setEnabled(false);
+			Admin.GUI.InterfacePnl.InstructionsEditBtn.setEnabled(false);
+			Admin.GUI.InterfacePnl.InstructionsUpBtn.setEnabled(false);
+			Admin.GUI.InterfacePnl.InstructionsDownBtn.setEnabled(false);
 		}
 	}
 	

@@ -3,17 +3,15 @@ package visual;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.border.LineBorder;
-
-import objects.ThreadTimer;
+import objects.FreeThread;
 
 public class ImageButton extends ImageDisplay {
 
+	private static final long serialVersionUID = 1L;
 	protected boolean working = false;
-	private ThreadTimer animation;
 	private ImageIcon Image;
 	private ImageIcon hoverImage;
 	
@@ -58,13 +56,11 @@ public class ImageButton extends ImageDisplay {
 	
 	private void RunAnimation(){
 		setBackground(new Color(200, 200, 200));
-		animation = new ThreadTimer(500, new Runnable(){
+		new FreeThread(500, new Runnable(){
 			public void run(){
 				setBackground(new Color(240, 240, 240));
 			}
-		}, 1, "button anitamion", false);
-		animation.deSync();
-		animation.start();
+		}, 1, "button-animation");
 	}
 	
 	public void setHoverImage(ImageIcon img){
