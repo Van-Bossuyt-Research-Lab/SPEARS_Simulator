@@ -94,7 +94,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 			public void run(){
 				try {
 					excecute();
-					//System.out.println(name + "-physics\t" + Globals.TimeMillis);
+					//System.out.println(roverName + "-physics\t" + Globals.TimeMillis);
 					//RoverEvents.updateStats();
 				}
 				catch (Exception e){

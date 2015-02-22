@@ -85,7 +85,7 @@ public class ThreadItem implements Serializable {
 			return complete;
 		}
 		else {
-			return true;
+			return !permission;
 		}
 	}
 	
@@ -113,7 +113,12 @@ public class ThreadItem implements Serializable {
 	}
 
 	public void shakeThread() {
-		thread.Shake();
+		try {
+			thread.Shake();
+		} catch (NullPointerException e) {
+			System.err.println(name);
+			e.printStackTrace();
+		}
 	}
 
 	@Override

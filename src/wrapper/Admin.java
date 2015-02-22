@@ -255,9 +255,7 @@ public class Admin {
 			roversToAdd.remove(GUI.WrapperPnl.RoverList.getSelectedItem().toString());
 			GUI.WrapperPnl.RoverList.removeValue(GUI.WrapperPnl.RoverList.getSelectedIndex());
 		} 
-		catch (Exception e){
-			e.printStackTrace();
-		}
+		catch (Exception e){}
 	}
 	
 	public void addSatelliteToList(){

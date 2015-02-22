@@ -343,7 +343,7 @@ public class InterfaceCode {
 				}
 				if (listening){
 					if (out.equals(listenFor)){
-						new SyncronousThread(0, listenAction, 1, "interface listening");
+						new FreeThread(0, listenAction, 1, "interface listening");
 					}
 				}
 				return out;
@@ -362,7 +362,7 @@ public class InterfaceCode {
 		listenFor = msg;
 		listenAction = new Runnable(){
 			public void run(){
-				listenTimer.interrupt();
+				listenTimer.Stop();
 				listening = false;
 				passaction.run();
 			}

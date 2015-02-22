@@ -103,9 +103,7 @@ public class RoverObject implements Serializable {
 			}
 			
 			if (Globals.RFAvailable(IDcode) > 1) { // if there is a message
-				System.out.println("available!");
 				delay(500);
-				System.out.println("done waiting!");
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
 															// go is set to false if the first read is not IDcode 

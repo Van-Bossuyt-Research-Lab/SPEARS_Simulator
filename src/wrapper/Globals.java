@@ -1,6 +1,7 @@
 package wrapper;
 
 import java.util.Random;
+
 import objects.FreeThread;
 import objects.Map;
 import objects.Queue;
@@ -10,7 +11,7 @@ import visual.AccelPopUp;
 
 public class Globals {
 
-	public static String vrsionNumber = "2.2";
+	public static String vrsionNumber = "2.2.1";
 	
 	private static Queue<Byte>[] SerialBuffers; // the buffer for messages
 	private static String[] SerialBufferCodes;
@@ -24,7 +25,6 @@ public class Globals {
 	
 	private static boolean begun = false;
 	private static Map<String, ThreadItem> threads = new Map<String, ThreadItem>();
-	private static boolean ready = false;
 	private static boolean milliDone = false;
 	
 	private static int exitTime = -1;
@@ -44,21 +44,6 @@ public class Globals {
 				threadCheckIn("milli-clock");
 			}
 		}, SyncronousThread.FOREVER, "milli-clock", true);
-		TimeMillis++;
-		Object[] keys = threads.getKeys();
-		int x = 0;
-		while (x < keys.length){
-			if (keys[x].equals(null)){
-				break;
-			}
-			String key = (String) keys[x];
-			threads.get(key).reset();
-			if (threads.get(key).getNext() == TimeMillis){
-				threads.get(key).grantPermission();
-			}
-			x++;
-		}
-		ready = true;
 	}
 	
 	public static void writeToSerial(char write, String from){
@@ -213,6 +198,9 @@ public class Globals {
 	}
 	
 	public static void checkOutThread(String name){
+		if (!name.contains("delay")){
+			System.err.println(name + " out.");
+		}
 		threads.remove(name);
 		threadCheckIn(name);
 	}
@@ -221,7 +209,7 @@ public class Globals {
 		try {
 			threads.get(name).markFinished();
 			threads.get(name).advance();
-		} catch (Exception e) {}
+		} catch (NullPointerException e) {}
 		if (name.equals("milli-clock") || milliDone){
 			for (Object o : threads.getKeys()){
 				String key = (String) o;
@@ -232,13 +220,12 @@ public class Globals {
 					continue;
 				}
 				if (!threads.get(key).isFinished()){
-					System.out.println(key + " - " + threads.get(key).getState());
+					//System.out.println(key + " - " + threads.get(key).getState());
 					milliDone = true;
-					//threads.get(key).shakeThread();
+					threads.get(key).shakeThread();
 					return;
 				}
 			}
-			ready = false;
 			milliDone = false;
 			TimeMillis++;
 			for (Object o : threads.getKeys()){
@@ -253,7 +240,6 @@ public class Globals {
 					continue;
 				}
 			}
-			ready = true;
 		}
 	}
 	
@@ -269,18 +255,12 @@ public class Globals {
 		catch (Exception e){
 			try{
 				double length = time;
-				Thread.sleep((long)(length/Globals.getTimeScale()), (int)((length/Globals.getTimeScale()-(int)length/Globals.getTimeScale())*1000000));
+				Thread.sleep((long)(length/getTimeScale()), (int)((length/getTimeScale()-(int)length/getTimeScale())*1000000));
 			} catch (Exception ex) {
-				Globals.reportError("InterfaceCode", "delay", ex);
+				Globals.reportError("Globals", "delayThread", ex);
 			}
 			return "pass";
 		}
-	}
-	
-	public static void threadIsRunning(String name){
-		try {
-			threads.get(name).setRunning(true);
-		} catch (NullPointerException e) {}
 	} 
 	
 	public static void threadDelayComplete(String name){
@@ -288,16 +268,21 @@ public class Globals {
 		threads.get(name).unSuspend();
 	}
 	
+	public static void threadIsRunning(String name){
+		try {
+			threads.get(name).setRunning(true);
+		} catch (NullPointerException e) {}
+	}
+	
 	public static boolean getThreadRunPermission(String name){
 		try {
-			if (threads.get(name).hasPermission() && ready && begun){
+			if (threads.get(name).hasPermission() && begun){
 				threads.get(name).revokePermission();
 				return true;
 			}
 		}
 		catch (NullPointerException e){
-			// If not on the list don't hold it up
-			return true;
+			e.printStackTrace();
 		}
 		return false;
 	}

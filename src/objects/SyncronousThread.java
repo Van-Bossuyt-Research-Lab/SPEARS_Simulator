@@ -13,7 +13,7 @@ public class SyncronousThread extends Thread implements Serializable {
 	private boolean forever = false;
 	public static int FOREVER = -1;
 	private boolean stopped = false;
-	private boolean shaken = false;
+	private boolean running = false;
 	
 	public SyncronousThread(int interval, Runnable run, int times, String name){
 		super.setName(name);
@@ -44,7 +44,8 @@ public class SyncronousThread extends Thread implements Serializable {
 					Thread.sleep(Integer.MAX_VALUE);
 				}
 				catch (InterruptedException e) {
-					if (stopped || !shaken){
+					running = true;
+					if (stopped){
 						Globals.checkOutThread(getName());
 						return;
 					}
@@ -55,8 +56,8 @@ public class SyncronousThread extends Thread implements Serializable {
 						if (!forever){
 							actions--;
 						}
-						shaken = false;
 					}
+					running  = false;
 				}
 			}			
 		}
@@ -70,8 +71,9 @@ public class SyncronousThread extends Thread implements Serializable {
 	}
 	
 	public void Shake(){
-		shaken = true;
-		this.interrupt();
+		if (!running){
+			this.interrupt();
+		}
 	}
 	
 	@Override

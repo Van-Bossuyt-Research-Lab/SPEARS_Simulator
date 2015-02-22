@@ -71,9 +71,7 @@ public class SatelliteObject implements Serializable {
 	public void excecuteCode(){
 		try {
 			if (Globals.RFAvailable(IDcode) > 1) { // if there is a message
-				System.out.println("Available - SAT");
 				delay(500);
-				System.out.println("Done delaying!");
 				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0) { // if the message is for us and are we allowed to read it
 					delay(500);
@@ -99,7 +97,7 @@ public class SatelliteObject implements Serializable {
 						sendSerial(data);
 						delay(1000);
 						if (data[2] != '^' && data[2] != '*' && data[2] != '%' && data[2] != '}' && data[2] != '{'){ // don't confirm tags
-							sendSerial("g #"); // confirm
+							sendSerial("r #"); // confirm
 						}
 					}
 					if (tag[0] == 'r'){ // forward to rover
@@ -108,7 +106,7 @@ public class SatelliteObject implements Serializable {
 						sendSerial(data);
 						delay(1000);
 						if (data[3] != '^' && data[3] != '*' && data[3] != '%' && data[3] != '}' && data[3] != '{'){ // don't confirm tags
-							sendSerial("r #"); // confirm
+							sendSerial("g #"); // confirm
 						}
 					}
 					if (tag[0] == 'c'){ // command for the satellite
@@ -316,9 +314,7 @@ public class SatelliteObject implements Serializable {
 	
 	private void delay(int length) { // sleep thread for a bit
 		String newname = Globals.delayThread(Thread.currentThread().getName(), length);
-		while (!Globals.getThreadRunPermission(newname)) {
-			System.out.println("delaying");
-		}
+		while (!Globals.getThreadRunPermission(newname)) {}
 		Globals.threadDelayComplete(Thread.currentThread().getName());
 	}
 
