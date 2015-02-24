@@ -182,7 +182,7 @@ public class Globals {
 	
 	public static void setUpAcceleratedRun(int runtime){
 		exitTime = runtime;
-		informer = new AccelPopUp(exitTime, (int) (exitTime/time_accelerant*3/60000));
+		informer = new AccelPopUp(exitTime, (int) (exitTime/time_accelerant/60000));
 		new FreeThread(1000, new Runnable(){
 			public void run(){
 				informer.update((int)TimeMillis);
