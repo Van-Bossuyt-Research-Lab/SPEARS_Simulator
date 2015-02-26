@@ -56,8 +56,16 @@ public class Access {
 		return Admin.GUI.TerrainPnl.HeightMap.isPointOnTarget(loc);
 	}
 	
+	public static int getTargetValue(DecimalPoint loc){
+		return Admin.GUI.TerrainPnl.HeightMap.getTargetValue(loc);
+	}
+	
 	public static boolean isInHazard(DecimalPoint loc){
 		return Admin.GUI.TerrainPnl.HeightMap.isPointInHazard(loc);
+	}
+	
+	public static int getHazardValue(DecimalPoint loc){
+		return Admin.GUI.TerrainPnl.HeightMap.getHazardValue(loc);
 	}
 	
 	public static void updateRoverLocation(String name, DecimalPoint loc, double dir){

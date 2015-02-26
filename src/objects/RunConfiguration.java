@@ -25,6 +25,8 @@ public class RunConfiguration implements Serializable {
 	public int mapDetail;
 	public double targetDensity;
 	public double hazardDensity;
+	public boolean monoTargets;
+	public boolean monoHazards;
 	public boolean accelerated;
 	public int runtime;
 	
@@ -47,7 +49,7 @@ public class RunConfiguration implements Serializable {
 			RoverObject[] rovers, Map<String, String> satelliteNames,
 			SatelliteObject[] satellites, String[] tags, double mapRough,
 			int mapSize, int mapDetail, double targetDensity,
-			double hazardDensity, boolean accelerated, int runtime) {
+			double hazardDensity, boolean monoTargets, boolean monoHazards, boolean accelerated, int runtime) {
 		mapFromFile = false;
 		this.roverNames = roverNames;
 		this.rovers = rovers;
@@ -59,6 +61,8 @@ public class RunConfiguration implements Serializable {
 		this.mapDetail = mapDetail;
 		this.targetDensity = targetDensity;
 		this.hazardDensity = hazardDensity;
+		this.monoTargets = monoTargets;
+		this.monoHazards = monoHazards;
 		this.accelerated = accelerated;
 		this.runtime = runtime;
 	}

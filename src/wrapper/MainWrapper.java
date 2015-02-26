@@ -97,6 +97,8 @@ public class MainWrapper extends Panel {
 				JSpinner MapSizeSpnr;
 				JSpinner HazardDensitySpnr;
 				JSpinner TargetDensitySpnr;
+				JCheckBox ValuedTargetsChk;
+				JCheckBox ValuedHazardsChk;
 			private JPanel SelectionFilePnl;
 				private JLabel FileLocLbl;
 				JTextField FileLocTxt;
@@ -269,7 +271,7 @@ public class MainWrapper extends Panel {
 		
 		TypeSelector = new JTabbedPane(JTabbedPane.TOP);
 		TypeSelector.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
-		TypeSelector.setBounds(740, 41, 636, 229);
+		TypeSelector.setBounds(740, 41, 636, 267);
 		CreateNewPnl.add(TypeSelector);
 		
 		SelectionPlasmaPnl = new JPanel();
@@ -330,7 +332,7 @@ public class MainWrapper extends Panel {
 		TargetDensitySpnr = new JSpinner();
 		TargetDensitySpnr.setBounds(162, 154, 80, 25);
 		SelectionPlasmaPnl.add(TargetDensitySpnr);
-		TargetDensitySpnr.setModel(new SpinnerNumberModel(6., 0.0, 100.0, 0.1));
+		TargetDensitySpnr.setModel(new SpinnerNumberModel(4., 0.0, 100.0, 0.1));
 		TargetDensitySpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		
 		TargetDensityLbl = new JLabel("Target Density:");
@@ -352,6 +354,16 @@ public class MainWrapper extends Panel {
 		SelectionPlasmaPnl.add(MapSizeSpnr);
 		MapSizeSpnr.setModel(new SpinnerNumberModel(7, 4, 9, 1));
 		MapSizeSpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
+		
+		ValuedTargetsChk = new JCheckBox("Use Valued Targets");
+		ValuedTargetsChk.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+		ValuedTargetsChk.setBounds(73, 196, 169, 23);
+		SelectionPlasmaPnl.add(ValuedTargetsChk);
+		
+		ValuedHazardsChk = new JCheckBox("Use Valued Hazards");
+		ValuedHazardsChk.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+		ValuedHazardsChk.setBounds(373, 196, 169, 23);
+		SelectionPlasmaPnl.add(ValuedHazardsChk);
 		
 		SelectionFilePnl = new JPanel();
 		TypeSelector.addTab("From File", null, SelectionFilePnl, null);

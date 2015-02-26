@@ -122,4 +122,18 @@ public class GridList<T> implements Serializable {
 		return out;
 	}
 	
+	public ArrayList<T> getValues(){
+		ArrayList<T> out = new ArrayList<T>();
+		for (int i = 0; i < data.size(); i++){
+			for (int x : data.get(i).keySet()){
+				for (int j = 0; j < data.get(i).get(x).size(); j++){
+					for (int y : data.get(i).get(x).get(j).keySet()){
+						out.add(data.get(i).get(x).get(j).get(y));
+					}
+				}
+			}
+		}
+		return out;
+	}
+	
 }

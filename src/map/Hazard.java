@@ -6,10 +6,12 @@ public class Hazard {
 
 	private DecimalPoint position;
 	private double radius;
+	private int scale;
 	
-	public Hazard(DecimalPoint pos, double r){
+	public Hazard(DecimalPoint pos, double r, int scale){
 		position = pos;
 		radius = r;
+		this.scale = scale;
 	}
 	
 	public boolean isPointWithin(DecimalPoint pnt){
@@ -27,6 +29,10 @@ public class Hazard {
 
 	public double getRadius() {
 		return radius;
+	}
+	
+	public int getValue(){
+		return scale;
 	}
 	
 }

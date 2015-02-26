@@ -80,8 +80,18 @@ public class Admin {
 		}
 		else {
 			GUI.TerrainPnl.HeightMap.genorateLandscape(config.mapSize, config.mapDetail, config.mapRough);
-			GUI.TerrainPnl.HeightMap.genorateTargets(config.targetDensity);
-			GUI.TerrainPnl.HeightMap.genorateHazards(config.hazardDensity);
+			if (config.monoTargets){
+				GUI.TerrainPnl.HeightMap.genorateTargets(config.targetDensity);
+			}
+			else {
+				GUI.TerrainPnl.HeightMap.genorateValuedTargets(config.targetDensity);
+			}
+			if (config.monoHazards){
+				GUI.TerrainPnl.HeightMap.genorateHazards(config.hazardDensity);
+			}
+			else {
+				GUI.TerrainPnl.HeightMap.genorateValuedHazards(config.hazardDensity);
+			}
 			Globals.writeToLogFile("Start Up", "Using Random Map");
 		}
 		
@@ -181,8 +191,11 @@ public class Admin {
 			int mapDetail = (int) GUI.WrapperPnl.MapDetailSpnr.getValue();
 			double targetDensity = (double) GUI.WrapperPnl.TargetDensitySpnr.getValue()/1000.;
 			double hazardDensity = (double) GUI.WrapperPnl.HazardDensitySpnr.getValue()/1000.;
+			boolean monoTargets = !GUI.WrapperPnl.ValuedTargetsChk.isSelected(); //cause the for says use and the computer reads not using
+			boolean monoHazards = !GUI.WrapperPnl.ValuedHazardsChk.isSelected();
 			return new RunConfiguration(roverNames, rovers, satelliteNames,	satellites, tags, mapRough,
-					mapSize, mapDetail, targetDensity, hazardDensity, GUI.WrapperPnl.AccelChk.isSelected(), 
+					mapSize, mapDetail, targetDensity, hazardDensity, monoTargets, 
+					monoHazards, GUI.WrapperPnl.AccelChk.isSelected(), 
 					(int)GUI.WrapperPnl.RuntimeSpnr.getValue());
 		}
 	}

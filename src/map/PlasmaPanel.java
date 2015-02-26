@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -25,9 +26,12 @@ public class PlasmaPanel extends JPanel {
 
 	private double[][] values;
 	private GridList<Integer> targets;
-	private GridList<Integer> hazards;
+	private int[][] hazards;
 	private boolean viewTargets = true;
 	private boolean viewHazards = true;
+	private boolean monoTargets = true;
+	private boolean monoHazards = true;
+	private int layerSize;
 	private double rough;
 	private double minval;
 	private double maxval;
@@ -36,7 +40,7 @@ public class PlasmaPanel extends JPanel {
 	private int squareResolution = 50;
 	private int detail = 3;
 	
-	private String fileID = "^v<>";
+	private String fileID = "<^v>";
 	
 	private int currentColorScheme = 0;
 	public static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
@@ -63,6 +67,7 @@ public class PlasmaPanel extends JPanel {
 	//Generates the height map using a plasma fractal
 	public void genorateLandscape(int size, int det, double roughFactor){
 		double rough = size * roughFactor;
+		this.layerSize = size;
 		this.rough = rough;
 		this.detail = det;
 		size += detail;
@@ -204,32 +209,35 @@ public class PlasmaPanel extends JPanel {
 						try {
 							try {
 								if (viewHazards){
-									if (hazards.get(x/detail, y/detail) > 0){
-										g.setColor(Color.GRAY);
+									if (hazards[x/detail][y/detail] > 5){
+										int value = (11-hazards[x/detail][y/detail])*20+100;
+										g.setColor(new Color(value, value, value));			
+									}
+									else {
+										throw new NullPointerException();
 									}
 								}
 								else {
-									int a = 1/0; // Force Catch Statement
+									throw new NullPointerException();
 								}
 							}
 							catch (NullPointerException e){
 								if (viewTargets){
 									if (targets.get(x/detail, y/detail) > 0){
-										g.setColor(Color.MAGENTA);										
+										int value = targets.get(x/detail, y/detail);
+										g.setColor(new Color(Color.MAGENTA.getRed()*(value+5)/15, Color.MAGENTA.getGreen()*(value+5)/15, Color.MAGENTA.getBlue()*(value+5)/15));										
+									}
+									else {
+										throw new Exception();
 									}
 								}
 								else {
-									int a = 1/0; // Force Catch Statement
+									throw new Exception();
 								}
 							}
 						}
 						catch (Exception e){
-							try {
-								g.setColor(getColor(values[x+detail/2][y+detail/2]));
-							} catch (Exception i){
-								i.printStackTrace();
-								g.setColor(getColor(values[x][y]));
-							}
+							g.setColor(getColor(values[x+detail/2][y+detail/2]));
 						}
 						g.fillRect(x * squareResolution / detail, y * squareResolution / detail, squareResolution, squareResolution);
 						switch (currentColorScheme){
@@ -263,8 +271,18 @@ public class PlasmaPanel extends JPanel {
 	//force a target distribution
 	public void setTargets(Point[] targs){
 		targets = new GridList<Integer>();
+		monoTargets = true;
 		for (Point p : targs){
-			targets.put(1, p.x, p.y);
+			targets.put(10, p.x, p.y);
+		}
+		this.repaint();
+	}
+	
+	public void setTargets(Point[] targs, int[] values){
+		monoTargets = false;
+		targets = new GridList<Integer>();
+		for (int i = 0; i < targs.length; i++){
+			targets.put(values[i], targs[i].x, targs[i].y);
 		}
 		this.repaint();
 	}
@@ -277,10 +295,54 @@ public class PlasmaPanel extends JPanel {
 	//Generate a target distribution
 	public void genorateTargets(double density){
 		targets = new GridList<Integer>();
+		monoTargets = true;
 		int size = (int)(values.length*values[0].length/(detail*detail)*density);
 		int x = 0;
 		while (x < size){
-			targets.put(1, rnd.nextInt(values.length/detail), rnd.nextInt(values.length/detail));
+			targets.put(10, rnd.nextInt(values.length/detail), rnd.nextInt(values.length/detail));
+			x++;
+		}
+	}
+	
+	public void genorateValuedTargets(double density){
+		targets = new GridList<Integer>();
+		monoTargets = false;
+		int size = (int)(values.length*values[0].length/(detail*detail)*density);
+		int x = 0;
+		while (x < size){
+			int value;
+			double rand = rnd.nextDouble();
+			if (rand < 0.3){
+				value = 1;
+			}
+			else if (rand < 0.45){
+				value = 2;
+			}
+			else if (rand < 0.6){
+				value = 3;
+			}
+			else if (rand < 0.7){
+				value = 4;
+			}
+			else if (rand < 0.8){
+				value = 5;
+			}
+			else if (rand < 0.86){
+				value = 6;
+			}
+			else if (rand < 0.91){
+				value = 7;
+			}
+			else if (rand < 0.95){
+				value = 8;
+			}
+			else if (rand < 0.98){
+				value = 9;
+			}
+			else {
+				value = 10;
+			}
+			targets.put(value, rnd.nextInt(values.length/detail), rnd.nextInt(values.length/detail));
 			x++;
 		}
 	}
@@ -290,15 +352,21 @@ public class PlasmaPanel extends JPanel {
 		int x = (int) getMapSquare(loc).getX();
 		int y = (int) getMapSquare(loc).getY();
 		try {
-			if (targets.get(x, y).equals(true)){
-				return true;
-			}
-			else {
-				return false;
-			}
+			return targets.get(x, y) > 0;
 		}
 		catch (NullPointerException e){
 			return false;
+		}
+	}
+	
+	public int getTargetValue(DecimalPoint loc){
+		int x = (int) getMapSquare(loc).getX();
+		int y = (int) getMapSquare(loc).getY();
+		try {
+			return targets.get(x, y).intValue();
+		}
+		catch (NullPointerException e){
+			return 0;
 		}
 	}
 	
@@ -313,10 +381,11 @@ public class PlasmaPanel extends JPanel {
 	
 	//Generate random hazards
 	public void genorateHazards(double density){
-		this.hazards = new GridList<Integer>();
+		this.hazards = new int[this.values.length/detail][this.values[0].length/detail];
+		monoHazards = true;
 		Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)*density)];
 		for (int x = 0; x < hazards.length; x++){
-			hazards[x] = new Hazard(new DecimalPoint(values.length/detail*rnd.nextDouble()-values.length/detail/2, values.length/detail*rnd.nextDouble()-values.length/detail/2), 5*rnd.nextDouble()+1);
+			hazards[x] = new Hazard(new DecimalPoint(values.length/detail*rnd.nextDouble()-values.length/detail/2, values.length/detail*rnd.nextDouble()-values.length/detail/2), 5*rnd.nextDouble()+1, 10);
 		}
 		for (int i = 0; i < values.length/detail; i++){
 			for (int j = 0; j < values[0].length/detail; j++){
@@ -324,7 +393,36 @@ public class PlasmaPanel extends JPanel {
 				int y = values.length/detail/2 - j;
 				for (int z = 0; z < hazards.length; z++){
 					if (hazards[z].isPointWithin(new DecimalPoint(x, y))){
-						this.hazards.put(1, i, j);
+						this.hazards[i][j] = hazards[z].getValue();
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	public void genorateValuedHazards(double density){
+		monoHazards = false;
+		PlasmaPanel hazMap = new PlasmaPanel();
+		hazMap.genorateLandscape(layerSize, detail, 2.6);
+		this.hazards = new int[this.values.length/detail][this.values[0].length/detail];
+		double max = hazMap.getMax()+0.001;
+		for (int i = 0; i < hazards.length; i++){
+			for (int j = 0; j < hazards[0].length; j++){
+				hazards[i][j] = (int)(hazMap.values[i][j]/max*5);
+			}
+		}
+		Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)*density*2.5)];
+		for (int x = 0; x < hazards.length; x++){
+			hazards[x] = new Hazard(new DecimalPoint(values.length/detail*rnd.nextDouble()-values.length/detail/2, values.length/detail*rnd.nextDouble()-values.length/detail/2), 5*rnd.nextDouble()+1, rnd.nextInt(5)+1);
+		}
+		for (int i = 0; i < values.length/detail; i++){
+			for (int j = 0; j < values[0].length/detail; j++){
+				int x = i - values.length/detail/2;
+				int y = values.length/detail/2 - j;
+				for (int z = 0; z < hazards.length; z++){
+					if (hazards[z].isPointWithin(new DecimalPoint(x, y))){
+						this.hazards[i][j] += hazards[z].getValue();
 						break;
 					}
 				}
@@ -333,15 +431,21 @@ public class PlasmaPanel extends JPanel {
 	}
 	
 	public void setHazards(Point[] hzds){
-		hazards = new GridList<Integer>();
+		hazards = new int[this.values.length/detail][this.values[0].length/detail];
+		monoHazards = false;
 		for (Point p : hzds){
-			hazards.put(1, p.x, p.y);
+			hazards[p.x][p.y] = 10;
 		}
 		this.repaint();
 	}
 	
+	public void setHazards(int[][] values){
+		hazards = values;
+		monoHazards = false;
+	}
+	
 	//get the hazard list
-	public GridList<Integer> getHazards(){
+	public int[][] getHazards(){
 		return hazards;
 	}
 	
@@ -350,16 +454,17 @@ public class PlasmaPanel extends JPanel {
 		int x = (int) getMapSquare(loc).getX();
 		int y = (int) getMapSquare(loc).getY();
 		try {
-			if (hazards.get(x, y).equals(true)){
-				return true;
-			}
-			else {
-				return false;
-			}
+			return hazards[x][y] > 0;
 		}
 		catch (NullPointerException e){
 			return false;
 		}
+	}
+	
+	public int getHazardValue(DecimalPoint loc){
+		int x = (int) getMapSquare(loc).getX();
+		int y = (int) getMapSquare(loc).getY();
+		return hazards[x][y];
 	}
 	
 	public void setHazardsVisible(boolean b){
@@ -610,11 +715,59 @@ public class PlasmaPanel extends JPanel {
 				write.write('\n');
 			}
 			
+			if (monoTargets){
+				write.write("m");
+			}
+			else {
+				write.write("v");
+				
+			}		
 			write.write("\n" + targets.size() + "\n");
 			write.write(targets.genorateList() + "\n");
+			if (!monoTargets){
+				for (Integer val : targets.getValues()){
+					write.write(val + "\n");
+				}
+			}
 			
-			write.write("\n" + hazards.size() + "\n");
-			write.write(hazards.genorateList() + "\n");
+			if (monoHazards){
+				write.write("m");
+				ArrayList<String> valueLocs = new ArrayList<String>();
+				for (int i = 0; i < hazards.length; i++){
+					for (int j = 0; j < hazards[0].length; j++){
+						try {
+							if (hazards[i][j] > 0){
+								valueLocs.add(i + "\t" + j);
+							}
+						} catch (NullPointerException e) {}
+					}
+				}
+				write.write("\n" + valueLocs.size() + "\n");
+				for (String str : valueLocs){
+					write.write(str + "\n");
+				}
+				write.write("\n");
+			}
+			else {
+				write.write("v");
+				write.write(hazards[0].length + "\n" + hazards.length + "\n");
+				for (int i = 0; i < hazards.length; i++){
+					for (int j = 0; j < hazards[0].length; j++){
+						try {
+							if (hazards[i][j] > 0){
+								write.write(hazards[i][j] + "\t");
+							}
+							else {
+								write.write(0 + "\t");
+							}
+						}
+						catch (NullPointerException e) {
+							write.write(0 + "\t");
+						}
+					}
+					write.write("\n");
+				}
+			}
 			
 			write.flush();
 			write.close();
@@ -646,6 +799,7 @@ public class PlasmaPanel extends JPanel {
 			}
 			this.setValues(values);
 			
+			boolean mono = data.next().equals("m");
 			int targs = data.nextInt();
 			if (targs > 0){
 				Point[] targets = new Point[targs];
@@ -654,18 +808,42 @@ public class PlasmaPanel extends JPanel {
 					int y = data.nextInt();
 					targets[i] = new Point(x, y);
 				}
-				this.setTargets(targets);
+				if (mono){
+					this.setTargets(targets);
+				}
+				else {
+					int[] targVals = new int[targs];
+					for (int i = 0; i < targVals.length; i++){
+						targVals[i] = data.nextInt();
+					}				
+					this.setTargets(targets, targVals);
+				}
 			}
 			
-			int hzdrs = data.nextInt();
-			if (hzdrs > 0){
-				Point[] hazards = new Point[hzdrs];
-				for (int i = 0; i < hazards.length; i++){
-					int x = data.nextInt();
-					int y = data.nextInt();
-					hazards[i] = new Point(x, y);
+			if (data.next().equals("m")){
+				int hzdrs = data.nextInt();
+				if (hzdrs > 0){
+					Point[] hazards = new Point[hzdrs];
+					for (int i = 0; i < hazards.length; i++){
+						int x = data.nextInt();
+						int y = data.nextInt();
+						hazards[i] = new Point(x, y);
+					}
+					this.setHazards(hazards);
 				}
-				this.setHazards(hazards);
+			}
+			else {
+				width = data.nextInt();
+				height = data.nextInt();
+				int[][] hazVals = new int[width][height];
+				for (int i = 0; i < height; i++){
+					int[] row = new int[width];
+					for (int j = 0; j < width; j++){
+						row[j] = data.nextInt();
+					}
+					hazVals[i] = row;
+				}
+				this.setHazards(hazVals);
 			}
 			
 		} catch (FileNotFoundException e) {
