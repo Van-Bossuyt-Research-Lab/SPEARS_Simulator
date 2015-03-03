@@ -466,7 +466,7 @@ public class RoverObject implements Serializable {
 						physics.getBatteryTemperature(),
 						physics.getBatteryCharge()
 				);
-				// switch all known commands
+				//TODO switch all known commands
 				if (strcmp(cmd, "") == 0){ /*Do Nothing*/ }
 				else if (strcmp(cmd, "move") == 0) {
 					driveForward();
@@ -815,7 +815,7 @@ public class RoverObject implements Serializable {
 		}
 	}
 	
-//TODO PHYSCIS STARTS HERE *****************************************************************************************************************************************************************************************************
+//PHYSCIS Related Stuff *****************************************************************************************************************************************************************************************************
 	
 	public void addToSerialHistory(String out){
 		serialHistory += out + "\t\t\t" + Globals.TimeMillis + "\n";

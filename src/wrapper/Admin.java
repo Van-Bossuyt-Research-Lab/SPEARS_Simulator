@@ -52,6 +52,7 @@ public class Admin {
 		addItemToSelectionList(		"RAIR Risk Seeking", new RAIRcodeRS());
 		addItemToSelectionList(		"RAIR Risk Temper", new RAIRcodeRT());	
 		addItemToSelectionList(		"PIDAA",		new PIDAAcode());
+		addItemToSelectionList(		"GORARO Simp",	new GORAROcode1());
 		//addItemToSelectionList(		"PIDAA 2",		new PIDAAcode2());
 		addItemToSelectionList(		"[null]", 		(SatelliteAutonomusCode)null);
 		addItemToSelectionList(		"[null]", 		(SatelliteParametersList)null);
