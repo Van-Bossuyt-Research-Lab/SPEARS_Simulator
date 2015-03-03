@@ -116,6 +116,7 @@ public class Admin {
 		GUI.RoverHubPnl.setRovers(config.rovers);
 		GUI.SatelliteHubPnl.setSatellites(config.satellites);
 		Access.INTERFACE.setCallTags(config.roverNames, config.satelliteNames);
+		GUI.RoverHubPnl.setIdentifiers(config.roverNames.getValues(), config.satelliteNames.getValues());
 		InterfaceCode.start();
 		GUI.RoverHubPnl.start();
 		GUI.SatelliteHubPnl.start();

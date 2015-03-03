@@ -23,7 +23,7 @@ public class InterfaceCode {
 	private String connectedPort = "COM13";
 	private ZDate DateTime;
 	public SyncronousThread clock;
-	private String IDcode = "g";
+	public static String IDcode = "g";
 	
 	private int connectionTime = 0;
 	private int countSec = 0;

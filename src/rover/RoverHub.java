@@ -9,18 +9,23 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
+import control.InterfaceCode;
 import objects.SyncronousThread;
 import visual.LEDIndicator;
 import visual.Panel;
 import wrapper.Access;
+import wrapper.Globals;
 
 public class RoverHub extends Panel {
 	
@@ -67,6 +72,10 @@ public class RoverHub extends Panel {
 	private JLabel[] UnusedLbl6 = new JLabel[numberOfDisplays];
 	private LEDIndicator[] UnusedLED7 = new LEDIndicator[numberOfDisplays];
 	private JLabel[] UnusedLbl7 = new JLabel[numberOfDisplays];
+	
+	private JComboBox<String> satSelect;
+	private JComboBox<String> rovSelect;
+	private JTextField commandInput;
 
 	public RoverHub(Dimension size){
 		super(size, "Rover Hub");
@@ -326,6 +335,43 @@ public class RoverHub extends Panel {
 			
 			x++;
 		}
+		
+		commandInput = new JTextField();
+		commandInput.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+		commandInput.setSize(300, 28);
+		commandInput.setLocation(super.getWidth()-commandInput.getWidth()-10, super.getTopOfPage()+super.getWorkingHeight()*7/8);
+		commandInput.setVisible(false);
+		commandInput.addKeyListener(new KeyAdapter(){
+			@Override
+			public void keyPressed(KeyEvent e){
+				if (e.getKeyCode() == KeyEvent.VK_ENTER){
+					char[] out = (satSelect.getSelectedItem() + " " + rovSelect.getSelectedItem() + " " + commandInput.getText()).toCharArray();
+					commandInput.setText("");
+					for (char c : out){
+						Globals.writeToSerial(c, InterfaceCode.IDcode);
+					}
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
+					focusOnHub();
+				}
+			}
+		});
+		this.add(commandInput);
+		
+		satSelect = new JComboBox<String>();
+		satSelect.setSize(commandInput.getWidth()/2, 28);
+		satSelect.setLocation(commandInput.getX(), commandInput.getY()-satSelect.getHeight());
+		satSelect.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+		satSelect.setVisible(false);
+		this.add(satSelect);
+		
+		rovSelect = new JComboBox<String>();
+		rovSelect.setSize(commandInput.getWidth()/2, 28);
+		rovSelect.setLocation(commandInput.getX()+commandInput.getWidth()-rovSelect.getWidth(), commandInput.getY()-rovSelect.getHeight());
+		rovSelect.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+		rovSelect.setVisible(false);
+		this.add(rovSelect);
+		
 	}
 	
 	public void start(){
@@ -339,6 +385,24 @@ public class RoverHub extends Panel {
 			rovers[x].start();
 			x++;
 		}
+	}
+	
+	public void setIdentifiers(Object[] rovs, Object[] sats){
+		rovSelect.removeAllItems();
+		for (Object rov : rovs){
+			rovSelect.addItem((String)rov);
+		}
+		satSelect.removeAllItems();
+		for (Object sat : sats){
+			satSelect.addItem((String)sat);
+		}
+	}
+	
+	private void focusOnHub(){
+		requestFocus();
+		try {
+			this.getKeyListeners()[0].keyPressed(null);
+		} catch (ArrayIndexOutOfBoundsException e) {}
 	}
 	
 	//adds the rover objects to the hub
@@ -365,6 +429,7 @@ public class RoverHub extends Panel {
 		if (which >= 0 && which < rovers.length){
 			HUDDisplayLinks[0] = which;
 			updateDisplays();
+			rovSelect.setSelectedIndex(which);
 		}
 	}
 	
@@ -523,6 +588,9 @@ public class RoverHub extends Panel {
 	public void setInHUDMode(boolean b){
 		inHUDmode = b;
 		updateDisplays();
+		commandInput.setVisible(b);
+		satSelect.setVisible(b);
+		rovSelect.setVisible(b);
 	}
 	
 	public boolean isInHUDMode(){

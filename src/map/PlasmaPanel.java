@@ -451,8 +451,8 @@ public class PlasmaPanel extends JPanel {
 	
 	//is the given point in a hazard
 	public boolean isPointInHazard(DecimalPoint loc){
-		int x = (int) getMapSquare(loc).getX();
-		int y = (int) getMapSquare(loc).getY();
+		int x = (int) getMapSquare(loc).getX() / detail;
+		int y = (int) getMapSquare(loc).getY() / detail;
 		try {
 			return hazards[x][y] > 0;
 		}
