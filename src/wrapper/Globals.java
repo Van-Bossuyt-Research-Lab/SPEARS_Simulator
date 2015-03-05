@@ -158,6 +158,36 @@ public class Globals {
 		}
 	}
 	
+	//NOT A TRUE SUBTRACTION: if the second angle is clockwise of the first, returns the negative number of units between, positive if second is to ccw
+	public static double subtractAngles(double first, double second){
+		double one = first - second;
+		double two = ((first+Math.PI)%(2*Math.PI)) - ((second+Math.PI)%(2*Math.PI));
+		if (Math.abs(one-two) < 0.00001){
+			return -1*one;
+		}
+		if (Math.abs(one) > Math.abs(two)){
+			return -1*two;
+		}
+		else {
+			return -1*one;
+		}
+	}
+	
+	//NOT A TRUE SUBTRACTION: if the second angle is clockwise of the first, returns the negative number of units between, positive if second is to ccw
+	public static double subtractAnglesDeg(double first, double second){
+		double one = first - second;
+		double two = ((first+180)%360) - ((second+180)%360);
+		if (Math.abs(one-two) < 0.00001){
+			return -1*one;
+		}
+		if (Math.abs(one) > Math.abs(two)){
+			return -1*two;
+		}
+		else {
+			return -1*one;
+		}
+	}
+	
 	public static Queue<Byte>[] getSerialQueues(int key){
 		try {
 			if (key == access_key){
