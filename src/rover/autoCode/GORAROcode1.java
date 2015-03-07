@@ -1,6 +1,7 @@
 package rover.autoCode;
 
 import objects.DecimalPoint;
+import objects.List;
 import rover.RoverAutonomusCode;
 import wrapper.Access;
 import wrapper.Globals;
@@ -13,23 +14,27 @@ public class GORAROcode1 extends RoverAutonomusCode {
 	private int score = 0;
 	private int state = 1;
 	
-	private int sampleDirections = 8;
+	private int histories = 3;
+	private int sampleDirections = 16;
 	private double sampleRadius = 2;
+	
+	double[][] potentials;
 	
 	private double averagingRadius = 25;
 	private double averagingAngle = Math.PI / 6.0; //rad
 	private double averagingPStep = Math.PI / 45.0;
-	private double averagingRStep = 1;
+	private double averagingRStep = 0.1;
 	
 	private double targetDirection = 0;
 	private long lastOptTime = 0;
 	
-	private double[] mentality = new double[] { 5000, 3000, 900, 250, 500 };
-	int[] science = new int[8];
-	int[] hazards = new int[8];
+	private List<DecimalPoint> visitedScience = new List<DecimalPoint>();
+	
+	private double[] mentality = new double[] { 10000, 3000, 1200, 500, 50 };
 
 	public GORAROcode1(){
 		super("GORARO Simple", "GORARO");
+		potentials = new double[histories][sampleDirections];
 	}	
 	
 	public GORAROcode1(int sampleDirections, double sampleRadius, double averagingRadius,
@@ -43,6 +48,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 		this.averagingPStep = averagingPStep;
 		this.averagingRStep = averagingRStep;
 		this.mentality = new double[] { mentality1, mentality2, mentality3, mentality4, mentality5 };
+		potentials = new double[histories][sampleDirections];
 		
 	}
 
@@ -57,6 +63,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 		this.mentality = org.mentality;
 		this.targetDirection = org.targetDirection;
 		this.lastOptTime = org.lastOptTime;
+		potentials = new double[histories][sampleDirections];
 	}	
 
 	@Override
@@ -71,12 +78,20 @@ public class GORAROcode1 extends RoverAutonomusCode {
 			double battery_current, double battery_temp, double battery_charge) 
 	{
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
-		if (Access.isAtTarget(location)){
+		if (hasUnvisitedScience(location)){
 			score += Access.getTargetValue(location);
+			visitedScience.add(location);
+			System.out.println("Score = " + score);
 		}
+		int[] sciences = new int[sampleDirections];
+		int[] hazards = new int[sampleDirections];
 		switch (state){
 		case 1:
-			double[] potentials = new double[sampleDirections];
+			for (int i = 1; i < histories; i++){
+				for (int j = 0; j < sampleDirections; j++){
+					potentials[i-1][j] = potentials[i][j];
+				}
+			}
 			double maxPotential = Double.MIN_VALUE;
 			double maxDirection = 0;
 			for (int i = 0; i < sampleDirections; i++){
@@ -87,8 +102,11 @@ public class GORAROcode1 extends RoverAutonomusCode {
 				
 				//if there is a scientific value at the point raise priority
 				int science = 0;
-				if (Access.isAtTarget(examine)){
-					science = 1;
+				for (int radius = 0; radius < sampleRadius; radius++){
+					if (hasUnvisitedScience(location.offset(radius*Math.cos(theta), radius*Math.sin(theta)))){
+						science = 1;
+						break;
+					}
 				}
 				
 				//if there is a hazard at the point get less excited
@@ -99,12 +117,11 @@ public class GORAROcode1 extends RoverAutonomusCode {
 				
 				//Calculate the density of science targets in a wedge away from the rover 
 				double scienceArea = 0;
-				for (double radius = 0; radius <= averagingRadius; radius += averagingRStep){
+				for (double radius = sampleRadius; radius <= averagingRadius; radius += averagingRStep){
 					for (double phi = -averagingAngle/2.0; phi <= averagingAngle/2.0; phi += averagingPStep){
-						if (Access.isAtTarget(location.offset(radius*Math.cos(theta+phi), radius*Math.sin(theta+phi)))){
-							scienceArea++;
-							this.science[i] += 1;
-							System.err.println("SCIENCE!!!");
+						if (hasUnvisitedScience(location.offset(radius*Math.cos(theta+phi), radius*Math.sin(theta+phi)))){
+							scienceArea += sampleRadius/radius;
+							sciences[i] += 1;
 						}
 					}
 				}
@@ -112,11 +129,11 @@ public class GORAROcode1 extends RoverAutonomusCode {
 				
 				//Calculate the density of hazards in a wedge away from the rover 
 				double hazardArea = 0;
-				for (double radius = 0; radius <= averagingRadius; radius += averagingRStep){
+				for (double radius = sampleRadius; radius <= averagingRadius; radius += averagingRStep){
 					for (double phi = -averagingAngle/2.0; phi <= averagingAngle/2.0; phi += averagingPStep){
 						if (Access.isInHazard(location.offset(radius*Math.cos(theta+phi), radius*Math.sin(theta+phi)))){
-							hazardArea++;
-							this.hazards[i]++;
+							hazardArea += sampleRadius/radius;
+							hazards[i] += 1;
 						}
 					}
 				}
@@ -126,9 +143,14 @@ public class GORAROcode1 extends RoverAutonomusCode {
 				double energyCost = Math.tan((Access.getMapHeightatPoint(examine)-Access.getMapHeightatPoint(location)) / sampleRadius);
 				
 				//calculate the potential of the point
-				potentials[i] = mentality[0]*science - mentality[1]*hazard + mentality[2]*scienceArea - mentality[3]*hazardArea - mentality[4]*energyCost;
-				if (potentials[i] > maxPotential){
-					maxPotential = potentials[i];
+				potentials[histories-1][i] = mentality[0]*science - mentality[1]*hazard + mentality[2]*scienceArea - mentality[3]*hazardArea - mentality[4]*energyCost;
+				double average = 0;
+				for (int j = 0; j < histories; j++){
+					average += potentials[j][i];
+				}
+				average /= (double)histories;
+				if (average > maxPotential){
+					maxPotential = average;
 					maxDirection = theta;
 				}
 			}
@@ -141,12 +163,12 @@ public class GORAROcode1 extends RoverAutonomusCode {
 			//}
 			
 			System.out.println("\n\n\n\n\n\n");
-			System.out.println("\t\t" + formatDouble(potentials[2])+"("+this.science[2]+", "+this.hazards[2]+")");
-			System.out.println("\t" + formatDouble(potentials[3])+"("+this.science[3]+", "+this.hazards[3]+")" + "\t\t" + formatDouble(potentials[1])+"("+this.science[1]+", "+this.hazards[1]+")");
-			System.out.println(formatDouble(potentials[4])+"("+this.science[4]+", "+this.hazards[4]+")" + "\t\t\t\t" + formatDouble(potentials[0])+"("+this.science[0]+", "+this.hazards[0]+")");
-			System.out.println("\t" + formatDouble(potentials[5])+"("+this.science[5]+", "+this.hazards[5]+")" + "\t\t" + formatDouble(potentials[7])+"("+this.science[7]+", "+this.hazards[7]+")");
-			System.out.println("\t\t" + formatDouble(potentials[6])+"("+this.science[6]+", "+this.hazards[6]+")");
-			
+			System.out.println("\t\t" + formatDouble(potentials[histories-1][4])+"("+sciences[4]+", "+hazards[4]+")");
+			System.out.println("\t" + formatDouble(potentials[histories-1][6])+"("+sciences[6]+", "+hazards[6]+")" + "\t\t" + formatDouble(potentials[histories-1][2])+"("+sciences[2]+", "+hazards[2]+")");
+			System.out.println(formatDouble(potentials[histories-1][8])+"("+sciences[8]+", "+hazards[8]+")" + "\t\t\t\t" + formatDouble(potentials[histories-1][0])+"("+sciences[0]+", "+hazards[0]+")");
+			System.out.println("\t" + formatDouble(potentials[histories-1][10])+"("+sciences[10]+", "+hazards[10]+")" + "\t\t" + formatDouble(potentials[histories-1][14])+"("+sciences[14]+", "+hazards[14]+")");
+			System.out.println("\t\t" + formatDouble(potentials[histories-1][12])+"("+sciences[12]+", "+hazards[12]+")");
+		
 			targetDirection = maxDirection;
 			state++;
 			if (Globals.subtractAngles(direction, targetDirection) < 0){
@@ -177,6 +199,18 @@ public class GORAROcode1 extends RoverAutonomusCode {
 		}
 	}
 
+	private boolean hasUnvisitedScience(DecimalPoint loc){
+		if (Access.isAtTarget(loc)){
+			for (int i = 0; i < visitedScience.length; i++){
+				if (Math.sqrt(Math.pow(loc.getX()-visitedScience.get(i).getX(), 2) + Math.pow(loc.getY()-visitedScience.get(i).getY(), 2)) < 3){
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
 	@Override
 	public RoverAutonomusCode clone() {
 		return new GORAROcode1(this);

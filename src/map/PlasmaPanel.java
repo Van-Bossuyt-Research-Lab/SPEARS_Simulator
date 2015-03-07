@@ -349,8 +349,8 @@ public class PlasmaPanel extends JPanel {
 	
 	//is the given point a target
 	public boolean isPointOnTarget(DecimalPoint loc){
-		int x = (int) getMapSquare(loc).getX();
-		int y = (int) getMapSquare(loc).getY();
+		int x = (int) getMapSquare(loc).getX() / detail;
+		int y = (int) getMapSquare(loc).getY() / detail;
 		try {
 			return targets.get(x, y) > 0;
 		}
@@ -360,8 +360,8 @@ public class PlasmaPanel extends JPanel {
 	}
 	
 	public int getTargetValue(DecimalPoint loc){
-		int x = (int) getMapSquare(loc).getX();
-		int y = (int) getMapSquare(loc).getY();
+		int x = (int) getMapSquare(loc).getX() / detail;
+		int y = (int) getMapSquare(loc).getY() / detail;
 		try {
 			return targets.get(x, y).intValue();
 		}
@@ -432,7 +432,7 @@ public class PlasmaPanel extends JPanel {
 	
 	public void setHazards(Point[] hzds){
 		hazards = new int[this.values.length/detail][this.values[0].length/detail];
-		monoHazards = false;
+		monoHazards = true;
 		for (Point p : hzds){
 			hazards[p.x][p.y] = 10;
 		}
@@ -462,8 +462,8 @@ public class PlasmaPanel extends JPanel {
 	}
 	
 	public int getHazardValue(DecimalPoint loc){
-		int x = (int) getMapSquare(loc).getX();
-		int y = (int) getMapSquare(loc).getY();
+		int x = (int) getMapSquare(loc).getX() / detail;
+		int y = (int) getMapSquare(loc).getY() / detail;
 		return hazards[x][y];
 	}
 	
