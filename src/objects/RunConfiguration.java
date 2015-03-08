@@ -13,6 +13,8 @@ public class RunConfiguration implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private String fileCode = "yak";
+	
 	public boolean mapFromFile;
 	public Map<String, String> roverNames;
 	public RoverObject[] rovers;
@@ -70,6 +72,9 @@ public class RunConfiguration implements Serializable {
 	public RunConfiguration(File save) throws Exception {
 		ObjectInputStream in = new ObjectInputStream(new FileInputStream(save.getAbsolutePath()));
 		RunConfiguration input = (RunConfiguration) in.readObject();
+		if (!this.fileCode.equals(input.fileCode)){
+			throw new Exception("Invalid File Version");
+		}
 		this.mapFromFile = input.mapFromFile;
 		this.roverNames = input.roverNames;
 		this.rovers = input.rovers;

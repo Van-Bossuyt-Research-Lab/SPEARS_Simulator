@@ -77,10 +77,16 @@ public class GORAROcode1 extends RoverAutonomusCode {
 			double motor_temp_BR, double battery_voltage,
 			double battery_current, double battery_temp, double battery_charge) 
 	{
+		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + score + "\t" + state + "\t" + battery_charge);
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
 			score += Access.getTargetValue(location);
-			visitedScience.add(location);
+			visitedScience.add(location.clone());
+			for (int x = 0; x < histories; x++){
+				for (int y = 0; y < sampleDirections; y++){
+					potentials[x][y] = 0;
+				}
+			}
 			System.out.println("Score = " + score);
 		}
 		int[] sciences = new int[sampleDirections];
@@ -162,12 +168,12 @@ public class GORAROcode1 extends RoverAutonomusCode {
 			//	System.out.println();
 			//}
 			
-			System.out.println("\n\n\n\n\n\n");
-			System.out.println("\t\t" + formatDouble(potentials[histories-1][4])+"("+sciences[4]+", "+hazards[4]+")");
-			System.out.println("\t" + formatDouble(potentials[histories-1][6])+"("+sciences[6]+", "+hazards[6]+")" + "\t\t" + formatDouble(potentials[histories-1][2])+"("+sciences[2]+", "+hazards[2]+")");
-			System.out.println(formatDouble(potentials[histories-1][8])+"("+sciences[8]+", "+hazards[8]+")" + "\t\t\t\t" + formatDouble(potentials[histories-1][0])+"("+sciences[0]+", "+hazards[0]+")");
-			System.out.println("\t" + formatDouble(potentials[histories-1][10])+"("+sciences[10]+", "+hazards[10]+")" + "\t\t" + formatDouble(potentials[histories-1][14])+"("+sciences[14]+", "+hazards[14]+")");
-			System.out.println("\t\t" + formatDouble(potentials[histories-1][12])+"("+sciences[12]+", "+hazards[12]+")");
+//			System.out.println("\n\n\n\n\n\n");
+//			System.out.println("\t\t" + formatDouble(potentials[histories-1][4])+"("+sciences[4]+", "+hazards[4]+")");
+//			System.out.println("\t" + formatDouble(potentials[histories-1][6])+"("+sciences[6]+", "+hazards[6]+")" + "\t\t" + formatDouble(potentials[histories-1][2])+"("+sciences[2]+", "+hazards[2]+")");
+//			System.out.println(formatDouble(potentials[histories-1][8])+"("+sciences[8]+", "+hazards[8]+")" + "\t\t\t\t" + formatDouble(potentials[histories-1][0])+"("+sciences[0]+", "+hazards[0]+")");
+//			System.out.println("\t" + formatDouble(potentials[histories-1][10])+"("+sciences[10]+", "+hazards[10]+")" + "\t\t" + formatDouble(potentials[histories-1][14])+"("+sciences[14]+", "+hazards[14]+")");
+//			System.out.println("\t\t" + formatDouble(potentials[histories-1][12])+"("+sciences[12]+", "+hazards[12]+")");
 		
 			targetDirection = maxDirection;
 			state++;

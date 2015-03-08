@@ -281,9 +281,10 @@ public class MainWrapper extends Panel {
 		MapRoughSlider = new JSlider();
 		MapRoughSlider.setBounds(162, 43, 400, 30);
 		SelectionPlasmaPnl.add(MapRoughSlider);
-		MapRoughSlider.setMajorTickSpacing(10);
+		MapRoughSlider.setMaximum(700);
+		MapRoughSlider.setMajorTickSpacing(100);
 		MapRoughSlider.setPaintTicks(true);
-		MapRoughSlider.setValue(30);
+		MapRoughSlider.setValue(200);
 		
 		MapSmoothLbl = new JLabel("Smooth");
 		MapSmoothLbl.setBounds(91, 43, 61, 21);

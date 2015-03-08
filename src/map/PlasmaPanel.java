@@ -5,7 +5,6 @@ import javax.swing.JPanel;
 
 import objects.DecimalPoint;
 import objects.GridList;
-import wrapper.Globals;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -35,7 +34,7 @@ public class PlasmaPanel extends JPanel {
 	private double rough;
 	private float minval;
 	private float maxval;
-	private float maxHeight = 5;
+	private float maxHeight = 3.2f;
 	private Random rnd = new Random();
 	private int squareResolution = 50;
 	private int detail = 3;
@@ -183,19 +182,19 @@ public class PlasmaPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		try { 
-			int xstart = (-this.getLocation().x / squareResolution) * detail;
+			int xstart = (-this.getLocation().x / squareResolution - 1) * detail;
 			if (xstart < 0){
 				xstart = 0;
 			}
-			int xend = xstart + (this.getParent().getWidth() / squareResolution + 2) * detail;
+			int xend = xstart + (this.getParent().getWidth() / squareResolution + 3) * detail;
 			if (xend > values.length){
 				xend = values.length;
 			}
-			int ystart = (-this.getLocation().y / squareResolution) * detail;
+			int ystart = (-this.getLocation().y / squareResolution - 1) * detail;
 			if (ystart < 0){
 				ystart = 0;
 			}
-			int yend = ystart + (this.getParent().getHeight() / squareResolution + 2) * detail;
+			int yend = ystart + (this.getParent().getHeight() / squareResolution + 4) * detail;
 			if (yend > values[0].length){
 				yend = values[0].length;
 			}
@@ -238,7 +237,7 @@ public class PlasmaPanel extends JPanel {
 						catch (Exception e){
 							g.setColor(getColor(values[x/detail][y/detail]));
 						}
-						g.fillRect(x * squareResolution / detail - squareResolution/2, y * squareResolution / detail - squareResolution/2, squareResolution, squareResolution);
+						g.fillRect(x * squareResolution / detail + squareResolution/2, y * squareResolution / detail + squareResolution/2, squareResolution, squareResolution);
 						switch (currentColorScheme){
 						case REDtoGREEN:
 						case BLUEtoWHITE:
@@ -248,7 +247,7 @@ public class PlasmaPanel extends JPanel {
 							g.setColor(new Color(240, 250, 0));
 							break;
 						}
-						g.drawRect(x * squareResolution / detail - squareResolution/2, y * squareResolution / detail - squareResolution/2, squareResolution, squareResolution);
+						g.drawRect(x * squareResolution / detail + squareResolution/2, y * squareResolution / detail + squareResolution/2, squareResolution, squareResolution);
 						y += detail;
 					}
 					x += detail;
@@ -523,6 +522,7 @@ public class PlasmaPanel extends JPanel {
 			}
 			x++;
 		}
+		System.out.println(max);
 		return max;
 	}
 	
@@ -782,6 +782,7 @@ public class PlasmaPanel extends JPanel {
 			
 			String ver = data.next();
 			if (!ver.equals(fileID)){
+				data.close();
 				throw new Exception("Invalid File Version");
 			}
 			
@@ -845,6 +846,7 @@ public class PlasmaPanel extends JPanel {
 				this.setHazards(hazVals);
 			}
 			
+			data.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

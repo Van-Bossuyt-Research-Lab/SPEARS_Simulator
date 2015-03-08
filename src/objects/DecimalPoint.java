@@ -3,7 +3,7 @@ package objects;
 import java.awt.Point;
 import java.io.Serializable;
 
-public class DecimalPoint implements Serializable {
+public class DecimalPoint implements Serializable, Cloneable {
 
 	private double x, y;
 	
@@ -62,6 +62,11 @@ public class DecimalPoint implements Serializable {
 	@Override
 	public String toString(){
 		return (Math.round(x*1000)/1000.0) + ", " + (Math.round(y*1000)/1000.0);
+	}
+	
+	@Override
+	public DecimalPoint clone(){
+		return new DecimalPoint(x, y);
 	}
 	
 }

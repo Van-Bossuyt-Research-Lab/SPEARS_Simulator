@@ -188,7 +188,7 @@ public class Admin {
 					(int)GUI.WrapperPnl.RuntimeSpnr.getValue());
 		}
 		else {
-			double mapRough = GUI.WrapperPnl.MapRoughSlider.getValue()/1000.0;
+			double mapRough = GUI.WrapperPnl.MapRoughSlider.getValue()/10000.0;
 			int mapSize = (int) GUI.WrapperPnl.MapSizeSpnr.getValue();
 			int mapDetail = (int) GUI.WrapperPnl.MapDetailSpnr.getValue();
 			double targetDensity = (double) GUI.WrapperPnl.TargetDensitySpnr.getValue()/1000.;
