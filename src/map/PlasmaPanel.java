@@ -24,7 +24,7 @@ import java.util.Scanner;
 
 public class PlasmaPanel extends JPanel {
 
-	private double[][] values;
+	private float[][] values;
 	private GridList<Integer> targets;
 	private int[][] hazards;
 	private boolean viewTargets = true;
@@ -33,14 +33,14 @@ public class PlasmaPanel extends JPanel {
 	private boolean monoHazards = true;
 	private int layerSize;
 	private double rough;
-	private double minval;
-	private double maxval;
-	private double maxHeight = 5;
+	private float minval;
+	private float maxval;
+	private float maxHeight = 5;
 	private Random rnd = new Random();
 	private int squareResolution = 50;
 	private int detail = 3;
 	
-	private String fileID = "<^v>";
+	private String fileID = "628";
 	
 	private int currentColorScheme = 0;
 	public static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
@@ -70,16 +70,15 @@ public class PlasmaPanel extends JPanel {
 		this.layerSize = size;
 		this.rough = rough;
 		this.detail = det;
-		size += detail;
 		double seed = System.currentTimeMillis() / 10000.0;
 		while (seed > 30){
 			seed = seed / 10.0;
 		}
-		double[][] values = new double[2][2];
-		values[0][0] = Math.abs(seed + random());
-		values[0][1] = Math.abs(seed + random());
-		values[1][0] = Math.abs(seed + random());
-		values[1][1] = Math.abs(seed + random());		
+		float[][] values = new float[2][2];
+		values[0][0] = (float) Math.abs(seed + random());
+		values[0][1] = (float) Math.abs(seed + random());
+		values[1][0] = (float) Math.abs(seed + random());
+		values[1][1] = (float) Math.abs(seed + random());		
 		int master = 0;
 		while (master <= size){
 			values = expand(values);
@@ -110,7 +109,7 @@ public class PlasmaPanel extends JPanel {
 			}
 			master++;
 		}
-		double[][] values2 = new double[values.length-4-((size+detail)%2+1)][values.length-4-((size+detail)%2+1)];
+		float[][] values2 = new float[values.length-5-((values.length-5)%detail)+(detail/2)][values.length-5-((values.length-5)%detail)+(detail/2)];
 		int count = 9;
 		int x = 0;
 		while (x < values.length){
@@ -156,7 +155,7 @@ public class PlasmaPanel extends JPanel {
 	}
 	
 	//force a height map into the display
-	public void setValues(double[][] vals){
+	public void setValues(float[][] vals){
 		values = vals;
 		minval = getMin();
 		maxval = maxHeight;
@@ -175,7 +174,7 @@ public class PlasmaPanel extends JPanel {
 		this.repaint();
 	}
 	
-	public double[][] getValues(){
+	public float[][] getValues(){
 		return values;
 	}
 	
@@ -184,34 +183,34 @@ public class PlasmaPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		try { 
-			int xstart = -(this.getLocation().x / squareResolution * detail) - detail;
+			int xstart = (-this.getLocation().x / squareResolution) * detail;
 			if (xstart < 0){
 				xstart = 0;
 			}
-			int xend = xstart + (this.getParent().getWidth() / squareResolution * detail) + detail*3;
+			int xend = xstart + (this.getParent().getWidth() / squareResolution + 2) * detail;
 			if (xend > values.length){
 				xend = values.length;
 			}
-			int ystart = -(this.getLocation().y / squareResolution * detail) - detail;
+			int ystart = (-this.getLocation().y / squareResolution) * detail;
 			if (ystart < 0){
 				ystart = 0;
 			}
-			int yend = ystart + (this.getParent().getHeight() / squareResolution * detail) + detail*3;
+			int yend = ystart + (this.getParent().getHeight() / squareResolution + 2) * detail;
 			if (yend > values[0].length){
 				yend = values[0].length;
 			}
 			if (values.length > 0){
-				this.setSize(values.length*squareResolution/detail, values[0].length*squareResolution/detail);
+				//this.setSize(values.length*squareResolution/detail, values[0].length*squareResolution/detail);
 				int x = xstart;
 				while (x < xend){
 					int y = ystart;
 					while (y < yend){
 						try {
 							try {
-								if (viewHazards){
-									if (hazards[x/detail][y/detail] > 5){
-										int value = (11-hazards[x/detail][y/detail])*20+100;
-										g.setColor(new Color(value, value, value));			
+								if (viewTargets){
+									if (targets.get(x/detail, y/detail) > 0){
+										int value = targets.get(x/detail, y/detail);
+										g.setColor(new Color(Color.MAGENTA.getRed()*(value+5)/15, Color.MAGENTA.getGreen()*(value+5)/15, Color.MAGENTA.getBlue()*(value+5)/15));	
 									}
 									else {
 										throw new NullPointerException();
@@ -222,10 +221,10 @@ public class PlasmaPanel extends JPanel {
 								}
 							}
 							catch (NullPointerException e){
-								if (viewTargets){
-									if (targets.get(x/detail, y/detail) > 0){
-										int value = targets.get(x/detail, y/detail);
-										g.setColor(new Color(Color.MAGENTA.getRed()*(value+5)/15, Color.MAGENTA.getGreen()*(value+5)/15, Color.MAGENTA.getBlue()*(value+5)/15));										
+								if (viewHazards){
+									if (hazards[x/detail][y/detail] > 5){
+										int value = (11-hazards[x/detail][y/detail])*20+100;
+										g.setColor(new Color(value, value, value));												
 									}
 									else {
 										throw new Exception();
@@ -237,9 +236,9 @@ public class PlasmaPanel extends JPanel {
 							}
 						}
 						catch (Exception e){
-							g.setColor(getColor(values[x+detail/2][y+detail/2]));
+							g.setColor(getColor(values[x/detail][y/detail]));
 						}
-						g.fillRect(x * squareResolution / detail, y * squareResolution / detail, squareResolution, squareResolution);
+						g.fillRect(x * squareResolution / detail - squareResolution/2, y * squareResolution / detail - squareResolution/2, squareResolution, squareResolution);
 						switch (currentColorScheme){
 						case REDtoGREEN:
 						case BLUEtoWHITE:
@@ -249,7 +248,7 @@ public class PlasmaPanel extends JPanel {
 							g.setColor(new Color(240, 250, 0));
 							break;
 						}
-						g.drawRect(x * squareResolution / detail, y * squareResolution / detail, squareResolution, squareResolution);
+						g.drawRect(x * squareResolution / detail - squareResolution/2, y * squareResolution / detail - squareResolution/2, squareResolution, squareResolution);
 						y += detail;
 					}
 					x += detail;
@@ -477,13 +476,13 @@ public class PlasmaPanel extends JPanel {
 	}
 	
 	//part of the plasma fractal generation, pushes the array from |x|x|x| to |x|_|x|_|x|
-	private double[][] expand(double[][] in){
-		double[][] out = new double[in.length * 2 - 1][in.length * 2 - 1];
+	private float[][] expand(float[][] values2){
+		float[][] out = new float[values2.length * 2 - 1][values2.length * 2 - 1];
 		int x = 0;
-		while (x < in.length){
+		while (x < values2.length){
 			int y = 0;
-			while (y < in.length){
-				out[x*2][y*2] = in[x][y];
+			while (y < values2.length){
+				out[x*2][y*2] = values2[x][y];
 				y++;
 			}
 			x++;
@@ -491,20 +490,20 @@ public class PlasmaPanel extends JPanel {
 		return out;
 	}
 	
-	private double center(double a, double b, double c, double d, double rough){
-		return ((a+b+c+d)/4 + (rough*random()));
+	private float center(float a, float b, float c, float d, double rough){
+		return (float) ((a+b+c+d)/4 + (rough*random()));
 	}
 	
-	private double midpoint(double a, double b, double rough){
-		return ((a+b)/2 + (rough*random()));
+	private float midpoint(float a, float b, double rough){
+		return (float) ((a+b)/2 + (rough*random()));
 	}
 	
-	private double random(){
+	private float random(){
 		int rough = (int)(this.rough * 10.0);
 		while (rough < 1){
 			rough *= 10;
 		}
-		double out = rnd.nextInt(rough) + rnd.nextDouble();
+		float out = (float) (rnd.nextInt(rough) + rnd.nextDouble());
 		if (rnd.nextBoolean()){
 			out *= -1;
 		}
@@ -527,8 +526,8 @@ public class PlasmaPanel extends JPanel {
 		return max;
 	}
 	
-	private double getMin(){
-		double min = Integer.MAX_VALUE;
+	private float getMin(){
+		float min = Float.MAX_VALUE;
 		int x = 0;
 		while (x < values.length){
 			int y = 0;
@@ -615,61 +614,61 @@ public class PlasmaPanel extends JPanel {
 		return detail;
 	}
 	
-	public void SaveImage(double[][] values, int detail, int scheme, String filepath){
-		BufferedImage image = new BufferedImage(15*values.length/detail, 15*values.length/detail, BufferedImage.TYPE_INT_RGB);
+	public void SaveImage(float[][] fs, int detail, int scheme, String filepath){
+		BufferedImage image = new BufferedImage(15*fs.length/detail, 15*fs.length/detail, BufferedImage.TYPE_INT_RGB);
 		Graphics g = image.getGraphics();   
 		double maxval = Double.MIN_VALUE;
 		double minval = Double.MAX_VALUE;
 		int x = 0;
-		while (x < values.length){
+		while (x < fs.length){
 			int y = 0;
-			while (y < values.length){
-				if (values[x][y] > maxval){
-					maxval = values[x][y];
+			while (y < fs.length){
+				if (fs[x][y] > maxval){
+					maxval = fs[x][y];
 				}
-				if (values[x][y] < minval){
-					minval = values[x][y];
+				if (fs[x][y] < minval){
+					minval = fs[x][y];
 				}
 				y++;
 			}
 			x++;
 		}
 		x = 0;
-		while (x < values.length){
+		while (x < fs.length){
 			int y = 0;
-			while (y < values.length){
+			while (y < fs.length){
 				try {
 					switch (scheme){
 					case REDtoGREEN:
-						int red = (int)(255 - (ColorModifier*4/3.0)*Math.pow((values[x+detail/2][y+detail/2]-((maxval-minval)/2.0+minval)), 2));
+						int red = (int)(255 - (ColorModifier*4/3.0)*Math.pow((fs[x+detail/2][y+detail/2]-((maxval-minval)/2.0+minval)), 2));
 						if (red < 0){
 							red = 0;
 						}
-						int green = (int)(255 - (ColorModifier*3/4.0)*Math.pow((values[x+detail/2][y+detail/2]-maxval-0.5), 2));
+						int green = (int)(255 - (ColorModifier*3/4.0)*Math.pow((fs[x+detail/2][y+detail/2]-maxval-0.5), 2));
 						if (green < 0){
 							green = 0;
 						}
-						int blue = (int) ((green - 240) / 2 + (values[x+detail/2][y+detail/2] - maxHeight) * 2);
+						int blue = (int) ((green - 240) / 2 + (fs[x+detail/2][y+detail/2] - maxHeight) * 2);
 						if (blue < 0){
 							blue = 0;
 						}
-						if (values[x+detail/2][y+detail/2] > maxHeight){
+						if (fs[x+detail/2][y+detail/2] > maxHeight){
 							//System.out.println(Math.round(numb*100)/100.0 + ": " + red + ", " + green + ", " + blue);
 						}
-						int scaled = (int) (values[x+detail/2][y+detail/2] * 100 / maxHeight);
+						int scaled = (int) (fs[x+detail/2][y+detail/2] * 100 / maxHeight);
 						g.setColor(new Color(2.0f * scaled, 2.0f * (1 - scaled), 0));
 						break;
 					case BLACKtoWHITE:
-						int i = (int) Math.round((values[x+detail/2][y+detail/2] - minval) / (maxval-minval) * 255);
+						int i = (int) Math.round((fs[x+detail/2][y+detail/2] - minval) / (maxval-minval) * 255);
 						g.setColor(new Color(i, i, i));
 						break;
 					case BLUEtoWHITE:
-						int j = (int) Math.round((values[x+detail/2][y+detail/2] - minval) / (maxval-minval) * 255);
+						int j = (int) Math.round((fs[x+detail/2][y+detail/2] - minval) / (maxval-minval) * 255);
 						g.setColor(new Color(255-j, 255-j, 255));
 						break;
 					}
 				} catch (Exception i){
-					g.setColor(getColor(values[x][y]));
+					g.setColor(getColor(fs[x][y]));
 				}
 				g.fillRect(x * 15 / detail, y * 15 / detail, 15, 15);
 				y += detail;
@@ -688,7 +687,7 @@ public class PlasmaPanel extends JPanel {
 		}
 	}
 	
-	private Point getMapSquare(DecimalPoint loc){ // says which display square a given coordinate falls in
+	public Point getMapSquare(DecimalPoint loc){ // says which display square a given coordinate falls in
 		int shift = values.length / (detail * 2);
 		double x = loc.getX() + shift;
 		double y = shift - loc.getY();
@@ -789,11 +788,11 @@ public class PlasmaPanel extends JPanel {
 			int width = data.nextInt();
 			int height = data.nextInt();
 			
-			double[][] values = new double[height][width];
+			float[][] values = new float[height][width];
 			for (int i = 0; i < height; i++){
-				double[] row = new double[width];
+				float[] row = new float[width];
 				for (int j = 0; j < width; j++){
-					row[j] = data.nextDouble();
+					row[j] = data.nextFloat();
 				}
 				values[i] = row;
 			}

@@ -352,7 +352,7 @@ public class MainWrapper extends Panel {
 		MapSizeSpnr = new JSpinner();
 		MapSizeSpnr.setBounds(162, 105, 80, 25);
 		SelectionPlasmaPnl.add(MapSizeSpnr);
-		MapSizeSpnr.setModel(new SpinnerNumberModel(7, 4, 9, 1));
+		MapSizeSpnr.setModel(new SpinnerNumberModel(10, 7, 13, 1));
 		MapSizeSpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		
 		ValuedTargetsChk = new JCheckBox("Use Valued Targets");
