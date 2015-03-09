@@ -1,11 +1,14 @@
 package rover;
 
+import java.awt.Point;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.HashSet;
 
 import objects.DecimalPoint;
 import objects.Map;
 import objects.SyncronousThread;
+import wrapper.Access;
 import wrapper.Globals;
 
 public class RoverObject implements Serializable {
@@ -55,6 +58,8 @@ public class RoverObject implements Serializable {
 	private long lastCurrentCheck = 0; // time of last current check
 	private long startCurretIntegral = 0; // time of initial integral check
 	private float averageCurrent = 0; // integral divided by time
+	
+	private HashSet<Point> visitedScience = new HashSet<Point>();
 		
 	private String serialHistory = "";
 	private Map<String, Boolean> LEDs = new Map<String, Boolean>();
@@ -82,10 +87,12 @@ public class RoverObject implements Serializable {
 		SyncronousThread.FOREVER, name+"-code");
 		physics.start();
 		timeOfLastCmd = Globals.TimeMillis;
+		Globals.writeToLogFile(this.name, "time\tX\tY\tZ\tscore\tcharge");
 	}
 	
 	private void excecuteCode(){
 		try {
+			Globals.writeToLogFile(this.name, Globals.TimeMillis + "\t" + physics.getLocation().getX() + "\t" + physics.getLocation().getY() + "\t" + Access.getMapHeightatPoint(physics.getLocation()) + "\t" + visitedScience.size()*10 + "\t" + physics.getBatteryCharge());
 			try {
 				motorVoltage = (float) getBatteryVoltage(); // check battery voltage
 				if (motorVoltage < 0.0001){
@@ -217,6 +224,12 @@ public class RoverObject implements Serializable {
 						else if (strcmp(data, "auto") == 0){ // force into autonomous mode
 							run_auto = true;
 							sendSerial("s1 g %");
+						}
+						else if (strcmp(data, "score") == 0){
+							if (Access.isAtTarget(getLocation())){
+								this.visitedScience.add(Access.CODE.GUI.TerrainPnl.HeightMap.getMapSquare(getLocation()));
+								System.out.println("Aquired.  New Score = " + visitedScience.size());
+							}
 						}
 					} 
 					// if there isn't more to the message interpret the tag

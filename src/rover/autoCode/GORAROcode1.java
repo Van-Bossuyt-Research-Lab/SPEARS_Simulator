@@ -77,7 +77,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 			double motor_temp_BR, double battery_voltage,
 			double battery_current, double battery_temp, double battery_charge) 
 	{
-		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + score + "\t" + state + "\t" + battery_charge);
+		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + Access.getMapHeightatPoint(location) + "\t" + score + "\t" + state + "\t" + battery_charge);
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
 			score += Access.getTargetValue(location);

@@ -153,7 +153,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		location.offsetThis(speed*time_step*Math.cos(direction), speed*time_step*(Math.sin(direction)));
 		//TODO													  + here??
 		location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
-		direction = (direction + angular_velocity*time_step) % (2*Math.PI);
+		direction = (direction + angular_velocity*time_step + 2*Math.PI) % (2*Math.PI);
 		// report new location to map
 		Access.updateRoverLocation(roverName, location, direction);
 		

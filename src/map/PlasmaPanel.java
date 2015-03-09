@@ -851,4 +851,8 @@ public class PlasmaPanel extends JPanel {
 			e.printStackTrace();
 		}
 	}
+
+	public void setDetail(int detail) {
+		this.detail = detail;
+	}
 }

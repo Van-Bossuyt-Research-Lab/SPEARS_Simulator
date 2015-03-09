@@ -115,10 +115,7 @@ public class ThreadItem implements Serializable {
 	public void shakeThread() {
 		try {
 			thread.Shake();
-		} catch (NullPointerException e) {
-			System.err.println(name);
-			e.printStackTrace();
-		}
+		} catch (NullPointerException e) {}
 	}
 
 	@Override

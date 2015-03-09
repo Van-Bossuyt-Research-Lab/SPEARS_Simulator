@@ -300,31 +300,9 @@ public class LandMapPanel extends Panel{
 		);
 	}
 	
-	//returns the array point in which the map location falls
-	private Point getMapSquare(DecimalPoint loc){ // says which display square a given coordinate falls in
-		double shift = HeightMap.getWidth()/HeightMap.getResolution() / 2.0;
-		double x = loc.getX() + shift;
-		double y = shift - loc.getY();
-		int outx = (int)(x*HeightMap.getDetail());
-		int outy = (int)(y*HeightMap.getDetail());
-		return new Point(outx, outy);
-	}
-	private Point getMapSquare(DecimalPoint loc, boolean offset){ // says which display square a given coordinate falls in
-		double x = loc.getX();
-		double y = loc.getY();
-		if (offset){
-			double shift = HeightMap.getWidth()/HeightMap.getResolution() / 2.0;
-			x = loc.getX() + shift;
-			y = shift - loc.getY();
-		}
-		int outx = (int)(x*HeightMap.getDetail());
-		int outy = (int)(y*HeightMap.getDetail());
-		return new Point(outx, outy);
-	}
-	
 	//returns the height of the map at the given point
 	public double getHeight(DecimalPoint loc){
-		Point mapSquare = getMapSquare(loc);
+		Point mapSquare = HeightMap.getMapSquare(loc);
 		int x = (int) mapSquare.getX();
 		int y = (int) mapSquare.getY();
 		DecimalPoint lifePnt = new DecimalPoint(loc.getX() + HeightMap.getWidth()/HeightMap.getResolution() / 2.0, HeightMap.getWidth()/HeightMap.getResolution() / 2.0 - loc.getY());
@@ -335,6 +313,12 @@ public class LandMapPanel extends Panel{
 	
 	//returns the angle which the rover is facing
 	public double getIncline(DecimalPoint loc, double dir){
+		double radius = 0.01;
+		double h0 = getHeight(loc);
+		DecimalPoint loc2 = loc.offset(radius*Math.cos(dir), radius*Math.sin(dir));
+		double hnew = getHeight(loc2);
+		return Math.atan((hnew-h0)/radius);
+		/*
 		Point mapSquare = getMapSquare(loc);
 		int x = (int) mapSquare.getX();
 		int y = (int) mapSquare.getY();
@@ -349,11 +333,12 @@ public class LandMapPanel extends Panel{
 		locy = (point2.getY() - (lifePnt.getY()-locy/HeightMap.getDetail())) * HeightMap.getDetail();
 		double hnew = getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
 		return Math.atan(hnew-h0);
+		*/
 	}
 	
 	//returns the angle perpendicular to the direction the rover is facing
 	public double getCrossSlope(DecimalPoint loc, double dir){
-		return getIncline(loc, dir-Math.PI/2.0);
+		return getIncline(loc, (dir-Math.PI/2.0+Math.PI*2)%(2*Math.PI));
 	}
 	
 	// retrieve temperature from a coordinate, with interpolation
@@ -385,6 +370,7 @@ public class LandMapPanel extends Panel{
 	
 	// interpolates between the corners of a square to find mid-range values
 	public double getIntermidiateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
+		//System.out.println(topleft + "\t" + relativex + "\t" + topright + "\n" + relativey + "\n" + bottomleft + "\t\t\t" + bottomright);
 		if (relativex > relativey){ //top right triangle
 			return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
 		}
