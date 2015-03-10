@@ -206,14 +206,6 @@ public class LandMapPanel extends Panel{
 			}
 		});
 		
-		this.addMouseListener(new MouseAdapter(){
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}			
-		});
-		
 		//Allows the user to easily scroll in and out
 		this.addMouseWheelListener(new MouseWheelListener(){
 			@Override
@@ -313,27 +305,11 @@ public class LandMapPanel extends Panel{
 	
 	//returns the angle which the rover is facing
 	public double getIncline(DecimalPoint loc, double dir){
-		double radius = 0.01;
+		double radius = 0.1;
 		double h0 = getHeight(loc);
 		DecimalPoint loc2 = loc.offset(radius*Math.cos(dir), radius*Math.sin(dir));
 		double hnew = getHeight(loc2);
 		return Math.atan((hnew-h0)/radius);
-		/*
-		Point mapSquare = getMapSquare(loc);
-		int x = (int) mapSquare.getX();
-		int y = (int) mapSquare.getY();
-		DecimalPoint lifePnt = new DecimalPoint(loc.getX() + HeightMap.getWidth()/HeightMap.getResolution() / 2.0, HeightMap.getWidth()/HeightMap.getResolution() / 2.0 - loc.getY());
-		double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
-		double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
-		double h0 = getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
-		DecimalPoint point2 = lifePnt.offset(Math.cos(dir), -Math.sin(dir));
-		x = (int) getMapSquare(point2, false).getX();
-		y = (int) getMapSquare(point2, false).getY();
-		locx = (point2.getX() - (lifePnt.getX()-locx/HeightMap.getDetail())) * HeightMap.getDetail();
-		locy = (point2.getY() - (lifePnt.getY()-locy/HeightMap.getDetail())) * HeightMap.getDetail();
-		double hnew = getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
-		return Math.atan(hnew-h0);
-		*/
 	}
 	
 	//returns the angle perpendicular to the direction the rover is facing

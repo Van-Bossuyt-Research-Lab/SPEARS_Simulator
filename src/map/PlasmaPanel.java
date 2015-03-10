@@ -11,6 +11,8 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,12 +36,12 @@ public class PlasmaPanel extends JPanel {
 	private double rough;
 	private float minval;
 	private float maxval;
-	private float maxHeight = 3.2f;
+	private float maxHeight = 4.2f;
 	private Random rnd = new Random();
 	private int squareResolution = 50;
 	private int detail = 3;
 	
-	private String fileID = "628";
+	private String fileID = "%&$#";
 	
 	private int currentColorScheme = 0;
 	public static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
@@ -108,7 +110,7 @@ public class PlasmaPanel extends JPanel {
 			}
 			master++;
 		}
-		float[][] values2 = new float[values.length-5-((values.length-5)%detail)+(detail/2)][values.length-5-((values.length-5)%detail)+(detail/2)];
+		float[][] values2 = new float[values.length-4-((values.length-4)%(detail*2))][values.length-4-((values.length-4)%(detail*2))];
 		int count = 9;
 		int x = 0;
 		while (x < values.length){
@@ -237,7 +239,7 @@ public class PlasmaPanel extends JPanel {
 						catch (Exception e){
 							g.setColor(getColor(values[x/detail][y/detail]));
 						}
-						g.fillRect(x * squareResolution / detail + squareResolution/2, y * squareResolution / detail + squareResolution/2, squareResolution, squareResolution);
+						g.fillRect(x * squareResolution / detail, y * squareResolution / detail, squareResolution, squareResolution);
 						switch (currentColorScheme){
 						case REDtoGREEN:
 						case BLUEtoWHITE:
@@ -247,7 +249,7 @@ public class PlasmaPanel extends JPanel {
 							g.setColor(new Color(240, 250, 0));
 							break;
 						}
-						g.drawRect(x * squareResolution / detail + squareResolution/2, y * squareResolution / detail + squareResolution/2, squareResolution, squareResolution);
+						g.drawRect(x * squareResolution / detail, y * squareResolution / detail, squareResolution, squareResolution);
 						y += detail;
 					}
 					x += detail;
@@ -706,7 +708,7 @@ public class PlasmaPanel extends JPanel {
 			
 			write.write(fileID + "\n");
 			
-			write.write(values[0].length + "\n" + values.length + "\n\n");
+			write.write(values[0].length + "\n" + values.length + "\n" + detail + "\n\n");
 			for (int i = 0; i < values.length; i++){
 				for (int j = 0; j < values[i].length; j++){
 					write.write(values[i][j] + "\t");
@@ -788,6 +790,8 @@ public class PlasmaPanel extends JPanel {
 			
 			int width = data.nextInt();
 			int height = data.nextInt();
+			int detail = data.nextInt();
+			setDetail(detail);
 			
 			float[][] values = new float[height][width];
 			for (int i = 0; i < height; i++){
