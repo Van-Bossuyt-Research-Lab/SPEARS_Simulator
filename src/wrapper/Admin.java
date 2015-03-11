@@ -45,6 +45,7 @@ public class Admin {
 	public Admin(){
 		//addItemToSelectionList(	name_on_list ,	object_to_add	);
 		addItemToSelectionList(		"Default", 		new RoverPhysicsModel());
+		addItemToSelectionList(		"[null]", 		new BlankRoverAuto());
 		addItemToSelectionList(		"Generic4", 	new GenericRover("Generic4", 4));
 		addItemToSelectionList(		"RAIR", 		new RAIRcode());
 		addItemToSelectionList(		"RAIR Control", new RAIRcodeControl());

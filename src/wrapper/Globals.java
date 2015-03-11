@@ -245,16 +245,16 @@ public class Globals {
 				String key = (String) o;
 				try {
 					threads.get(key).equals(null);
+					if (key.equals("milli-clock")){
+						continue;
+					}
+					if (!threads.get(key).isFinished()){
+						//System.out.println(key + " - " + threads.get(key).getState());
+						milliDone = true;
+						threads.get(key).shakeThread();
+						return;
+					}
 				} catch (NullPointerException e) { continue; }
-				if (key.equals("milli-clock")){
-					continue;
-				}
-				if (!threads.get(key).isFinished()){
-					//System.out.println(key + " - " + threads.get(key).getState());
-					milliDone = true;
-					threads.get(key).shakeThread();
-					return;
-				}
 			}
 			milliDone = false;
 			TimeMillis++;

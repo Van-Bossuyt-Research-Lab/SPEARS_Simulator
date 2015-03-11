@@ -77,7 +77,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 			double motor_temp_BR, double battery_voltage,
 			double battery_current, double battery_temp, double battery_charge) 
 	{
-		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + Access.getMapHeightatPoint(location) + "\t" + score + "\t" + state + "\t" + battery_charge);
+		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + Access.getMapHeightatPoint(location) + "\t" + score + "\t" + battery_charge + "\t" + state);
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
 			score += Access.getTargetValue(location);
@@ -87,7 +87,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 					potentials[x][y] = 0;
 				}
 			}
-			System.out.println("Score = " + score);
+			//System.out.println("Score = " + score);
 		}
 		int[] sciences = new int[sampleDirections];
 		int[] hazards = new int[sampleDirections];

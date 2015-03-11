@@ -92,12 +92,11 @@ public class RoverObject implements Serializable {
 	
 	private void excecuteCode(){
 		try {
-			Globals.writeToLogFile(this.name, Globals.TimeMillis + "\t" + physics.getLocation().getX() + "\t" + physics.getLocation().getY() + "\t" + Access.getMapHeightatPoint(physics.getLocation()) + "\t" + visitedScience.size()*10 + "\t" + physics.getBatteryCharge());
+			//Globals.writeToLogFile(this.name, Globals.TimeMillis + "\t" + physics.getLocation().getX() + "\t" + physics.getLocation().getY() + "\t" + Access.getMapHeightatPoint(physics.getLocation()) + "\t" + visitedScience.size()*10 + "\t" + physics.getBatteryCharge());
 			try {
 				motorVoltage = (float) getBatteryVoltage(); // check battery voltage
 				if (motorVoltage < 0.0001){
 					Globals.writeToLogFile("Rover", "Rover out of Power:\t" + Globals.TimeMillis);
-					System.exit(0);
 				}
 				motorCurrent = (float) getBatteryCurrent(); // measure current draw				
 				if (checkCurrent){
