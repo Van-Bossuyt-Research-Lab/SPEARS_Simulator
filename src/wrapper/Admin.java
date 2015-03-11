@@ -2,6 +2,7 @@ package wrapper;
 
 import java.io.File;
 import java.util.Random;
+
 import control.InterfaceCode;
 import control.PopUp;
 import objects.DecimalPoint;
@@ -249,10 +250,14 @@ public class Admin {
 	public void addRoverToList(){
 		if (GUI.WrapperPnl.RovAutonomusCodeList.getSelectedIndex() != -1 && GUI.WrapperPnl.RovDriveModelList.getSelectedIndex() != -1){
 			int numb = 1;
-			String newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
+			String namebase = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem(); 
+			if (GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem().equals("[null]")){
+				namebase = "Rover";
+			}
+			String newName = namebase + " " + numb;
 			while (contains(GUI.WrapperPnl.RoverList.getItems(), newName)){
 				numb++;
-				newName = (String)GUI.WrapperPnl.RovAutonomusCodeList.getSelectedItem() + " " + numb;
+				newName = namebase + " " + numb;
 			}
 			//TODO change temp to map temp
 			GUI.WrapperPnl.RoverList.addValue(newName);

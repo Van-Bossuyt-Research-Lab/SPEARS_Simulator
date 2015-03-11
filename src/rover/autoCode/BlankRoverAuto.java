@@ -1,4 +1,4 @@
-package wrapper;
+package rover.autoCode;
 
 import objects.DecimalPoint;
 import rover.RoverAutonomusCode;
@@ -21,7 +21,7 @@ public class BlankRoverAuto extends RoverAutonomusCode {
 			double motor_temp_BR, double battery_voltage,
 			double battery_current, double battery_temp, double battery_charge) {
 		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 	@Override

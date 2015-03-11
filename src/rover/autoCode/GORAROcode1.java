@@ -28,6 +28,13 @@ public class GORAROcode1 extends RoverAutonomusCode {
 	private double targetDirection = 0;
 	private long lastOptTime = 0;
 	
+	private DecimalPoint lastLoc = new DecimalPoint(0, 0);
+	private long timeAtPoint = 0;
+	private boolean begun = false;
+	private static final double STALL_RADIUS = 1.5;
+	private static final int STALL_TIME = 3000;
+	private static final int RUN_TIME = 4000;
+	
 	private List<DecimalPoint> visitedScience = new List<DecimalPoint>();
 	
 	private double[] mentality = new double[] { 10000, 3000, 1200, 500, 50 };
@@ -97,6 +104,23 @@ public class GORAROcode1 extends RoverAutonomusCode {
 				for (int j = 0; j < sampleDirections; j++){
 					potentials[i-1][j] = potentials[i][j];
 				}
+			}
+			if (Math.sqrt(Math.pow(location.getX()-lastLoc.getX(), 2) + Math.pow(location.getY()-lastLoc.getY(), 2)) < STALL_RADIUS){
+				if (milliTime-timeAtPoint > STALL_TIME){
+					if (begun){
+						state = 4;
+						lastOptTime = milliTime;
+						return "move";
+					}
+					else {
+						timeAtPoint = milliTime;
+						begun = true;
+					}
+				}
+			}
+			else {
+				lastLoc = location.clone();
+				timeAtPoint = milliTime;
 			}
 			double maxPotential = Double.MIN_VALUE;
 			double maxDirection = 0;
@@ -197,10 +221,19 @@ public class GORAROcode1 extends RoverAutonomusCode {
 					return "spin_ccw";
 				}
 			}
-		default:
+		case 3:
 			if (milliTime-lastOptTime > RECALC_TIME){
 				state = 1;
 			}
+			return "";
+		case 4:
+			if (milliTime-lastOptTime > RUN_TIME){
+				lastOptTime = (long)(milliTime - RECALC_TIME);
+				state = 1;
+			}
+			return "";
+		default:
+			state = 1;
 			return "";
 		}
 	}

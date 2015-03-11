@@ -36,7 +36,7 @@ public class PlasmaPanel extends JPanel {
 	private double rough;
 	private float minval;
 	private float maxval;
-	private float maxHeight = 4.2f;
+	private float maxHeight = 4.5f;
 	private Random rnd = new Random();
 	private int squareResolution = 50;
 	private int detail = 3;
