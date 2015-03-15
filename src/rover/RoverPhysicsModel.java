@@ -16,69 +16,96 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	private String roverName;
 	public final double time_step = 0.01; // time step of physics, in seconds
 	
-	private final double wheel_radius = 0.0476; //m
-	private final double wheel_mass = 0.064; //kg
-	private final double rover_width = 0.438; //m
-	private final double rover_length = 0.229; //m
-	private final double motor_arm = Math.sqrt(Math.pow(rover_width, 2) + Math.pow(rover_length, 2)) / 2.0; //m
-	private final double rover_mass = 2.266; //kg
-	private final double rover_inertia = 0.1025; //kg*m^2
-	private final double wheel_inertia = 0.5 * wheel_mass * Math.pow(wheel_radius, 2); //kg*m^2
+	protected final double wheel_radius = 0.0476; //m
+	protected final double wheel_mass = 0.064; //kg
+	protected final double rover_width = 0.438; //m
+	protected final double rover_length = 0.229; //m
+	protected final double motor_arm = Math.sqrt(Math.pow(rover_width, 2) + Math.pow(rover_length, 2)) / 2.0; //m
+	protected final double rover_mass = 2.266; //kg
+	protected final double rover_inertia = 0.1025; //kg*m^2
+	protected final double wheel_inertia = 0.5 * wheel_mass * Math.pow(wheel_radius, 2); //kg*m^2
 	
-	private final double motor_energy_transform = 0.035;
-	private final double motor_voltage_transform = 0.571;
-	private final double motor_resistance = 3; //Ohm
-	private final double motor_inductance = 0.11455; //H
-	private final double friction_axle = 0.0002621;
-	private final double friction_gr = .65;
-	private final double friction_s = 1.2;
-	private final double gamma = Math.atan(1/rover_width);
+	protected final double motor_energy_transform = 0.035;
+	protected final double motor_voltage_transform = 0.571;
+	protected final double motor_resistance = 3; //Ohm
+	protected final double motor_inductance = 0.11455; //H
+	protected final double friction_axle = 0.0002621;
+	protected final double friction_gr = .65;
+	protected final double friction_s = 1.2;
+	protected final double gamma = Math.atan(1/rover_width);
 	
-	private final double R_cp0 = 0.07; //Ohm
-	private final double R_cp1 = 0.01; //Ohm
-	private final double R_cp2 = 3;
-	private final double capacitance_battery = 12000; //F
-	private final double capacitance_cp = 0.2; //F
-	private final double resistance_s = 0.01; //Ohm
-	private final double resistance_parasite = 100000000; //Ohm
-	private double battery_max_charge = 140000; //C
+	protected final double R_cp0 = 0.07; //Ohm
+	protected final double R_cp1 = 0.01; //Ohm
+	protected final double R_cp2 = 3;
+	protected final double capacitance_battery = 12000; //F
+	protected final double capacitance_cp = 0.2; //F
+	protected final double resistance_s = 0.01; //Ohm
+	protected final double resistance_parasite = 100000000; //Ohm
+	protected double battery_max_charge = 140000; //C
 	
-	private final double battery_heat_transfer = 10; //J/s/*c
-	private final double battery_thermal_cap = 170; //J/K
+	protected final double battery_heat_transfer = 10; //J/s/*c
+	protected final double battery_thermal_cap = 170; //J/K
 	
-	private final double winding_heat_transfer = 2; //J/s/*c
-	private final double winding_thermal_cap = 1.7; //J/*c
-	private final double motor_surface_heat_transfer = 0.9; //J/s/*c
-	private final double motor_thermal_cap = 0.8; //J/*c	
+	protected final double winding_heat_transfer = 2; //J/s/*c
+	protected final double winding_thermal_cap = 1.7; //J/*c
+	protected final double motor_surface_heat_transfer = 0.9; //J/s/*c
+	protected final double motor_thermal_cap = 0.8; //J/*c	
 	
-	private double fric_gr_all = 0;
-	private double[] slip = { 0, 0, 0, 0 };		
+	protected double fric_gr_all = 0;
+	protected double[] slip = { 0, 0, 0, 0 };		
 	
-	private int[] motor_power = new int[] {  250, 250, 250, 250 }; // assigned motor powers
-	private int[] motor_states = new int[] { 0, 0, 0, 0 }; // assigned motor states
-	private double[] wheel_speed = { 0, 0, 0, 0 }; //rad/s	
-	private double[] motor_current = { 0, 0, 0, 0 }; //A
+	protected int[] motor_power = new int[] {  250, 250, 250, 250 }; // assigned motor powers
+	protected int[] motor_states = new int[] { 0, 0, 0, 0 }; // assigned motor states
+	protected double[] wheel_speed = { 0, 0, 0, 0 }; //rad/s	
+	protected double[] motor_current = { 0, 0, 0, 0 }; //A
 	
-	private double battery_charge; //C
-	private double battery_cp_charge = 0; //C
-	private double battery_voltage = 12; //V
-	private double battery_current = 0; //A
-	private double SOC = 1;
+	protected double battery_charge = 0; //C
+	protected double battery_cp_charge = 0; //C
+	protected double battery_voltage = 12; //V
+	protected double battery_current = 0; //A
+	protected double SOC = 1;
 	
-	private double battery_temperature = 30; //*c
-	private double[] winding_temp = { 30, 30, 30, 30 }; //*c
-	private double[] motor_temp = { 30, 30, 30, 30 }; //*c
+	protected double battery_temperature = 30; //*c
+	protected double[] winding_temp = { 30, 30, 30, 30 }; //*c
+	protected double[] motor_temp = { 30, 30, 30, 30 }; //*c
 	
-	private DecimalPoint location; //m x m from center of map
-	private double direction; //rad off of positive X
-	private double speed = 0; //m/s
-	private double angular_velocity = 0; //rad/s
-	private double acceleration = 0; //m/s^2
-	private double angular_acceleration = 0; //rad/s^2
-	private double slip_acceleration = 0; //m/s^2
-	private double slip_velocity = 0; //m/s
+	protected DecimalPoint location = new DecimalPoint(); //m x m from center of map
+	protected double direction = 0; //rad off of positive X
+	protected double speed = 0; //m/s
+	protected double angular_velocity = 0; //rad/s
+	protected double acceleration = 0; //m/s^2
+	protected double angular_acceleration = 0; //rad/s^2
+	protected double slip_acceleration = 0; //m/s^2
+	protected double slip_velocity = 0; //m/s
 	
 	public RoverPhysicsModel() {}
+	
+	protected RoverPhysicsModel(RoverPhysicsModel origin){
+		roverName = origin.roverName;
+		battery_max_charge = origin.battery_max_charge;
+		fric_gr_all = origin.fric_gr_all;
+		slip = origin.slip.clone();
+		motor_power = origin.motor_power.clone();
+		motor_states = origin.motor_states.clone();
+		wheel_speed = origin.wheel_speed.clone();
+		motor_current = origin.motor_current.clone();
+		battery_charge = origin.battery_charge;
+		battery_cp_charge = origin.battery_cp_charge;
+		battery_voltage = origin.battery_voltage;
+		battery_current = origin.battery_current;
+		SOC = origin.SOC;
+		battery_temperature = origin.battery_temperature;
+		winding_temp = origin.winding_temp.clone();
+		motor_temp = origin.motor_temp.clone();
+		location = origin.location.clone();
+		direction = origin.direction;
+		speed = origin.speed;
+		angular_velocity = origin.angular_velocity;
+		acceleration = origin.acceleration;
+		angular_acceleration = origin.angular_acceleration;
+		slip_acceleration = origin.slip_acceleration;
+		slip_velocity = origin.slip_velocity;
+	}
 	
 	public void initalizeConditions(String name, double bat_charge, double temp){
 		roverName = name;
@@ -195,7 +222,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	
 	@Override
 	public RoverPhysicsModel clone(){
-		return new RoverPhysicsModel();
+		return new RoverPhysicsModel(this);
 	}
 	
 	private double resistance_cp(){ // get the resistance of the CP resistor as a function of SOC

@@ -63,6 +63,15 @@ public class PlasmaPanel extends JPanel {
 				}
 			}
 		});
+		this.addMouseListener(new MouseAdapter(){
+			@Override
+			public void mouseClicked(MouseEvent e){
+				double shift = values.length / (double)detail * squareResolution / 2.0;
+				double x = (e.getX()-shift) / squareResolution;
+				double y = (shift-e.getY()) / squareResolution;
+				System.out.println(x + ", " + y);
+			}
+		});
 	}
 	
 	//Generates the height map using a plasma fractal
