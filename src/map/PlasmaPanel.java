@@ -366,6 +366,9 @@ public class PlasmaPanel extends JPanel {
 		catch (NullPointerException e){
 			return false;
 		}
+		catch (ArrayIndexOutOfBoundsException e){
+			return false;
+		}
 	}
 	
 	public int getTargetValue(DecimalPoint loc){
@@ -375,6 +378,9 @@ public class PlasmaPanel extends JPanel {
 			return targets.get(x, y).intValue();
 		}
 		catch (NullPointerException e){
+			return 0;
+		}
+		catch (ArrayIndexOutOfBoundsException e){
 			return 0;
 		}
 	}
@@ -468,12 +474,20 @@ public class PlasmaPanel extends JPanel {
 		catch (NullPointerException e){
 			return false;
 		}
+		catch (ArrayIndexOutOfBoundsException e){
+			return true;
+		}
 	}
 	
 	public int getHazardValue(DecimalPoint loc){
 		int x = (int) getMapSquare(loc).getX() / detail;
 		int y = (int) getMapSquare(loc).getY() / detail;
-		return hazards[x][y];
+		try {
+			return hazards[x][y];
+		}
+		catch (ArrayIndexOutOfBoundsException e){
+			return 10;
+		}
 	}
 	
 	public void setHazardsVisible(boolean b){
@@ -533,7 +547,6 @@ public class PlasmaPanel extends JPanel {
 			}
 			x++;
 		}
-		System.out.println(max);
 		return max;
 	}
 	

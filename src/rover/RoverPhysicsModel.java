@@ -13,7 +13,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	
 	private final int FL = 0, FR = 1, BL = 2, BR = 3;
 	
-	private String roverName;
+	protected String roverName;
 	public final double time_step = 0.01; // time step of physics, in seconds
 	
 	protected final double wheel_radius = 0.0476; //m

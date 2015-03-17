@@ -48,6 +48,7 @@ public class Admin {
 		//addItemToSelectionList(	name_on_list ,	object_to_add	);
 		addItemToSelectionList(		"Default", 		new RoverPhysicsModel());
 		addItemToSelectionList(		"Fail On Hazard", new FailOnHazard());
+		addItemToSelectionList(		"Risk On Hazard", new RiskOnHazard());
 		addItemToSelectionList(		"[null]", 		new BlankRoverAuto());
 		addItemToSelectionList(		"Generic4", 	new GenericRover("Generic4", 4));
 		addItemToSelectionList(		"RAIR", 		new RAIRcode());
@@ -57,6 +58,30 @@ public class Admin {
 		addItemToSelectionList(		"RAIR Risk Temper", new RAIRcodeRT());	
 		addItemToSelectionList(		"PIDAA",		new PIDAAcode());
 		addItemToSelectionList(		"GORARO Simp",	new GORAROcode1());
+		addItemToSelectionList(		"GORARO Adv A",	new GORAROAdvanceCode(new double[]{
+				100, 40, 10, 10, 10
+		}));
+		addItemToSelectionList(		"GORARO Adv B",	new GORAROAdvanceCode(new double[]{
+				100, 60, 10, 10, 10
+		}));
+		addItemToSelectionList(		"GORARO Adv C",	new GORAROAdvanceCode(new double[]{
+				100, 80, 10, 10, 10
+		}));
+		addItemToSelectionList(		"GORARO Adv D",	new GORAROAdvanceCode(new double[]{
+				100, 100, 10, 10, 10
+		}));
+		addItemToSelectionList(		"GORARO Adv E",	new GORAROAdvanceCode(new double[]{
+				100, 40, 30, 10, 10
+		}));
+		addItemToSelectionList(		"GORARO Adv F",	new GORAROAdvanceCode(new double[]{
+				100, 60, 30, 10, 10
+		}));
+		addItemToSelectionList(		"GORARO Adv G",	new GORAROAdvanceCode(new double[]{
+				100, 80, 30, 10, 10
+		}));
+		addItemToSelectionList(		"GORARO Adv H",	new GORAROAdvanceCode(new double[]{
+				100, 100, 30, 10, 10
+		}));
 		addItemToSelectionList(		"MER", 			new MER(new DecimalPoint[] {
 				new DecimalPoint(-9.5, -9.5),
 				new DecimalPoint(-12.5, -5.5),

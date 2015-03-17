@@ -87,7 +87,6 @@ public class RoverObject implements Serializable {
 		SyncronousThread.FOREVER, name+"-code");
 		physics.start();
 		timeOfLastCmd = Globals.TimeMillis;
-		Globals.writeToLogFile(this.name, "time\tX\tY\tZ\tscore\tcharge");
 	}
 	
 	private void excecuteCode(){
