@@ -71,16 +71,16 @@ public class Admin {
 				100, 100, 10, 10, 10
 		}));
 		addItemToSelectionList(		"GORARO Adv E",	new GORAROAdvanceCode(new double[]{
-				100, 40, 30, 10, 10
+				100, 120, 10, 10, 10
 		}));
 		addItemToSelectionList(		"GORARO Adv F",	new GORAROAdvanceCode(new double[]{
-				100, 60, 30, 10, 10
+				100, 140, 10, 10, 10
 		}));
 		addItemToSelectionList(		"GORARO Adv G",	new GORAROAdvanceCode(new double[]{
-				100, 80, 30, 10, 10
+				100, 40, 30, 10, 10
 		}));
 		addItemToSelectionList(		"GORARO Adv H",	new GORAROAdvanceCode(new double[]{
-				100, 100, 30, 10, 10
+				100, 60, 30, 10, 10
 		}));
 		addItemToSelectionList(		"MER", 			new MER(new DecimalPoint[] {
 				new DecimalPoint(-9.5, -9.5),

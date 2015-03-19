@@ -82,10 +82,10 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 	{
 		if (!runyet){
 			writeToLog(mentalityStr);
-			writeToLog("time\tX\tY\tZ\tscore\tcharge\tstate");
+			writeToLog("time\tX\tY\tZ\tscore\tcharge\tstate\thazard");
 			runyet = true;
 		}
-		writeToLog(milliTime + "\t" + formatDouble(location.getX()) + "\t" + formatDouble(location.getY()) + "\t" + formatDouble(Access.getMapHeightatPoint(location)) + "\t" + score + "\t" + formatDouble(battery_charge) + "\t" + state);
+		writeToLog(milliTime + "\t" + formatDouble(location.getX()) + "\t" + formatDouble(location.getY()) + "\t" + formatDouble(Access.getMapHeightatPoint(location)) + "\t" + score + "\t" + formatDouble(battery_charge) + "\t" + state + "\t" + Access.getHazardValue(location));
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
 			score += Access.getTargetValue(location);
