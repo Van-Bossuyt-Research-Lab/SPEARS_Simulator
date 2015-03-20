@@ -773,7 +773,7 @@ public class PlasmaPanel extends JPanel {
 			}
 			else {
 				write.write("v");
-				write.write(hazards[0].length + "\n" + hazards.length + "\n");
+				write.write("\n" + hazards[0].length + "\n" + hazards.length + "\n");
 				for (int i = 0; i < hazards.length; i++){
 					for (int j = 0; j < hazards[0].length; j++){
 						try {
@@ -870,7 +870,7 @@ public class PlasmaPanel extends JPanel {
 					hazVals[i] = row;
 				}
 				this.setHazards(hazVals);
-			}
+			};
 			
 			data.close();
 		} catch (FileNotFoundException e) {

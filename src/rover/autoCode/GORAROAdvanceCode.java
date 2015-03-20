@@ -1,9 +1,14 @@
 package rover.autoCode;
 
+import java.awt.Point;
+import java.util.HashSet;
+import java.util.Set;
+
 import objects.DecimalPoint;
 import objects.List;
 import rover.RoverAutonomusCode;
 import wrapper.Access;
+import wrapper.Admin;
 import wrapper.Globals;
 
 public class GORAROAdvanceCode extends RoverAutonomusCode {
@@ -36,7 +41,7 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 	private static final double RUN_ROTATION = 5*Math.PI/16.0;
 	private static final int RUN_TIME = 5000;
 	
-	private List<DecimalPoint> visitedScience = new List<DecimalPoint>();
+	private Set<Point> visitedScience = new HashSet<Point>();
 	
 	private double[] mentality = new double[] { 10000, 3000, 1200, 500, 50 };
 	private String mentalityStr;
@@ -89,7 +94,8 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
 			score += Access.getTargetValue(location);
-			visitedScience.add(location.clone());
+			Point mapLoc = Admin.GUI.TerrainPnl.HeightMap.getMapSquare(location);
+			visitedScience.add(new Point(mapLoc.x/3, mapLoc.y/3));
 			for (int x = 0; x < histories; x++){
 				for (int y = 0; y < sampleDirections; y++){
 					potentials[x][y] = 0;
@@ -123,7 +129,7 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 				lastLoc = location.clone();
 				timeAtPoint = milliTime;
 			}
-			double maxPotential = Double.MIN_VALUE;
+			double maxPotential = Integer.MIN_VALUE;
 			double maxDirection = 0;
 			for (int i = 0; i < sampleDirections; i++){
 				double theta = 2*Math.PI*i/(double)sampleDirections;
@@ -135,7 +141,7 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 				int science = 0;
 				for (int radius = 0; radius < sampleRadius; radius++){
 					if (hasUnvisitedScience(location.offset(radius*Math.cos(theta), radius*Math.sin(theta)))){
-						science = 1;
+						science = Access.getTargetValue(location.offset(radius*Math.cos(theta), radius*Math.sin(theta)));
 						break;
 					}
 				}
@@ -143,7 +149,7 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 				//if there is a hazard at the point get less excited
 				int hazard = 0;
 				if (Access.isInHazard(examine)){
-					hazard = 1;
+					hazard = Access.getHazardValue(location.offset(sampleRadius*Math.cos(theta), sampleRadius*Math.sin(theta)));
 				}
 				
 				//Calculate the density of science targets in a wedge away from the rover 
@@ -152,7 +158,7 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 					for (double phi = -averagingAngle/2.0; phi <= averagingAngle/2.0; phi += averagingPStep){
 						if (hasUnvisitedScience(location.offset(radius*Math.cos(theta+phi), radius*Math.sin(theta+phi)))){
 							scienceArea += sampleRadius/radius;
-							sciences[i] += 1;
+							sciences[i] += Access.getTargetValue(location.offset(radius*Math.cos(theta+phi), radius*Math.sin(theta+phi)));
 						}
 					}
 				}
@@ -164,14 +170,21 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 					for (double phi = -averagingAngle/2.0; phi <= averagingAngle/2.0; phi += averagingPStep){
 						if (Access.isInHazard(location.offset(radius*Math.cos(theta+phi), radius*Math.sin(theta+phi)))){
 							hazardArea += sampleRadius/radius;
-							hazards[i] += 1;
+							hazards[i] += Access.getHazardValue(location.offset(radius*Math.cos(theta+phi), radius*Math.sin(theta+phi)));
 						}
 					}
 				}
 				hazardArea /= averagingRadius*averagingAngle;
 				
 				//work required to move the same translational distance increases proportional to the tangent of the slope
-				double energyCost = Math.tan((Access.getMapHeightatPoint(examine)-Access.getMapHeightatPoint(location)) / sampleRadius);
+				double heightDif = Access.getMapHeightatPoint(examine)-Access.getMapHeightatPoint(location);
+				double energyCost;
+				if (Math.abs(Math.atan(heightDif/sampleRadius)) > 0.104719){
+					energyCost = 100;
+				}
+				else {
+					energyCost = Math.atan(heightDif/sampleRadius)/0.104719*10;
+				}
 				
 				//calculate the potential of the point
 				potentials[histories-1][i] = mentality[0]*science - mentality[1]*hazard + mentality[2]*scienceArea - mentality[3]*hazardArea - mentality[4]*energyCost;
@@ -250,12 +263,8 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 
 	private boolean hasUnvisitedScience(DecimalPoint loc){
 		if (Access.isAtTarget(loc)){
-			for (int i = 0; i < visitedScience.length; i++){
-				if (Math.sqrt(Math.pow(loc.getX()-visitedScience.get(i).getX(), 2) + Math.pow(loc.getY()-visitedScience.get(i).getY(), 2)) < 3){
-					return false;
-				}
-			}
-			return true;
+			Point mapLoc = Admin.GUI.TerrainPnl.HeightMap.getMapSquare(loc);
+			return !visitedScience.contains(new Point(mapLoc.x/3, mapLoc.y/3));
 		}
 		return false;
 	}
