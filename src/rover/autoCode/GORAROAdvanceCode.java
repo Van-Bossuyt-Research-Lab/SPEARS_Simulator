@@ -36,10 +36,10 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 	private DecimalPoint lastLoc = new DecimalPoint(0, 0);
 	private long timeAtPoint = 0;
 	private boolean begun = false;
-	private static final double STALL_RADIUS = 2;
-	private static final int STALL_TIME = 30000;
+	private static final double STALL_RADIUS = 5;
+	private static final int STALL_TIME = 60000;
 	private static final double RUN_ROTATION = 5*Math.PI/16.0;
-	private static final int RUN_TIME = 5000;
+	private static final int RUN_TIME = 15000;
 	
 	private Set<Point> visitedScience = new HashSet<Point>();
 	
@@ -72,6 +72,11 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 		this.mentalityStr = org.mentalityStr;
 		this.runyet = org.runyet;
 		potentials = new double[histories][sampleDirections];
+		this.targetDirection = org.targetDirection;
+		this.lastOptTime = org.lastOptTime;		
+		this.lastLoc = org.lastLoc;
+		this.timeAtPoint = org.timeAtPoint;
+		this.begun = org.begun;
 	}
 
 	@Override
@@ -126,6 +131,7 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 				}
 			}
 			else {
+				
 				lastLoc = location.clone();
 				timeAtPoint = milliTime;
 			}

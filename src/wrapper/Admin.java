@@ -59,28 +59,28 @@ public class Admin {
 		addItemToSelectionList(		"PIDAA",		new PIDAAcode());
 		addItemToSelectionList(		"GORARO Simp",	new GORAROcode1());
 		addItemToSelectionList(		"GORARO Adv A",	new GORAROAdvanceCode(new double[]{
-				100, 40, 10, 10, 10
+				10000, 40, 500, 2, 0
 		}));
 		addItemToSelectionList(		"GORARO Adv B",	new GORAROAdvanceCode(new double[]{
-				100, 60, 10, 10, 10
+				10000, 70, 500, 2, 0
 		}));
 		addItemToSelectionList(		"GORARO Adv C",	new GORAROAdvanceCode(new double[]{
-				100, 80, 10, 10, 10
+				10000, 100, 500, 2, 0
 		}));
 		addItemToSelectionList(		"GORARO Adv D",	new GORAROAdvanceCode(new double[]{
-				100, 100, 10, 10, 10
+				10000, 40, 600, 2, 0
 		}));
 		addItemToSelectionList(		"GORARO Adv E",	new GORAROAdvanceCode(new double[]{
-				100, 120, 10, 10, 10
+				10000, 70, 600, 2, 0
 		}));
 		addItemToSelectionList(		"GORARO Adv F",	new GORAROAdvanceCode(new double[]{
-				100, 140, 10, 10, 10
+				10000, 100, 600, 2, 0
 		}));
 		addItemToSelectionList(		"GORARO Adv G",	new GORAROAdvanceCode(new double[]{
-				100, 40, 30, 10, 10
+				10000, 40, 700, 2, 0
 		}));
 		addItemToSelectionList(		"GORARO Adv H",	new GORAROAdvanceCode(new double[]{
-				100, 60, 30, 10, 10
+				10000, 70, 700, 2, 0
 		}));
 		addItemToSelectionList(		"MER", 			new MER(new DecimalPoint[] {
 				new DecimalPoint(-9.5, -9.5),

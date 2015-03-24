@@ -126,7 +126,6 @@ public class MainWrapper extends Panel {
 	
 	public MainWrapper(Dimension size) {
 		super(size /*new Dimension(1024, 800)*/, "Wrapper Display");
-		
 		initalize();
 		align();
 	}
@@ -136,7 +135,7 @@ public class MainWrapper extends Panel {
 		tabbedPane.setEnabled(false);
 		tabbedPane.setTabPlacement(JTabbedPane.TOP);
 		tabbedPane.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
-		tabbedPane.setBounds(10, 56, 1900, 979);
+		tabbedPane.setBounds(10, super.getTopOfPage()+5, this.getWidth()-20, super.getWorkingHeight()-10);
 		add(tabbedPane);
 		
 		CreateNewPnl = new JPanel();
@@ -515,7 +514,6 @@ public class MainWrapper extends Panel {
 	}
 	
 	private void align(){
-		
 		int spacing = 10;
 		Dimension panelSize = new Dimension(tabbedPane.getWidth()-6, tabbedPane.getHeight()-40);
 		int listWidth = (int) (((panelSize.getWidth() / 2) - spacing*4 - RovAddBtn.getWidth()) / 3 - 50);
