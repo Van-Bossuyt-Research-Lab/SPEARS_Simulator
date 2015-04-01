@@ -1,8 +1,13 @@
 package rover;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
 
 import objects.DecimalPoint;
+import wrapper.Access;
 import wrapper.Globals;
 
 public abstract class RoverAutonomusCode implements Serializable, Cloneable {
@@ -11,6 +16,8 @@ public abstract class RoverAutonomusCode implements Serializable, Cloneable {
 	
 	private String name;
 	private String roverName;
+	
+	private File logFile;
 	
 	public RoverAutonomusCode(String name, String rover){
 		this.name = name;
@@ -54,8 +61,29 @@ public abstract class RoverAutonomusCode implements Serializable, Cloneable {
 		return name;
 	}
 	
+	private boolean tried = false;
 	protected void writeToLog(String message){
-		Globals.writeToLogFile(roverName + ":" + name + " - Autonomous Code", message);
+		try {
+			BufferedWriter write = new BufferedWriter(new FileWriter(logFile, true));
+			write.write(message + "\t\t" + Access.INTERFACE.DateTime.toString("[MM/dd/yyyy hh:mm:ss.") + (Globals.TimeMillis%1000) + "]\r\n");
+			write.flush();
+			write.close();
+		}
+		catch (NullPointerException e){
+			if (!tried){
+				tried = true;
+				logFile = new File("Logs/" + roverName + " Log " + Access.INTERFACE.DateTime.toString("MM-dd-yyyy hh-mm") + ".txt");
+				Globals.writeToLogFile(roverName, "Writing rover's autonomous log file to: " + logFile.getAbsolutePath());
+				writeToLog(message);
+			}
+			else {
+				e.printStackTrace();
+				Globals.writeToLogFile(roverName, "Rover's autonomous log file failed to initalize.");
+			}
+		}
+		catch (IOException e){
+			e.printStackTrace();
+		}
 	}
 	
 	public abstract RoverAutonomusCode clone();

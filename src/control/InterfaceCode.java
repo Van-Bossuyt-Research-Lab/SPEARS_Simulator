@@ -21,7 +21,7 @@ public class InterfaceCode {
     
     private File logFile;
 	private String connectedPort = "COM13";
-	private ZDate DateTime;
+	public ZDate DateTime;
 	public SyncronousThread clock;
 	public static String IDcode = "g";
 	
