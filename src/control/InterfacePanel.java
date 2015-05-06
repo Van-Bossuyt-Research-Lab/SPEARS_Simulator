@@ -42,6 +42,8 @@ import visual.ZList;
 import wrapper.Access;
 import wrapper.Globals;
 
+//TODO pop out option
+//TODO more adaptable 'plug in' interface like communication style
 public class InterfacePanel extends Panel{
 
 	JPanel ProgramBtnsPnl;

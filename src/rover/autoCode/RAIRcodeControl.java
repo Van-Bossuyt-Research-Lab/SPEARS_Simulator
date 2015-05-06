@@ -1,7 +1,6 @@
 package rover.autoCode;
 
 import objects.DecimalPoint;
-import rover.RoverAutonomusCode;
 import wrapper.Access;
 
 public class RAIRcodeControl extends RoverAutonomusCode {

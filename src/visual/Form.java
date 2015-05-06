@@ -39,6 +39,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 
+//TODO make into a signularity thingy
 public class Form extends JFrame {
 	
 	static final int WRAPPER = 0, MAP = 1, ROVER = 2, ORBIT = 3, SATELLITE = 4, INTERFACE = 5;
@@ -176,7 +177,7 @@ public class Form extends JFrame {
 	}
 	
 	public void exit(){
-		//TODO exit procedures
+		//exit procedures
 		System.exit(0);
 	}
 	

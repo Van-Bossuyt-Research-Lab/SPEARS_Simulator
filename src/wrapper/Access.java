@@ -9,6 +9,8 @@ import objects.DecimalPoint;
 import rover.RoverObject;
 import map.PlanetParametersList;
 
+
+//TODO get rid of this class
 public class Access {
 
 	public static Admin CODE = new Admin();

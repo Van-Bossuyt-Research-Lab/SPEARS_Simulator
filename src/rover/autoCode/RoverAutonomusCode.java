@@ -1,4 +1,4 @@
-package rover;
+package rover.autoCode;
 
 import java.io.BufferedWriter;
 import java.io.File;

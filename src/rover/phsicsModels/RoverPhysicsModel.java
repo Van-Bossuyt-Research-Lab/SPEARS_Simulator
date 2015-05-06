@@ -1,12 +1,15 @@
-package rover;
+package rover.phsicsModels;
 
 import java.io.Serializable;
 
 import objects.DecimalPoint;
 import objects.SyncronousThread;
+import rover.MotorState;
+import rover.RoverWheels;
 import wrapper.Access;
 import wrapper.Globals;
 
+//TODO add implementation with better time stepping
 public class RoverPhysicsModel implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;

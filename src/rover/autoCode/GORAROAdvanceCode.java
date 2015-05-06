@@ -6,7 +6,6 @@ import java.util.Set;
 
 import objects.DecimalPoint;
 import objects.List;
-import rover.RoverAutonomusCode;
 import wrapper.Access;
 import wrapper.Admin;
 import wrapper.Globals;

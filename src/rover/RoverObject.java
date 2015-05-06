@@ -8,9 +8,13 @@ import java.util.HashSet;
 import objects.DecimalPoint;
 import objects.Map;
 import objects.SyncronousThread;
+import rover.autoCode.RoverAutonomusCode;
+import rover.phsicsModels.RoverPhysicsModel;
 import wrapper.Access;
 import wrapper.Globals;
 
+//TODO actually debug instructions
+//TODO make for modular for OCP, SRP
 public class RoverObject implements Serializable {
 	
 	private static final long serialVersionUID = 1L;

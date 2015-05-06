@@ -9,6 +9,7 @@ import objects.ThreadItem;
 import objects.SyncronousThread;
 import visual.AccelPopUp;
 
+//TODO make into a signularity thingy
 public class Globals {
 
 	public static String vrsionNumber = "2.2.1";

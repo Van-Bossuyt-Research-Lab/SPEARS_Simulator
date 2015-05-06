@@ -17,6 +17,10 @@ import wrapper.Access;
 import wrapper.Admin;
 import wrapper.Globals;
 
+//TODO clean this up
+//TODO figure out how it actually works
+//TODO change implementation to allow for 'plug in' communications
+//TODO update the actual console code to look like this
 public class InterfaceCode {
     
     private File logFile;

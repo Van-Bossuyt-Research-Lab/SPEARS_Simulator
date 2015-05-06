@@ -1,6 +1,5 @@
 package rover.phsicsModels;
 
-import rover.RoverPhysicsModel;
 import wrapper.Access;
 
 public class FailOnHazard extends RoverPhysicsModel {

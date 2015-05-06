@@ -1,7 +1,6 @@
 package rover.autoCode;
 
 import objects.DecimalPoint;
-import rover.RoverAutonomusCode;
 
 public class BlankRoverAuto extends RoverAutonomusCode {
 

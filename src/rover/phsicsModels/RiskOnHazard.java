@@ -2,7 +2,6 @@ package rover.phsicsModels;
 
 import java.util.Random;
 
-import rover.RoverPhysicsModel;
 import wrapper.Access;
 import wrapper.Globals;
 

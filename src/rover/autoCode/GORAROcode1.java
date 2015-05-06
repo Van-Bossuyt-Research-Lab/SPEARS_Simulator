@@ -2,7 +2,6 @@ package rover.autoCode;
 
 import objects.DecimalPoint;
 import objects.List;
-import rover.RoverAutonomusCode;
 import wrapper.Access;
 import wrapper.Globals;
 

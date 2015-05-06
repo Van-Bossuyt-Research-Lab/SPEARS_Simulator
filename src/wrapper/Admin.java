@@ -11,9 +11,7 @@ import objects.List;
 import objects.Map;
 import objects.Queue;
 import objects.RunConfiguration;
-import rover.RoverAutonomusCode;
 import rover.RoverObject;
-import rover.RoverPhysicsModel;
 import rover.autoCode.*;
 import rover.phsicsModels.*;
 import satellite.SatelliteAutonomusCode;
@@ -21,6 +19,7 @@ import satellite.SatelliteObject;
 import satellite.SatelliteParametersList;
 import visual.Form;
 
+//TODO make into a signularity thingy
 public class Admin {
 
 	public static Form GUI = new Form();
@@ -44,6 +43,7 @@ public class Admin {
 	}
 	
 	//TODO Add items for rover and satellite option here using addItemToSelectionList
+	//TODO clean up this interface for OCP
 	public Admin(){
 		//addItemToSelectionList(	name_on_list ,	object_to_add	);
 		addItemToSelectionList(		"Default", 		new RoverPhysicsModel());
@@ -130,7 +130,7 @@ public class Admin {
 	}
 	
 	public void beginSimulation(RunConfiguration config){
-	
+		//TODO add option to toggle time shifted executions
 		if (config.rovers.length == 0 ||config.satellites.length == 0){
 			System.err.println("Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;
