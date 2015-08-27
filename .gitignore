@@ -9,3 +9,4 @@ Data/*
 default.cfg
 .idea/*
 *.iml
+target/*

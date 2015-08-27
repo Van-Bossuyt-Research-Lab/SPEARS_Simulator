@@ -1,10 +1,10 @@
-package test;
+package com.csm.rover.simulator.test;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import wrapper.Globals;
+import com.csm.rover.simulator.wrapper.Globals;
 
 public class angles {
 

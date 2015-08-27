@@ -1,12 +1,12 @@
-package test;
+package com.csm.rover.simulator.test;
 
 import static org.junit.Assert.*;
 
 import java.awt.Dimension;
 import java.awt.Point;
 
-import map.LandMapPanel;
-import objects.DecimalPoint;
+import com.csm.rover.simulator.map.LandMapPanel;
+import com.csm.rover.simulator.objects.DecimalPoint;
 
 import org.junit.Before;
 import org.junit.Test;

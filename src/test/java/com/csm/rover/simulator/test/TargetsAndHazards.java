@@ -1,10 +1,10 @@
-package test;
+package com.csm.rover.simulator.test;
 
 import static org.junit.Assert.*;
 
 import java.awt.Point;
 
-import map.PlasmaPanel;
+import com.csm.rover.simulator.map.PlasmaPanel;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
