@@ -1,9 +1,9 @@
-package rover.autoCode;
+package com.csm.rover.simulator.rover.autoCode;
 
-import objects.DecimalPoint;
-import objects.List;
-import wrapper.Access;
-import wrapper.Globals;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.List;
+import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Globals;
 
 public class GORAROcode1 extends RoverAutonomusCode {
 	

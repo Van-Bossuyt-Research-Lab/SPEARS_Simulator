@@ -1,7 +1,7 @@
-package rover.autoCode;
+package com.csm.rover.simulator.rover.autoCode;
 
-import objects.DecimalPoint;
-import wrapper.Access;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.wrapper.Access;
 
 public class RAIRcodeRT extends RoverAutonomusCode {
 

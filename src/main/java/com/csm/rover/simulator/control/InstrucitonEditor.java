@@ -1,4 +1,4 @@
-package control;
+package com.csm.rover.simulator.control;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -31,8 +31,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
-import visual.ZList;
-import wrapper.Access;
+import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.visual.ZList;
+import com.csm.rover.simulator.wrapper.Access;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -220,7 +221,7 @@ public class InstrucitonEditor extends JDialog {
 			this.setVisible(false);
 		}
 		else {
-			new objects.SyncronousThread( 0, new Runnable(){
+			new SyncronousThread( 0, new Runnable(){
 				public void run(){
 					(new PopUp()).showConfirmDialog("You are missing required information.", "Submit Failed", PopUp.DEFAULT_OPTIONS);
 				}
@@ -233,7 +234,7 @@ public class InstrucitonEditor extends JDialog {
 	}
 	
 	private void AddParameter_Clicked(){
-		new objects.SyncronousThread(0, new Runnable(){
+		new SyncronousThread(0, new Runnable(){
 			public void run(){
 				String name = (new PopUp()).showInputDialog("Parameter Name:", "Add Parameter", PopUp.OK_CANCEL_OPTIONS);
 				if (!name.equals("")){

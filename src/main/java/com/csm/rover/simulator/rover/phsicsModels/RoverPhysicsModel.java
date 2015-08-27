@@ -1,13 +1,13 @@
-package rover.phsicsModels;
+package com.csm.rover.simulator.rover.phsicsModels;
 
 import java.io.Serializable;
 
-import objects.DecimalPoint;
-import objects.SyncronousThread;
-import rover.MotorState;
-import rover.RoverWheels;
-import wrapper.Access;
-import wrapper.Globals;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.rover.MotorState;
+import com.csm.rover.simulator.rover.RoverWheels;
+import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Globals;
 
 //TODO add implementation with better time stepping
 public class RoverPhysicsModel implements Serializable, Cloneable {

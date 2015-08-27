@@ -1,4 +1,4 @@
-package rover.autoCode;
+package com.csm.rover.simulator.rover.autoCode;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -6,9 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 
-import objects.DecimalPoint;
-import wrapper.Access;
-import wrapper.Globals;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Globals;
 
 public abstract class RoverAutonomusCode implements Serializable, Cloneable {
 

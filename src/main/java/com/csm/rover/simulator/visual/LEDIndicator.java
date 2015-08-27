@@ -1,4 +1,4 @@
-package visual;
+package com.csm.rover.simulator.visual;
 
 import java.awt.Cursor;
 

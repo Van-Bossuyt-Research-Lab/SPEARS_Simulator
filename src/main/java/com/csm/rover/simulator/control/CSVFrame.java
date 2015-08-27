@@ -1,4 +1,4 @@
-package control;
+package com.csm.rover.simulator.control;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;

@@ -1,10 +1,10 @@
-package map;
+package com.csm.rover.simulator.map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import objects.DecimalPoint;
-import objects.GridList;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.GridList;
 
 import java.awt.Color;
 import java.awt.Graphics;

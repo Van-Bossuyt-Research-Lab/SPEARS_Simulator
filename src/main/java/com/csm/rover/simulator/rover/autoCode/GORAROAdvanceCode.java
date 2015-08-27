@@ -1,14 +1,14 @@
-package rover.autoCode;
+package com.csm.rover.simulator.rover.autoCode;
 
 import java.awt.Point;
 import java.util.HashSet;
 import java.util.Set;
 
-import objects.DecimalPoint;
-import objects.List;
-import wrapper.Access;
-import wrapper.Admin;
-import wrapper.Globals;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.List;
+import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Admin;
+import com.csm.rover.simulator.wrapper.Globals;
 
 public class GORAROAdvanceCode extends RoverAutonomusCode {
 

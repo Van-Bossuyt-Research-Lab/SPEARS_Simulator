@@ -1,4 +1,4 @@
-package visual;
+package com.csm.rover.simulator.visual;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -16,7 +16,7 @@ import java.awt.Font;
 
 import javax.swing.JProgressBar;
 
-import wrapper.Access;
+import com.csm.rover.simulator.wrapper.Access;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;

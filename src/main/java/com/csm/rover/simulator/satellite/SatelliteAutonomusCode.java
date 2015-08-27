@@ -1,9 +1,9 @@
-package satellite;
+package com.csm.rover.simulator.satellite;
 
 import java.io.Serializable;
 
-import objects.DecimalPoint;
-import wrapper.Globals;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.wrapper.Globals;
 
 public abstract class SatelliteAutonomusCode implements Serializable {
 	

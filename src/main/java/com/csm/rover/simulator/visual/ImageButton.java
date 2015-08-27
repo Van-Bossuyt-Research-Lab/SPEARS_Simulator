@@ -1,4 +1,4 @@
-package visual;
+package com.csm.rover.simulator.visual;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.border.LineBorder;
-import objects.FreeThread;
+import com.csm.rover.simulator.objects.FreeThread;
 
 public class ImageButton extends ImageDisplay {
 

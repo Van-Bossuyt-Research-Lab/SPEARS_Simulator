@@ -1,17 +1,17 @@
-package rover;
+package com.csm.rover.simulator.rover;
 
 import java.awt.Point;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashSet;
 
-import objects.DecimalPoint;
-import objects.Map;
-import objects.SyncronousThread;
-import rover.autoCode.RoverAutonomusCode;
-import rover.phsicsModels.RoverPhysicsModel;
-import wrapper.Access;
-import wrapper.Globals;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.Map;
+import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.rover.autoCode.RoverAutonomusCode;
+import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
+import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Globals;
 
 //TODO actually debug instructions
 //TODO make for modular for OCP, SRP

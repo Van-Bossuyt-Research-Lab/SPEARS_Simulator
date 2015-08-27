@@ -1,4 +1,4 @@
-package visual;
+package com.csm.rover.simulator.visual;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -18,20 +18,20 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import map.LandMapPanel;
-import map.PlanetParametersList;
+import com.csm.rover.simulator.map.LandMapPanel;
+import com.csm.rover.simulator.map.PlanetParametersList;
 
 import javax.swing.JButton;
 
-import objects.RunConfiguration;
-import control.InterfacePanel;
-import control.PopUp;
-import rover.RoverHub;
-import rover.autoCode.GenericRover;
-import satellite.SatelliteHub;
-import wrapper.Access;
-import wrapper.Globals;
-import wrapper.MainWrapper;
+import com.csm.rover.simulator.objects.RunConfiguration;
+import com.csm.rover.simulator.control.InterfacePanel;
+import com.csm.rover.simulator.control.PopUp;
+import com.csm.rover.simulator.rover.RoverHub;
+import com.csm.rover.simulator.rover.autoCode.GenericRover;
+import com.csm.rover.simulator.satellite.SatelliteHub;
+import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Globals;
+import com.csm.rover.simulator.wrapper.MainWrapper;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -71,7 +71,7 @@ public class Form extends JFrame {
 				try {
 					screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 					frame = new Form();
-					wrapper.Admin.align();
+					com.csm.rover.simulator.wrapper.Admin.align();
 					frame.setUndecorated(true);
 					frame.setSize(screenSize);
 				    frame.setVisible(true);

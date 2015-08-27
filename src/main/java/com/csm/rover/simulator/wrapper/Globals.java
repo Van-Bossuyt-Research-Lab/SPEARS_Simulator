@@ -1,13 +1,13 @@
-package wrapper;
+package com.csm.rover.simulator.wrapper;
 
 import java.util.Random;
 
-import objects.FreeThread;
-import objects.Map;
-import objects.Queue;
-import objects.ThreadItem;
-import objects.SyncronousThread;
-import visual.AccelPopUp;
+import com.csm.rover.simulator.objects.FreeThread;
+import com.csm.rover.simulator.objects.Map;
+import com.csm.rover.simulator.objects.Queue;
+import com.csm.rover.simulator.objects.ThreadItem;
+import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.visual.AccelPopUp;
 
 //TODO make into a signularity thingy
 public class Globals {

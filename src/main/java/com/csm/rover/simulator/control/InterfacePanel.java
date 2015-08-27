@@ -1,4 +1,4 @@
-package control;
+package com.csm.rover.simulator.control;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -35,12 +35,12 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import objects.SyncronousThread;
-import visual.ImageButton;
-import visual.Panel;
-import visual.ZList;
-import wrapper.Access;
-import wrapper.Globals;
+import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.visual.ImageButton;
+import com.csm.rover.simulator.visual.Panel;
+import com.csm.rover.simulator.visual.ZList;
+import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Globals;
 
 //TODO pop out option
 //TODO more adaptable 'plug in' interface like communication style

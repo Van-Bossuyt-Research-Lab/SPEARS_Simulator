@@ -1,4 +1,4 @@
-package rover;
+package com.csm.rover.simulator.rover;
 
 public enum MotorState {
 

@@ -1,4 +1,4 @@
-package rover;
+package com.csm.rover.simulator.rover;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -20,12 +20,12 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import control.InterfaceCode;
-import objects.SyncronousThread;
-import visual.LEDIndicator;
-import visual.Panel;
-import wrapper.Access;
-import wrapper.Globals;
+import com.csm.rover.simulator.control.InterfaceCode;
+import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.visual.LEDIndicator;
+import com.csm.rover.simulator.visual.Panel;
+import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Globals;
 
 public class RoverHub extends Panel {
 	

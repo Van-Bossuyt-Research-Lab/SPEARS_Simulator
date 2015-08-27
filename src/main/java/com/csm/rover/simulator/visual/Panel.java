@@ -1,4 +1,4 @@
-package visual;
+package com.csm.rover.simulator.visual;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -21,7 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import wrapper.Globals;
+import com.csm.rover.simulator.wrapper.Globals;
 
 public class Panel extends JPanel{
 

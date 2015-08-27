@@ -1,4 +1,4 @@
-package map;
+package com.csm.rover.simulator.map;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,15 +16,15 @@ import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 
-import control.InterfacePanel;
-import objects.DecimalPoint;
-import objects.ImageFileFilter;
-import objects.MapFileFilter;
-import wrapper.Access;
-import wrapper.Globals;
-import rover.RoverObject;
-import visual.ImageButton;
-import visual.Panel;
+import com.csm.rover.simulator.control.InterfacePanel;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.ImageFileFilter;
+import com.csm.rover.simulator.objects.MapFileFilter;
+import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Globals;
+import com.csm.rover.simulator.rover.RoverObject;
+import com.csm.rover.simulator.visual.ImageButton;
+import com.csm.rover.simulator.visual.Panel;
 
 import javax.swing.JPopupMenu;
 

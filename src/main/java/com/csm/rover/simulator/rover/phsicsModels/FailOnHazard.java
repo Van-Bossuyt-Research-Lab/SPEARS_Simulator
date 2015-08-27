@@ -1,6 +1,6 @@
-package rover.phsicsModels;
+package com.csm.rover.simulator.rover.phsicsModels;
 
-import wrapper.Access;
+import com.csm.rover.simulator.wrapper.Access;
 
 public class FailOnHazard extends RoverPhysicsModel {
 

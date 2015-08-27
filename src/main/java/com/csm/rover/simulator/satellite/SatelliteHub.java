@@ -1,4 +1,4 @@
-package satellite;
+package com.csm.rover.simulator.satellite;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -16,11 +16,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
-import objects.SyncronousThread;
-import rover.RoverObject;
-import visual.LEDIndicator;
-import visual.Panel;
-import wrapper.Access;
+import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.rover.RoverObject;
+import com.csm.rover.simulator.visual.LEDIndicator;
+import com.csm.rover.simulator.visual.Panel;
+import com.csm.rover.simulator.wrapper.Access;
 
 public class SatelliteHub extends Panel{
 	

@@ -1,23 +1,23 @@
-package wrapper;
+package com.csm.rover.simulator.wrapper;
 
 import java.io.File;
 import java.util.Random;
 
-import control.InterfaceCode;
-import control.PopUp;
-import objects.DecimalPoint;
-import objects.FreeThread;
-import objects.List;
-import objects.Map;
-import objects.Queue;
-import objects.RunConfiguration;
-import rover.RoverObject;
-import rover.autoCode.*;
-import rover.phsicsModels.*;
-import satellite.SatelliteAutonomusCode;
-import satellite.SatelliteObject;
-import satellite.SatelliteParametersList;
-import visual.Form;
+import com.csm.rover.simulator.control.InterfaceCode;
+import com.csm.rover.simulator.control.PopUp;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.FreeThread;
+import com.csm.rover.simulator.objects.List;
+import com.csm.rover.simulator.objects.Map;
+import com.csm.rover.simulator.objects.Queue;
+import com.csm.rover.simulator.objects.RunConfiguration;
+import com.csm.rover.simulator.rover.RoverObject;
+import com.csm.rover.simulator.rover.autoCode.*;
+import com.csm.rover.simulator.rover.phsicsModels.*;
+import com.csm.rover.simulator.satellite.SatelliteAutonomusCode;
+import com.csm.rover.simulator.satellite.SatelliteObject;
+import com.csm.rover.simulator.satellite.SatelliteParametersList;
+import com.csm.rover.simulator.visual.Form;
 
 //TODO make into a signularity thingy
 public class Admin {
@@ -256,20 +256,20 @@ public class Admin {
 			File mapFile = new File(GUI.WrapperPnl.FileLocTxt.getText());
 			return new RunConfiguration(roverNames,	rovers, satelliteNames,
 					satellites, tags, mapFile, GUI.WrapperPnl.AccelChk.isSelected(), 
-					(int)GUI.WrapperPnl.RuntimeSpnr.getValue());
+					(Integer)GUI.WrapperPnl.RuntimeSpnr.getValue());
 		}
 		else {
 			double mapRough = GUI.WrapperPnl.MapRoughSlider.getValue()/10000.0;
-			int mapSize = (int) GUI.WrapperPnl.MapSizeSpnr.getValue();
-			int mapDetail = (int) GUI.WrapperPnl.MapDetailSpnr.getValue();
-			double targetDensity = (double) GUI.WrapperPnl.TargetDensitySpnr.getValue()/1000.;
-			double hazardDensity = (double) GUI.WrapperPnl.HazardDensitySpnr.getValue()/1000.;
+			int mapSize = (Integer) GUI.WrapperPnl.MapSizeSpnr.getValue();
+			int mapDetail = (Integer) GUI.WrapperPnl.MapDetailSpnr.getValue();
+			double targetDensity = (Double) GUI.WrapperPnl.TargetDensitySpnr.getValue()/1000.;
+			double hazardDensity = (Double) GUI.WrapperPnl.HazardDensitySpnr.getValue()/1000.;
 			boolean monoTargets = !GUI.WrapperPnl.ValuedTargetsChk.isSelected(); //cause the for says use and the computer reads not using
 			boolean monoHazards = !GUI.WrapperPnl.ValuedHazardsChk.isSelected();
 			return new RunConfiguration(roverNames, rovers, satelliteNames,	satellites, tags, mapRough,
 					mapSize, mapDetail, targetDensity, hazardDensity, monoTargets, 
 					monoHazards, GUI.WrapperPnl.AccelChk.isSelected(), 
-					(int)GUI.WrapperPnl.RuntimeSpnr.getValue());
+					(Integer)GUI.WrapperPnl.RuntimeSpnr.getValue());
 		}
 	}
 	

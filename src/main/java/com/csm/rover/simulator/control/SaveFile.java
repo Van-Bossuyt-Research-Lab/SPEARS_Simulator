@@ -1,4 +1,4 @@
-package control;
+package com.csm.rover.simulator.control;
 
 import java.io.Serializable;
 

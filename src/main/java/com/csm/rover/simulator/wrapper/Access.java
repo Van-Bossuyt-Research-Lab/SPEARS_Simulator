@@ -1,14 +1,13 @@
-package wrapper;
+package com.csm.rover.simulator.wrapper;
 
 import java.awt.event.KeyEvent;
 import java.io.File;
 
-import control.InstructionObj;
-import control.InterfaceCode;
-import objects.DecimalPoint;
-import rover.RoverObject;
-import map.PlanetParametersList;
-
+import com.csm.rover.simulator.control.InstructionObj;
+import com.csm.rover.simulator.control.InterfaceCode;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.rover.RoverObject;
+import com.csm.rover.simulator.map.PlanetParametersList;
 
 //TODO get rid of this class
 public class Access {

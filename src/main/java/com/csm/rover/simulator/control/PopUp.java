@@ -1,4 +1,4 @@
-package control;
+package com.csm.rover.simulator.control;
 
 import java.awt.Dimension;
 import java.awt.Font;

@@ -1,4 +1,5 @@
-package objects;
+package com.csm.rover.simulator.objects;
+
 import java.io.File;
 import java.io.Serializable;
 

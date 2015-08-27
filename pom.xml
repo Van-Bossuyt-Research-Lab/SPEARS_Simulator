@@ -23,9 +23,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.miglayout</groupId>
-			<artifactId>miglayout</artifactId>
-			<version>3.7.4</version>
+			<groupId>jgoodies</groupId>
+			<artifactId>forms</artifactId>
+			<version>1.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>

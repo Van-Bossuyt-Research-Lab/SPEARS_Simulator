@@ -1,12 +1,12 @@
-package satellite;
+package com.csm.rover.simulator.satellite;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import wrapper.Globals;
-import objects.Map;
-import objects.SyncronousThread;
+import com.csm.rover.simulator.wrapper.Globals;
+import com.csm.rover.simulator.objects.Map;
+import com.csm.rover.simulator.objects.SyncronousThread;
 
 public class SatelliteObject implements Serializable {
 

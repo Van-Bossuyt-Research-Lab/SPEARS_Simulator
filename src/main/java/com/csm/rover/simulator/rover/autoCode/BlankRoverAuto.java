@@ -1,6 +1,6 @@
-package rover.autoCode;
+package com.csm.rover.simulator.rover.autoCode;
 
-import objects.DecimalPoint;
+import com.csm.rover.simulator.objects.DecimalPoint;
 
 public class BlankRoverAuto extends RoverAutonomusCode {
 

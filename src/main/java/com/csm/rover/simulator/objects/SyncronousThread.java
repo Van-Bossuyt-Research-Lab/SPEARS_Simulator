@@ -1,7 +1,7 @@
-package objects;
+package com.csm.rover.simulator.objects;
 
 import java.io.Serializable;
-import wrapper.Globals;
+import com.csm.rover.simulator.wrapper.Globals;
 
 public class SyncronousThread extends Thread implements Serializable {
 

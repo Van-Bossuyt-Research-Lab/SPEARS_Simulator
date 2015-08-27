@@ -1,4 +1,4 @@
-package map;
+package com.csm.rover.simulator.map;
 
 public class PlanetParametersList {
 	

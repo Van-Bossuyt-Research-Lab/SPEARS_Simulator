@@ -1,6 +1,6 @@
-package map;
+package com.csm.rover.simulator.map;
 
-import objects.DecimalPoint;
+import com.csm.rover.simulator.objects.DecimalPoint;
 
 public class Hazard {
 

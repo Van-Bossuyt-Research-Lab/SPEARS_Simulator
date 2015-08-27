@@ -1,4 +1,4 @@
-package control;
+package com.csm.rover.simulator.control;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -9,13 +9,11 @@ import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-import objects.FreeThread;
-import objects.SyncronousThread;
-import objects.ZDate;
-import objects.Map;
-import wrapper.Access;
-import wrapper.Admin;
-import wrapper.Globals;
+import com.csm.rover.simulator.objects.Map;
+import com.csm.rover.simulator.objects.*;
+import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Admin;
+import com.csm.rover.simulator.wrapper.Globals;
 
 //TODO clean this up
 //TODO figure out how it actually works
@@ -1000,17 +998,16 @@ public class InterfaceCode {
 					}
 					int choice = (new PopUp()).showOptionDialog("Select a File", "Open File", choices);
 					if (choice != -1){
-						switch (getFileType(receivedFiles[choice])){
-						case ("jpg"):
+						if (getFileType(receivedFiles[choice]).equals("jpg")) {
 							File image = new File(receivedFiles[choice]);
 							try {
 								final BufferedImage img = ImageIO.read(image);
-								new SyncronousThread(0, new Runnable(){
-									public void run(){
+								new SyncronousThread(0, new Runnable() {
+									public void run() {
 										PopUp opane = new PopUp();
-										opane.setCustomButtonOptions(new String[] { "Save", "Close" }, new int[] { 0, 1 });
+										opane.setCustomButtonOptions(new String[]{"Save", "Close"}, new int[]{0, 1});
 										int choice = opane.showPictureDialog(new ImageIcon(img), "Received Image", PopUp.CUSTOM_OPTIONS);
-										if (choice == 0){
+										if (choice == 0) {
 											javax.swing.JFileChooser browse = new javax.swing.JFileChooser();
 											browse.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("JPEG file", "jpg", "jpeg"));
 											browse.showSaveDialog(Admin.GUI.InterfacePnl);
@@ -1019,32 +1016,31 @@ public class InterfaceCode {
 												File imageOut = new File(filepath);
 												try {
 													ImageIO.write(img, "jpg", imageOut);
-												}
-												catch (Exception e1){
+												} catch (Exception e1) {
 													Globals.reportError("InterfaceCode", "OpenRecievedFiles - e1", e1);
 													opane.showConfirmDialog("Something went worng and the file failed to save.", "IO Error", PopUp.DEFAULT_OPTIONS);
 												}
-												
+
 											} catch (Exception e2) {
 												Globals.reportError("InterfaceCode", "OpenRecievedFiles - e2", e2);
-											}								
+											}
 										}
 									}
 								}, 1, "open file 1");
 								receivedFiles = Remove(receivedFiles, choice);
-								if (receivedFiles.length == 0){
+								if (receivedFiles.length == 0) {
 									Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail.png")));
 								}
 							} catch (Exception e3) {
 								Globals.reportError("InterfaceCode", "OpenRecievedFiles - e3", e3);
 							}
-							break;
-						case "CSV":
+						}
+						if (getFileType(receivedFiles[choice]).equals("CSV")) {
 							final String file = receivedFiles[choice];
-							new SyncronousThread(0, new Runnable(){
-								public void run(){
+							new SyncronousThread(0, new Runnable() {
+								public void run() {
 									int choice = new CSVFrame().OpenCSVFile(file);
-									if (choice == 1){
+									if (choice == 1) {
 										javax.swing.JFileChooser browse = new javax.swing.JFileChooser();
 										browse.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Comma Seperated Value", "CSV"));
 										browse.showSaveDialog(Admin.GUI.InterfacePnl);
@@ -1055,29 +1051,27 @@ public class InterfaceCode {
 												FileReader input = new FileReader(file);
 												@SuppressWarnings("resource")
 												Scanner dataIn = new Scanner(input);
-												while (dataIn.hasNextLine()){
+												while (dataIn.hasNextLine()) {
 													data += dataIn.nextLine() + "\n";
 												}
 												input.close();
 												PrintWriter dataOut = new PrintWriter(filepath);
 												dataOut.print(data);
 												dataOut.close();
-											}
-											catch (Exception e4){
+											} catch (Exception e4) {
 												Globals.reportError("InterfaceCode", "OpenRecievedFiles - e4", e4);
 												new PopUp().showConfirmDialog("Something went worng and the file failed to save.", "IO Error", PopUp.DEFAULT_OPTIONS);
-											}											
+											}
 										} catch (Exception e5) {
 											Globals.reportError("InterfaceCode", "OpenReviecedFiles - e5", e5);
-										}								
+										}
 									}
 								}
 							}, 1, "open file 2");
 							receivedFiles = Remove(receivedFiles, choice);
-							if (receivedFiles.length == 0){
+							if (receivedFiles.length == 0) {
 								Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail.png")));
 							}
-							break;
 						}
 					}
 				}

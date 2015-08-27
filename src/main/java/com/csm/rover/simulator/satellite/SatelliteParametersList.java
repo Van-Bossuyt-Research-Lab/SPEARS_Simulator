@@ -1,4 +1,4 @@
-package satellite;
+package com.csm.rover.simulator.satellite;
 
 import java.io.Serializable;
 

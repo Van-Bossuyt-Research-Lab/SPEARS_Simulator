@@ -1,4 +1,4 @@
-package objects;
+package com.csm.rover.simulator.objects;
 
 import java.awt.Point;
 import java.io.Serializable;

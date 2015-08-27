@@ -1,9 +1,9 @@
-package rover.phsicsModels;
+package com.csm.rover.simulator.rover.phsicsModels;
 
 import java.util.Random;
 
-import wrapper.Access;
-import wrapper.Globals;
+import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Globals;
 
 public class RiskOnHazard extends RoverPhysicsModel {
 	

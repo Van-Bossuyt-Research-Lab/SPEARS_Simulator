@@ -1,4 +1,4 @@
-package wrapper;
+package com.csm.rover.simulator.wrapper;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -7,8 +7,8 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
-import visual.Panel;
-import visual.ZList;
+import com.csm.rover.simulator.visual.Panel;
+import com.csm.rover.simulator.visual.ZList;
 
 import javax.swing.JTabbedPane;
 
@@ -21,8 +21,8 @@ import javax.swing.SwingConstants;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JScrollPane;
 
-import rover.RoverObject;
-import satellite.SatelliteObject;
+import com.csm.rover.simulator.rover.RoverObject;
+import com.csm.rover.simulator.satellite.SatelliteObject;
 
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -47,7 +47,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JTextField;
 
-import objects.MapFileFilter;
+import com.csm.rover.simulator.objects.MapFileFilter;
 
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -439,7 +439,7 @@ public class MainWrapper extends Panel {
 		RuntimeSpnr = new JSpinner();
 		RuntimeSpnr.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-				RunAltLbl.setText("(" + (int)((int)RuntimeSpnr.getValue()*60/Globals.getTimeAccelerant()*3) + " min)");
+				RunAltLbl.setText("(" + (int)((Integer)RuntimeSpnr.getValue()*60/Globals.getTimeAccelerant()*3) + " min)");
 			}
 		});
 		RuntimeSpnr.addKeyListener(new KeyAdapter(){
@@ -469,8 +469,8 @@ public class MainWrapper extends Panel {
 		RunAltLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		RunAltLbl.setBounds(991, 427, 149, 21);
 		CreateNewPnl.add(RunAltLbl);
-		RuntimeSpnr.setValue((int)RuntimeSpnr.getValue()+1);
-		RuntimeSpnr.setValue((int)RuntimeSpnr.getValue()-1);
+		RuntimeSpnr.setValue((Integer)RuntimeSpnr.getValue()+1);
+		RuntimeSpnr.setValue((Integer)RuntimeSpnr.getValue()-1);
 		
 		RuntimePnl = new JPanel();
 		tabbedPane.addTab("Running Simulation", null, RuntimePnl, null);
@@ -568,11 +568,11 @@ public class MainWrapper extends Panel {
 		SerialDisplayPnl.setLayout(new FormLayout(
 			new ColumnSpec[] {
 				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("center:default:grow"),
+				new ColumnSpec("center:default:grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("left:default:grow"),
+				new ColumnSpec("left:default:grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("right:default"),
+				new ColumnSpec("right:default"),
 				FormFactory.RELATED_GAP_COLSPEC,},
 			rows ));
 		JLabel[] titles = new JLabel[rovs.length+sats.length+1];

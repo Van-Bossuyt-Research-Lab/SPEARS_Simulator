@@ -1,4 +1,4 @@
-package map;
+package com.csm.rover.simulator.map;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import objects.DecimalPoint;
+import com.csm.rover.simulator.objects.DecimalPoint;
 
 public class RoverIcon extends JPanel{
 	
