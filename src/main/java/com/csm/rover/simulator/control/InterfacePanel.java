@@ -122,7 +122,7 @@ public class InterfacePanel extends Panel{
 		super(size, "Control Interface");
 		super.titleLbl.setVisible(false);
 		super.postScript.setVisible(false);
-		super.background = new ImageIcon(InterfacePanel.class.getResource("/Background.png"));
+		super.background = new ImageIcon(getClass().getResource("/images/Background.png"));
 		initalize();
 		alignComponents();
 	}
@@ -175,7 +175,7 @@ public class InterfacePanel extends Panel{
 				Access.INTERFACE.resetConnection();
 			}
 		});
-		LinkBtn.setImage(new ImageIcon(InterfacePanel.class.getResource("/Earth_Up.png")));
+		LinkBtn.setImage(new ImageIcon(getClass().getResource("/icons/Earth_Up.png")));
 		ProgramBtnsPnl.add(LinkBtn);
 		
 		PingBtn = new ImageButton();
@@ -185,14 +185,14 @@ public class InterfacePanel extends Panel{
 				Access.INTERFACE.pingRover();
 			}
 		});
-		PingBtn.setImage(new ImageIcon(InterfacePanel.class.getResource("/Wi-Fi.png")));
+		PingBtn.setImage(new ImageIcon(getClass().getResource("/icons/Wi-Fi.png")));
 		PingBtn.setToolTipText("Ping Rover");
 		PingBtn.setBounds(75, 20, 55, 55);
 		ProgramBtnsPnl.add(PingBtn);
 		
 		MailBtn = new ImageButton();
 		MailBtn.setBounds(140, 20, 55, 55);
-		MailBtn.setImage(new ImageIcon(InterfacePanel.class.getResource("/Mail.png")));
+		MailBtn.setImage(new ImageIcon(getClass().getResource("/icons/Mail.png")));
 		MailBtn.setToolTipText("View Data");
 		MailBtn.addMouseListener(new MouseAdapter() {
 			@Override
@@ -204,7 +204,7 @@ public class InterfacePanel extends Panel{
 		
 		MessageBtn = new ImageButton();
 		MessageBtn.setBounds(400, 20, 55, 55);
-		MessageBtn.setImage(new ImageIcon(InterfacePanel.class.getResource("/Comment_Up.png")));
+		MessageBtn.setImage(new ImageIcon(getClass().getResource("/icons/Comment_Up.png")));
 		MessageBtn.setToolTipText("Send Command");
 		MessageBtn.addMouseListener(new MouseAdapter() {
 			@Override
@@ -218,7 +218,7 @@ public class InterfacePanel extends Panel{
 		
 		CommentBtn = new ImageButton();
 		CommentBtn.setBounds(270, 20, 55, 55);
-		CommentBtn.setImage(new ImageIcon(InterfacePanel.class.getResource("/New_Post.png")));
+		CommentBtn.setImage(new ImageIcon(getClass().getResource("/icons/New_Post.png")));
 		CommentBtn.setToolTipText("Note on Log");
 		CommentBtn.addMouseListener(new MouseAdapter() {
 			@Override
@@ -229,7 +229,7 @@ public class InterfacePanel extends Panel{
 		ProgramBtnsPnl.add(CommentBtn);
 		
 		OptionsBtn = new ImageButton();
-		OptionsBtn.setImage(new ImageIcon(InterfacePanel.class.getResource("/Gear.png")));
+		OptionsBtn.setImage(new ImageIcon(getClass().getResource("/icons/Gear.png")));
 		OptionsBtn.setToolTipText("View Activity Log");
 		OptionsBtn.setBounds(335, 20, 55, 55);
 		OptionsBtn.addMouseListener(new MouseAdapter() {
@@ -241,7 +241,7 @@ public class InterfacePanel extends Panel{
 		ProgramBtnsPnl.add(OptionsBtn);
 		
 		FolderBtn = new ImageButton();
-		FolderBtn.setImage(new ImageIcon(InterfacePanel.class.getResource("/Folder.png")));
+		FolderBtn.setImage(new ImageIcon(getClass().getResource("/icons/Folder.png")));
 		FolderBtn.setToolTipText("View Files");
 		FolderBtn.setBounds(205, 20, 55, 55);
 		FolderBtn.addMouseListener(new MouseAdapter() {
@@ -282,7 +282,7 @@ public class InterfacePanel extends Panel{
 		ConnectionLbl.setHorizontalAlignment(SwingConstants.RIGHT);
 		ConnectionLbl.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		
-		MuteIcon = new JLabel(new ImageIcon(InterfacePanel.class.getResource("/Mute.png")));
+		MuteIcon = new JLabel(new ImageIcon(getClass().getResource("/icons/Mute.png")));
 		MuteIcon.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -407,7 +407,7 @@ public class InterfacePanel extends Panel{
 		RoverPageLeftBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		RoverPageLeftBtn.setHorizontalAlignment(SwingConstants.CENTER);
 		RoverPageLeftBtn.setHorizontalTextPosition(SwingConstants.CENTER);
-		RoverPageLeftBtn.setIcon(new ImageIcon(InterfacePanel.class.getResource("/Left_Shaded.png")));
+		RoverPageLeftBtn.setIcon(new ImageIcon(getClass().getResource("/icons/Left_Shaded.png")));
 		RoverPageLeftBtn.setEnabled(false);
 		RoverPageLeftBtn.setBounds(434, 81, 34, 18);
 		RoverBtnsPnl.add(RoverPageLeftBtn);
@@ -422,7 +422,7 @@ public class InterfacePanel extends Panel{
 			}
 		});
 		RoverPageRightBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		RoverPageRightBtn.setIcon(new ImageIcon(InterfacePanel.class.getResource("/Right_Shaded.png")));
+		RoverPageRightBtn.setIcon(new ImageIcon(getClass().getResource("/icons/Right_Shaded.png")));
 		RoverPageRightBtn.setHorizontalTextPosition(SwingConstants.CENTER);
 		RoverPageRightBtn.setHorizontalAlignment(SwingConstants.CENTER);
 		RoverPageRightBtn.setBounds(478, 82, 34, 18);
@@ -554,7 +554,7 @@ public class InterfacePanel extends Panel{
 				}
 			}
 		});
-		SatPageLeftBtn.setIcon(new ImageIcon(InterfacePanel.class.getResource("/Left_Shaded.png")));
+		SatPageLeftBtn.setIcon(new ImageIcon(getClass().getResource("/icons/Left_Shaded.png")));
 		SatPageLeftBtn.setHorizontalTextPosition(SwingConstants.CENTER);
 		SatPageLeftBtn.setHorizontalAlignment(SwingConstants.CENTER);
 		SatPageLeftBtn.setEnabled(false);
@@ -570,7 +570,7 @@ public class InterfacePanel extends Panel{
 				}
 			}
 		});
-		SatPageRightBtn.setIcon(new ImageIcon(InterfacePanel.class.getResource("/Right_Shaded.png")));
+		SatPageRightBtn.setIcon(new ImageIcon(getClass().getResource("/icons/Right_Shaded.png")));
 		SatPageRightBtn.setHorizontalTextPosition(SwingConstants.CENTER);
 		SatPageRightBtn.setHorizontalAlignment(SwingConstants.CENTER);
 		SatPageRightBtn.setBounds(479, 93, 34, 18);

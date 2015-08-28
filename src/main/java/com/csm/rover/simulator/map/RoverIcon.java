@@ -65,7 +65,7 @@ public class RoverIcon extends JPanel{
 		}
 		Angle = Math.toDegrees(angle) % 360;
 		try {
-			ImageIcon img = new ImageIcon(RoverIcon.class.getResource("/Rover Marker " + (int)(Angle - Angle%5) + ".png"));
+			ImageIcon img = new ImageIcon(getClass().getResource("/markers/Rover Marker " + (int)(Angle - Angle%5) + ".png"));
 			img = resize(img, iconImage.getWidth(), iconImage.getHeight());
 			iconImage.setIcon(img);
 		}

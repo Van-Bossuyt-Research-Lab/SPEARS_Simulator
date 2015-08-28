@@ -55,8 +55,8 @@ public class Panel extends JPanel{
 		exitBtn.setOpaque(false);
 		exitBtn.setBorder(null);
 		exitBtn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		exitBtn.setImage(new ImageIcon(Form.class.getResource("/Close.png")));
-		exitBtn.setHoverImage(new ImageIcon(Form.class.getResource("/Close Hover.png")));
+		exitBtn.setImage(new ImageIcon(getClass().getResource("/icons/Close.png")));
+		exitBtn.setHoverImage(new ImageIcon(getClass().getResource("/icons/Close Hover.png")));
 		exitBtn.setToolTipText("");
 		exitBtn.setMargin(0);
 		exitBtn.setBounds(this.getWidth()-55, 0, 48, 19);
@@ -73,8 +73,8 @@ public class Panel extends JPanel{
 		minimizeBtn.setToolTipText("");
 		minimizeBtn.setBorder(null);
 		minimizeBtn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		minimizeBtn.setImage(new ImageIcon(Form.class.getResource("/Minimize.png")));
-		minimizeBtn.setHoverImage(new ImageIcon(Form.class.getResource("/Minimize Hover.png")));
+		minimizeBtn.setImage(new ImageIcon(getClass().getResource("/icons/Minimize.png")));
+		minimizeBtn.setHoverImage(new ImageIcon(getClass().getResource("/icons/Minimize Hover.png")));
 		minimizeBtn.setMargin(0);
 		minimizeBtn.setBounds(exitBtn.getX()-29, 0, 29, 19);
 		minimizeBtn.addMouseListener(new MouseAdapter() {

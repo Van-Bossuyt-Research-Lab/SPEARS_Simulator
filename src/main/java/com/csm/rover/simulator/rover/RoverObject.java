@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Random;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.Map;
@@ -652,7 +653,7 @@ public class RoverObject implements Serializable {
 	private void takePicture() { // take a picture
 		try {
 			sendSerial("s1 g }"); // mute the ground so it can't interrupt
-			InputStream data = RoverObject.class.getResourceAsStream("/Rover Sample.jpg"); // get the buffer from the "camera"
+			InputStream data = RoverObject.class.getResourceAsStream(getSampleImageName()); // get the buffer from the "camera"
 			delay(2000);
 			sendSerial("s c [o]"); // tell the satellite a file is coming
 			delay(2000);
@@ -673,6 +674,11 @@ public class RoverObject implements Serializable {
 		}
 	}
 	
+	private String getSampleImageName() {
+		Random rnd = new Random();
+		return String.format("/%s/%s %d.%s", "images", "Rover Photo", rnd.nextInt(10));
+	}
+
 	private void pingGround(){ // ping the ground station and listen for a response
 		sendSerial("s1 g *");
 		setWaitForResponse('*', 3000);

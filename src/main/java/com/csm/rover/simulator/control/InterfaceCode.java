@@ -793,14 +793,14 @@ public class InterfaceCode {
 				Admin.GUI.InterfacePnl.SatBtns[x].setToolTipText("Unassigned");
 			}
 			try {
-				Admin.GUI.InterfacePnl.RoverBtns[x].setImage(new ImageIcon(InterfaceCode.class.getResource("/" + actionIcons[0][x+currentActionPages[0]*pageLength])));
+				Admin.GUI.InterfacePnl.RoverBtns[x].setImage(new ImageIcon(getClass().getResource("/icons/" + actionIcons[0][x+currentActionPages[0]*pageLength])));
 			}
 			catch (Exception e) {
 				Admin.GUI.InterfacePnl.RoverBtns[x].setImage(null);
 			}
 			Admin.GUI.InterfacePnl.RoverBtns[x].setEnabled(!actionCommands[0][x+currentActionPages[0]*pageLength].equals(""));
 			try {
-				Admin.GUI.InterfacePnl.SatBtns[x].setImage(new ImageIcon(InterfaceCode.class.getResource("/" + actionIcons[1][x+currentActionPages[1]*pageLength])));
+				Admin.GUI.InterfacePnl.SatBtns[x].setImage(new ImageIcon(getClass().getResource("/icons/" + actionIcons[1][x+currentActionPages[1]*pageLength])));
 			}
 			catch (Exception e){
 				Admin.GUI.InterfacePnl.SatBtns[x].setImage(null);
@@ -908,7 +908,7 @@ public class InterfaceCode {
 					writeToLog("Interface", "Recieved Image.  Stored in: " + image.getAbsolutePath());
 					receivingFile = false;
 					Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Done.\n");
-					Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail_Message.png")));
+					Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(getClass().getResource("/icons/Mail_Message.png")));
 				}
 				else {
 					Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Image transfer failed, incomplete size requirement.\n");
@@ -973,7 +973,7 @@ public class InterfaceCode {
 						writeToLog("Interface", "Recieved Data File.  Stored in: " + image.getAbsolutePath());
 						receivingFile = false;
 						Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Done.\n");
-						Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail_Message.png")));
+						Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(getClass().getResource("/icons/Mail_Message.png")));
 					}
 					else {
 						Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + "Data File transfer failed, incomplete size requirement.\n");
@@ -1029,7 +1029,7 @@ public class InterfaceCode {
 								}, 1, "open file 1");
 								receivedFiles = Remove(receivedFiles, choice);
 								if (receivedFiles.length == 0) {
-									Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail.png")));
+									Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(getClass().getResource("/icons/Mail.png")));
 								}
 							} catch (Exception e3) {
 								Globals.reportError("InterfaceCode", "OpenRecievedFiles - e3", e3);
@@ -1070,7 +1070,7 @@ public class InterfaceCode {
 							}, 1, "open file 2");
 							receivedFiles = Remove(receivedFiles, choice);
 							if (receivedFiles.length == 0) {
-								Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(InterfaceCode.class.getResource("/Mail.png")));
+								Admin.GUI.InterfacePnl.MailBtn.setIcon(new ImageIcon(getClass().getResource("/icons/Mail.png")));
 							}
 						}
 					}

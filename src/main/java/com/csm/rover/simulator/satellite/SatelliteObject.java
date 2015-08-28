@@ -3,6 +3,7 @@ package com.csm.rover.simulator.satellite;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Random;
 
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.objects.Map;
@@ -289,7 +290,7 @@ public class SatelliteObject implements Serializable {
 	void takePhoto(){
 	  try {
 		  sendSerial("r }"); // mute ground
-		  InputStream data = SatelliteObject.class.getResourceAsStream("/Satellite Sample.jpg"); // "get data from camera"
+		  InputStream data = SatelliteObject.class.getResourceAsStream(getSampleImageName()); // "get data from camera"
 		  delay(2000);
 		  sendSerial("g i 12764"); //magic length
 		  delay(2000);
@@ -312,6 +313,11 @@ public class SatelliteObject implements Serializable {
 		}
 	}
 	
+	private String getSampleImageName() {
+		Random rnd = new Random();
+		return String.format("/%s/%s %d.%s", "images", "Satellite Photo", rnd.nextInt(7));
+	}
+
 	private void delay(int length) { // sleep thread for a bit
 		String newname = Globals.delayThread(Thread.currentThread().getName(), length);
 		while (!Globals.getThreadRunPermission(newname)) {}
