@@ -129,6 +129,7 @@ public class RoverHub extends Panel {
 		int x = 0;
 		while (x < numberOfDisplays){
 			RoverDisplayWindow[x] = new JPanel();
+			RoverDisplayWindow[x].setOpaque(false);
 			RoverDisplayWindow[x].setLayout(new BorderLayout());
 			RoverDisplayWindow[x].setPreferredSize(new Dimension(450, 325));
 			RoverDisplayWindow[x].setBounds(0, 0, 450, 325);
@@ -182,6 +183,7 @@ public class RoverHub extends Panel {
 			SerialHistoryLbl[x].setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
 			
 			scrollPane_1[x] = new JScrollPane();
+			scrollPane_1[x].setOpaque(false);
 			tabbedPane[x].addTab("Movement", null, scrollPane_1[x], null);
 			
 			MovementStatsLbl[x] = new JTextArea();
@@ -440,13 +442,11 @@ public class RoverHub extends Panel {
 				if (HUDDisplayLinks[x] == -1){
 					PageLeftBtn[x].setVisible(false);
 					tabbedPane[x].setVisible(false);
-					RoverDisplayWindow[x].setOpaque(false);
 					RoverNameLbl[x].setText("Undefined");
 				}
 				else {
 					PageLeftBtn[x].setVisible(true);
 					tabbedPane[x].setVisible(true);
-					RoverDisplayWindow[x].setOpaque(true);
 					RoverNameLbl[x].setText(rovers[HUDDisplayLinks[x]].getName());
 					SerialHistoryLbl[x].setText(rovers[HUDDisplayLinks[x]].getSerialHistory());
 					MovementStatsLbl[x].setText("X: " + formatDouble(rovers[HUDDisplayLinks[x]].getLocation().getX()) 
@@ -636,7 +636,6 @@ public class RoverHub extends Panel {
 						height
 				);
 				RoverDisplayWindow[x].setVisible(true);
-				RoverDisplayWindow[x].setOpaque(true);
 				x++;
 			}
 		}

@@ -10,6 +10,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import java.awt.Toolkit;
@@ -101,6 +102,8 @@ public class Form extends JFrame {
 	}
 	
 	private void initialize(){
+		UIManager.put("TabbedPane.contentOpaque", false);
+		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/GPS.png")));
 		setTitle("PHM Simulator");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -149,7 +152,7 @@ public class Form extends JFrame {
 				InterfacePnl.requestFocus();
 			}
 		});
-		InterfacePnl.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
+		InterfacePnl.setImage(new ImageIcon(getClass().getResource("/images/Background.png")));
 		InterfacePnl.setVisible(false);
 		contentPane.add(InterfacePnl);
 		

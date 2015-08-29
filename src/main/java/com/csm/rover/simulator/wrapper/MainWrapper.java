@@ -139,6 +139,7 @@ public class MainWrapper extends Panel {
 		add(tabbedPane);
 		
 		CreateNewPnl = new JPanel();
+		CreateNewPnl.setOpaque(false);
 		tabbedPane.addTab("New Simulation", null, CreateNewPnl, null);
 		CreateNewPnl.setLayout(null);
 		
@@ -274,10 +275,12 @@ public class MainWrapper extends Panel {
 		CreateNewPnl.add(TypeSelector);
 		
 		SelectionPlasmaPnl = new JPanel();
+		SelectionPlasmaPnl.setOpaque(false);
 		TypeSelector.addTab("Plasma Fractal", null, SelectionPlasmaPnl, null);
 		SelectionPlasmaPnl.setLayout(null);
 		
 		MapRoughSlider = new JSlider();
+		MapRoughSlider.setOpaque(false);
 		MapRoughSlider.setBounds(162, 43, 400, 30);
 		SelectionPlasmaPnl.add(MapRoughSlider);
 		MapRoughSlider.setMaximum(700);
@@ -356,16 +359,19 @@ public class MainWrapper extends Panel {
 		MapSizeSpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		
 		ValuedTargetsChk = new JCheckBox("Use Valued Targets");
+		ValuedTargetsChk.setOpaque(false);
 		ValuedTargetsChk.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		ValuedTargetsChk.setBounds(73, 196, 169, 23);
 		SelectionPlasmaPnl.add(ValuedTargetsChk);
 		
 		ValuedHazardsChk = new JCheckBox("Use Valued Hazards");
+		ValuedHazardsChk.setOpaque(false);
 		ValuedHazardsChk.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		ValuedHazardsChk.setBounds(373, 196, 169, 23);
 		SelectionPlasmaPnl.add(ValuedHazardsChk);
 		
 		SelectionFilePnl = new JPanel();
+		SelectionFilePnl.setOpaque(false);
 		TypeSelector.addTab("From File", null, SelectionFilePnl, null);
 		SelectionFilePnl.setLayout(null);
 		
@@ -473,6 +479,7 @@ public class MainWrapper extends Panel {
 		RuntimeSpnr.setValue((Integer)RuntimeSpnr.getValue()-1);
 		
 		RuntimePnl = new JPanel();
+		RuntimePnl.setOpaque(false);
 		tabbedPane.addTab("Running Simulation", null, RuntimePnl, null);
 		RuntimePnl.setLayout(null);
 		

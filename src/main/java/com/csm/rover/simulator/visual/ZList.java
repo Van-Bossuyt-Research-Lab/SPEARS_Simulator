@@ -27,6 +27,7 @@ public class ZList extends JPanel implements Cloneable{
 	
 	public ZList(){
 		this.setLayout(null);
+		this.setOpaque(false);
 		super.setBounds(0, 0, 100, 100);
 		this.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		items = new JLabel[0];

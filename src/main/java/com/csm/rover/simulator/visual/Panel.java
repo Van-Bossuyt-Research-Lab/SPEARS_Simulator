@@ -37,7 +37,10 @@ public class Panel extends JPanel{
 		super.setSize(size);
 		super.setLocation(0, 0);
 		super.setLayout(null);
-		
+		inialize(title);
+	}
+	
+	private void inialize(String title){		
 		titleLbl = new JLabel(title);
 		titleLbl.setLocation(20, 10);
 		titleLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 25));
@@ -89,17 +92,22 @@ public class Panel extends JPanel{
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if (false){//hasImage){
+		if (hasImage && isOpaque()){
 			try {
-				BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TRANSLUCENT);
-			    Graphics2D g1 = bi.createGraphics();
-			    g1.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-			            RenderingHints.VALUE_ANTIALIAS_ON);
-		        Composite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1);
-		        g1.setComposite(comp);
-		        g1.drawImage(((ImageIcon) (background)).getImage(), 0, 0, this.getWidth(), this.getHeight(), null);
-			    g1.dispose();
-				g1.drawImage((new ImageIcon(bi)).getImage(), 0, 0, this.getWidth(), this.getHeight(), null);
+//				BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TRANSLUCENT);
+//			    Graphics2D g1 = bi.createGraphics();
+//			    g1.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//			            RenderingHints.VALUE_ANTIALIAS_ON);
+//		        Composite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1);
+//		        g1.setComposite(comp);
+//		        g1.drawImage(((ImageIcon) (background)).getImage(), 0, 0, this.getWidth(), this.getHeight(), null);
+//			    g1.dispose();
+//				g.drawImage((new ImageIcon(bi)).getImage(), 0, 0, this.getWidth(), this.getHeight(), null);
+				for (int i = 0; i*background.getIconWidth() < this.getWidth(); i++){
+					for (int j = 0; j*background.getIconHeight() < this.getHeight(); j++){
+						g.drawImage(background.getImage(), i*background.getIconWidth(), j*background.getIconHeight(), null);
+					}
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
