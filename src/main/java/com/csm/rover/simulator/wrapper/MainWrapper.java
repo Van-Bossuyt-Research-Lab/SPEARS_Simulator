@@ -413,6 +413,7 @@ public class MainWrapper extends Panel {
 			}
 		});
 		AccelChk.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+		AccelChk.setOpaque(false);
 		AccelChk.setBounds(750, 397, 181, 23);
 		CreateNewPnl.add(AccelChk);
 		
@@ -466,12 +467,15 @@ public class MainWrapper extends Panel {
 		RuntimePnl.setLayout(null);
 		
 		SerialDisplayScroll = new JScrollPane();
+		SerialDisplayScroll.setOpaque(false);
 		SerialDisplayScroll.setBorder(null);
 		SerialDisplayScroll.setBounds(10, 41, 620, 444);
+		SerialDisplayScroll.getViewport().setOpaque(false);
 		RuntimePnl.add(SerialDisplayScroll);
 		
 		SerialDisplayPnl = new JPanel();
 		SerialDisplayPnl.setBorder(null);
+		SerialDisplayPnl.setOpaque(false);
 		SerialDisplayScroll.setViewportView(SerialDisplayPnl);
 		
 		SerialDisplayTitle = new JLabel("Serial Buffers");
@@ -486,6 +490,7 @@ public class MainWrapper extends Panel {
 		RuntimePnl.add(SerialAvialableLbl);
 		
 		SerialHistorySlider = new JSlider();
+		SerialHistorySlider.setOpaque(false);
 		SerialHistorySlider.setMinorTickSpacing(1);
 		SerialHistorySlider.addMouseListener(new MouseAdapter() {
 			@Override
