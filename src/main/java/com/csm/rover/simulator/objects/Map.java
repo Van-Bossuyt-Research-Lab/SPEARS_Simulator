@@ -2,7 +2,9 @@ package com.csm.rover.simulator.objects;
 
 import java.io.Serializable;
 
-public class Map < KeyType, ItemType > implements Serializable {
+public class Map<KeyType, ItemType> implements Serializable {
+	
+	private static final long serialVersionUID = 5131097728579814550L;
 	
 	private KeyType[] keys;
 	private ItemType[] items;

@@ -5,13 +5,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.objects.List;
 import com.csm.rover.simulator.wrapper.Access;
 import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
 
 public class GORAROAdvanceCode extends RoverAutonomusCode {
 
+	private static final long serialVersionUID = -5817385172013297956L;
+	
 	private static final double ANGLE_ERROR = Math.PI/16.0;
 	private static final double RECALC_TIME = 2000; //ms
 	

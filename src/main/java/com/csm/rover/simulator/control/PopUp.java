@@ -12,6 +12,8 @@ import javax.swing.*;
 
 public class PopUp extends JDialog {
 
+	private static final long serialVersionUID = 2647075812202288041L;
+	
 	public static final int OK_OPTION = 0, CANCEL_OPTION = 1, YES_OPTION = 2, NO_OPTION = 3;
 	public static final int DEFAULT_OPTIONS = 0, OK_CANCEL_OPTIONS = 1, YES_NO_OPTIONS = 2, YES_NO_CANCEL_OPTIONS = 3, CUSTOM_OPTIONS = 4;
 	
@@ -145,7 +147,7 @@ public class PopUp extends JDialog {
 		title3.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		title3.setBounds(20, input2.getY() + input2.getHeight() + 10, (int)title3.getPreferredSize().getWidth(), (int)title3.getPreferredSize().getHeight());
 		this.add(title3);
-		JComboBox input3 = new JComboBox(options3);		
+		JComboBox<String> input3 = new JComboBox<String>(options3);		
 		input3.setSelectedItem(initial3);
 		input3.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		input3.setBounds(20, title3.getY() + title3.getHeight() + 5, this.getWidth() - 40, 25);
@@ -180,7 +182,7 @@ public class PopUp extends JDialog {
 		title1.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		title1.setBounds(20, 10, (int)title1.getPreferredSize().getWidth(), (int)title1.getPreferredSize().getHeight());
 		this.add(title1);
-		JComboBox input3 = new JComboBox(options);
+		JComboBox<String> input3 = new JComboBox<String>(options);
 		input3.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		input3.setBounds(20, title1.getY() + title1.getHeight() + 5, this.getWidth() - 40, 25);
 		this.add(input3);

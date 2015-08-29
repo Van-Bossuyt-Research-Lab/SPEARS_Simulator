@@ -6,6 +6,8 @@ import javax.swing.ImageIcon;
 
 public class LEDIndicator extends ImageDisplay{
 
+	private static final long serialVersionUID = 1L;
+	
 	private boolean on = false;
 	private String color = "LED_Red.png";
 	public static final int GREEN = 0, RED = 1, LIGHT_BLUE = 2, LIGHT_GREEN = 3, ORANGE = 4, PURPLE = 5, BLUE = 6, YELLOW = 7;

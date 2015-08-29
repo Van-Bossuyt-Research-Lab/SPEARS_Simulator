@@ -12,6 +12,8 @@ import javax.swing.JLabel;
 
 public class ImageDisplay extends JLabel{
 
+	private static final long serialVersionUID = 1L;
+	
 	private ImageIcon Image;
 	private int Margin = 10;
 	

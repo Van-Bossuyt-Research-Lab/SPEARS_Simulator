@@ -2,10 +2,11 @@ package com.csm.rover.simulator.objects;
 
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.Date;
 
 public class ZDate implements Serializable {
     
+    private static final long serialVersionUID = 1354011586595017310L;
+	
     public int year;
     public int month;
     public int day;
@@ -17,12 +18,12 @@ public class ZDate implements Serializable {
     
     public ZDate(){
         Calendar cal = Calendar.getInstance();
-        year = cal.get(cal.YEAR);
-        month = cal.get(cal.MONTH) + 1;
-        day = cal.get(cal.DAY_OF_MONTH);
-        hour = cal.get(cal.HOUR_OF_DAY);
-        minute = cal.get(cal.MINUTE);
-        second = cal.get(cal.SECOND);
+        year = cal.get(Calendar.YEAR);
+        month = cal.get(Calendar.MONTH) + 1;
+        day = cal.get(Calendar.DAY_OF_MONTH);
+        hour = cal.get(Calendar.HOUR_OF_DAY);
+        minute = cal.get(Calendar.MINUTE);
+        second = cal.get(Calendar.SECOND);
     }
     
     public ZDate(int year, int month, int day){

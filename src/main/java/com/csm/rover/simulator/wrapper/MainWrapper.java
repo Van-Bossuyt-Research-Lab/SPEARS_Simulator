@@ -1,64 +1,46 @@
 package com.csm.rover.simulator.wrapper;
 
 import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.Font;
+import java.awt.Cursor;
 
-import javax.swing.JComboBox;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-
-import com.csm.rover.simulator.visual.Panel;
-import com.csm.rover.simulator.visual.ZList;
-
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.UIManager;
+import javax.swing.JCheckBox;
+import javax.swing.JTextField;
 import javax.swing.JTabbedPane;
-
-import java.awt.Font;
-
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JScrollPane;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
+import com.csm.rover.simulator.visual.Panel;
+import com.csm.rover.simulator.visual.ZList;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.satellite.SatelliteObject;
+import com.csm.rover.simulator.objects.MapFileFilter;
 
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.factories.FormFactory;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
-import java.io.File;
-import java.io.FilenameFilter;
-
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.filechooser.FileFilter;
-
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JTextField;
-
-import com.csm.rover.simulator.objects.MapFileFilter;
-
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-
-import java.awt.Color;
-import java.awt.Cursor;
-
-import javax.swing.UIManager;
-import javax.swing.JCheckBox;
-
 public class MainWrapper extends Panel {
+
+	private static final long serialVersionUID = 2633938480331316518L;
 
 	static final int MAX_MAP_LAYERS = 10;
 	

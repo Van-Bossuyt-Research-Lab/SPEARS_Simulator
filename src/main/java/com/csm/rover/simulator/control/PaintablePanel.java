@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 
 public class PaintablePanel extends JPanel{
 
+	private static final long serialVersionUID = 8987209351446604431L;
+	
 	private String title = "", horzTitle = "", horzUnit = "", vertTitle = "", vertUnit = "";
 	private double[] xs = new double[0], ys = new double[0];
 	boolean graphSet = false;

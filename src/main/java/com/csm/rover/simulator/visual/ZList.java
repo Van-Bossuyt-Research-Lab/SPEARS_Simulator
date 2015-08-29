@@ -13,11 +13,12 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.control.InstructionObj;
 
 public class ZList extends JPanel implements Cloneable{
 
+	private static final long serialVersionUID = 1L;
+	
 	private JLabel[] items;
 	private JScrollBar scroll;
 	private Object[] values = new String[0];
@@ -52,7 +53,6 @@ public class ZList extends JPanel implements Cloneable{
 		while (x < items.length){
 			items[x] = new JLabel("  " + values[x].toString());
 			items[x].setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
-			final int hold = x;
 			items[x].addMouseListener(new MouseAdapter(){
 				@Override
 				public void mouseClicked(MouseEvent e){
@@ -157,7 +157,6 @@ public class ZList extends JPanel implements Cloneable{
 		items = Augment(items, new JLabel("  " + val.toString()), loc);
 		values = Augment(values, val, loc);
 		items[loc].setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
-		final int hold = loc;
 		items[loc].addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e){

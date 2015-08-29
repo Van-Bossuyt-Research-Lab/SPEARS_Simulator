@@ -5,6 +5,8 @@ import com.csm.rover.simulator.wrapper.Access;
 
 public class PIDAAcode extends RoverAutonomusCode {
 
+	private static final long serialVersionUID = -6895122583195199637L;
+
 	public PIDAAcode(PIDAAcode in) {
 		super(in);
 		this.phiBound = in.phiBound;
@@ -54,7 +56,7 @@ public class PIDAAcode extends RoverAutonomusCode {
 		Trgt = in.Trgt;
 		this.lastActionTime = in.lastActionTime;
 		this.action = in.action;
-		this.seconds = seconds;
+		this.seconds = in.seconds;
 		hazard=in.hazard;
 		elevation=in.elevation;
 		HBatt=in.HBatt;
@@ -422,6 +424,7 @@ if (milliTime-rnTime>=500){
 		
 
 //Method for selection of minimum option
+	@SuppressWarnings("unused")
 	private double minscore(double o1,double o2,double o3,double o4,double o5,double o6,double o7,double o8,double o9,double o10,double o11,double o12,double o13, double o14, double o15,double o16) {
 		double tested;
 		int Option;
@@ -633,6 +636,7 @@ if (milliTime-rnTime>=500){
 	}
 		
 //Method for determining Point Optimization Score
+	@SuppressWarnings("unused")
 	private double RouteMit(DecimalPoint pnt,DecimalPoint loc){
 		double score;
 		double hzrds;

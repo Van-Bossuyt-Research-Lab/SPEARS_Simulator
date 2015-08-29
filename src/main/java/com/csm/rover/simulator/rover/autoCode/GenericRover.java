@@ -4,6 +4,8 @@ import com.csm.rover.simulator.objects.DecimalPoint;
 
 public class GenericRover extends RoverAutonomusCode {
 
+	private static final long serialVersionUID = -5883548370057346938L;
+	
 	private long lastActionTime = 0;
 	private int action = 0;
 	private int seconds = 1;

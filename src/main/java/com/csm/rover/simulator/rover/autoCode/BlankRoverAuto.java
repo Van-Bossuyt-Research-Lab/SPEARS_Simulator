@@ -4,6 +4,8 @@ import com.csm.rover.simulator.objects.DecimalPoint;
 
 public class BlankRoverAuto extends RoverAutonomusCode {
 
+	private static final long serialVersionUID = 4270320886718139449L;
+
 	public BlankRoverAuto() {
 		super("NULL", "NULL");
 		// TODO Auto-generated constructor stub

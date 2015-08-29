@@ -73,6 +73,7 @@ public class RunConfiguration implements Serializable {
 		ObjectInputStream in = new ObjectInputStream(new FileInputStream(save.getAbsolutePath()));
 		RunConfiguration input = (RunConfiguration) in.readObject();
 		if (!this.fileCode.equals(input.fileCode)){
+			in.close();
 			throw new Exception("Invalid File Version");
 		}
 		this.mapFromFile = input.mapFromFile;
@@ -89,6 +90,7 @@ public class RunConfiguration implements Serializable {
 		this.hazardDensity = input.hazardDensity;
 		this.accelerated = input.accelerated;
 		this.runtime = input.runtime;
+		in.close();
 	}
 
 	public void Save(File file) throws Exception {

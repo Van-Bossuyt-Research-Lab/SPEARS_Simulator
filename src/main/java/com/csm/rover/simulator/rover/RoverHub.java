@@ -8,8 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -28,6 +26,8 @@ import com.csm.rover.simulator.wrapper.Access;
 import com.csm.rover.simulator.wrapper.Globals;
 
 public class RoverHub extends Panel {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private RoverObject[] rovers;
 	private boolean inHUDmode = false;
@@ -377,7 +377,7 @@ public class RoverHub extends Panel {
 	}
 	
 	public void start(){
-		SyncronousThread updateTimer = new SyncronousThread(500, new Runnable(){
+		new SyncronousThread(500, new Runnable(){
 			public void run(){
 				updateDisplays();
 			}

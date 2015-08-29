@@ -4,6 +4,8 @@ import com.csm.rover.simulator.wrapper.Access;
 
 public class FailOnHazard extends RoverPhysicsModel {
 
+	private static final long serialVersionUID = 1973210335815945685L;
+	
 	private boolean failed = false;
 	
 	public FailOnHazard() {}

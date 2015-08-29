@@ -2,8 +2,10 @@ package com.csm.rover.simulator.objects;
 
 import java.io.Serializable;
 
-public class List <Type> implements Serializable {
+public class List<Type> implements Serializable {
 
+	private static final long serialVersionUID = 4449293775088189036L;
+	
 	private Type[] array;
 	public int length;
 	

@@ -1,21 +1,12 @@
 package com.csm.rover.simulator.visual;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,6 +16,8 @@ import com.csm.rover.simulator.wrapper.Globals;
 
 public class Panel extends JPanel{
 
+	private static final long serialVersionUID = -7055141051608083309L;
+	
 	protected JLabel titleLbl;
 	protected JLabel postScript;
 	private ImageButton exitBtn;

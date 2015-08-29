@@ -9,6 +9,7 @@ import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.objects.Map;
 import com.csm.rover.simulator.objects.SyncronousThread;
 
+@SuppressWarnings("unused")
 public class SatelliteObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;

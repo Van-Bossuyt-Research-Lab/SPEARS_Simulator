@@ -46,6 +46,8 @@ import com.csm.rover.simulator.wrapper.Globals;
 //TODO more adaptable 'plug in' interface like communication style
 public class InterfacePanel extends Panel{
 
+	private static final long serialVersionUID = -2554090286918354434L;
+	
 	JPanel ProgramBtnsPnl;
 		ImageButton LinkBtn;
 		ImageButton PingBtn;
@@ -897,6 +899,7 @@ public class InterfacePanel extends Panel{
 		StatusPnl.add(StatusArmPower);
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void setNamesLists(Object[] rovers, Object[] sats){
 		RoverSelectionCombo.setModel(new DefaultComboBoxModel(rovers));
 		SatSelectionCombo.setModel(new DefaultComboBoxModel(sats));

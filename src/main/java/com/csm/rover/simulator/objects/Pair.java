@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class Pair <T1, T2> implements Serializable {
 		
+	private static final long serialVersionUID = -7708932608841754837L;
+	
 	private T1 first;
 	private T2 second;
 	

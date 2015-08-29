@@ -12,6 +12,7 @@ import com.csm.rover.simulator.objects.SyncronousThread;
 import com.csm.rover.simulator.rover.autoCode.RoverAutonomusCode;
 import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
 
 //TODO actually debug instructions
@@ -25,9 +26,11 @@ public class RoverObject implements Serializable {
 	private RoverPhysicsModel physics;
 	private RoverAutonomusCode autoCode;
 	
+	@SuppressWarnings("unused")
 	private boolean connected = false; // Can the ground station hear/talk to us
 	private boolean mute = false; // Can we talk at all
 	private boolean moving = false; // are we moving
+	@SuppressWarnings("unused")
 	private String motorState = ""; // how are we moving
 
 	private boolean hasInstructions = false; // has a list of instructions on file
@@ -55,13 +58,16 @@ public class RoverObject implements Serializable {
 	private int index = 0;
 	private boolean go = true; // allowed to interpret message
 	
+	@SuppressWarnings("unused")
 	private double EOLbattery = -1;
+	@SuppressWarnings("unused")
 	private double EOLmotor = Double.MAX_VALUE;
 	
 	private boolean checkCurrent = false; // are we checking current
 	private float currentIntegral = 0; // the sum of all currents checked
 	private long lastCurrentCheck = 0; // time of last current check
 	private long startCurretIntegral = 0; // time of initial integral check
+	@SuppressWarnings("unused")
 	private float averageCurrent = 0; // integral divided by time
 	
 	private HashSet<Point> visitedScience = new HashSet<Point>();
@@ -230,7 +236,7 @@ public class RoverObject implements Serializable {
 						}
 						else if (strcmp(data, "score") == 0){
 							if (Access.isAtTarget(getLocation())){
-								this.visitedScience.add(Access.CODE.GUI.TerrainPnl.HeightMap.getMapSquare(getLocation()));
+								this.visitedScience.add(Admin.GUI.TerrainPnl.HeightMap.getMapSquare(getLocation()));
 								System.out.println("Aquired.  New Score = " + visitedScience.size());
 							}
 						}

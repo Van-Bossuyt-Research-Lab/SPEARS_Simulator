@@ -6,6 +6,8 @@ import com.csm.rover.simulator.wrapper.Globals;
 
 public class MER extends RoverAutonomusCode {
 	
+	private static final long serialVersionUID = 1195207024217443714L;
+
 	private static final double ANGLE_ERROR = Math.PI/16.0;
 	
 	private int completed = 0;

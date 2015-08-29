@@ -7,6 +7,8 @@ import com.csm.rover.simulator.wrapper.Globals;
 
 public class GORAROcode1 extends RoverAutonomusCode {
 	
+	private static final long serialVersionUID = -7214933982888683962L;
+	
 	private static final double ANGLE_ERROR = Math.PI/16.0;
 	private static final double RECALC_TIME = 2000; //ms
 	
@@ -93,7 +95,6 @@ public class GORAROcode1 extends RoverAutonomusCode {
 					potentials[x][y] = 0;
 				}
 			}
-			//System.out.println("Score = " + score);
 		}
 		int[] sciences = new int[sampleDirections];
 		int[] hazards = new int[sampleDirections];
@@ -184,19 +185,6 @@ public class GORAROcode1 extends RoverAutonomusCode {
 				}
 			}
 			lastOptTime = milliTime;
-			//if (true){
-			//	for (double pot : potentials){
-			//		System.out.print(pot + "\t");
-			//	}
-			//	System.out.println();
-			//}
-			
-//			System.out.println("\n\n\n\n\n\n");
-//			System.out.println("\t\t" + formatDouble(potentials[histories-1][4])+"("+sciences[4]+", "+hazards[4]+")");
-//			System.out.println("\t" + formatDouble(potentials[histories-1][6])+"("+sciences[6]+", "+hazards[6]+")" + "\t\t" + formatDouble(potentials[histories-1][2])+"("+sciences[2]+", "+hazards[2]+")");
-//			System.out.println(formatDouble(potentials[histories-1][8])+"("+sciences[8]+", "+hazards[8]+")" + "\t\t\t\t" + formatDouble(potentials[histories-1][0])+"("+sciences[0]+", "+hazards[0]+")");
-//			System.out.println("\t" + formatDouble(potentials[histories-1][10])+"("+sciences[10]+", "+hazards[10]+")" + "\t\t" + formatDouble(potentials[histories-1][14])+"("+sciences[14]+", "+hazards[14]+")");
-//			System.out.println("\t\t" + formatDouble(potentials[histories-1][12])+"("+sciences[12]+", "+hazards[12]+")");
 		
 			targetDirection = maxDirection;
 			state++;
@@ -207,7 +195,6 @@ public class GORAROcode1 extends RoverAutonomusCode {
 				return "spin_ccw";
 			}
 		case 2:
-			//System.out.println(direction + " - " + targetDirection);
 			if (Math.abs(direction-targetDirection) < ANGLE_ERROR){
 				state++;
 				return "move"; 
@@ -252,35 +239,6 @@ public class GORAROcode1 extends RoverAutonomusCode {
 	@Override
 	public RoverAutonomusCode clone() {
 		return new GORAROcode1(this);
-	}
-	
-	private String formatDouble(double in){ 
-		String out = "";
-		if (Math.abs(in) < Integer.MAX_VALUE/1000){
-			if (in < 0){
-				in *= -1;
-				out = "-";
-			}
-			int whole = (int)in;
-			out += whole;
-			int part = (int)((in * 1000) - whole*1000);
-			if (part == 0){
-				out += ".000";
-			}
-			else if (part < 10){
-				out += "." + part + "00";
-			}
-			else if (part < 100){
-				out += "." + part + "0";
-			}
-			else {
-				out += "." + part;
-			}
-		}
-		else {
-			out = (int)in + "";
-		}
-		return out;
 	}
 
 }

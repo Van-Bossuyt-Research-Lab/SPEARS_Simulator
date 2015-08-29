@@ -25,6 +25,8 @@ import java.util.Scanner;
 
 public class PlasmaPanel extends JPanel {
 
+	private static final long serialVersionUID = -4479973616638409494L;
+	
 	private float[][] values;
 	private GridList<Integer> targets;
 	private int[][] hazards;

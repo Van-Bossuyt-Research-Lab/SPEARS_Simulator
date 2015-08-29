@@ -5,44 +5,37 @@ import java.awt.EventQueue;
 import java.awt.Frame;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-import java.awt.Toolkit;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
 import com.csm.rover.simulator.map.LandMapPanel;
 import com.csm.rover.simulator.map.PlanetParametersList;
-
-import javax.swing.JButton;
-
 import com.csm.rover.simulator.objects.RunConfiguration;
 import com.csm.rover.simulator.control.InterfacePanel;
 import com.csm.rover.simulator.control.PopUp;
 import com.csm.rover.simulator.rover.RoverHub;
-import com.csm.rover.simulator.rover.autoCode.GenericRover;
 import com.csm.rover.simulator.satellite.SatelliteHub;
 import com.csm.rover.simulator.wrapper.Access;
-import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.MainWrapper;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 
 //TODO make into a signularity thingy
 public class Form extends JFrame {
 	
+	private static final long serialVersionUID = 5065827458217177853L;
+
 	static final int WRAPPER = 0, MAP = 1, ROVER = 2, ORBIT = 3, SATELLITE = 4, INTERFACE = 5;
 	
 	static public Form frame;

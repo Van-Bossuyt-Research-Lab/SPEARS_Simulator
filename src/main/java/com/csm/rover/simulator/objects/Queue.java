@@ -2,7 +2,9 @@ package com.csm.rover.simulator.objects;
 
 import java.io.Serializable;
 
-public class Queue < Type extends Object > implements Serializable {
+public class Queue<Type extends Object> implements Serializable {
+
+	private static final long serialVersionUID = 4588180882747764006L;
 
 	private Type[] array;
 	

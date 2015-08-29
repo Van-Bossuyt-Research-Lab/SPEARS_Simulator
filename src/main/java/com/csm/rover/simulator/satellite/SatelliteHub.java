@@ -17,12 +17,12 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
 import com.csm.rover.simulator.objects.SyncronousThread;
-import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.visual.LEDIndicator;
 import com.csm.rover.simulator.visual.Panel;
-import com.csm.rover.simulator.wrapper.Access;
 
 public class SatelliteHub extends Panel{
+	
+	private static final long serialVersionUID = 2063498616789417121L;
 	
 	private SatelliteObject[] satellites;
 	private int[][] standardDisplayLinks;
@@ -309,7 +309,7 @@ public class SatelliteHub extends Panel{
 	}
 	
 	public void start(){
-		SyncronousThread updateTimer = new SyncronousThread(500, new Runnable(){
+		new SyncronousThread(500, new Runnable(){
 			public void run(){
 				updateDisplays();
 			}
@@ -418,6 +418,7 @@ public class SatelliteHub extends Panel{
 	}
 	
 	// round doubles so they're pretty to display
+		@SuppressWarnings("unused")
 		private String formatDouble(double in){ 
 			String out = "";
 			if (Math.abs(in) < Integer.MAX_VALUE/1000){

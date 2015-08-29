@@ -1,7 +1,6 @@
 package com.csm.rover.simulator.map;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -19,6 +18,8 @@ import com.csm.rover.simulator.objects.DecimalPoint;
 
 public class RoverIcon extends JPanel{
 	
+	private static final long serialVersionUID = 1L;
+
 	private int _size = 80;
 	
 	private JLabel nameTitle;

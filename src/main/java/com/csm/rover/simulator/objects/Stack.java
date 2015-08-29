@@ -2,7 +2,9 @@ package com.csm.rover.simulator.objects;
 
 import java.io.Serializable;
 
-public class Stack < Type extends Object > implements Serializable {
+public class Stack<Type extends Object> implements Serializable {
+
+	private static final long serialVersionUID = 1555763099414317542L;
 
 	private Type[] array;
 	

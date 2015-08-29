@@ -5,6 +5,8 @@ import com.csm.rover.simulator.wrapper.Access;
 
 public class PIDAAcontrol extends RoverAutonomusCode {
 
+	private static final long serialVersionUID = 4160697317388735672L;
+
 	public PIDAAcontrol(PIDAAcontrol in) {
 		super(in);
 		this.phiBound = in.phiBound;
@@ -20,7 +22,7 @@ public class PIDAAcontrol extends RoverAutonomusCode {
 		Trgt = in.Trgt;
 		this.lastActionTime = in.lastActionTime;
 		this.action = in.action;
-		this.seconds = seconds;
+		this.seconds = in.seconds;
 		hazard=in.hazard;
 		elevation=in.elevation;
 		HBatt=in.HBatt;

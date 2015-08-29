@@ -5,6 +5,8 @@ import com.csm.rover.simulator.wrapper.Access;
 
 public class PIDAAcode3 extends RoverAutonomusCode {
 
+	private static final long serialVersionUID = 730021582768234189L;
+
 	public PIDAAcode3(PIDAAcode3 in) {
 		super(in);
 		this.phiBound = in.phiBound;
@@ -20,7 +22,7 @@ public class PIDAAcode3 extends RoverAutonomusCode {
 		Trgt = in.Trgt;
 		this.lastActionTime = in.lastActionTime;
 		this.action = in.action;
-		this.seconds = seconds;
+		this.seconds = in.seconds;
 		hazard=in.hazard;
 		
 	}
@@ -251,6 +253,7 @@ public class PIDAAcode3 extends RoverAutonomusCode {
 		return newTrgt;
 	}
 //Look at hazard and try to skirt around it
+	@SuppressWarnings("unused")
 	private double skirt(DecimalPoint loc,DecimalPoint trgt,double Hatt){
 		double dir;
 		double d1;
@@ -300,6 +303,7 @@ public class PIDAAcode3 extends RoverAutonomusCode {
 		return dir;
 	}
 //Method for selection of minimum option
+	@SuppressWarnings("unused")
 	private double mindist(double o1,double o2,double o3,double o4,double o5,double o6,double o7,double o8) {
 			double tested;
 			int Option;

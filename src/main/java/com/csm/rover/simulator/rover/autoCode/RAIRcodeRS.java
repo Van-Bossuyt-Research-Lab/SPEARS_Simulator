@@ -5,6 +5,8 @@ import com.csm.rover.simulator.wrapper.Access;
 
 public class RAIRcodeRS extends RoverAutonomusCode {
 
+	private static final long serialVersionUID = -8559687637329165760L;
+
 	public RAIRcodeRS(RAIRcodeRS in) {
 		super(in);
 		this.phiBound = in.phiBound;
@@ -54,7 +56,7 @@ public class RAIRcodeRS extends RoverAutonomusCode {
 		Trgt = in.Trgt;
 		this.lastActionTime = in.lastActionTime;
 		this.action = in.action;
-		this.seconds = seconds;
+		this.seconds = in.seconds;
 	}
 
 		//Declare any variables you want here
@@ -123,6 +125,7 @@ public class RAIRcodeRS extends RoverAutonomusCode {
 		}
 	
 //	@Override
+	@SuppressWarnings("unused")
 	public String nextCommand(
 			long milliTime,
 			DecimalPoint location,
@@ -323,6 +326,7 @@ if (milliTime-rnTime>=500){
 		
 
 //Method for selection of minimum option
+	@SuppressWarnings("unused")
 	private double minscore(double o1,double o2,double o3,double o4,double o5,double o6,double o7,double o8,double o9,double o10,double o11,double o12,double o13, double o14, double o15,double o16) {
 		double tested;
 		int Option;
@@ -492,6 +496,7 @@ if (milliTime-rnTime>=500){
 	}
 
 		//Method for determining Point that is best at escaping a hole
+		@SuppressWarnings("unused")
 		private double FastRoute(DecimalPoint pnt,DecimalPoint loc){
 			double score;
 

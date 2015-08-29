@@ -6,6 +6,8 @@ import java.util.TreeMap;
 
 public class GridList<T> implements Serializable {
 
+	private static final long serialVersionUID = -5680890788280888934L;
+	
 	private ArrayList<TreeMap<Integer, ArrayList<TreeMap<Integer, T>>>> data;
 	private int size;
 	private int stored;

@@ -7,6 +7,8 @@ import com.csm.rover.simulator.wrapper.Globals;
 
 public class RiskOnHazard extends RoverPhysicsModel {
 	
+	private static final long serialVersionUID = 1L;
+	
 	private boolean failed = false;
 	Random rnd = new Random();
 	

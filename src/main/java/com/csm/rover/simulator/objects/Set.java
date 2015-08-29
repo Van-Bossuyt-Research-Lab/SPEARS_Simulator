@@ -2,12 +2,15 @@ package com.csm.rover.simulator.objects;
 
 import java.io.Serializable;
 
-public class Set <Type>  implements Serializable {
+public class Set<Type> implements Serializable {
+
+	private static final long serialVersionUID = 6967555463211432184L;
 
 	private Type[] array;
 	
 	private boolean editing = false;
 	
+	@SuppressWarnings("unchecked")
 	public Set(){
 		array = (Type[]) new Object[0];
 	}
@@ -30,6 +33,7 @@ public class Set <Type>  implements Serializable {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public synchronized void push(Type val){
 		while (editing) {}
 		editing = true;

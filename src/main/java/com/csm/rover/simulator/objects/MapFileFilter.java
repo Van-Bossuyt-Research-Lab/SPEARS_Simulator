@@ -7,6 +7,8 @@ import javax.swing.filechooser.FileFilter;
 
 public class MapFileFilter extends FileFilter implements Serializable {
 	
+	private static final long serialVersionUID = -7881971699253008902L;
+
 	@Override
 	public boolean accept(File arg0) {
 		String path = arg0.getAbsolutePath();

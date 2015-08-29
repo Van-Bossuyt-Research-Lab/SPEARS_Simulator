@@ -7,6 +7,8 @@ import javax.swing.filechooser.FileFilter;
 
 public class ImageFileFilter extends FileFilter implements Serializable{
 	
+	private static final long serialVersionUID = 4401711245546132169L;
+
 	@Override
 	public boolean accept(File arg0) {
 		String path = arg0.getAbsolutePath();

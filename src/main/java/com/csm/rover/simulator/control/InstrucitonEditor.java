@@ -3,30 +3,22 @@ package com.csm.rover.simulator.control;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
-
-import java.awt.Font;
-
 import javax.swing.JTextField;
-
-import java.awt.Color;
-
-import javax.swing.border.EtchedBorder;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.SwingConstants;
 import javax.swing.JCheckBox;
-import javax.swing.JProgressBar;
-
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
@@ -40,6 +32,8 @@ import java.awt.event.KeyEvent;
 
 public class InstrucitonEditor extends JDialog {
 
+	private static final long serialVersionUID = -9105351356099819758L;
+	
 	private final JPanel contentPanel = new JPanel();
 	private JTextField TitleTxt;
 	private ZList ParameterTitles;
@@ -174,10 +168,11 @@ public class InstrucitonEditor extends JDialog {
 			new Object[][] { {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
 				{""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""} },
 				new String[] { "Command" } ) {
-			Class[] columnTypes = new Class[] {
+			private static final long serialVersionUID = 1L;
+			Class<?>[] columnTypes = new Class[] {
 				String.class
 			};
-			public Class getColumnClass(int columnIndex) {
+			public Class<?> getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
 		};

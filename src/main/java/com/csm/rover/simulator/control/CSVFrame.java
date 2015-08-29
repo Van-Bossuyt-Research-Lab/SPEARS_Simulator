@@ -16,9 +16,10 @@ import java.util.Scanner;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Font;
 
-
 public class CSVFrame extends JFrame {
 
+	private static final long serialVersionUID = -3993565159460072336L;
+	
 	private JPanel contentPane;
 	private JTable ValuesTable;
 	private PaintablePanel GraphPnl;
@@ -81,35 +82,38 @@ public class CSVFrame extends JFrame {
 			
 			String title = "", horzTitle = "", horzUnit = "", vertTitle = "", vertUnit = "";
 			double[] xs = new double[0], ys = new double[0];
-			input = new Scanner(data);
-			while (input.hasNextLine()){
-				String current = input.nextLine();
+			input.close();
+			Scanner input2 = new Scanner(data);
+			while (input2.hasNextLine()){
+				String current = input2.nextLine();
 				if (current.equals("Label")){
 					break;
 				}
 				else if (current.equals("Vertical Units")){
-					vertUnit = input.nextLine();
+					vertUnit = input2.nextLine();
 				}
 				else if (current.equals("Horizontal Units")){
-					horzUnit = input.nextLine();
+					horzUnit = input2.nextLine();
 				}
 				else if (current.equals("Graph Title")){
-					title = input.nextLine();
+					title = input2.nextLine();
 				}
 			}
-			horzTitle = input.nextLine();
-			vertTitle = input.nextLine();
-			while (input.hasNextDouble()){
-				xs = Augment(xs, input.nextDouble());
-				ys = Augment(ys, input.nextDouble());
-			}			
+			horzTitle = input2.nextLine();
+			vertTitle = input2.nextLine();
+			while (input2.hasNextDouble()){
+				xs = Augment(xs, input2.nextDouble());
+				ys = Augment(ys, input2.nextDouble());
+			}
+			input2.close();
 			try {
 				GraphPnl.drawGraw(title, horzTitle, horzUnit, vertTitle, vertUnit, xs, ys);	
 			ValuesTable.setModel(new DefaultTableModel(
 				new Object[xs.length][2],
 				new String[] {
 					(horzTitle + " (" + horzUnit + ")"), (vertTitle + " (" + vertUnit + ")")
-				}) {				
+				}) {
+				private static final long serialVersionUID = 1L;				
 			});	
 			int x = 0;
 			while (x < xs.length){
@@ -179,17 +183,6 @@ public class CSVFrame extends JFrame {
 			x++;
 		}
 		out[x] = val;
-		return out;
-	}
-	
-	private Object[][] convertToObjectDoubleArray(double[] array1, double[] array2){
-		Object[][] out = new Object[2][array1.length];
-		int x = 0;
-		while (x < array1.length){
-			out[0][x] = new Double(array1[x]);
-			out[1][x] = new Double(array2[x]);
-			x++;
-		}
 		return out;
 	}
 	

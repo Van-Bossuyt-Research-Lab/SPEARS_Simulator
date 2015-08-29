@@ -7,37 +7,30 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.Component;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
 import java.io.File;
-import java.util.Random;
 
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 
-import com.csm.rover.simulator.control.InterfacePanel;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.ImageFileFilter;
 import com.csm.rover.simulator.objects.MapFileFilter;
 import com.csm.rover.simulator.wrapper.Access;
-import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.rover.RoverObject;
-import com.csm.rover.simulator.visual.ImageButton;
 import com.csm.rover.simulator.visual.Panel;
-
-import javax.swing.JPopupMenu;
-
-import java.awt.Component;
-
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButtonMenuItem;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class LandMapPanel extends Panel{
 	
+	private static final long serialVersionUID = 3715566110839859923L;
+
 	private PlanetParametersList params;
 	
 	private int mapSize = 7;
@@ -49,9 +42,6 @@ public class LandMapPanel extends Panel{
 	private boolean focusEngauged = false;
 	
 	public PlasmaPanel HeightMap;
-	private double[][] TemperatureMap;
-	private double[][] PressureMap;
-	private double[][][][] WindMap;
 	
 	private JPopupMenu MapOptionsPopMenu;
 	private JMenuItem mntmShowFocusedRover;
@@ -61,7 +51,6 @@ public class LandMapPanel extends Panel{
 	private JRadioButtonMenuItem rdbtnmntmShowHazards;
 	
 	private RoverIcon[] roverIcons;
-	private DecimalPoint[][] roverTrails;
 
 	public LandMapPanel(Dimension size, PlanetParametersList params){
 		super(size /*new Dimension(700, 500)*/, "Terrain View");
@@ -319,34 +308,11 @@ public class LandMapPanel extends Panel{
 	
 	// retrieve temperature from a coordinate, with interpolation
 	public double getTemperature(DecimalPoint loc){ 
-		//uniform temp map
 		return -30;
-		//variable temp map
-		/*
-		try {
-			Point mapSquare = getMapSquare(loc);
-			int x = (int) mapSquare.getX();
-			int y = (int) mapSquare.getY();
-			double locx = ((int)((loc.getX() - (int)loc.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
-			double locy = ((int)((loc.getY() - (int)loc.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0;
-			try {
-				return getIntermidiateValue(TemperatureMap[x][y], TemperatureMap[x+1][y], TemperatureMap[x][y+1], TemperatureMap[x+1][y+1], locx, locy);
-			}
-			catch (Exception e){
-				//TODO actually initialize this map
-				return 0;
-			}
-		}
-		catch (Exception e){
-			Globals.reportError("MapFrame", "getTempAtLoc", e);
-			return 0;
-		}
-		*/
 	}
 	
 	// interpolates between the corners of a square to find mid-range values
 	public double getIntermidiateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
-		//System.out.println(topleft + "\t" + relativex + "\t" + topright + "\n" + relativey + "\n" + bottomleft + "\t\t\t" + bottomright);
 		if (relativex > relativey){ //top right triangle
 			return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
 		}
