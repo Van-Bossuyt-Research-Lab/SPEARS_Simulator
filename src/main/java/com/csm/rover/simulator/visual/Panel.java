@@ -94,15 +94,6 @@ public class Panel extends JPanel{
 		super.paintComponent(g);
 		if (hasImage && isOpaque()){
 			try {
-//				BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TRANSLUCENT);
-//			    Graphics2D g1 = bi.createGraphics();
-//			    g1.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-//			            RenderingHints.VALUE_ANTIALIAS_ON);
-//		        Composite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1);
-//		        g1.setComposite(comp);
-//		        g1.drawImage(((ImageIcon) (background)).getImage(), 0, 0, this.getWidth(), this.getHeight(), null);
-//			    g1.dispose();
-//				g.drawImage((new ImageIcon(bi)).getImage(), 0, 0, this.getWidth(), this.getHeight(), null);
 				for (int i = 0; i*background.getIconWidth() < this.getWidth(); i++){
 					for (int j = 0; j*background.getIconHeight() < this.getHeight(); j++){
 						g.drawImage(background.getImage(), i*background.getIconWidth(), j*background.getIconHeight(), null);
@@ -111,9 +102,6 @@ public class Panel extends JPanel{
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-		else {
-			//System.out.println("no image");
 		}
 	}
 	
