@@ -236,7 +236,7 @@ public class LandMapPanel extends Panel{
 		}
 		try {
 			this.getParent().repaint();
-		} catch (Exception e) { e.printStackTrace(); }
+		} catch (Exception e) {}
 	}
 	
 	//populates an array of roverIcons in the simulator
