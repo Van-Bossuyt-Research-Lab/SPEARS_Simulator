@@ -49,8 +49,6 @@ public class PlasmaPanel extends JPanel {
 	private int currentColorScheme = 0;
 	public static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
 	
-	private double ColorModifier;
-	
 	public PlasmaPanel(){
 		this.setBounds(0, 0, 100, 100);
 		this.setBackground(Color.BLACK);
@@ -163,7 +161,6 @@ public class PlasmaPanel extends JPanel {
 			x++;
 		}
 		minval = 0;
-		setColorMultipliers();
 		this.setSize(values.length*squareResolution/detail, values[0].length*squareResolution/detail);
 	}
 	
@@ -182,7 +179,6 @@ public class PlasmaPanel extends JPanel {
 			x++;
 		}
 		minval = 0;
-		setColorMultipliers();
 		this.setSize(values.length*squareResolution/detail, values[0].length*squareResolution/detail);
 		this.repaint();
 	}
@@ -567,11 +563,6 @@ public class PlasmaPanel extends JPanel {
 			x++;
 		}
 		return min;
-	}
-	
-	private void setColorMultipliers(){
-		double x = ((maxval-minval)/2.0+minval);
-		ColorModifier = 255 / (x*x - 2*minval*x + minval*minval);
 	}
 	
 	private Color getColor(double numb) {
