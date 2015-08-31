@@ -1,7 +1,8 @@
 package com.csm.rover.simulator.rover.autoCode;
 
+import java.util.ArrayList;
+
 import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.objects.List;
 import com.csm.rover.simulator.wrapper.Access;
 import com.csm.rover.simulator.wrapper.Globals;
 
@@ -36,7 +37,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 	private static final int STALL_TIME = 3000;
 	private static final int RUN_TIME = 4000;
 	
-	private List<DecimalPoint> visitedScience = new List<DecimalPoint>();
+	private ArrayList<DecimalPoint> visitedScience = new ArrayList<DecimalPoint>();
 	
 	private double[] mentality = new double[] { 10000, 3000, 1200, 500, 50 };
 
@@ -226,8 +227,8 @@ public class GORAROcode1 extends RoverAutonomusCode {
 
 	private boolean hasUnvisitedScience(DecimalPoint loc){
 		if (Access.isAtTarget(loc)){
-			for (int i = 0; i < visitedScience.length; i++){
-				if (Math.sqrt(Math.pow(loc.getX()-visitedScience.get(i).getX(), 2) + Math.pow(loc.getY()-visitedScience.get(i).getY(), 2)) < 3){
+			for (DecimalPoint past : visitedScience){
+				if (Math.sqrt(Math.pow(loc.getX()-past.getX(), 2) + Math.pow(loc.getY()-past.getY(), 2)) < 3){
 					return false;
 				}
 			}

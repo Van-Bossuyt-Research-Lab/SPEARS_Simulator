@@ -4,10 +4,11 @@ import java.awt.Point;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.objects.Map;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.rover.autoCode.RoverAutonomusCode;
 import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
@@ -73,7 +74,7 @@ public class RoverObject implements Serializable {
 	private HashSet<Point> visitedScience = new HashSet<Point>();
 		
 	private String serialHistory = "";
-	private Map<String, Boolean> LEDs = new Map<String, Boolean>();
+	private Map<String, Boolean> LEDs = new TreeMap<String, Boolean>();
 	
 	public RoverObject(String name, String ID, RoverPhysicsModel param, RoverAutonomusCode code, DecimalPoint loc, double dir, double temp){
 		this.name = name;
@@ -83,9 +84,9 @@ public class RoverObject implements Serializable {
 		physics.initalizeConditions(name, physics.getbattery_max_charge(), temp);
 		physics.setLocation(loc);
 		physics.setDirection(dir);
-		LEDs.add("Mute", false);
-		LEDs.add("Instructions", false);
-		LEDs.add("Autonomus", false);
+		LEDs.put("Mute", false);
+		LEDs.put("Instructions", false);
+		LEDs.put("Autonomus", false);
 	}
 	
 	public void start(){
@@ -260,11 +261,11 @@ public class RoverObject implements Serializable {
 					}
 					else if (tag == '}') { // we have been muted
 						mute = true;
-						LEDs.set("Mute", mute);
+						LEDs.put("Mute", mute);
 					} 
 					else if (tag == '{') { // we have been unmuted
 						mute = false;
-						LEDs.set("Mute", mute);
+						LEDs.put("Mute", mute);
 					}
 					data = new char[data.length]; // reset data array
 					index = 0;
@@ -305,8 +306,8 @@ public class RoverObject implements Serializable {
 			if (Globals.TimeMillis - timeOfLastCmd > 60000){ // if it has been a minute since we heard from them
 				//System.out.println(this.name);
 				if (hasInstructions && !mute) { // if we have instructions, can send things
-					LEDs.set("Instructions", true);
-					LEDs.set("Autonomus", false);
+					LEDs.put("Instructions", true);
+					LEDs.put("Autonomus", false);
 					run_auto = false; // don't run autonomously
 					if (!waiting || (Globals.TimeMillis > cmdWaitTime)) { // if we're not waiting or have waiting long enough
 						waiting = false;
@@ -457,13 +458,13 @@ public class RoverObject implements Serializable {
 				}
 			}
 			else {
-				LEDs.set("Autonomus", run_auto);
-				LEDs.set("Instructions", false);
+				LEDs.put("Autonomus", run_auto);
+				LEDs.put("Instructions", false);
 			}
 			
 			if (run_auto){//Follow Autonomous Thought
-				LEDs.set("Autonomus", true);
-				LEDs.set("Instructions", false);
+				LEDs.put("Autonomus", true);
+				LEDs.put("Instructions", false);
 				
 				String cmd = autoCode.nextCommand(
 						Globals.TimeMillis,

@@ -1,10 +1,12 @@
 package com.csm.rover.simulator.wrapper;
 
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
+import java.util.TreeMap;
 
 import com.csm.rover.simulator.objects.FreeThread;
-import com.csm.rover.simulator.objects.Map;
-import com.csm.rover.simulator.objects.Queue;
 import com.csm.rover.simulator.objects.ThreadItem;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.AccelPopUp;
@@ -25,7 +27,7 @@ public class Globals {
 	private static int access_key = "qwert".hashCode();
 	
 	private static boolean begun = false;
-	private static Map<String, ThreadItem> threads = new Map<String, ThreadItem>();
+	private static Map<String, ThreadItem> threads = new TreeMap<String, ThreadItem>();
 	private static boolean milliDone = false;
 	
 	private static int exitTime = -1;
@@ -57,7 +59,7 @@ public class Globals {
 		SerialBuffers = new Queue[IDs.length];
 		int x = 0;
 		while (x < IDs.length){
-			SerialBuffers[x] = new Queue<Byte>();
+			SerialBuffers[x] = new LinkedList<Byte>();
 			x++;
 		}
 	}
@@ -67,7 +69,7 @@ public class Globals {
 		while (x < SerialBufferCodes.length){
 			if (!SerialBufferCodes[x].equals(from)){
 				if (SerialBuffers[x].size() < 64){
-					SerialBuffers[x].push(write);
+					SerialBuffers[x].add(write);
 				}
 				else {
 					writeToLogFile(SerialBufferCodes[x], "Failed to recieve: " + (char)write + ", full buffer.");
@@ -94,7 +96,7 @@ public class Globals {
 		int x = 0;
 		while (x < SerialBufferCodes.length){
 			if (SerialBufferCodes[x].equals(which)){
-				out = SerialBuffers[x].pop().byteValue();
+				out = SerialBuffers[x].poll().byteValue();
 				break;
 			}
 			x++;
@@ -198,7 +200,7 @@ public class Globals {
 				Queue<Byte>[] out = new Queue[SerialBuffers.length];
 				int x = 0;
 				while (x < out.length){
-					out[x] = new Queue<Byte>(SerialBuffers[x]);
+					out[x] = new LinkedList<Byte>(SerialBuffers[x]);
 					x++;
 				}
 				return out;
@@ -227,7 +229,7 @@ public class Globals {
 	}
 	
 	public static void registerNewThread(String name, int delay, SynchronousThread thread){
-		threads.add(name, new ThreadItem(name, delay, TimeMillis, thread));
+		threads.put(name, new ThreadItem(name, delay, TimeMillis, thread));
 	}
 	
 	public static void checkOutThread(String name){
@@ -244,7 +246,7 @@ public class Globals {
 			threads.get(name).advance();
 		} catch (NullPointerException e) {}
 		if (name.equals("milli-clock") || milliDone){
-			for (Object o : threads.getKeys()){
+			for (Object o : threads.keySet()){
 				String key = (String) o;
 				try {
 					threads.get(key).equals(null);
@@ -261,7 +263,7 @@ public class Globals {
 			}
 			milliDone = false;
 			TimeMillis++;
-			for (Object o : threads.getKeys()){
+			for (Object o : threads.keySet()){
 				try {
 					String key = (String) o;
 					threads.get(key).reset();

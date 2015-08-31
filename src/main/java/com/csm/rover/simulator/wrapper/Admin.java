@@ -1,15 +1,16 @@
 package com.csm.rover.simulator.wrapper;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
+import java.util.TreeMap;
 
 import com.csm.rover.simulator.control.InterfaceCode;
 import com.csm.rover.simulator.control.PopUp;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.FreeThread;
-import com.csm.rover.simulator.objects.List;
-import com.csm.rover.simulator.objects.Map;
-import com.csm.rover.simulator.objects.Queue;
 import com.csm.rover.simulator.objects.RunConfiguration;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.rover.autoCode.*;
@@ -27,15 +28,15 @@ public class Admin {
 	Random rnd = new Random();
 	private int queue_key = "qwert".hashCode();
 	
-	private Map<String, RoverPhysicsModel> roverParameters = new Map<String, RoverPhysicsModel>();
-	private Map<String, RoverAutonomusCode> roverLogics = new Map<String, RoverAutonomusCode>();
-	private Map<String, SatelliteParametersList> satelliteParameters = new Map<String, SatelliteParametersList>();
-	private Map<String, SatelliteAutonomusCode> satelliteLogics = new Map<String, SatelliteAutonomusCode>();
+	private Map<String, RoverPhysicsModel> roverParameters = new TreeMap<String, RoverPhysicsModel>();
+	private Map<String, RoverAutonomusCode> roverLogics = new TreeMap<String, RoverAutonomusCode>();
+	private Map<String, SatelliteParametersList> satelliteParameters = new TreeMap<String, SatelliteParametersList>();
+	private Map<String, SatelliteAutonomusCode> satelliteLogics = new TreeMap<String, SatelliteAutonomusCode>();
 	
-	private Map<String, RoverObject> roversToAdd = new Map<String, RoverObject>();
-	private Map<String, SatelliteObject> satsToAdd = new Map<String, SatelliteObject>();
+	private Map<String, RoverObject> roversToAdd = new TreeMap<String, RoverObject>();
+	private Map<String, SatelliteObject> satsToAdd = new TreeMap<String, SatelliteObject>();
 	
-	private List<List<String>> serialHistory = new List<List<String>>();
+	private ArrayList<ArrayList<String>> serialHistory = new ArrayList<ArrayList<String>>();
 	
 	public void wakeUp(){}
 	public static void align(){
@@ -173,10 +174,10 @@ public class Admin {
 			Globals.setUpAcceleratedRun(3600000*config.runtime);
 		}
 		
-		serialHistory = new List<List<String>>();
+		serialHistory = new ArrayList<ArrayList<String>>();
 		int x = 0;
 		while (x < 1+config.satellites.length+config.rovers.length){
-			serialHistory.add(new List<String>());
+			serialHistory.add(new ArrayList<String>());
 			serialHistory.get(x).add("");
 			x++;
 		}
@@ -188,7 +189,7 @@ public class Admin {
 		GUI.RoverHubPnl.setRovers(config.rovers);
 		GUI.SatelliteHubPnl.setSatellites(config.satellites);
 		Access.INTERFACE.setCallTags(config.roverNames, config.satelliteNames);
-		GUI.RoverHubPnl.setIdentifiers(config.roverNames.getValues(), config.satelliteNames.getValues());
+		GUI.RoverHubPnl.setIdentifiers(config.roverNames.values(), config.satelliteNames.values());
 		InterfaceCode.start();
 		GUI.RoverHubPnl.start();
 		GUI.SatelliteHubPnl.start();
@@ -230,9 +231,9 @@ public class Admin {
 	}
 	
 	public RunConfiguration getConfigurationFromForm(){
-		Map<String, String> roverNames = new Map<String, String>();
+		Map<String, String> roverNames = new TreeMap<String, String>();
 		RoverObject[] rovers = new RoverObject[roversToAdd.size()];
-		Map<String, String> satelliteNames = new Map<String, String>();
+		Map<String, String> satelliteNames = new TreeMap<String, String>();
 		SatelliteObject[] satellites = new SatelliteObject[satsToAdd.size()];
 		String[] tags = new String[roversToAdd.size()+satsToAdd.size()+1];
 		tags[0] = "g";
@@ -240,7 +241,7 @@ public class Admin {
 		while (x < GUI.WrapperPnl.SatelliteList.getItems().length){
 			String key = (String)GUI.WrapperPnl.SatelliteList.getItemAt(x);
 			satellites[x] = satsToAdd.get(key);
-			satelliteNames.add(key, satellites[x].getIDCode());
+			satelliteNames.put(key, satellites[x].getIDCode());
 			tags[x+1] = satellites[x].getIDCode();
 			x++;
 		}
@@ -248,7 +249,7 @@ public class Admin {
 		while (x < GUI.WrapperPnl.RoverList.getItems().length){
 			String key = (String)GUI.WrapperPnl.RoverList.getItemAt(x);
 			rovers[x] = roversToAdd.get(key);
-			roverNames.add(key, rovers[x].getIDTag());
+			roverNames.put(key, rovers[x].getIDTag());
 			tags[x+1+satsToAdd.size()] = rovers[x].getIDTag();
 			x++;
 		}
@@ -280,7 +281,7 @@ public class Admin {
 		while (x < buffers.length){
 			stored[x] = "";
 			while (!buffers[x].isEmpty()){
-				stored[x] += (char) buffers[x].pop().byteValue();
+				stored[x] += (char) buffers[x].poll().byteValue();
 			}
 			x++;
 		}
@@ -336,7 +337,7 @@ public class Admin {
 			RoverPhysicsModel params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem()).clone();
 			// for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
 			DecimalPoint location = new DecimalPoint(0, 0);
-			roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, location, Math.PI/2, GUI.TerrainPnl.getTemperature(location)));		
+			roversToAdd.put(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, location, Math.PI/2, GUI.TerrainPnl.getTemperature(location)));		
 		}
 	}
 	
@@ -361,7 +362,7 @@ public class Admin {
 					//newName = (String)GUI.WrapperPnl.SatAutonomusCodeList.getSelectedItem() + " " + numb;
 				}
 				GUI.WrapperPnl.SatelliteList.addValue(newName);
-				this.satsToAdd.add(newName, new SatelliteObject(newName, "s"+GUI.WrapperPnl.SatelliteList.getItems().length, null, null, rnd.nextDouble()*100000+10000000, rnd.nextDouble()*90, rnd.nextDouble()*360));
+				this.satsToAdd.put(newName, new SatelliteObject(newName, "s"+GUI.WrapperPnl.SatelliteList.getItems().length, null, null, rnd.nextDouble()*100000+10000000, rnd.nextDouble()*90, rnd.nextDouble()*360));
 			}
 		}
 		catch (Exception e){
@@ -380,22 +381,22 @@ public class Admin {
 	}
 	
 	private void addItemToSelectionList(String name, RoverPhysicsModel item){
-		roverParameters.add(name, item);
+		roverParameters.put(name, item);
 		GUI.WrapperPnl.RovDriveModelList.addValue(name);
 	}
 	
 	private void addItemToSelectionList(String name, RoverAutonomusCode item){
-		roverLogics.add(name, item);
+		roverLogics.put(name, item);
 		GUI.WrapperPnl.RovAutonomusCodeList.addValue(name);
 	}
 	
 	private void addItemToSelectionList(String name, SatelliteParametersList item){
-		satelliteParameters.add(name, item);
+		satelliteParameters.put(name, item);
 		GUI.WrapperPnl.SatDriveModelList.addValue(name);
 	}
 	
 	private void addItemToSelectionList(String name, SatelliteAutonomusCode item){
-		satelliteLogics.add(name, item);
+		satelliteLogics.put(name, item);
 		GUI.WrapperPnl.SatAutonomusCodeList.addValue(name);
 	}
 	

@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Collection;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -389,7 +390,7 @@ public class RoverHub extends Panel {
 		}
 	}
 	
-	public void setIdentifiers(Object[] rovs, Object[] sats){
+	public void setIdentifiers(Collection<String> rovs, Collection<String> sats){
 		rovSelect.removeAllItems();
 		for (Object rov : rovs){
 			rovSelect.addItem((String)rov);

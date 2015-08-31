@@ -16,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -899,10 +900,9 @@ public class InterfacePanel extends Panel{
 		StatusPnl.add(StatusArmPower);
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void setNamesLists(Object[] rovers, Object[] sats){
-		RoverSelectionCombo.setModel(new DefaultComboBoxModel(rovers));
-		SatSelectionCombo.setModel(new DefaultComboBoxModel(sats));
+	public void setNamesLists(Set<String> rovers, Set<String> sats){
+		RoverSelectionCombo.setModel(new DefaultComboBoxModel<String>(rovers.toArray(new String[rovers.size()])));
+		SatSelectionCombo.setModel(new DefaultComboBoxModel<String>(sats.toArray(new String[sats.size()])));
 	}
 	
 	private void alignComponents(){

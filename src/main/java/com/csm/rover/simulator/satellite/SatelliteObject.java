@@ -3,10 +3,11 @@ package com.csm.rover.simulator.satellite;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import com.csm.rover.simulator.wrapper.Globals;
-import com.csm.rover.simulator.objects.Map;
 import com.csm.rover.simulator.objects.SynchronousThread;
 
 @SuppressWarnings("unused")
@@ -24,7 +25,7 @@ public class SatelliteObject implements Serializable {
 	private String instructions = ""; // the "file" of instructions
 	private boolean hasInstructions = false; // do we have instructions
 	private int instructsComplete = 0; // how many instructions have we done
-	private long timeSinceCmd = 0; // how lond since we heard from anybody
+	private long timeSinceCmd = 0; // how long since we heard from anybody
 
 	// artifact picture stuff
 	private int imageSize;
@@ -37,7 +38,7 @@ public class SatelliteObject implements Serializable {
 	private char[] tag = new char[2];
 	
 	private String serialHistory = "";
-	private Map<String, Boolean> LEDs = new Map<String, Boolean>();
+	private Map<String, Boolean> LEDs = new TreeMap<String, Boolean>();
 	
 	public SatelliteObject(String name, String id, SatelliteParametersList params, SatelliteAutonomusCode code, double altitue, double orbitIncline, double theta){
 		this.name = name;

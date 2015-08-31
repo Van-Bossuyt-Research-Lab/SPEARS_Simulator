@@ -9,7 +9,6 @@ import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-import com.csm.rover.simulator.objects.Map;
 import com.csm.rover.simulator.objects.*;
 import com.csm.rover.simulator.wrapper.Access;
 import com.csm.rover.simulator.wrapper.Admin;
@@ -215,7 +214,7 @@ public class InterfaceCode {
 	public void setCallTags(Map<String, String> rover, Map<String, String> satellite){
 		roverNames = rover;
 		satelliteNames = satellite;
-		Admin.GUI.InterfacePnl.setNamesLists(rover.getKeys(), satellite.getKeys());
+		Admin.GUI.InterfacePnl.setNamesLists(rover.keySet(), satellite.keySet());
 	}
 	
 	// COM CONNECTION STUFF
