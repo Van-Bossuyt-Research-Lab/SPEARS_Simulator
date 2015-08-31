@@ -11,7 +11,6 @@ import com.csm.rover.simulator.objects.FreeThread;
 public class ImageButton extends ImageDisplay {
 
 	private static final long serialVersionUID = 1L;
-	protected boolean working = false;
 	private ImageIcon Image;
 	private ImageIcon hoverImage;
 	
@@ -24,12 +23,8 @@ public class ImageButton extends ImageDisplay {
 		this.addMouseListener(new MouseAdapter() {			
 			@Override
 			public void mouseClicked(MouseEvent arg0){
-				try{
-					hoverImage.equals(Image);
-				} catch (Exception e) {
-					if (isEnabled()){
-						RunAnimation();
-					}
+				if (hoverImage != null && isEnabled()){
+					RunAnimation();
 				}
 			}
 			@Override
@@ -72,15 +67,12 @@ public class ImageButton extends ImageDisplay {
 	}
 	
 	private void startHover(){
-		try {
-			hoverImage.equals(Image);
+		if (hoverImage != null){
 			super.setImage(hoverImage);
-		} catch (Exception e) {}
+		}
 	}
 	
 	private void endHover(){
-		try {
-			super.setImage(Image);
-		} catch (Exception e) {}
+		super.setImage(Image);
 	}
 }

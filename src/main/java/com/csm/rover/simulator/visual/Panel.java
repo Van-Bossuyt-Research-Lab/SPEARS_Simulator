@@ -20,8 +20,6 @@ public class Panel extends JPanel{
 	
 	protected JLabel titleLbl;
 	protected JLabel postScript;
-	private ImageButton exitBtn;
-	private ImageButton minimizeBtn;
 	protected ImageIcon background;
 	protected boolean hasImage = false;
 	
@@ -46,8 +44,8 @@ public class Panel extends JPanel{
 		postScript.setLocation((this.getWidth()-postScript.getWidth())/2, this.getHeight()-postScript.getHeight()-10);
 		postScript.setHorizontalAlignment(SwingConstants.CENTER);
 		this.add(postScript);
-		
-		exitBtn = new ImageButton();
+
+		ImageButton exitBtn = new ImageButton();
 		exitBtn.setOpaque(false);
 		exitBtn.setBorder(null);
 		exitBtn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -55,7 +53,7 @@ public class Panel extends JPanel{
 		exitBtn.setHoverImage(new ImageIcon(getClass().getResource("/icons/Close Hover.png")));
 		exitBtn.setToolTipText("");
 		exitBtn.setMargin(0);
-		exitBtn.setBounds(this.getWidth()-55, 0, 48, 19);
+		exitBtn.setBounds(this.getWidth() - 55, 0, 48, 19);
 		exitBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -63,8 +61,8 @@ public class Panel extends JPanel{
 			}
 		});
 		add(exitBtn);
-		
-		minimizeBtn = new ImageButton();
+
+		ImageButton minimizeBtn = new ImageButton();
 		minimizeBtn.setOpaque(false);
 		minimizeBtn.setToolTipText("");
 		minimizeBtn.setBorder(null);
@@ -72,7 +70,7 @@ public class Panel extends JPanel{
 		minimizeBtn.setImage(new ImageIcon(getClass().getResource("/icons/Minimize.png")));
 		minimizeBtn.setHoverImage(new ImageIcon(getClass().getResource("/icons/Minimize Hover.png")));
 		minimizeBtn.setMargin(0);
-		minimizeBtn.setBounds(exitBtn.getX()-29, 0, 29, 19);
+		minimizeBtn.setBounds(exitBtn.getX() - 29, 0, 29, 19);
 		minimizeBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -100,7 +98,7 @@ public class Panel extends JPanel{
 	
 	public void setImage(ImageIcon icon){
 		background = icon;
-		hasImage = !icon.equals(null);
+		hasImage = icon != null;
 	}
 	
 	public ImageIcon getImage(){

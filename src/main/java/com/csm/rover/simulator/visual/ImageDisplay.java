@@ -34,7 +34,7 @@ public class ImageDisplay extends JLabel{
 	protected void updateImage(){
 		try {
 			super.setIcon(resize(getIcon(), this.getWidth() - Margin, this.getHeight() - Margin));
-		} catch (Exception e) {}
+		} catch (Exception e) { e.printStackTrace(); }
 	}
 	
 	protected ImageIcon resize(Icon image, int width, int height) throws Exception {

@@ -66,26 +66,15 @@ public class MainWrapper extends Panel {
 			ZList SatelliteList;
 		private JLabel MapConfigTtl;
 			JTabbedPane TypeSelector;
-			private JPanel SelectionPlasmaPnl;
-				JSlider MapRoughSlider;
-				private JLabel MapRoughnessLbl;
-				private JLabel MapSmoothLbl;
-				private JLabel MapRoughLbl;
-				private JLabel MapDetailLbl;
-				private JLabel HazardDensityLbl;
-				private JLabel TargetDensityLbl;
-				private JLabel MapSizeLbl;
-				JSpinner MapDetailSpnr;
+	JSlider MapRoughSlider;
+	JSpinner MapDetailSpnr;
 				JSpinner MapSizeSpnr;
 				JSpinner HazardDensitySpnr;
 				JSpinner TargetDensitySpnr;
 				JCheckBox ValuedTargetsChk;
 				JCheckBox ValuedHazardsChk;
-			private JPanel SelectionFilePnl;
-				private JLabel FileLocLbl;
-				JTextField FileLocTxt;
-				private JButton FileLocBtn;
-		private JLabel TimingOptionsTtl;
+	JTextField FileLocTxt;
+	private JLabel TimingOptionsTtl;
 			JCheckBox AccelChk;
 			private JLabel RuntimeLbl;
 			JSpinner RuntimeSpnr;
@@ -255,88 +244,88 @@ public class MainWrapper extends Panel {
 		TypeSelector.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		TypeSelector.setBounds(740, 41, 636, 267);
 		CreateNewPnl.add(TypeSelector);
-		
-		SelectionPlasmaPnl = new JPanel();
-		SelectionPlasmaPnl.setOpaque(false);
-		TypeSelector.addTab("Plasma Fractal", null, SelectionPlasmaPnl, null);
-		SelectionPlasmaPnl.setLayout(null);
+
+		JPanel selectionPlasmaPnl = new JPanel();
+		selectionPlasmaPnl.setOpaque(false);
+		TypeSelector.addTab("Plasma Fractal", null, selectionPlasmaPnl, null);
+		selectionPlasmaPnl.setLayout(null);
 		
 		MapRoughSlider = new JSlider();
 		MapRoughSlider.setOpaque(false);
 		MapRoughSlider.setBounds(162, 43, 400, 30);
-		SelectionPlasmaPnl.add(MapRoughSlider);
+		selectionPlasmaPnl.add(MapRoughSlider);
 		MapRoughSlider.setMaximum(700);
 		MapRoughSlider.setMajorTickSpacing(100);
 		MapRoughSlider.setPaintTicks(true);
 		MapRoughSlider.setValue(200);
-		
-		MapSmoothLbl = new JLabel("Smooth");
-		MapSmoothLbl.setBounds(91, 43, 61, 21);
-		SelectionPlasmaPnl.add(MapSmoothLbl);
-		MapSmoothLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-		MapSmoothLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-		
-		MapRoughnessLbl = new JLabel("Map Roughness:");
-		MapRoughnessLbl.setBounds(10, 11, 142, 21);
-		SelectionPlasmaPnl.add(MapRoughnessLbl);
-		MapRoughnessLbl.setHorizontalAlignment(SwingConstants.RIGHT);
-		MapRoughnessLbl.setHorizontalTextPosition(SwingConstants.LEFT);
-		MapRoughnessLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
-		
-		MapRoughLbl = new JLabel("Rough");
-		MapRoughLbl.setBounds(572, 43, 43, 21);
-		SelectionPlasmaPnl.add(MapRoughLbl);
-		MapRoughLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
+
+		JLabel mapSmoothLbl = new JLabel("Smooth");
+		mapSmoothLbl.setBounds(91, 43, 61, 21);
+		selectionPlasmaPnl.add(mapSmoothLbl);
+		mapSmoothLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+		mapSmoothLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
+
+		JLabel mapRoughnessLbl = new JLabel("Map Roughness:");
+		mapRoughnessLbl.setBounds(10, 11, 142, 21);
+		selectionPlasmaPnl.add(mapRoughnessLbl);
+		mapRoughnessLbl.setHorizontalAlignment(SwingConstants.RIGHT);
+		mapRoughnessLbl.setHorizontalTextPosition(SwingConstants.LEFT);
+		mapRoughnessLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+
+		JLabel mapRoughLbl = new JLabel("Rough");
+		mapRoughLbl.setBounds(572, 43, 43, 21);
+		selectionPlasmaPnl.add(mapRoughLbl);
+		mapRoughLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
 		
 		MapDetailSpnr = new JSpinner();
 		MapDetailSpnr.setBounds(462, 105, 80, 25);
-		SelectionPlasmaPnl.add(MapDetailSpnr);
+		selectionPlasmaPnl.add(MapDetailSpnr);
 		MapDetailSpnr.setModel(new SpinnerNumberModel(3, 1, 9, 1));
 		MapDetailSpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
-		
-		MapDetailLbl = new JLabel("Map Detail:");
-		MapDetailLbl.setBounds(310, 107, 142, 21);
-		SelectionPlasmaPnl.add(MapDetailLbl);
-		MapDetailLbl.setHorizontalTextPosition(SwingConstants.LEFT);
-		MapDetailLbl.setHorizontalAlignment(SwingConstants.RIGHT);
-		MapDetailLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
-		
-		HazardDensityLbl = new JLabel("Hazard Density:");
-		HazardDensityLbl.setBounds(310, 156, 142, 21);
-		SelectionPlasmaPnl.add(HazardDensityLbl);
-		HazardDensityLbl.setHorizontalTextPosition(SwingConstants.LEFT);
-		HazardDensityLbl.setHorizontalAlignment(SwingConstants.RIGHT);
-		HazardDensityLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+
+		JLabel mapDetailLbl = new JLabel("Map Detail:");
+		mapDetailLbl.setBounds(310, 107, 142, 21);
+		selectionPlasmaPnl.add(mapDetailLbl);
+		mapDetailLbl.setHorizontalTextPosition(SwingConstants.LEFT);
+		mapDetailLbl.setHorizontalAlignment(SwingConstants.RIGHT);
+		mapDetailLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+
+		JLabel hazardDensityLbl = new JLabel("Hazard Density:");
+		hazardDensityLbl.setBounds(310, 156, 142, 21);
+		selectionPlasmaPnl.add(hazardDensityLbl);
+		hazardDensityLbl.setHorizontalTextPosition(SwingConstants.LEFT);
+		hazardDensityLbl.setHorizontalAlignment(SwingConstants.RIGHT);
+		hazardDensityLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		
 		HazardDensitySpnr = new JSpinner();
 		HazardDensitySpnr.setBounds(462, 154, 80, 25);
-		SelectionPlasmaPnl.add(HazardDensitySpnr);
+		selectionPlasmaPnl.add(HazardDensitySpnr);
 		HazardDensitySpnr.setModel(new SpinnerNumberModel(0.4, 0.0, 100.0, 0.01));
 		HazardDensitySpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		
 		TargetDensitySpnr = new JSpinner();
 		TargetDensitySpnr.setBounds(162, 154, 80, 25);
-		SelectionPlasmaPnl.add(TargetDensitySpnr);
+		selectionPlasmaPnl.add(TargetDensitySpnr);
 		TargetDensitySpnr.setModel(new SpinnerNumberModel(4., 0.0, 100.0, 0.1));
 		TargetDensitySpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
-		
-		TargetDensityLbl = new JLabel("Target Density:");
-		TargetDensityLbl.setBounds(10, 156, 142, 21);
-		SelectionPlasmaPnl.add(TargetDensityLbl);
-		TargetDensityLbl.setHorizontalTextPosition(SwingConstants.LEFT);
-		TargetDensityLbl.setHorizontalAlignment(SwingConstants.RIGHT);
-		TargetDensityLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
-		
-		MapSizeLbl = new JLabel("Map Size:");
-		MapSizeLbl.setBounds(10, 107, 142, 21);
-		SelectionPlasmaPnl.add(MapSizeLbl);
-		MapSizeLbl.setHorizontalTextPosition(SwingConstants.LEFT);
-		MapSizeLbl.setHorizontalAlignment(SwingConstants.RIGHT);
-		MapSizeLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+
+		JLabel targetDensityLbl = new JLabel("Target Density:");
+		targetDensityLbl.setBounds(10, 156, 142, 21);
+		selectionPlasmaPnl.add(targetDensityLbl);
+		targetDensityLbl.setHorizontalTextPosition(SwingConstants.LEFT);
+		targetDensityLbl.setHorizontalAlignment(SwingConstants.RIGHT);
+		targetDensityLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
+
+		JLabel mapSizeLbl = new JLabel("Map Size:");
+		mapSizeLbl.setBounds(10, 107, 142, 21);
+		selectionPlasmaPnl.add(mapSizeLbl);
+		mapSizeLbl.setHorizontalTextPosition(SwingConstants.LEFT);
+		mapSizeLbl.setHorizontalAlignment(SwingConstants.RIGHT);
+		mapSizeLbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		
 		MapSizeSpnr = new JSpinner();
 		MapSizeSpnr.setBounds(162, 105, 80, 25);
-		SelectionPlasmaPnl.add(MapSizeSpnr);
+		selectionPlasmaPnl.add(MapSizeSpnr);
 		MapSizeSpnr.setModel(new SpinnerNumberModel(10, 7, 13, 1));
 		MapSizeSpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		
@@ -344,41 +333,41 @@ public class MainWrapper extends Panel {
 		ValuedTargetsChk.setOpaque(false);
 		ValuedTargetsChk.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		ValuedTargetsChk.setBounds(73, 196, 169, 23);
-		SelectionPlasmaPnl.add(ValuedTargetsChk);
+		selectionPlasmaPnl.add(ValuedTargetsChk);
 		
 		ValuedHazardsChk = new JCheckBox("Use Valued Hazards");
 		ValuedHazardsChk.setOpaque(false);
 		ValuedHazardsChk.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		ValuedHazardsChk.setBounds(373, 196, 169, 23);
-		SelectionPlasmaPnl.add(ValuedHazardsChk);
-		
-		SelectionFilePnl = new JPanel();
-		SelectionFilePnl.setOpaque(false);
-		TypeSelector.addTab("From File", null, SelectionFilePnl, null);
-		SelectionFilePnl.setLayout(null);
-		
-		FileLocLbl = new JLabel("File Location:");
-		FileLocLbl.setBounds(10, 13, 142, 21);
-		SelectionFilePnl.add(FileLocLbl);
-		FileLocLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-		FileLocLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
+		selectionPlasmaPnl.add(ValuedHazardsChk);
+
+		JPanel selectionFilePnl = new JPanel();
+		selectionFilePnl.setOpaque(false);
+		TypeSelector.addTab("From File", null, selectionFilePnl, null);
+		selectionFilePnl.setLayout(null);
+
+		JLabel fileLocLbl = new JLabel("File Location:");
+		fileLocLbl.setBounds(10, 13, 142, 21);
+		selectionFilePnl.add(fileLocLbl);
+		fileLocLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+		fileLocLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
 		
 		FileLocTxt = new JTextField();
 		FileLocTxt.setBounds(162, 11, 338, 25);
-		SelectionFilePnl.add(FileLocTxt);
+		selectionFilePnl.add(FileLocTxt);
 		FileLocTxt.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		FileLocTxt.setColumns(10);
-		
-		FileLocBtn = new JButton("Browse...");
-		FileLocBtn.setBounds(510, 13, 105, 25);
-		SelectionFilePnl.add(FileLocBtn);
-		FileLocBtn.addActionListener(new ActionListener() {
+
+		JButton fileLocBtn = new JButton("Browse...");
+		fileLocBtn.setBounds(510, 13, 105, 25);
+		selectionFilePnl.add(fileLocBtn);
+		fileLocBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser finder = new JFileChooser();
 				finder.setFileFilter(new MapFileFilter());
 				finder.setApproveButtonText("Choose");
 				int option = finder.showOpenDialog(getParent());
-				if (option == JFileChooser.APPROVE_OPTION){
+				if (option == JFileChooser.APPROVE_OPTION) {
 					FileLocTxt.setText(finder.getSelectedFile().getAbsolutePath());
 				}
 			}

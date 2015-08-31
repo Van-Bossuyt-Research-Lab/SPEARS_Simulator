@@ -37,7 +37,7 @@ public class Admin {
 	
 	private List<List<String>> serialHistory = new List<List<String>>();
 	
-	public void wakeUp(){};
+	public void wakeUp(){}
 	public static void align(){
 		GUI = Form.frame;
 	}
@@ -345,7 +345,7 @@ public class Admin {
 			roversToAdd.remove(GUI.WrapperPnl.RoverList.getSelectedItem().toString());
 			GUI.WrapperPnl.RoverList.removeValue(GUI.WrapperPnl.RoverList.getSelectedIndex());
 		} 
-		catch (Exception e){}
+		catch (Exception e){ e.printStackTrace(); }
 	}
 	
 	public void addSatelliteToList(){
@@ -385,7 +385,7 @@ public class Admin {
 	}
 	
 	private void addItemToSelectionList(String name, RoverAutonomusCode item){
-		roverLogics.add(name, (RoverAutonomusCode)item);
+		roverLogics.add(name, item);
 		GUI.WrapperPnl.RovAutonomusCodeList.addValue(name);
 	}
 	

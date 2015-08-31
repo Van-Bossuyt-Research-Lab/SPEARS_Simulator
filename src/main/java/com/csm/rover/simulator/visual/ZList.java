@@ -1,7 +1,6 @@
 package com.csm.rover.simulator.visual;
 
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseAdapter;
@@ -12,8 +11,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import com.csm.rover.simulator.control.InstructionObj;
 
 public class ZList extends JPanel implements Cloneable{
 
@@ -33,7 +30,7 @@ public class ZList extends JPanel implements Cloneable{
 		this.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		items = new JLabel[0];
 		scroll = new JScrollBar();
-		scroll.setOrientation(SwingConstants.VERTICAL);
+		scroll.setOrientation(Adjustable.VERTICAL);
 		scroll.addAdjustmentListener(new AdjustmentListener() {
 			public void adjustmentValueChanged(AdjustmentEvent arg0) {
 				scroll();
@@ -69,7 +66,7 @@ public class ZList extends JPanel implements Cloneable{
 				scroll();
 			}
 		});
-		scroll.setOrientation(SwingConstants.VERTICAL);
+		scroll.setOrientation(Adjustable.VERTICAL);
 		this.add(scroll);
 		placeComps();
 	}
@@ -234,7 +231,7 @@ public class ZList extends JPanel implements Cloneable{
 		for (Object listener : listeners){
 			try {
 				((ListSelectionListener) listener).valueChanged(event);
-			} catch (Exception e) {}
+			} catch (Exception e) { e.printStackTrace(); }
 		}
 	}
 	
@@ -250,7 +247,7 @@ public class ZList extends JPanel implements Cloneable{
 	public Object getItemAt(int loc){
 		try {
 			try {
-				return ((InstructionObj) values[loc]);
+				return values[loc];
 			}
 			catch (Exception e){
 				return values[loc];

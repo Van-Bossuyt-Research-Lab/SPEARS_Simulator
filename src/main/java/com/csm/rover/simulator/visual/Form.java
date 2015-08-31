@@ -13,10 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import com.csm.rover.simulator.map.LandMapPanel;
@@ -40,8 +37,7 @@ public class Form extends JFrame {
 	
 	static public Form frame;
 	private static Dimension screenSize;
-	private JPanel contentPane;
-	
+
 	public MainWrapper WrapperPnl;
 	public Panel OrbitalPnl;
 	public LandMapPanel TerrainPnl;
@@ -70,7 +66,7 @@ public class Form extends JFrame {
 					frame.setSize(screenSize);
 				    frame.setVisible(true);
 				    frame.setResizable(false);
-				    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 				    if (goFin){
 				    	Access.CODE.beginSimulation(new RunConfiguration(new File("default.cfg")));
 				    }
@@ -90,7 +86,7 @@ public class Form extends JFrame {
 		});
 		KeyboardFocusManager masterKeyManager = KeyboardFocusManager
 				.getCurrentKeyboardFocusManager();
-		masterKeyManager.addKeyEventDispatcher((KeyEventDispatcher) new KeyDispatcher());
+		masterKeyManager.addKeyEventDispatcher(new KeyDispatcher());
 		initialize();
 	}
 	
@@ -99,9 +95,8 @@ public class Form extends JFrame {
 		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/GPS.png")));
 		setTitle("PHM Simulator");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocation(0, 0);
-		contentPane = new JPanel();
+		JPanel contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
