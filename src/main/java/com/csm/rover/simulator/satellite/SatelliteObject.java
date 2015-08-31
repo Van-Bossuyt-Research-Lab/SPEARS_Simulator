@@ -7,7 +7,7 @@ import java.util.Random;
 
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.objects.Map;
-import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.objects.SynchronousThread;
 
 @SuppressWarnings("unused")
 public class SatelliteObject implements Serializable {
@@ -47,19 +47,19 @@ public class SatelliteObject implements Serializable {
 	}
 	
 	public void start(){
-		new SyncronousThread(100, new Runnable(){
+		new SynchronousThread(100, new Runnable(){
 			public void run(){
 				excecuteCode();
 			}
 		},
-		SyncronousThread.FOREVER, name+"-code");
+		SynchronousThread.FOREVER, name+"-code");
 		//TODO Satellite Physics
-		//new SyncronousThread((int) (time_step*1000), new Runnable(){
+		//new SynchronousThread((int) (time_step*1000), new Runnable(){
 		//	public void run(){
 		//		excecutePhysics();
 		//	}
 		//},
-		//SyncronousThread.FOREVER, name+"-physics");
+		//SynchronousThread.FOREVER, name+"-physics");
 	}
 	
 	public String getName(){

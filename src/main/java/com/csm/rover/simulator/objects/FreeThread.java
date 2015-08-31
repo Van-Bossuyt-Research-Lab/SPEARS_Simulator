@@ -48,7 +48,6 @@ public class FreeThread extends Thread implements Serializable {
 				actions--;
 			}
 		}
-		return;
 	}
 	
 	public void Stop(){

@@ -35,7 +35,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.ImageButton;
 import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.visual.ZList;
@@ -136,7 +136,7 @@ public class InterfacePanel extends Panel{
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				CursorInMuteOptn = false;
-				new SyncronousThread(400, new Runnable(){
+				new SynchronousThread(400, new Runnable(){
 					public void run(){
 						OverrideMuteOptn.setVisible(CursorInMuteOptn);
 					}
@@ -212,7 +212,7 @@ public class InterfacePanel extends Panel{
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (!MessageBtn.getText().equals("")){
-					Access.sendMsg(JOptionPane.showInputDialog(getParent().getParent(), "Enter a Command:", "Write to Serial", JOptionPane.DEFAULT_OPTION));
+					Access.sendMsg(JOptionPane.showInputDialog(getParent().getParent(), "Enter a Command:", "Write to Serial", JOptionPane.PLAIN_MESSAGE));
 				}
 			}
 		});
@@ -225,7 +225,7 @@ public class InterfacePanel extends Panel{
 		CommentBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				Access.addNoteToLog("User", JOptionPane.showInputDialog(getParent().getParent(), "Note for log:", "Data Log Edit", JOptionPane.DEFAULT_OPTION));
+				Access.addNoteToLog("User", JOptionPane.showInputDialog(getParent().getParent(), "Note for log:", "Data Log Edit", JOptionPane.PLAIN_MESSAGE));
 			}
 		});
 		ProgramBtnsPnl.add(CommentBtn);
@@ -919,9 +919,9 @@ public class InterfacePanel extends Panel{
 		RoverDeleteLink.setLocation(RoverBtnsPnl.getWidth() - 10 - RoverDeleteLink.getWidth(), RoverSendLbl.getY());
 		RoverEditLink.setLocation((RoverDeleteLink.getX() - 10 - RoverEditLink.getWidth()), RoverSendLbl.getY());
 		RoverAddLink.setLocation((RoverEditLink.getX() - 10 - RoverAddLink.getWidth()), RoverSendLbl.getY());
-		RoverPageRightBtn.setLocation((int)((RoverAddLink.getX() - RoverSendBtn.getX() - RoverSendBtn.getWidth()) / 3 + RoverSendBtn.getX() + RoverSendBtn.getWidth()), RoverAddLink.getY());
+		RoverPageRightBtn.setLocation(((RoverAddLink.getX() - RoverSendBtn.getX() - RoverSendBtn.getWidth()) / 3 + RoverSendBtn.getX() + RoverSendBtn.getWidth()), RoverAddLink.getY());
 		RoverPageLeftBtn.setLocation((RoverPageRightBtn.getX() - RoverPageLeftBtn.getWidth()), RoverPageRightBtn.getY());
-		RoverPageLbl.setLocation((int)((RoverAddLink.getX() - RoverSendBtn.getX() - RoverSendBtn.getWidth()) * 2 / 3 + RoverSendBtn.getX() + RoverSendBtn.getWidth()), RoverPageRightBtn.getY());
+		RoverPageLbl.setLocation(((RoverAddLink.getX() - RoverSendBtn.getX() - RoverSendBtn.getWidth()) * 2 / 3 + RoverSendBtn.getX() + RoverSendBtn.getWidth()), RoverPageRightBtn.getY());
 		
 		SatelliteBtnsPnl.setBounds(10, 10 + ProgramBtnsPnl.getHeight() + 10 + RoverBtnsPnl.getHeight() + 10, RoverBtnsPnl.getWidth(), 20 + SatSelectionCombo.getHeight() + 10 + SatBtns[0].getHeight() + 10 + SatSendTxt.getHeight() + 10);
 		SatSelectionCombo.setLocation(150, 20);
@@ -932,9 +932,9 @@ public class InterfacePanel extends Panel{
 		SatDeleteLink.setLocation(SatelliteBtnsPnl.getWidth() - 10 - SatDeleteLink.getWidth(), SatSendLbl.getY());
 		SatEditLink.setLocation((SatDeleteLink.getX() - 10 - SatEditLink.getWidth()), SatSendLbl.getY());
 		SatAddLink.setLocation((SatEditLink.getX() - 10 - SatAddLink.getWidth()), SatSendLbl.getY());
-		SatPageRightBtn.setLocation((int)((SatAddLink.getX() - SatSendBtn.getX() - SatSendBtn.getWidth()) / 3 + SatSendBtn.getX() + SatSendBtn.getWidth()), SatAddLink.getY());
+		SatPageRightBtn.setLocation(((SatAddLink.getX() - SatSendBtn.getX() - SatSendBtn.getWidth()) / 3 + SatSendBtn.getX() + SatSendBtn.getWidth()), SatAddLink.getY());
 		SatPageLeftBtn.setLocation((SatPageRightBtn.getX() - SatPageLeftBtn.getWidth()), SatPageRightBtn.getY());
-		SatPageLbl.setLocation((int)((SatAddLink.getX() - SatSendBtn.getX() - SatSendBtn.getWidth()) * 2 / 3 + SatSendBtn.getX() + SatSendBtn.getWidth()), SatPageRightBtn.getY());
+		SatPageLbl.setLocation(((SatAddLink.getX() - SatSendBtn.getX() - SatSendBtn.getWidth()) * 2 / 3 + SatSendBtn.getX() + SatSendBtn.getWidth()), SatPageRightBtn.getY());
 		
 		int spacing = (RoverBtnsPnl.getWidth() - 20 - 70 * (SatBtns.length)) / (SatBtns.length - 1);
 		int x = 0;

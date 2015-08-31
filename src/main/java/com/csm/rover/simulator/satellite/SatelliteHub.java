@@ -16,7 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
-import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.LEDIndicator;
 import com.csm.rover.simulator.visual.Panel;
 
@@ -309,11 +309,11 @@ public class SatelliteHub extends Panel{
 	}
 	
 	public void start(){
-		new SyncronousThread(500, new Runnable(){
+		new SynchronousThread(500, new Runnable(){
 			public void run(){
 				updateDisplays();
 			}
-		}, SyncronousThread.FOREVER, "Satellite Hub Update");
+		}, SynchronousThread.FOREVER, "Satellite Hub Update");
 		int x = 0;
 		while (x < satellites.length){
 			satellites[x].start();
@@ -405,16 +405,11 @@ public class SatelliteHub extends Panel{
 	
 	//change which rover is connected to a certain display
 	private void changeLinkedSatellite(int display, int by){
-		try {
-			satellites[0].equals("exists");
-		}
-		catch (Exception e){
+		if (satellites[0] == null){
 			return;
 		}
-		finally {
-			standardDisplayLinks[currentPage][display] += by;
-			updateDisplays();
-		}
+		standardDisplayLinks[currentPage][display] += by;
+		updateDisplays();
 	}
 	
 	// round doubles so they're pretty to display

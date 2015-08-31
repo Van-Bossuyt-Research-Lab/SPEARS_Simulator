@@ -19,8 +19,7 @@ import java.awt.Font;
 public class CSVFrame extends JFrame {
 
 	private static final long serialVersionUID = -3993565159460072336L;
-	
-	private JPanel contentPane;
+
 	private JTable ValuesTable;
 	private PaintablePanel GraphPnl;
 
@@ -37,7 +36,7 @@ public class CSVFrame extends JFrame {
 			}
 		});
 		setBounds(100, 100, 784, 325);
-		contentPane = new JPanel();
+		JPanel contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
@@ -80,7 +79,7 @@ public class CSVFrame extends JFrame {
 				}
 			}
 			
-			String title = "", horzTitle = "", horzUnit = "", vertTitle = "", vertUnit = "";
+			String title = "", horzUnit = "", vertUnit = "";
 			double[] xs = new double[0], ys = new double[0];
 			input.close();
 			Scanner input2 = new Scanner(data);
@@ -99,8 +98,8 @@ public class CSVFrame extends JFrame {
 					title = input2.nextLine();
 				}
 			}
-			horzTitle = input2.nextLine();
-			vertTitle = input2.nextLine();
+			String horzTitle = input2.nextLine();
+			String vertTitle = input2.nextLine();
 			while (input2.hasNextDouble()){
 				xs = Augment(xs, input2.nextDouble());
 				ys = Augment(ys, input2.nextDouble());
@@ -152,8 +151,7 @@ public class CSVFrame extends JFrame {
 				out = Augment(out, hold);
 				hold = "";
 			}
-			else if (working[x] == '\n') {}
-			else {
+			else if (working[x] != '\n') {
 				hold += working[x];
 			}
 			x++;

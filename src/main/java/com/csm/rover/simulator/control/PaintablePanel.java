@@ -28,10 +28,10 @@ public class PaintablePanel extends JPanel{
 			Rectangle2D textSize = fontMech.getStringBounds(title, g2);
 			g2.drawString(title, (int)(this.getWidth() - textSize.getWidth()) / 2, (int)(10 + textSize.getHeight()));
 			textSize = fontMech.getStringBounds("(" + vertUnit + ")", g2);
-			g2.drawString(vertTitle, 5, (int)((this.getHeight() / 2) - 3));
+			g2.drawString(vertTitle, 5, (this.getHeight() / 2) - 3);
 			g2.drawString("(" + vertUnit + ")", (int)(5 + (fontMech.stringWidth(vertTitle) - textSize.getWidth()) / 2), (int)((this.getHeight() / 2) + 3 + textSize.getHeight()));
 			textSize = fontMech.getStringBounds((horzTitle + " (" + horzUnit + ")"), g2);
-			g2.drawString((horzTitle + " (" + horzUnit + ")"), (int)(((this.getWidth() - fontMech.stringWidth(vertTitle) - 15) - textSize.getWidth()) / 2 + fontMech.stringWidth(vertTitle) + 15), (int)(this.getHeight() - 5));
+			g2.drawString((horzTitle + " (" + horzUnit + ")"), (int)(((this.getWidth() - fontMech.stringWidth(vertTitle) - 15) - textSize.getWidth()) / 2 + fontMech.stringWidth(vertTitle) + 15), this.getHeight() - 5);
 			textSize = fontMech.getStringBounds(vertTitle, g2);
 			g2.setColor(new Color(50, 50, 50));
 			Rectangle graphSpace = new Rectangle((int)(textSize.getWidth() + 40) + 4, (int)(15 + textSize.getHeight()), (int)(this.getWidth() - 20 - textSize.getWidth() - 40), ((int)(this.getHeight() - 15 - textSize.getHeight()) - (int)(35 + textSize.getHeight()) - 4));

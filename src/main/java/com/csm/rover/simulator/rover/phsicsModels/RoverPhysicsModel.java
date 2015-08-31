@@ -3,7 +3,7 @@ package com.csm.rover.simulator.rover.phsicsModels;
 import java.io.Serializable;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.rover.MotorState;
 import com.csm.rover.simulator.rover.RoverWheels;
 import com.csm.rover.simulator.wrapper.Access;
@@ -120,7 +120,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	}
 	
 	public void start(){
-		new SyncronousThread((int) (time_step*1000), new Runnable(){
+		new SynchronousThread((int) (time_step*1000), new Runnable(){
 			public void run(){
 				try {
 					excecute();
@@ -132,7 +132,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 				}
 			}
 		},
-		SyncronousThread.FOREVER, roverName+"-physics");
+		SynchronousThread.FOREVER, roverName+"-physics");
 	}
 	
 	public void excecute() throws Exception {

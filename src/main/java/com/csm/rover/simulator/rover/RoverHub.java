@@ -19,7 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import com.csm.rover.simulator.control.InterfaceCode;
-import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.LEDIndicator;
 import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.wrapper.Access;
@@ -377,11 +377,11 @@ public class RoverHub extends Panel {
 	}
 	
 	public void start(){
-		new SyncronousThread(500, new Runnable(){
+		new SynchronousThread(500, new Runnable(){
 			public void run(){
 				updateDisplays();
 			}
-		}, SyncronousThread.FOREVER, "Rover Hub Update");
+		}, SynchronousThread.FOREVER, "Rover Hub Update");
 		int x = 0;
 		while (x < rovers.length){
 			rovers[x].start();
@@ -404,9 +404,9 @@ public class RoverHub extends Panel {
 		requestFocus();
 		try {
 			this.getKeyListeners()[0].keyPressed(null);
-		} catch (ArrayIndexOutOfBoundsException e) {}
+		} catch (ArrayIndexOutOfBoundsException e) { e.printStackTrace(); }
 	}
-	
+
 	//adds the rover objects to the hub
 	public void setRovers(RoverObject[] rovers){
 		this.rovers = rovers;
@@ -565,23 +565,18 @@ public class RoverHub extends Panel {
 	
 	//change which rover is connected to a certain display
 	private void changeLinkedRover(int display, int by){
-		try {
-			rovers[0].equals("exists");
-		}
-		catch (Exception e){
+		if (rovers[0] == null){
 			return;
 		}
-		finally {
-			if (inHUDmode){
-				if (display != 0){
-					HUDDisplayLinks[display] += by;
-				}
+		if (inHUDmode){
+			if (display != 0){
+				HUDDisplayLinks[display] += by;
 			}
-			else {
-				standardDisplayLinks[currentPage][display] += by;
-			}
-			updateDisplays();
 		}
+		else {
+			standardDisplayLinks[currentPage][display] += by;
+		}
+		updateDisplays();
 	}
 	
 	//whether or not to show the panel as an overlay on the map

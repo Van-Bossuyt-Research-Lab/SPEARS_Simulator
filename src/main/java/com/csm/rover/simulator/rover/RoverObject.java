@@ -8,7 +8,7 @@ import java.util.Random;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.Map;
-import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.rover.autoCode.RoverAutonomusCode;
 import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.wrapper.Access;
@@ -89,13 +89,13 @@ public class RoverObject implements Serializable {
 	}
 	
 	public void start(){
-		new SyncronousThread(100, new Runnable(){
+		new SynchronousThread(100, new Runnable(){
 			public void run(){
 				//System.out.println(name + "-CODE\t" + Globals.TimeMillis);
 				excecuteCode();
 			}
 		},
-		SyncronousThread.FOREVER, name+"-code");
+		SynchronousThread.FOREVER, name+"-code");
 		physics.start();
 		timeOfLastCmd = Globals.TimeMillis;
 	}

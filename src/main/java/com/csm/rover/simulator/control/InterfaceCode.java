@@ -24,7 +24,7 @@ public class InterfaceCode {
     private File logFile;
 	private String connectedPort = "COM13";
 	public ZDate DateTime;
-	public SyncronousThread clock;
+	public SynchronousThread clock;
 	public static String IDcode = "g";
 	
 	private int connectionTime = 0;
@@ -46,7 +46,7 @@ public class InterfaceCode {
 	
 	private boolean listening = false;
 	private String listenFor;
-	private SyncronousThread listenTimer;
+	private SynchronousThread listenTimer;
 	private Runnable listenAction;
 	private Runnable listenFail;
 	private String[] receivedFiles = new String[0];
@@ -66,7 +66,7 @@ public class InterfaceCode {
 	public InterfaceCode(){
 		DateTime = new ZDate();
 		DateTime.setFormat("[hh:mm:ss]");
-		clock = new SyncronousThread(1000, new Runnable(){
+		clock = new SynchronousThread(1000, new Runnable(){
 			public void run(){
 				DateTime.advanceClock();
 				if (Connected){
@@ -81,17 +81,17 @@ public class InterfaceCode {
 					Admin.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected");
 				}
 			}
-		}, SyncronousThread.FOREVER, "clock", false);
+		}, SynchronousThread.FOREVER, "clock", false);
 		initalize();
 	}
 	
 	public static void start(){
 		@SuppressWarnings("unused")
-		SyncronousThread serialCheck = new SyncronousThread(400, new Runnable(){
+        SynchronousThread serialCheck = new SynchronousThread(400, new Runnable(){
 			public void run(){
 				Access.INTERFACE.updateSerialCom();
 			}
-		}, SyncronousThread.FOREVER, "Interface serial");
+		}, SynchronousThread.FOREVER, "Interface serial");
 	}
 	
 	public void initalize(){
@@ -119,7 +119,9 @@ public class InterfaceCode {
 				ver++;
 				logFile = new File("Logs\\Log File " + DateTime.toString("MM-dd-yyyy hh-mm") + " (" + ver + ").txt");
 			}
-			logFile.createNewFile();
+			if (!logFile.createNewFile()){
+				throw new IOException("Failed to create new log file");
+			}
 			BufferedWriter write = new BufferedWriter(new FileWriter(logFile));
 			write.write("CSM PHM Rover System Simulator Log " + DateTime.toString("on MM-dd-yyyy at hh:mm") + "\r\n\r\n");
 			write.close();
@@ -183,31 +185,31 @@ public class InterfaceCode {
 	public void pingRover(){
 		Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Pinging Rover...\n");
 		writeToSerial(tagMessage("^", 'r'), true);
-		listenForSignal("g ^", 
-			new Runnable(){
-				public void run(){
-					runThreadOutOfSync(new Runnable(){
-						public void run(){
-							Connected = true;
-							Admin.GUI.InterfacePnl.ConnectionLbl.setText("Connected for 0 min.");
-							Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover Connected: " + DateTime.toString("hh:mm:ss") + "\n");
-							(new PopUp()).showConfirmDialog("Rover connected.", "Ping Confirm", PopUp.DEFAULT_OPTIONS);
-						}
-					}, "ping-return");
-				}
-			}, new Runnable(){
-				public void run(){
-					runThreadOutOfSync(new Runnable(){
-						public void run(){
-							Connected = false;
-							Admin.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected.");
-							Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover did not respond.\n");
-							(new PopUp()).showConfirmDialog("No Rover found.", "Ping Failed", PopUp.DEFAULT_OPTIONS);
-						}
-					}, "ping-return");
-			}
-		}, 
-		10);
+		listenForSignal("g ^",
+				new Runnable() {
+					public void run() {
+						runThreadOutOfSync(new Runnable() {
+							public void run() {
+								Connected = true;
+								Admin.GUI.InterfacePnl.ConnectionLbl.setText("Connected for 0 min.");
+								Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover Connected: " + DateTime.toString("hh:mm:ss") + "\n");
+								(new PopUp()).showConfirmDialog("Rover connected.", "Ping Confirm", PopUp.DEFAULT_OPTIONS);
+							}
+						}, "ping-return");
+					}
+				}, new Runnable() {
+					public void run() {
+						runThreadOutOfSync(new Runnable() {
+							public void run() {
+								Connected = false;
+								Admin.GUI.InterfacePnl.ConnectionLbl.setText("Not Connected.");
+								Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Rover did not respond.\n");
+								(new PopUp()).showConfirmDialog("No Rover found.", "Ping Failed", PopUp.DEFAULT_OPTIONS);
+							}
+						}, "ping-return");
+					}
+				},
+				10);
 	}
 	
 	public void setCallTags(Map<String, String> rover, Map<String, String> satellite){
@@ -235,12 +237,6 @@ public class InterfaceCode {
 	public void writeToSerial(String msg){
 		if (Connected && !muted){
 			writeToLog("Interface Serial", "Command sent: \'" + msg + "\'");
-			//try {
-            // 	outputStream.write(msg.getBytes());
-        	//} catch (Exception e) {
-        	//	Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Message Failed" + "\n");
-        	//	pingRover();
-        	//}
 			char[] output = msg.toCharArray();
 			int x = 0;
 			while (x < output.length){
@@ -254,12 +250,6 @@ public class InterfaceCode {
 	public void writeToSerial(String msg, boolean override){
 		if ((Connected || override) && !muted){
 			writeToLog("Interface Serial", "Command sent: \'" + msg + "\'");
-			//try {
-            // 	outputStream.write(msg.getBytes());
-        	//} catch (Exception e) {
-        	//	Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.setText(Access.CODE.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Message Failed" + "\n");
-        	//	pingRover();
-        	//}
 			char[] output = msg.toCharArray();
 			int x = 0;
 			while (x < output.length){
@@ -319,7 +309,7 @@ public class InterfaceCode {
 					}
 				}
 				else {
-					if (input.equals("Data Could Not be Parsed\n".toCharArray())){
+					if (Arrays.equals(input, "Data Could Not be Parsed\n".toCharArray())){
 						Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Data Could Not be Parsed\n");
 					}
 				}
@@ -375,7 +365,7 @@ public class InterfaceCode {
 				failaction.run();
 			}
 		};
-		listenTimer = new SyncronousThread((secs*1000), listenFail, 1, "listening timer");
+		listenTimer = new SynchronousThread((secs*1000), listenFail, 1, "listening timer");
 	}
 	
 	
@@ -464,12 +454,12 @@ public class InterfaceCode {
             Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Sent: \"" + Admin.GUI.InterfacePnl.RoverSendTxt.getText() + "\"\n");
             listenForSignal("g #", new Runnable(){
 				public void run(){
-					listenForSignal("g %", new Runnable(){
-						public void run(){
+					listenForSignal("g %", new Runnable() {
+						public void run() {
 							runThreadOutOfSync(confirmMessage, "confirm 3");
 						}
-					}, new Runnable(){
-						public void run(){
+					}, new Runnable() {
+						public void run() {
 							runThreadOutOfSync(failMessage, "fail 3");
 						}
 					}, 5);
@@ -482,7 +472,7 @@ public class InterfaceCode {
 			Admin.GUI.InterfacePnl.RoverSendTxt.setText("");
 		}
 		else {
-			new SyncronousThread(0, new Runnable(){
+			new SynchronousThread(0, new Runnable(){
 				public void run(){
 					(new PopUp()).showConfirmDialog("You must enter a message into the field.", "Message Failed", PopUp.DEFAULT_OPTIONS);
 				}
@@ -506,8 +496,8 @@ public class InterfaceCode {
 			Admin.GUI.InterfacePnl.SatSendTxt.setText("");
 		}
 		else {
-			runThreadOutOfSync(new Runnable(){
-				public void run(){
+			runThreadOutOfSync(new Runnable() {
+				public void run() {
 					(new PopUp()).showConfirmDialog("You must enter a message into the field.", "Message Failed", PopUp.DEFAULT_OPTIONS);
 				}
 			}, "invalid message 2");
@@ -549,7 +539,7 @@ public class InterfaceCode {
 	// ACTION BUTTON EDITING
 	
 	public void addRoverBtn(){
-		new SyncronousThread(0, new Runnable(){
+		new SynchronousThread(0, new Runnable(){
 			public void run(){
 				String[] data;
 				boolean go = true;
@@ -613,7 +603,7 @@ public class InterfaceCode {
 	}
 	
 	private void editRover2(final int which){
-		new SyncronousThread(0, new Runnable(){
+		new SynchronousThread(0, new Runnable(){
 			public void run(){
 				String[] data;
 				boolean go = true;
@@ -656,7 +646,7 @@ public class InterfaceCode {
 	}
 	
 	public void addSatBtn(){
-		new SyncronousThread(0, new Runnable(){
+		new SynchronousThread(0, new Runnable(){
 			public void run(){
 				String[] data;
 				boolean go = true;
@@ -720,7 +710,7 @@ public class InterfaceCode {
 	}
 	
 	private void editSat2(final int which){
-		new SyncronousThread(0, new Runnable(){
+		new SynchronousThread(0, new Runnable(){
 			public void run(){
 				String[] data;
 				boolean go = true;
@@ -871,8 +861,7 @@ public class InterfaceCode {
 				progress[0] = '>';
 				Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(text + buildString(progress, 0, progress.length - 1));
 				index = 0;
-				int i = 0;
-				//int escape = 0;
+				int i;
 				while (index < length && Globals.RFAvailable(IDcode) > 0){
 					i = 0;
 					while (i < 60 && index < length){
@@ -925,7 +914,11 @@ public class InterfaceCode {
 	private void ReadDataFile(int length){
 		if (receivingFile){
 			try {
-				while (Globals.RFAvailable(IDcode) == 0) {}
+				while (Globals.RFAvailable(IDcode) == 0) {
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) { e.printStackTrace(); }
+				}
 					delay(20);
 					Admin.GUI.InterfacePnl.SerialDisplayLbl.setText(Admin.GUI.InterfacePnl.SerialDisplayLbl.getText() + "Receiving Data.\n");
 					writeToLog("Date Reciever", "Receiving Data File");
@@ -988,7 +981,7 @@ public class InterfaceCode {
 	
 	public void OpenRecievedFiles(){
 		if (receivedFiles.length > 0){
-			new SyncronousThread(0, new Runnable(){
+			new SynchronousThread(0, new Runnable(){
 				public void run(){
 					String[] choices = new String[receivedFiles.length];
 					int x = 0;
@@ -1002,7 +995,7 @@ public class InterfaceCode {
 							File image = new File(receivedFiles[choice]);
 							try {
 								final BufferedImage img = ImageIO.read(image);
-								new SyncronousThread(0, new Runnable() {
+								new SynchronousThread(0, new Runnable() {
 									public void run() {
 										PopUp opane = new PopUp();
 										opane.setCustomButtonOptions(new String[]{"Save", "Close"}, new int[]{0, 1});
@@ -1037,7 +1030,7 @@ public class InterfaceCode {
 						}
 						if (getFileType(receivedFiles[choice]).equals("CSV")) {
 							final String file = receivedFiles[choice];
-							new SyncronousThread(0, new Runnable() {
+							new SynchronousThread(0, new Runnable() {
 								public void run() {
 									int choice = new CSVFrame().OpenCSVFile(file);
 									if (choice == 1) {
@@ -1078,7 +1071,7 @@ public class InterfaceCode {
 			}, 1, "open file 3");
 		}
 		else {
-			new SyncronousThread(0, new Runnable() {
+			new SynchronousThread(0, new Runnable() {
 				public void run(){
 					(new PopUp()).showConfirmDialog("There are no unread files.", "Received Files", PopUp.DEFAULT_OPTIONS);
 				}
@@ -1189,12 +1182,12 @@ public class InterfaceCode {
 			InstructionObj newCmd = (InstructionObj) Admin.GUI.InterfacePnl.ParameterList.getSelectedItem();
 			if (Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex() != -1){
 				newCmd.setDestination('r');
-				newCmd.setTitle("R-" + (String)Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedItem() + "-" + Admin.GUI.InterfacePnl.ParameterList.getSelectedItem().toString());
+				newCmd.setTitle("R-" + Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedItem() + "-" + Admin.GUI.InterfacePnl.ParameterList.getSelectedItem().toString());
 				newCmd.setEditIndexies(Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedIndex(), Admin.GUI.InterfacePnl.ParameterList.getSelectedIndex());
 			}
 			else {
 				newCmd.setDestination('s'); // Add a 'c' for command?
-				newCmd.setTitle("S-" + (String)Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedItem() + "-" + Admin.GUI.InterfacePnl.ParameterList.getSelectedItem().toString());
+				newCmd.setTitle("S-" + Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedItem() + "-" + Admin.GUI.InterfacePnl.ParameterList.getSelectedItem().toString());
 				newCmd.setEditIndexies(Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex(), Admin.GUI.InterfacePnl.ParameterList.getSelectedIndex());
 			}
 			if (Admin.GUI.InterfacePnl.ParameterTxt.isVisible()){
@@ -1223,7 +1216,7 @@ public class InterfaceCode {
 			}
 		}
 		else {
-			new SyncronousThread(0, new Runnable(){
+			new SynchronousThread(0, new Runnable(){
 				public void run(){
 					(new PopUp()).showConfirmDialog("You must enter a typed value for the selected parameter parameter.", "Instruction Failed", PopUp.DEFAULT_OPTIONS);
 				}
@@ -1303,7 +1296,7 @@ public class InterfaceCode {
 	}
 	
 	public void addInstructionToList(){
-		new SyncronousThread(0, new Runnable(){
+		new SynchronousThread(0, new Runnable(){
 			public void run(){
 				(new InstrucitonEditor()).open();
 			}
@@ -1355,7 +1348,7 @@ public class InterfaceCode {
 			final String[] finParam = parameters;
 			final String[][] finCommands = commands;
 			final boolean[] finBools = bools;
-			new SyncronousThread(0, new Runnable(){
+			new SynchronousThread(0, new Runnable(){
 				public void run(){
 					(new InstrucitonEditor(true, false, (String)Admin.GUI.InterfacePnl.RoverCommandsList.getSelectedItem(), finParam, finCommands, finBools)).open();
 				}
@@ -1377,7 +1370,7 @@ public class InterfaceCode {
 			final String[] finParam = parameters;
 			final String[][] finCommands = commands;
 			final boolean[] finBools = bools;
-			new SyncronousThread(0, new Runnable(){
+			new SynchronousThread(0, new Runnable(){
 				public void run(){
 					(new InstrucitonEditor(true, false, (String)Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedItem(), finParam, finCommands, finBools)).open();
 				}
@@ -1389,21 +1382,22 @@ public class InterfaceCode {
 	
 	private void SaveProgrammer(){
 		String filename = "CommandString.dll";
-		FileOutputStream fos = null;
-		ObjectOutputStream out = null;
 		try {
 			File file = new File("");
 			file = new File(file.getAbsolutePath() + "\\CommandString.dll");
-			file.delete();
+			if (!file.delete()){
+				Globals.reportError("Interface Object", "Failed to delete commandString.dll", null);
+			}
 		}
 		catch (Exception e) {
 			Globals.reportError("InterfaceCode", "SaveProgrammer - e", e);
 		}
 		try {
-			fos = new FileOutputStream(filename);
-			out = new ObjectOutputStream(fos);
+            FileOutputStream fos = new FileOutputStream(filename);
+            ObjectOutputStream out = new ObjectOutputStream(fos);
 			out.writeObject(new SaveFile(actionCommands, actionTips, actionIcons, Admin.GUI.InterfacePnl.RoverCommandsList.getListItems(), RoverInstructions, Admin.GUI.InterfacePnl.SatelliteCommandList.getListItems(), SatelliteInstructions));
 			out.close();
+            fos.close();
 		}
 		catch (Exception ex) {
 			Globals.reportError("InterfaceCode", "SaveProgrammer - ex", ex);

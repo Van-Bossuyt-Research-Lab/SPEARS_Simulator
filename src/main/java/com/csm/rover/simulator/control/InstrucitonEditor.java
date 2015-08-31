@@ -23,7 +23,7 @@ import javax.swing.JCheckBox;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
-import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.ZList;
 import com.csm.rover.simulator.wrapper.Access;
 
@@ -209,14 +209,14 @@ public class InstrucitonEditor extends JDialog {
 			InstructionObj[] instructions = new InstructionObj[ParameterTitles.getItems().length];
 			int x = 0;
 			while (x < instructions.length){
-				instructions[x] = new InstructionObj(cropStringArray(tableStrings[x]), (String)ParameterTitles.getValueAt(x), parameterBools[x]);
+				instructions[x] = new InstructionObj(cropStringArray(tableStrings[x]), ParameterTitles.getValueAt(x), parameterBools[x]);
 				x++;
 			}
 			Access.InstructionEditorFinish(AddRoverChk.isSelected(), AddSatelliteChk.isSelected(), TitleTxt.getText(), instructions);
 			this.setVisible(false);
 		}
 		else {
-			new SyncronousThread( 0, new Runnable(){
+			new SynchronousThread( 0, new Runnable(){
 				public void run(){
 					(new PopUp()).showConfirmDialog("You are missing required information.", "Submit Failed", PopUp.DEFAULT_OPTIONS);
 				}
@@ -229,7 +229,7 @@ public class InstrucitonEditor extends JDialog {
 	}
 	
 	private void AddParameter_Clicked(){
-		new SyncronousThread(0, new Runnable(){
+		new SynchronousThread(0, new Runnable(){
 			public void run(){
 				String name = (new PopUp()).showInputDialog("Parameter Name:", "Add Parameter", PopUp.OK_CANCEL_OPTIONS);
 				if (!name.equals("")){

@@ -44,9 +44,6 @@ public class LandMapPanel extends Panel{
 	public PlasmaPanel HeightMap;
 	
 	private JPopupMenu MapOptionsPopMenu;
-	private JMenuItem mntmShowFocusedRover;
-	private JMenuItem mntmSaveMapFile;
-	private JMenuItem mntmSaveMapImage;
 	private JRadioButtonMenuItem rdbtnmntmShowTargets;
 	private JRadioButtonMenuItem rdbtnmntmShowHazards;
 	
@@ -65,40 +62,40 @@ public class LandMapPanel extends Panel{
 			}
 		});
 		addPopup(this, MapOptionsPopMenu);
-		
-		mntmShowFocusedRover = new JMenuItem("Show Focused Rover");
+
+		JMenuItem mntmShowFocusedRover = new JMenuItem("Show Focused Rover");
 		mntmShowFocusedRover.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					setFocusPoint(roverIcons[focusedRover].getMapLocation());
 					focusEngauged = !focusEngauged;
-				} catch (Exception ex) {}
+				} catch (Exception ex) { ex.printStackTrace(); }
 			}
 		});
 		MapOptionsPopMenu.add(mntmShowFocusedRover);
-		
-		mntmSaveMapFile = new JMenuItem("Save Map File");
+
+		JMenuItem mntmSaveMapFile = new JMenuItem("Save Map File");
 		mntmSaveMapFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser finder = new JFileChooser();
 				finder.setFileFilter(new MapFileFilter());
 				finder.setApproveButtonText("Save");
 				int option = finder.showSaveDialog(getParent());
-				if (option == JFileChooser.APPROVE_OPTION){
+				if (option == JFileChooser.APPROVE_OPTION) {
 					HeightMap.saveMap(new File(finder.getSelectedFile().getAbsolutePath() + ".map"));
 				}
 			}
 		});
 		MapOptionsPopMenu.add(mntmSaveMapFile);
-		
-		mntmSaveMapImage = new JMenuItem("Save Map Image");
+
+		JMenuItem mntmSaveMapImage = new JMenuItem("Save Map Image");
 		mntmSaveMapImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser finder = new JFileChooser();
 				finder.setFileFilter(new ImageFileFilter());
 				finder.setApproveButtonText("Save");
 				int option = finder.showSaveDialog(getParent());
-				if (option == JFileChooser.APPROVE_OPTION){
+				if (option == JFileChooser.APPROVE_OPTION) {
 					HeightMap.SaveImage(HeightMap.getValues(), HeightMap.getDetail(), PlasmaPanel.REDtoGREEN, finder.getSelectedFile().getAbsolutePath());
 				}
 			}
@@ -173,7 +170,7 @@ public class LandMapPanel extends Panel{
 						Access.setFocusDisplayHUD(focusedRover);
 						setFocusPoint(roverIcons[focusedRover].getMapLocation());
 						focusEngauged = true;
-					} catch (Exception ex) {}
+					} catch (Exception ex) { ex.printStackTrace(); }
 					break;					
 				case KeyEvent.VK_PAGE_DOWN:
 					try {
@@ -183,13 +180,13 @@ public class LandMapPanel extends Panel{
 						Access.setFocusDisplayHUD(focusedRover);
 						setFocusPoint(roverIcons[focusedRover].getMapLocation());
 						focusEngauged = true;
-					} catch (Exception ex) {}
+					} catch (Exception ex) { ex.printStackTrace(); }
 				break;
 				case KeyEvent.VK_SPACE:
 					try {
 						setFocusPoint(roverIcons[focusedRover].getMapLocation());
 						focusEngauged = !focusEngauged;
-					} catch (Exception ex) {}
+					} catch (Exception ex) { ex.printStackTrace(); }
 					break;
 				}
 			}
@@ -239,7 +236,7 @@ public class LandMapPanel extends Panel{
 		}
 		try {
 			this.getParent().repaint();
-		} catch (Exception e) {}
+		} catch (Exception e) { e.printStackTrace(); }
 	}
 	
 	//populates an array of roverIcons in the simulator
@@ -287,8 +284,8 @@ public class LandMapPanel extends Panel{
 		int x = (int) mapSquare.getX();
 		int y = (int) mapSquare.getY();
 		DecimalPoint lifePnt = new DecimalPoint(loc.getX() + HeightMap.getWidth()/HeightMap.getResolution() / 2.0, HeightMap.getWidth()/HeightMap.getResolution() / 2.0 - loc.getY());
-		double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
-		double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (int)(1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
+		double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
+		double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (1000/HeightMap.getDetail())) / 1000.0 * HeightMap.getDetail();
 		return getIntermidiateValue(HeightMap.getValueAtLocation(x, y), HeightMap.getValueAtLocation(x+1, y), HeightMap.getValueAtLocation(x, y+1), HeightMap.getValueAtLocation(x+1, y+1), locx, locy);
 	}
 	

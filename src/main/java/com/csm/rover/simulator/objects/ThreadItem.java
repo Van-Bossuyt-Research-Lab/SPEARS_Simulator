@@ -17,11 +17,11 @@ public class ThreadItem implements Serializable {
 	private boolean complete;
 	private boolean suspended = false;
 	
-	private SyncronousThread thread;
+	private SynchronousThread thread;
 	
 	public static int offset = 0;
 
-	public ThreadItem(String name, int delay, long start, SyncronousThread thread) {
+	public ThreadItem(String name, int delay, long start, SynchronousThread thread) {
 		this.thread = thread;
 		this.name = name;
 		this.delay = delay;

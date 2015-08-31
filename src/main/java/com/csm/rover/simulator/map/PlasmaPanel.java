@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.GridList;
+import com.csm.rover.simulator.wrapper.Globals;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -377,7 +378,7 @@ public class PlasmaPanel extends JPanel {
 		int x = (int) getMapSquare(loc).getX() / detail;
 		int y = (int) getMapSquare(loc).getY() / detail;
 		try {
-			return targets.get(x, y).intValue();
+			return targets.get(x, y);
 		}
 		catch (NullPointerException e){
 			return 0;
@@ -408,9 +409,9 @@ public class PlasmaPanel extends JPanel {
 			for (int j = 0; j < values[0].length/detail; j++){
 				int x = i - values.length/detail/2;
 				int y = values.length/detail/2 - j;
-				for (int z = 0; z < hazards.length; z++){
-					if (hazards[z].isPointWithin(new DecimalPoint(x, y))){
-						this.hazards[i][j] = hazards[z].getValue();
+				for (Hazard hazard : hazards) {
+					if (hazard.isPointWithin(new DecimalPoint(x, y))) {
+						this.hazards[i][j] = hazard.getValue();
 						break;
 					}
 				}
@@ -437,9 +438,9 @@ public class PlasmaPanel extends JPanel {
 			for (int j = 0; j < values[0].length/detail; j++){
 				int x = i - values.length/detail/2;
 				int y = values.length/detail/2 - j;
-				for (int z = 0; z < hazards.length; z++){
-					if (hazards[z].isPointWithin(new DecimalPoint(x, y))){
-						this.hazards[i][j] += hazards[z].getValue();
+				for (Hazard hazard : hazards) {
+					if (hazard.isPointWithin(new DecimalPoint(x, y))) {
+						this.hazards[i][j] += hazard.getValue();
 						break;
 					}
 				}
@@ -577,7 +578,7 @@ public class PlasmaPanel extends JPanel {
 		switch (currentColorScheme){
 		case REDtoGREEN:
 			double scaled = numb / maxHeight * 100;
-			int red = 0, green = 0, blue = 0;
+			int red, green = 0, blue = 0;
 			if (scaled < 25){
 				red = (int) ((scaled)/25*255);
 			}
@@ -598,9 +599,6 @@ public class PlasmaPanel extends JPanel {
 				red = 255;
 				green = 255;
 				blue = 255;
-			}
-			if (numb > maxHeight){
-				//System.out.println(Math.round(numb*100)/100.0 + ": " + red + ", " + green + ", " + blue);
 			}
 			try{
 				return new Color(red, green, blue);
@@ -666,21 +664,6 @@ public class PlasmaPanel extends JPanel {
 				try {
 					switch (scheme){
 					case REDtoGREEN:
-						int red = (int)(255 - (ColorModifier*4/3.0)*Math.pow((fs[x+detail/2][y+detail/2]-((maxval-minval)/2.0+minval)), 2));
-						if (red < 0){
-							red = 0;
-						}
-						int green = (int)(255 - (ColorModifier*3/4.0)*Math.pow((fs[x+detail/2][y+detail/2]-maxval-0.5), 2));
-						if (green < 0){
-							green = 0;
-						}
-						int blue = (int) ((green - 240) / 2 + (fs[x+detail/2][y+detail/2] - maxHeight) * 2);
-						if (blue < 0){
-							blue = 0;
-						}
-						if (fs[x+detail/2][y+detail/2] > maxHeight){
-							//System.out.println(Math.round(numb*100)/100.0 + ": " + red + ", " + green + ", " + blue);
-						}
 						int scaled = (int) (fs[x+detail/2][y+detail/2] * 100 / maxHeight);
 						g.setColor(new Color(2.0f * scaled, 2.0f * (1 - scaled), 0));
 						break;
@@ -701,12 +684,14 @@ public class PlasmaPanel extends JPanel {
 			}
 			x += detail;
 		}
-		//g.drawString("Hello World!!!", 10, 20);
 		try {    
 			File output = new File(filepath + ".PNG");
-			output.createNewFile();
-			ImageIO.write(image, "png", output);
-			//System.out.println("Save Done");
+			if (output.createNewFile()){
+				ImageIO.write(image, "png", output);
+			}
+			else {
+				Globals.reportError("PlasmaPanel", "Failed to create image file on map images save", null);
+			}
 		} 
 		catch (IOException e) {
 			e.printStackTrace();   
@@ -733,9 +718,9 @@ public class PlasmaPanel extends JPanel {
 			write.write(fileID + "\n");
 			
 			write.write(values[0].length + "\n" + values.length + "\n" + detail + "\n\n");
-			for (int i = 0; i < values.length; i++){
-				for (int j = 0; j < values[i].length; j++){
-					write.write(values[i][j] + "\t");
+			for (float[] value : values) {
+				for (float aValue : value) {
+					write.write(aValue + "\t");
 				}
 				write.write('\n');
 			}
@@ -764,7 +749,7 @@ public class PlasmaPanel extends JPanel {
 							if (hazards[i][j] > 0){
 								valueLocs.add(i + "\t" + j);
 							}
-						} catch (NullPointerException e) {}
+						} catch (NullPointerException e) { e.printStackTrace(); }
 					}
 				}
 				write.write("\n" + valueLocs.size() + "\n");
@@ -776,17 +761,15 @@ public class PlasmaPanel extends JPanel {
 			else {
 				write.write("v");
 				write.write("\n" + hazards[0].length + "\n" + hazards.length + "\n");
-				for (int i = 0; i < hazards.length; i++){
-					for (int j = 0; j < hazards[0].length; j++){
+				for (int[] hazard : hazards) {
+					for (int hazardVal : hazard) {
 						try {
-							if (hazards[i][j] > 0){
-								write.write(hazards[i][j] + "\t");
-							}
-							else {
+							if (hazardVal > 0) {
+								write.write(hazardVal + "\t");
+							} else {
 								write.write(0 + "\t");
 							}
-						}
-						catch (NullPointerException e) {
+						} catch (NullPointerException e) {
 							write.write(0 + "\t");
 						}
 					}
@@ -872,7 +855,7 @@ public class PlasmaPanel extends JPanel {
 					hazVals[i] = row;
 				}
 				this.setHazards(hazVals);
-			};
+			}
 			
 			data.close();
 		} catch (FileNotFoundException e) {

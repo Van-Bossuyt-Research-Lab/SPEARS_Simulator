@@ -6,7 +6,7 @@ import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.objects.Map;
 import com.csm.rover.simulator.objects.Queue;
 import com.csm.rover.simulator.objects.ThreadItem;
-import com.csm.rover.simulator.objects.SyncronousThread;
+import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.AccelPopUp;
 
 //TODO make into a signularity thingy
@@ -44,7 +44,7 @@ public class Globals {
 				while (System.nanoTime() < end) {}
 				threadCheckIn("milli-clock");
 			}
-		}, SyncronousThread.FOREVER, "milli-clock", true);
+		}, SynchronousThread.FOREVER, "milli-clock", true);
 	}
 	
 	public static void writeToSerial(char write, String from){
@@ -127,7 +127,9 @@ public class Globals {
 	public static void reportError(String obj, String method, Exception error){
 		writeToLogFile("ERROR - " + Thread.currentThread().getName() + ": " + obj + ": " + method, error.toString());
 		System.err.println(Thread.currentThread().getName());
-		error.printStackTrace();
+		if (error != null){
+			error.printStackTrace();
+		}
 	}
 	
 	public synchronized static void writeToLogFile(String from, String write){ // writes the message to the log genorated by the interface
@@ -224,7 +226,7 @@ public class Globals {
 		}, FreeThread.FOREVER, "accel-pop-up");
 	}
 	
-	public static void registerNewThread(String name, int delay, SyncronousThread thread){
+	public static void registerNewThread(String name, int delay, SynchronousThread thread){
 		threads.add(name, new ThreadItem(name, delay, TimeMillis, thread));
 	}
 	
