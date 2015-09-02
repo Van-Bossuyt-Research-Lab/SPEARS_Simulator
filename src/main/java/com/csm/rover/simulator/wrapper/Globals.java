@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.objects.ThreadItem;
@@ -27,7 +27,7 @@ public class Globals {
 	private static int access_key = "qwert".hashCode();
 	
 	private static boolean begun = false;
-	private static Map<String, ThreadItem> threads = new TreeMap<String, ThreadItem>();
+	private static Map<String, ThreadItem> threads = new ConcurrentHashMap<String, ThreadItem>();
 	private static boolean milliDone = false;
 	
 	private static int exitTime = -1;
