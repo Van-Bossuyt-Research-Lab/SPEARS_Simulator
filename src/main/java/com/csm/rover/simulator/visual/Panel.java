@@ -38,7 +38,7 @@ public class Panel extends JPanel{
 		titleLbl.setSize((int)titleLbl.getPreferredSize().getWidth()+5, (int)titleLbl.getPreferredSize().getHeight()+5);
 		this.add(titleLbl);
 		
-		postScript = new JLabel("Colorado School of Mines     Prognostics and Health Management Project     System Simulator v" + Globals.vrsionNumber);
+		postScript = new JLabel("Colorado School of Mines     Prognostics and Health Management Project     System Simulator v" + Globals.versionNumber);
 		postScript.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		postScript.setSize((int)postScript.getPreferredSize().getWidth()+5, (int)postScript.getPreferredSize().getHeight()+5);
 		postScript.setLocation((this.getWidth()-postScript.getWidth())/2, this.getHeight()-postScript.getHeight()-10);
