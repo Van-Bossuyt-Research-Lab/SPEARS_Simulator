@@ -49,7 +49,6 @@ public class ZList extends JPanel implements Cloneable{
 		int x = 0;
 		while (x < items.length){
 			items[x] = new JLabel("  " + values[x].toString());
-			items[x].setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 			items[x].addMouseListener(new MouseAdapter(){
 				@Override
 				public void mouseClicked(MouseEvent e){
@@ -153,7 +152,7 @@ public class ZList extends JPanel implements Cloneable{
 		selectItem(-1);
 		items = Augment(items, new JLabel("  " + val.toString()), loc);
 		values = Augment(values, val, loc);
-		items[loc].setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
+		items[loc].setFont(getFont());
 		items[loc].addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e){
@@ -183,6 +182,16 @@ public class ZList extends JPanel implements Cloneable{
 		items = Remove(items, which);
 		values = Remove(values, which);
 		placeComps();
+	}
+
+	@Override
+	public void setFont(Font font){
+		super.setFont(font);
+		if (items != null) {
+			for (JLabel item : items) {
+				item.setFont(font);
+			}
+		}
 	}
 	
 	public void clearSelection(){
