@@ -83,7 +83,7 @@ public class Access {
 	}
 	
 	public static void setFocusDisplayHUD(int which){
-		Admin.GUI.RoverHubPnl.setfocusedRover(which);
+		Admin.GUI.RoverHubPnl.setFocusedRover(which);
 	}
 	
 	public static void COMPortChanged(){
