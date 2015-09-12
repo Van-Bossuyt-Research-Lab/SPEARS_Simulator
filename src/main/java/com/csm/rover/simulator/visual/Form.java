@@ -19,6 +19,7 @@ import com.csm.rover.simulator.control.PopUp;
 import com.csm.rover.simulator.rover.RoverHub;
 import com.csm.rover.simulator.satellite.SatelliteHub;
 import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.MainWrapper;
 
 import java.io.File;
@@ -32,6 +33,7 @@ public class Form extends JFrame {
 	
 	static public Form frame;
 	private static Dimension screenSize;
+	private int currentScreen = 0;
 
 	public MainWrapper WrapperPnl;
 	public Panel OrbitalPnl;
@@ -62,6 +64,7 @@ public class Form extends JFrame {
 				    frame.setVisible(true);
 				    frame.setResizable(false);
 				    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                    //frame.showOnScreen(frame.currentScreen);
 				    if (goFin){
 				    	Access.CODE.beginSimulation(new RunConfiguration(new File("default.cfg")));
 				    }
@@ -304,6 +307,28 @@ public class Form extends JFrame {
 			}
 		}
 	}
+
+	public void changeWindow(){
+		currentScreen = (currentScreen + 1) % GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length;
+        showOnScreen(currentScreen);
+	}
+
+	private void showOnScreen(int screen){
+		GraphicsEnvironment ge = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
+		GraphicsDevice[] gs = ge.getScreenDevices();
+		if( screen > -1 && screen < gs.length ){
+			gs[screen].setFullScreenWindow( this );
+		}
+		else if( gs.length > 0 ){
+			gs[0].setFullScreenWindow( this );
+		}
+		else{
+            Globals.reportError("Form", "No Screens Found", new RuntimeException("No Screens Found"));
+		}
+	}
+
+
 }
 
 class KeyDispatcher implements KeyEventDispatcher {
