@@ -1,11 +1,6 @@
 package com.csm.rover.simulator.visual;
 
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Frame;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
-import java.awt.Toolkit;
+import java.awt.*;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -129,7 +124,7 @@ public class Form extends JFrame {
 				TerrainPnl.requestFocus();
 			}
 		});
-		TerrainPnl.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
+		TerrainPnl.setBackground(Color.BLACK);
 		TerrainPnl.setVisible(false);
 		contentPane.add(TerrainPnl);
 		
