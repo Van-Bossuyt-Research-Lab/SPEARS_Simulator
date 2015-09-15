@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 import javax.swing.JPopupMenu;
@@ -47,7 +48,7 @@ public class LandMapPanel extends Panel{
 	private JRadioButtonMenuItem rdbtnmntmShowTargets;
 	private JRadioButtonMenuItem rdbtnmntmShowHazards;
 	
-	private RoverIcon[] roverIcons;
+	private ArrayList<RoverIcon> roverIcons;
 
 	public LandMapPanel(Dimension size, PlanetParametersList params){
 		super(size /*new Dimension(700, 500)*/, "Terrain View");
@@ -67,7 +68,7 @@ public class LandMapPanel extends Panel{
 		mntmShowFocusedRover.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					setFocusPoint(roverIcons[focusedRover].getMapLocation());
+					setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
 					focusEngauged = !focusEngauged;
 				} catch (Exception ex) { ex.printStackTrace(); }
 			}
@@ -120,7 +121,7 @@ public class LandMapPanel extends Panel{
 		rdbtnmntmShowHazards.setSelected(true);
 		MapOptionsPopMenu.add(rdbtnmntmShowHazards);
 		
-		roverIcons = new RoverIcon[0];
+		roverIcons = new ArrayList<RoverIcon>();
 		this.params = params;
 		
 		HeightMap = new PlasmaPanel();
@@ -165,26 +166,26 @@ public class LandMapPanel extends Panel{
 				case KeyEvent.VK_PAGE_UP:
 					try {
 						if (focusEngauged){
-							focusedRover = (focusedRover + 1) % roverIcons.length;
+							focusedRover = (focusedRover + 1) % roverIcons.size();
 						}
 						Access.setFocusDisplayHUD(focusedRover);
-						setFocusPoint(roverIcons[focusedRover].getMapLocation());
+						setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
 						focusEngauged = true;
 					} catch (Exception ex) { ex.printStackTrace(); }
 					break;					
 				case KeyEvent.VK_PAGE_DOWN:
 					try {
 						if (focusEngauged){
-							focusedRover = (roverIcons.length + focusedRover - 1) % roverIcons.length;
+							focusedRover = (roverIcons.size() + focusedRover - 1) % roverIcons.size();
 						}
 						Access.setFocusDisplayHUD(focusedRover);
-						setFocusPoint(roverIcons[focusedRover].getMapLocation());
+						setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
 						focusEngauged = true;
 					} catch (Exception ex) { ex.printStackTrace(); }
 				break;
 				case KeyEvent.VK_SPACE:
 					try {
-						setFocusPoint(roverIcons[focusedRover].getMapLocation());
+						setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
 						focusEngauged = !focusEngauged;
 					} catch (Exception ex) { ex.printStackTrace(); }
 					break;
@@ -228,10 +229,10 @@ public class LandMapPanel extends Panel{
 		HeightMap.setLocation((int)Math.round(this.getWidth()/2.0-focusPoint.getX()*HeightMap.getResolution()-HeightMap.getWidth()/2.0), 
 				(int)Math.round(this.getHeight()/2.0+focusPoint.getY()*HeightMap.getResolution()-HeightMap.getHeight()/2.0));
 		int x = 0;
-		while (x < roverIcons.length){
-			Point p = mapWorldToScreen(roverIcons[x].getMapLocation());
+		while (x < roverIcons.size()){
+			Point p = mapWorldToScreen(roverIcons.get(x).getMapLocation());
 			p.translate(HeightMap.getX(), HeightMap.getY());
-			roverIcons[x].setLocation(p);
+			roverIcons.get(x).setLocation(p);
 			x++;
 		}
 		try {
@@ -240,13 +241,13 @@ public class LandMapPanel extends Panel{
 	}
 	
 	//populates an array of roverIcons in the simulator
-	public void setRoverSwarm(RoverObject[] rovers){
-		roverIcons = new RoverIcon[rovers.length];
+	public void setRoverSwarm(ArrayList<RoverObject> rovers){
+		roverIcons = new ArrayList<RoverIcon>();
 		int x = 0;
-		while (x < roverIcons.length){
-			roverIcons[x] = new RoverIcon(rovers[x].getName(), rovers[x].getLocation(), rovers[x].getDirection());
-			this.add(roverIcons[x]);
-			this.setComponentZOrder(roverIcons[x], 0);
+		while (x < roverIcons.size()){
+			roverIcons.add(new RoverIcon(rovers.get(x).getName(), rovers.get(x).getLocation(), rovers.get(x).getDirection()));
+			this.add(roverIcons.get(x));
+			this.setComponentZOrder(roverIcons.get(x), 0);
 			x++;
 		}
 		focusedRover = 0;
@@ -256,18 +257,18 @@ public class LandMapPanel extends Panel{
 	//update a rover icon to match current stats
 	public boolean updateRover(String name, DecimalPoint loc, double dir){
 		int x = 0;
-		while (x < roverIcons.length){
-			if (roverIcons[x].getName().equals(name)){
-				roverIcons[x].updatePlacement(loc, dir);
+		while (x < roverIcons.size()){
+			if (roverIcons.get(x).getName().equals(name)){
+				roverIcons.get(x).updatePlacement(loc, dir);
 				if (focusEngauged && x == focusedRover){
-					setFocusPoint(roverIcons[focusedRover].getMapLocation());
+					setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
 				}
 				redraw();
 				break;
 			}
 			x++;
 		}
-		return !(x == roverIcons.length);
+		return !(x == roverIcons.size());
 	}
 	
 	//Converts a location from being a value on the map to the equivalent point on the screen

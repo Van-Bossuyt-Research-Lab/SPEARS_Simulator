@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Map;
 
 import com.csm.rover.simulator.rover.RoverObject;
@@ -15,14 +16,14 @@ public class RunConfiguration implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private String fileCode = "yak";
+	private String fileCode = "yeti";
 	
 	public boolean mapFromFile;
 	public Map<String, String> roverNames;
-	public RoverObject[] rovers;
+	public ArrayList<RoverObject> rovers;
 	public Map<String, String> satelliteNames;
-	public SatelliteObject[] satellites;
-	public String[] tags;
+	public ArrayList<SatelliteObject> satellites;
+	public ArrayList<String> tags;
 	public File mapFile;
 	public double mapRough;
 	public int mapSize;
@@ -35,8 +36,8 @@ public class RunConfiguration implements Serializable {
 	public int runtime;
 	
 	public RunConfiguration(Map<String, String> roverNames,
-			RoverObject[] rovers, Map<String, String> satelliteNames,
-			SatelliteObject[] satellites, String[] tags, File mapFile,
+			ArrayList<RoverObject> rovers, Map<String, String> satelliteNames,
+			ArrayList<SatelliteObject> satellites, ArrayList<String> tags, File mapFile,
 			boolean accelerated, int runtime) {
 		mapFromFile = true;
 		this.roverNames = roverNames;
@@ -50,8 +51,8 @@ public class RunConfiguration implements Serializable {
 	}
 
 	public RunConfiguration(Map<String, String> roverNames,
-			RoverObject[] rovers, Map<String, String> satelliteNames,
-			SatelliteObject[] satellites, String[] tags, double mapRough,
+			ArrayList<RoverObject> rovers, Map<String, String> satelliteNames,
+			ArrayList<SatelliteObject> satellites, ArrayList<String> tags, double mapRough,
 			int mapSize, int mapDetail, double targetDensity,
 			double hazardDensity, boolean monoTargets, boolean monoHazards, boolean accelerated, int runtime) {
 		mapFromFile = false;

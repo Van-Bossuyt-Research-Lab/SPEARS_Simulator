@@ -5,6 +5,7 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -12,70 +13,77 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class ZList extends JPanel implements Cloneable{
+import static java.util.Arrays.asList;
+
+public class ZList <T> extends JPanel implements Cloneable{
 
 	private static final long serialVersionUID = 1L;
 	
-	private JLabel[] items;
+	private ArrayList<JLabel> items;
 	private JScrollBar scroll;
-	private Object[] values = new String[0];
+	private ArrayList<T> values;
 	private int selected = -1;
 	
 	private EventListenerList ListSelectionListeners = new EventListenerList();
 	
 	public ZList(){
-		this.setLayout(null);
-		this.setOpaque(false);
-		super.setBounds(0, 0, 100, 100);
-		this.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		items = new JLabel[0];
-		scroll = new JScrollBar();
-		scroll.setOrientation(Adjustable.VERTICAL);
-		scroll.addAdjustmentListener(new AdjustmentListener() {
-			public void adjustmentValueChanged(AdjustmentEvent arg0) {
-				scroll();
-			}
-		});
-		this.add(scroll);
-		placeComps();
+        values = new ArrayList<T>();
+		items = new ArrayList<JLabel>();
+        initialize();
 	}
 	
-	public ZList(Object[] values){
-		this.values = values;
-		this.setLayout(null);
-		this.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		super.setBounds(0, 0, 100, 100);
-		items = new JLabel[values.length];
-		int x = 0;
-		while (x < items.length){
-			items[x] = new JLabel("  " + values[x].toString());
-			items[x].addMouseListener(new MouseAdapter(){
-				@Override
-				public void mouseClicked(MouseEvent e){
-					handleMouseClick(e);
-				}
-			});
-			items[x].setBackground(new Color(180, 200, 250));
-			this.add(items[x]);
-			x++;
-		}
-		scroll = new JScrollBar();
-		scroll.addAdjustmentListener(new AdjustmentListener() {
-			public void adjustmentValueChanged(AdjustmentEvent arg0) {
-				scroll();
-			}
-		});
-		scroll.setOrientation(Adjustable.VERTICAL);
-		this.add(scroll);
-		placeComps();
-	}
+	public ZList(T[] values){
+		this.values = new ArrayList<T>();
+        this.values.addAll(asList(values));    
+        setLabels();
+        initialize();
+	} 
+    
+    public ZList(ArrayList<T> values){
+        this.values = values;
+        setLabels();
+        initialize();
+    }
+    
+    private void initialize(){
+        this.setLayout(null);
+        this.setOpaque(false);
+        super.setBounds(0, 0, 100, 100);
+        this.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+        scroll = new JScrollBar();
+        scroll.addAdjustmentListener(new AdjustmentListener() {
+            public void adjustmentValueChanged(AdjustmentEvent arg0) {
+                scroll();
+            }
+        });
+        scroll.setOrientation(Adjustable.VERTICAL);
+        this.add(scroll);
+        placeComps();        
+    }
 	
+    private void setLabels(){
+        items = new ArrayList<JLabel>();
+        int x = 0;
+        while (x < items.size()){
+            items.add(new JLabel("  " + values.get(x).toString()));
+            items.get(x).addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    handleMouseClick(e);
+                }
+            });
+            items.get(x).setBackground(new Color(180, 200, 250));
+            this.add(items.get(x));
+            x++;
+        }        
+    }
+    
 	private void placeComps(){
 		int x = 0;
-		if (23*items.length > this.getHeight()){
+		if (23*items.size() > this.getHeight()){
 			scroll.setBounds(this.getWidth() - (int)scroll.getPreferredSize().getWidth() - 2, 0, (int)scroll.getPreferredSize().getWidth(), this.getHeight());
-			while (x < items.length){
-				items[x].setBounds(2, 3+23*x, this.getWidth() - (int)scroll.getPreferredSize().getWidth() - 4, 23);
+			while (x < items.size()){
+				items.get(x).setBounds(2, 3 + 23 * x, this.getWidth() - (int) scroll.getPreferredSize().getWidth() - 4, 23);
 				x++;
 			}
 			scroll.setMinimum(0);
@@ -85,34 +93,34 @@ public class ZList extends JPanel implements Cloneable{
 			scroll.setValue(0);
 		}
 		else {
-			while (x < items.length){
-				items[x].setBounds(2, 3+23*x, this.getWidth() - 4, 23);
+			while (x < items.size()){
+				items.get(x).setBounds(2, 3 + 23 * x, this.getWidth() - 4, 23);
 				x++;
 			}
 			scroll.setVisible(false);
 		}
-		
+
 	}
-	
+
 	@Override
 	public void setBounds(int x, int y, int width, int height){
 		super.setBounds(x, y, width, height);
 		placeComps();
 	}
-	
+
 	private void scroll(){
-		int x = 0;
-		while (x < items.length){
-			items[x].setLocation(0, 3+x*23-scroll.getValue());
+        int x = 0;
+		while (x < items.size()){
+			items.get(x).setLocation(0, 3 + x * 23 - scroll.getValue());
 			x++;
 		}
 	}
-	
+
 	private void handleMouseClick(MouseEvent e){
 		if (this.isEnabled()){
 			int x = 0;
-			while (x < items.length){
-				if (e.getComponent().equals(items[x])){
+			while (x < items.size()){
+				if (e.getComponent().equals(items.get(x))){
 					selectItem(x);
 					break;
 				}
@@ -120,53 +128,53 @@ public class ZList extends JPanel implements Cloneable{
 			}
 		}
 	}
-	
+
 	public void setSelection(int which){
-		if (which >= 0 && which < values.length){
+		if (which >= 0 && which < values.size()){
 			selectItem(which);
 		}
 	}
-	
+
 	private void selectItem(int which){
 		int x = 0;
-		while (x < items.length){
-			items[x].setOpaque(false);
+		while (x < items.size()){
+			items.get(x).setOpaque(false);
 			x++;
 		}
 		try {
-			items[which].setOpaque(true);
+			items.get(which).setOpaque(true);
 			selected = which;
-		} 
+		}
 		catch (Exception e) {
 			selected = -1;
 		}
 		this.repaint();
 		fireListSelectionEvent(new ListSelectionEvent("Stuff", 0, 0, false));
 	}
-	
-	public void addValue(Object val){
-		addValue(val, values.length);
+
+	public void addValue(T val){
+		addValue(val, values.size());
 	}
-	
-	public void addValue(Object val, int loc){
+
+	public void addValue(T val, int loc){
 		selectItem(-1);
-		items = Augment(items, new JLabel("  " + val.toString()), loc);
-		values = Augment(values, val, loc);
-		items[loc].setFont(getFont());
-		items[loc].addMouseListener(new MouseAdapter(){
-			@Override
-			public void mouseClicked(MouseEvent e){
-				handleMouseClick(e);
-			}
-		});
-		items[loc].setBackground(new Color(180, 200, 250));
-		this.add(items[loc]);
+        values.add(loc, val);
+        items.add(loc, new JLabel("  " + val.toString()));
+		items.get(loc).setFont(getFont());
+		items.get(loc).addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                handleMouseClick(e);
+            }
+        });
+		items.get(loc).setBackground(new Color(180, 200, 250));
+		this.add(items.get(loc));
 		placeComps();
 	}
-	
-	public void setValues(Object[] values){
+
+	public void setValues(T[] values){
 		selectItem(-1);
-		while (this.values.length > 0){
+		while (this.values.size() > 0){
 			removeValue(0);
 		}
 		int x = 0;
@@ -175,12 +183,12 @@ public class ZList extends JPanel implements Cloneable{
 			x++;
 		}
 	}
-	
+
 	public void removeValue(int which){
 		selectItem(-1);
-		this.remove(items[which]);
-		items = Remove(items, which);
-		values = Remove(values, which);
+		this.remove(items.get(which));
+		items.remove(which);
+		values.remove(which);
 		placeComps();
 	}
 
@@ -206,15 +214,15 @@ public class ZList extends JPanel implements Cloneable{
 		return getItemAt(selected);
 	}
 	
-	public Object[] getItems(){
-		return values;
+	public ArrayList<T> getItems(){
+        return values;
 	}
 	
 	public String[] getListItems(){
-		String[] out = new String[values.length];
+		String[] out = new String[values.size()];
 		int x = 0;
 		while (x < out.length){
-			out[x] = values[x].toString();
+			out[x] = values.get(x).toString();
 			x++;
 		}
 		return out;
@@ -246,7 +254,7 @@ public class ZList extends JPanel implements Cloneable{
 	
 	public String getValueAt(int loc){
 		try {
-			return values[loc].toString();
+			return values.get(loc).toString();
 		}
 		catch (Exception e){
 			return null;
@@ -256,10 +264,10 @@ public class ZList extends JPanel implements Cloneable{
 	public Object getItemAt(int loc){
 		try {
 			try {
-				return values[loc];
+				return values.get(loc);
 			}
 			catch (Exception e){
-				return values[loc];
+				return values.get(loc);
 			}
 		}
 		catch (Exception e){
@@ -269,8 +277,8 @@ public class ZList extends JPanel implements Cloneable{
 	
 	public int getLocationOfValue(Object val){
 		int x = 0;
-		while (x < values.length){
-			if (values[x].equals(val)){
+		while (x < values.size()){
+			if (values.get(x).equals(val)){
 				return x;
 			}
 			x++;

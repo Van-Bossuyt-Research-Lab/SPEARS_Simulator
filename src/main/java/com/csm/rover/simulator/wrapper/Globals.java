@@ -1,9 +1,6 @@
 package com.csm.rover.simulator.wrapper;
 
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.csm.rover.simulator.objects.FreeThread;
@@ -16,15 +13,13 @@ public class Globals {
 
 	public static String versionNumber = "2.2.1";
 	
-	private static Queue<Byte>[] SerialBuffers; // the buffer for messages
-	private static String[] SerialBufferCodes;
+	private static Map<String, Queue<Byte>> SerialBuffers; // the buffer for messages
 	
 	private static final double time_accelerant = 10;
 	private static double timeScale = 1.0;
 	public static long TimeMillis = 0;
 	
 	private static Random rnd = new Random();
-	private static int access_key = "qwert".hashCode();
 	
 	private static boolean begun = false;
 	private static Map<String, ThreadItem> threads = new ConcurrentHashMap<String, ThreadItem>();
@@ -54,52 +49,42 @@ public class Globals {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void initalizeLists(String[] IDs){
-		SerialBufferCodes = IDs;
-		SerialBuffers = new Queue[IDs.length];
-		int x = 0;
-		while (x < IDs.length){
-			SerialBuffers[x] = new LinkedList<Byte>();
-			x++;
-		}
+	public static void initializeLists(ArrayList<String> IDs){
+        for (String id : IDs){
+            SerialBuffers.put(id, new LinkedList<Byte>());
+        }
 	}
 	
 	public static void writeToSerial(byte write, String from){ // writes the character to the other 2 buffers
-		int x = 0;
-		while (x < SerialBufferCodes.length){
-			if (!SerialBufferCodes[x].equals(from)){
-				if (SerialBuffers[x].size() < 64){
-					SerialBuffers[x].add(write);
+		for (String id : SerialBuffers.keySet()){
+			if (!id.equals(from)){
+				if (SerialBuffers.get(id).size() < 64){
+					SerialBuffers.get(id).add(write);
 				}
 				else {
-					writeToLogFile(SerialBufferCodes[x], "Failed to recieve: " + (char)write + ", full buffer.");
+					writeToLogFile(id, "Failed to receive: " + (char)write + ", full buffer.");
 				}
 			}
-			x++;
 		}
 		Access.CODE.updateSerialDisplays();
 	}
 	
 	public static int RFAvailable(String which){ // Returns the number of chars waiting
-		int x = 0;
-		while (x < SerialBufferCodes.length){
-			if (SerialBufferCodes[x].equals(which)){
-				return SerialBuffers[x].size();
+		for (String id : SerialBuffers.keySet()){
+			if (id.equals(which)){
+				return SerialBuffers.get(id).size();
 			}
-			x++;
 		}
 		return -1;
 	}
 	
 	public static byte ReadSerial(String which){ // Returns the first waiting character
 		byte out = '\0';
-		int x = 0;
-		while (x < SerialBufferCodes.length){
-			if (SerialBufferCodes[x].equals(which)){
-				out = SerialBuffers[x].poll();
+		for (String id : SerialBuffers.keySet()){
+			if (id.equals(which)){
+				out = SerialBuffers.get(id).poll();
 				break;
 			}
-			x++;
 		}
 		Access.CODE.updateSerialDisplays();
 		return out;
@@ -107,13 +92,11 @@ public class Globals {
 	
 	public static byte PeekSerial(String which){  // get first waiting character without changing availability
 		byte out = '\0';
-		int x = 0;
-		while (x < SerialBufferCodes.length){
-			if (SerialBufferCodes[x].equals(which)){
-				out = SerialBuffers[x].peek();
+		for (String id : SerialBuffers.keySet()){
+			if (id.equals(which)){
+				out = SerialBuffers.get(id).peek();
 				break;
 			}
-			x++;
 		}
 		return out;
 	}
@@ -156,11 +139,9 @@ public class Globals {
 	
 	@SuppressWarnings("unused")
 	private static void printBuffers(){
-		int x = 0;
-		while (x < SerialBuffers.length){
-			writeToLogFile("Timing", SerialBufferCodes[x] + ": " + SerialBuffers[x].toString());
-			x++;
-		}
+        for (Map.Entry<String, Queue<Byte>> entry : SerialBuffers.entrySet()){
+            writeToLogFile("Timing", entry.getKey() + ": " + entry.getValue().toString());
+        }
 	}
 	
 	//NOT A TRUE SUBTRACTION: if the second angle is clockwise of the first, returns the negative number of units between, positive if second is to ccw
@@ -193,23 +174,16 @@ public class Globals {
 		}
 	}
 	
-	public static Queue<Byte>[] getSerialQueues(int key){
+	static ArrayList<Queue<Byte>> getSerialQueues(){
 		try {
-			if (key == access_key){
-				@SuppressWarnings("unchecked")
-				Queue<Byte>[] out = new Queue[SerialBuffers.length];
-				int x = 0;
-				while (x < out.length){
-					out[x] = new LinkedList<Byte>(SerialBuffers[x]);
-					x++;
-				}
-				return out;
-			}
-			else {
-				return null;
-			}
+            ArrayList<Queue<Byte>> out = new ArrayList<Queue<Byte>>(SerialBuffers.size());
+            for (Map.Entry<String, Queue<Byte>> entry : SerialBuffers.entrySet()){
+                out.add(entry.getValue());
+            }
+            return out;
 		}
 		catch (Exception e){
+            reportError("Globals", "getSerialQueues", e);
 			e.printStackTrace();
 			return null;
 		}		
@@ -244,7 +218,7 @@ public class Globals {
 		try {
 			threads.get(name).markFinished();
 			threads.get(name).advance();
-		} catch (NullPointerException e) { e.printStackTrace(); }
+		} catch (NullPointerException e) { System.err.println("In thread " + name); e.printStackTrace(); }
 		if (name.equals("milli-clock") || milliDone){
 			for (Object o : threads.keySet()){
 				String key = (String) o;

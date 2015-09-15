@@ -10,6 +10,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -539,8 +540,8 @@ public class MainWrapper extends Panel {
 		this.SerialAvialableLbl.setLocation(SerialDisplayScroll.getX()+SerialDisplayScroll.getWidth()-SerialAvialableLbl.getWidth(), SerialDisplayTitle.getY());
 	}
 	
-	public void genorateSerialDisplays(RoverObject[] rovs, SatelliteObject[] sats){
-		RowSpec[] rows = new RowSpec[rovs.length*2+sats.length*2+2+1];
+	public void genorateSerialDisplays(ArrayList<RoverObject> rovs, ArrayList<SatelliteObject> sats){
+		RowSpec[] rows = new RowSpec[rovs.size()*2+sats.size()*2+2+1];
 		rows[0] = FormFactory.RELATED_GAP_ROWSPEC;
 		int x = 1;
 		while (x < rows.length){
@@ -558,11 +559,11 @@ public class MainWrapper extends Panel {
 				new ColumnSpec("right:default"),
 				FormFactory.RELATED_GAP_COLSPEC,},
 			rows ));
-		JLabel[] titles = new JLabel[rovs.length+sats.length+1];
-		SerialRoverLbls = new JLabel[rovs.length];
-		SerialRoverAvailableLbls = new JLabel[rovs.length];
-		SerialSatelliteLbls = new JLabel[sats.length];
-		SerialSatelliteAvailableLbls = new JLabel[sats.length];
+		JLabel[] titles = new JLabel[rovs.size()+sats.size()+1];
+		SerialRoverLbls = new JLabel[rovs.size()];
+		SerialRoverAvailableLbls = new JLabel[rovs.size()];
+		SerialSatelliteLbls = new JLabel[sats.size()];
+		SerialSatelliteAvailableLbls = new JLabel[sats.size()];
 		titles[0] = new JLabel("Ground");
 		titles[0].setFont(new Font("Trebuchet MS", Font.BOLD, 13));
 		SerialDisplayPnl.add(titles[0], "2, 2, left, default");
@@ -574,8 +575,8 @@ public class MainWrapper extends Panel {
 		SerialDisplayPnl.add(SerialGroundAvailableLbl, "6, 2, right, default");
 		x = 1;
 		int i = 0;
-		while (i < sats.length){
-			titles[x] = new JLabel(sats[i].getName());
+		while (i < sats.size()){
+			titles[x] = new JLabel(sats.get(i).getName());
 			titles[x].setFont(new Font("Trebuchet MS", Font.BOLD, 13));
 			SerialDisplayPnl.add(titles[x], "2, " + (x*2+2) + ", left, default");
 			SerialSatelliteLbls[i] = new JLabel();
@@ -588,8 +589,8 @@ public class MainWrapper extends Panel {
 			x++;
 		}
 		i = 0;
-		while (i < rovs.length){
-			titles[x] = new JLabel(rovs[i].getName());
+		while (i < rovs.size()){
+			titles[x] = new JLabel(rovs.get(i).getName());
 			titles[x].setFont(new Font("Trebuchet MS", Font.BOLD, 13));
 			SerialDisplayPnl.add(titles[x], "2, " + (x*2+2) + ", left, default");
 			SerialRoverLbls[i] = new JLabel();

@@ -2,6 +2,7 @@ package com.csm.rover.simulator.wrapper;
 
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.ArrayList;
 
 import com.csm.rover.simulator.control.InstructionObj;
 import com.csm.rover.simulator.control.InterfaceCode;
@@ -15,7 +16,7 @@ public class Access {
 	public static Admin CODE = new Admin();
 	public static InterfaceCode INTERFACE = new InterfaceCode();
 	
-	public static void addRoversToMap(RoverObject[] rovs){ 
+	public static void addRoversToMap(ArrayList<RoverObject> rovs){
 		Admin.GUI.TerrainPnl.setRoverSwarm(rovs);
 	}
 	

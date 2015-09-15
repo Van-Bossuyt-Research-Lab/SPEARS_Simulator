@@ -20,6 +20,8 @@ import com.csm.rover.simulator.satellite.SatelliteObject;
 import com.csm.rover.simulator.satellite.SatelliteParametersList;
 import com.csm.rover.simulator.visual.Form;
 
+import static java.util.Arrays.asList;
+
 //TODO make into a signularity thingy
 public class Admin {
 
@@ -56,35 +58,35 @@ public class Admin {
 		addItemToSelectionList(		"RAIR Control", new RAIRcodeControl());
 		addItemToSelectionList(		"RAIR Risk Averse", new RAIRcodeRA());
 		addItemToSelectionList(		"RAIR Risk Seeking", new RAIRcodeRS());
-		addItemToSelectionList(		"RAIR Risk Temper", new RAIRcodeRT());	
-		addItemToSelectionList(		"PIDAA",		new PIDAAcode3());
-		addItemToSelectionList(	"PIDAA CONTROL", new PIDAAcontrol());
-		addItemToSelectionList(		"GORARO Simp",	new GORAROcode1());
-		addItemToSelectionList(		"GORARO Adv A",	new GORAROAdvanceCode(new double[]{
+		addItemToSelectionList("RAIR Risk Temper", new RAIRcodeRT());
+		addItemToSelectionList("PIDAA", new PIDAAcode3());
+		addItemToSelectionList("PIDAA CONTROL", new PIDAAcontrol());
+		addItemToSelectionList("GORARO Simp", new GORAROcode1());
+		addItemToSelectionList("GORARO Adv A", new GORAROAdvanceCode(new double[]{
 				10000, 84.2892, 567.513, 7.37412, 0
 		}));
-		addItemToSelectionList(		"GORARO Adv B",	new GORAROAdvanceCode(new double[]{
+		addItemToSelectionList("GORARO Adv B", new GORAROAdvanceCode(new double[]{
 				10000, 80.44, 972.8, 25.84, 0
 		}));
-		addItemToSelectionList(		"GORARO Adv C",	new GORAROAdvanceCode(new double[]{
+		addItemToSelectionList("GORARO Adv C", new GORAROAdvanceCode(new double[]{
 				10000, 100, 500, 2, 0
 		}));
-		addItemToSelectionList(		"GORARO Adv D",	new GORAROAdvanceCode(new double[]{
+		addItemToSelectionList("GORARO Adv D", new GORAROAdvanceCode(new double[]{
 				10000, 40, 600, 2, 0
 		}));
-		addItemToSelectionList(		"GORARO Adv E",	new GORAROAdvanceCode(new double[]{
+		addItemToSelectionList("GORARO Adv E", new GORAROAdvanceCode(new double[]{
 				10000, 70, 600, 2, 0
 		}));
-		addItemToSelectionList(		"GORARO Adv F",	new GORAROAdvanceCode(new double[]{
+		addItemToSelectionList("GORARO Adv F", new GORAROAdvanceCode(new double[]{
 				10000, 100, 600, 2, 0
 		}));
-		addItemToSelectionList(		"GORARO Adv G",	new GORAROAdvanceCode(new double[]{
+		addItemToSelectionList("GORARO Adv G", new GORAROAdvanceCode(new double[]{
 				10000, 40, 700, 2, 0
 		}));
-		addItemToSelectionList(		"GORARO Adv H",	new GORAROAdvanceCode(new double[]{
+		addItemToSelectionList("GORARO Adv H", new GORAROAdvanceCode(new double[]{
 				10000, 70, 700, 2, 0
 		}));
-		addItemToSelectionList(		"MER", 			new MER(new DecimalPoint[] {
+		addItemToSelectionList("MER", new MER(new DecimalPoint[]{
 				new DecimalPoint(-9.5, -9.5),
 				new DecimalPoint(-12.5, -5.5),
 				new DecimalPoint(-17.5, -9.5),
@@ -126,13 +128,13 @@ public class Admin {
 				new DecimalPoint(-5.5, -227.5)
 		}));
 		//addItemToSelectionList(		"PIDAA 2",		new PIDAAcode2());
-		addItemToSelectionList(		"[null]", 		(SatelliteAutonomusCode)null);
-		addItemToSelectionList(		"[null]", 		(SatelliteParametersList)null);
+		addItemToSelectionList("[null]", (SatelliteAutonomusCode) null);
+		addItemToSelectionList("[null]", (SatelliteParametersList) null);
 	}
 	
 	public void beginSimulation(RunConfiguration config){
 		//TODO add option to toggle time shifted executions
-		if (config.rovers.length == 0 ||config.satellites.length == 0){
+		if (config.rovers.size() == 0 ||config.satellites.size() == 0){
 			System.err.println("Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;
 		}
@@ -176,14 +178,14 @@ public class Admin {
 		
 		serialHistory = new ArrayList<ArrayList<String>>();
 		int x = 0;
-		while (x < 1+config.satellites.length+config.rovers.length){
+		while (x < 1+config.satellites.size()+config.rovers.size()){
 			serialHistory.add(new ArrayList<String>());
 			serialHistory.get(x).add("");
 			x++;
 		}
 		GUI.WrapperPnl.SerialHistorySlider.setValue(0);
 		GUI.WrapperPnl.SerialHistorySlider.setMaximum(0);
-		Globals.initalizeLists(config.tags);
+		Globals.initializeLists(config.tags);
 		
 		GUI.WrapperPnl.genorateSerialDisplays(config.rovers, config.satellites);
 		GUI.RoverHubPnl.setRovers(config.rovers);
@@ -232,25 +234,25 @@ public class Admin {
 	
 	public RunConfiguration getConfigurationFromForm(){
 		Map<String, String> roverNames = new TreeMap<String, String>();
-		RoverObject[] rovers = new RoverObject[roversToAdd.size()];
+		ArrayList<RoverObject> rovers = new ArrayList<RoverObject>(roversToAdd.size());
 		Map<String, String> satelliteNames = new TreeMap<String, String>();
-		SatelliteObject[] satellites = new SatelliteObject[satsToAdd.size()];
-		String[] tags = new String[roversToAdd.size()+satsToAdd.size()+1];
-		tags[0] = "g";
+		ArrayList<SatelliteObject> satellites = new ArrayList<SatelliteObject>(satsToAdd.size());
+		ArrayList<String> tags = new ArrayList<String>();
+		tags.add("g");
 		int x = 0;
 		while (x < GUI.WrapperPnl.SatelliteList.getItems().length){
 			String key = (String)GUI.WrapperPnl.SatelliteList.getItemAt(x);
-			satellites[x] = satsToAdd.get(key);
-			satelliteNames.put(key, satellites[x].getIDCode());
-			tags[x+1] = satellites[x].getIDCode();
+			satellites.add(x, satsToAdd.get(key));
+			satelliteNames.put(key, satellites.get(x).getIDCode());
+			tags.add(satellites.get(x).getIDCode());
 			x++;
 		}
 		x = 0;
 		while (x < GUI.WrapperPnl.RoverList.getItems().length){
 			String key = (String)GUI.WrapperPnl.RoverList.getItemAt(x);
-			rovers[x] = roversToAdd.get(key);
-			roverNames.put(key, rovers[x].getIDTag());
-			tags[x+1+satsToAdd.size()] = rovers[x].getIDTag();
+			rovers.add(roversToAdd.get(key));
+			roverNames.put(key, rovers.get(x).getIDTag());
+			tags.add(rovers.get(x).getIDTag());
 			x++;
 		}
 		if (GUI.WrapperPnl.TypeSelector.getSelectedIndex() == 1){
@@ -275,13 +277,13 @@ public class Admin {
 	}
 	
 	public void updateSerialDisplays(){
-		Queue<Byte>[] buffers = Globals.getSerialQueues(queue_key);
-		String[] stored = new String[buffers.length];
+		ArrayList<Queue<Byte>> buffers = Globals.getSerialQueues();
+		String[] stored = new String[buffers.size()];
 		int x = 0;
-		while (x < buffers.length){
+		while (x < buffers.size()){
 			stored[x] = "";
-			while (!buffers[x].isEmpty()){
-				stored[x] += (char) buffers[x].poll().byteValue();
+			while (!buffers.get(x).isEmpty()){
+				stored[x] += (char) buffers.get(x).poll().byteValue();
 			}
 			x++;
 		}
@@ -325,7 +327,7 @@ public class Admin {
 				namebase = "Rover";
 			}
 			String newName = namebase + " " + numb;
-			while (contains(GUI.WrapperPnl.RoverList.getItems(), newName)){
+			while (asList(GUI.WrapperPnl.RoverList.getItems()).contains(newName)){
 				numb++;
 				newName = namebase + " " + numb;
 			}
@@ -356,7 +358,7 @@ public class Admin {
 				//TODO change to code name
 				String newName = "Satellite " + numb;
 				//newName = (String)GUI.WrapperPnl.SatAutonomusCodeList.getSelectedItem() + " " + numb;
-				while (contains(GUI.WrapperPnl.SatelliteList.getItems(), newName)){
+				while (asList(GUI.WrapperPnl.SatelliteList.getItems()).contains(newName)){
 					numb++;
 					newName = "Satellite " + numb;
 					//newName = (String)GUI.WrapperPnl.SatAutonomusCodeList.getSelectedItem() + " " + numb;
@@ -398,16 +400,5 @@ public class Admin {
 	private void addItemToSelectionList(String name, SatelliteAutonomusCode item){
 		satelliteLogics.put(name, item);
 		GUI.WrapperPnl.SatAutonomusCodeList.addValue(name);
-	}
-	
-	private boolean contains(Object[] array, String val){
-		int x = 0;
-		while (x < array.length){
-			if (array[x].equals(val)){
-				return true;
-			}
-			x++;
-		}
-		return false;
 	}
 }

@@ -8,6 +8,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
@@ -24,10 +26,12 @@ public class RoverHub extends Panel {
 	
 	private ArrayList<RoverObject> rovers;
 	private boolean inHUDmode = false;
-	private int[][] standardDisplayLinks;
+	private Map<Integer, Map<Integer, Integer>> standardDisplayLinks;
+
+    private int numberOfPages = 1;
 	private int currentPage = 0;
 	
-	private int[] HUDDisplayLinks;
+	private Map<Integer, Integer> HUDDisplayLinks;
 	private int numberOfHUDDisplays;
 	
 	private int numberOfDisplays = 9;
@@ -39,24 +43,24 @@ public class RoverHub extends Panel {
 
 	public RoverHub(Dimension size){
 		super(size, "Rover Hub");
-		
-		standardDisplayLinks = new int[1][numberOfDisplays];
-		int x = 0;
-		while (x < numberOfDisplays){
-			standardDisplayLinks[0][x] = -1;
-			x++;
-		}
+
+        standardDisplayLinks = new TreeMap<Integer, Map<Integer, Integer>>();
+        for (int x = 0; x < numberOfPages; x++){
+            standardDisplayLinks.put(x, new TreeMap<Integer, Integer>());
+            for (int y = 0; y < numberOfDisplays; y++){
+                standardDisplayLinks.get(x).put(y, -1);
+            }
+        }
 		
 		numberOfHUDDisplays = 4;
 		if (numberOfHUDDisplays > numberOfDisplays){
 			numberOfHUDDisplays = numberOfDisplays;
 		}
-		HUDDisplayLinks = new int[numberOfHUDDisplays];
-		x = 0;
-		while (x < numberOfHUDDisplays){
-			HUDDisplayLinks[x] = -1;
-			x++;
-		}
+		HUDDisplayLinks = new TreeMap<Integer, Integer>();
+        for (int x = 0; x < numberOfHUDDisplays; x++){
+            HUDDisplayLinks.put(x, -1);
+        }
+
 		this.rovers = new ArrayList<RoverObject>();
 
 		initialize();
@@ -70,7 +74,7 @@ public class RoverHub extends Panel {
 							updateDisplays();
 						}
 					} else if (arg0.getKeyCode() == KeyEvent.VK_RIGHT) {
-						if (currentPage < standardDisplayLinks.length - 1) {
+						if (currentPage < standardDisplayLinks.size() - 1) {
 							currentPage++;
 							updateDisplays();
 						}
@@ -174,21 +178,20 @@ public class RoverHub extends Panel {
 	}
 
 	//adds the rover objects to the hub
-	public void setRovers(RoverObject[] rovers){
+	public void setRovers(ArrayList<RoverObject> rovers){
 		for (RoverObject rover : rovers){
 			this.rovers.add(rover);
 		}
 		Access.addRoversToMap(rovers);
 
-		standardDisplayLinks = new int[rovers.length][numberOfDisplays];
 		int x = 0;
-		while (x < rovers.length){
+		while (x < rovers.size()){
 			//set the first n displays to the the nth rover
-			standardDisplayLinks[x/numberOfDisplays][x%numberOfDisplays] = x;
+			standardDisplayLinks.get(x/numberOfDisplays).put(x%numberOfDisplays, x);
 			x++;
 		}
-		while (x < numberOfDisplays*standardDisplayLinks.length){
-			standardDisplayLinks[x/numberOfDisplays][x%numberOfDisplays] = -1;
+		while (x < numberOfDisplays*numberOfPages){
+			standardDisplayLinks.get(x/numberOfDisplays).put(x%numberOfDisplays, -1);
 			x++;
 		}
 		
@@ -197,7 +200,7 @@ public class RoverHub extends Panel {
 	
 	public void setFocusedRover(int which){
 		if (which >= 0 && which < rovers.size()){
-			HUDDisplayLinks[0] = which;
+			HUDDisplayLinks.put(0, which);
 			displayWindows.get(0).lockOnRover(which);
 			updateDisplays();
 			rovSelect.setSelectedIndex(which);
@@ -208,13 +211,13 @@ public class RoverHub extends Panel {
 		int x = 0;
 		while (x < numberOfDisplays){
 			if (inHUDmode){
-				displayWindows.get(x).update(HUDDisplayLinks[x]);
+				displayWindows.get(x).update(HUDDisplayLinks.get(0));
 				if (x+1 == numberOfHUDDisplays){
 					break;
 				}
 			}
 			else {
-				displayWindows.get(x).update(standardDisplayLinks[currentPage][x]);
+				displayWindows.get(x).update(standardDisplayLinks.get(currentPage).get(x));
 			}
 			x++;
 		}
@@ -226,10 +229,10 @@ public class RoverHub extends Panel {
 			return;
 		}
 		if (inHUDmode){
-			HUDDisplayLinks[display] += by;
+            HUDDisplayLinks.put(display, HUDDisplayLinks.get(display)+by);
         }
 		else {
-			standardDisplayLinks[currentPage][display] += by;
+            standardDisplayLinks.get(currentPage).put(display, standardDisplayLinks.get(currentPage).get(display)+by);
 		}
 		updateDisplays();
 	}
@@ -240,7 +243,7 @@ public class RoverHub extends Panel {
 			display.setHUDMode(b);
 		}
 		if (b){
-			displayWindows.get(0).lockOnRover(HUDDisplayLinks[0]);
+			displayWindows.get(0).lockOnRover(HUDDisplayLinks.get(0));
 		}
 		else {
 			displayWindows.get(0).unlock();

@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -24,7 +25,7 @@ public class SatelliteHub extends Panel{
 	
 	private static final long serialVersionUID = 2063498616789417121L;
 	
-	private SatelliteObject[] satellites;
+	private ArrayList<SatelliteObject> satellites;
 	private int[][] standardDisplayLinks;
 	int currentPage = 0;
 	
@@ -314,20 +315,18 @@ public class SatelliteHub extends Panel{
 				updateDisplays();
 			}
 		}, SynchronousThread.FOREVER, "Satellite Hub Update");
-		int x = 0;
-		while (x < satellites.length){
-			satellites[x].start();
-			x++;
+		for (SatelliteObject sat : satellites){
+			sat.start();
 		}
 	}
 	
 	//adds the rover objects to the hub
-	public void setSatellites(SatelliteObject[] sats){
+	public void setSatellites(ArrayList<SatelliteObject> sats){
 		this.satellites = sats;
 
-		standardDisplayLinks = new int[sats.length][numberOfDisplays];
+		standardDisplayLinks = new int[sats.size()][numberOfDisplays];
 		int x = 0;
-		while (x < sats.length){
+		while (x < sats.size()){
 			//set the first n displays to the the nth rover
 			standardDisplayLinks[x/numberOfDisplays][x%numberOfDisplays] = x;
 			x++;
@@ -352,8 +351,8 @@ public class SatelliteHub extends Panel{
 				PageLeftBtn[x].setVisible(true);
 				PageLeftBtn[x].setEnabled(true);
 				tabbedPane[x].setVisible(true);
-				SatelliteNameLbl[x].setText(satellites[standardDisplayLinks[currentPage][x]].getName());
-				SerialHistoryLbl[x].setText(satellites[standardDisplayLinks[currentPage][x]].getSerialHistory());
+				SatelliteNameLbl[x].setText(satellites.get(standardDisplayLinks[currentPage][x]).getName());
+				SerialHistoryLbl[x].setText(satellites.get(standardDisplayLinks[currentPage][x]).getSerialHistory());
 				/*MovementStatsLbl[x].setText("X: " + formatDouble(satellites[standardDisplayLinks[currentPage][x]].getLocation().getX()) 
 						+ " m\tAngular Spin FL: " + formatDouble(Math.toDegrees(satellites[standardDisplayLinks[currentPage][x]].getWheelSpeed(RoverObject.FL))) 
 						+ " deg/s\nY: " + formatDouble(satellites[standardDisplayLinks[currentPage][x]].getLocation().getY()) 
@@ -394,7 +393,7 @@ public class SatelliteHub extends Panel{
 			}
 			PageLeftBtn[x].setEnabled(standardDisplayLinks[currentPage][x] >= 0);
 			try {
-				PageRightBtn[x].setEnabled(standardDisplayLinks[currentPage][x] < satellites.length-1);
+				PageRightBtn[x].setEnabled(standardDisplayLinks[currentPage][x] < satellites.size()-1);
 			}
 			catch (Exception e){
 				PageRightBtn[x].setEnabled(false);
@@ -405,7 +404,7 @@ public class SatelliteHub extends Panel{
 	
 	//change which rover is connected to a certain display
 	private void changeLinkedSatellite(int display, int by){
-		if (satellites[0] == null){
+		if (satellites.get(0) == null){
 			return;
 		}
 		standardDisplayLinks[currentPage][display] += by;
