@@ -13,7 +13,7 @@ public class Globals {
 
 	public static String versionNumber = "2.2.1";
 	
-	private static Map<String, Queue<Byte>> SerialBuffers; // the buffer for messages
+	private static Map<String, Queue<Byte>> SerialBuffers = new HashMap<String, Queue<Byte>>(); // the buffer for messages
 	
 	private static final double time_accelerant = 10;
 	private static double timeScale = 1.0;

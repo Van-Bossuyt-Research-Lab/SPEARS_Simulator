@@ -240,7 +240,7 @@ public class Admin {
 		ArrayList<String> tags = new ArrayList<String>();
 		tags.add("g");
 		int x = 0;
-		while (x < GUI.WrapperPnl.SatelliteList.getItems().length){
+		while (x < GUI.WrapperPnl.SatelliteList.getItems().size()){
 			String key = (String)GUI.WrapperPnl.SatelliteList.getItemAt(x);
 			satellites.add(x, satsToAdd.get(key));
 			satelliteNames.put(key, satellites.get(x).getIDCode());
@@ -248,7 +248,7 @@ public class Admin {
 			x++;
 		}
 		x = 0;
-		while (x < GUI.WrapperPnl.RoverList.getItems().length){
+		while (x < GUI.WrapperPnl.RoverList.getItems().size()){
 			String key = (String)GUI.WrapperPnl.RoverList.getItemAt(x);
 			rovers.add(roversToAdd.get(key));
 			roverNames.put(key, rovers.get(x).getIDTag());
@@ -339,7 +339,7 @@ public class Admin {
 			RoverPhysicsModel params = roverParameters.get((String)GUI.WrapperPnl.RovDriveModelList.getSelectedItem()).clone();
 			// for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
 			DecimalPoint location = new DecimalPoint(0, 0);
-			roversToAdd.put(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().length, params, autoCode, location, Math.PI/2, GUI.TerrainPnl.getTemperature(location)));		
+			roversToAdd.put(newName, new RoverObject(newName, "r"+GUI.WrapperPnl.RoverList.getItems().size(), params, autoCode, location, Math.PI/2, GUI.TerrainPnl.getTemperature(location)));
 		}
 	}
 	
@@ -364,7 +364,7 @@ public class Admin {
 					//newName = (String)GUI.WrapperPnl.SatAutonomusCodeList.getSelectedItem() + " " + numb;
 				}
 				GUI.WrapperPnl.SatelliteList.addValue(newName);
-				this.satsToAdd.put(newName, new SatelliteObject(newName, "s"+GUI.WrapperPnl.SatelliteList.getItems().length, null, null, rnd.nextDouble()*100000+10000000, rnd.nextDouble()*90, rnd.nextDouble()*360));
+				this.satsToAdd.put(newName, new SatelliteObject(newName, "s"+GUI.WrapperPnl.SatelliteList.getItems().size(), null, null, rnd.nextDouble()*100000+10000000, rnd.nextDouble()*90, rnd.nextDouble()*360));
 			}
 		}
 		catch (Exception e){

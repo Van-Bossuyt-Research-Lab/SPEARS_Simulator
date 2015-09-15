@@ -206,7 +206,7 @@ public class InstrucitonEditor extends JDialog {
 	
 	private void OK_Clicked(){
 		if (!TitleTxt.getText().equals("") && (AddRoverChk.isSelected() || AddSatelliteChk.isSelected()) && commandsFilled()){
-			InstructionObj[] instructions = new InstructionObj[ParameterTitles.getItems().length];
+			InstructionObj[] instructions = new InstructionObj[ParameterTitles.getItems().size()];
 			int x = 0;
 			while (x < instructions.length){
 				instructions[x] = new InstructionObj(cropStringArray(tableStrings[x]), ParameterTitles.getValueAt(x), parameterBools[x]);
@@ -236,7 +236,7 @@ public class InstrucitonEditor extends JDialog {
 					tableStrings = Augment(tableStrings);
 					parameterBools = Augment(parameterBools);
 					ParameterTitles.addValue(name);
-					ParameterTitles.setSelection(ParameterTitles.getItems().length - 1);
+					ParameterTitles.setSelection(ParameterTitles.getItems().size() - 1);
 					CommandsTable.setEnabled(true);
 				}
 			}
@@ -284,7 +284,7 @@ public class InstrucitonEditor extends JDialog {
 	}
 	
 	private boolean commandsFilled(){
-		if (ParameterTitles.getItems().length == 0){
+		if (ParameterTitles.getItems().size() == 0){
 			return false;
 		}
 		int x = 0;

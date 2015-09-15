@@ -180,7 +180,7 @@ public class Access {
 			Admin.GUI.InterfacePnl.InstructionsDeleteBtn.setEnabled(true);
 			Admin.GUI.InterfacePnl.InstructionsEditBtn.setEnabled(true);
 			Admin.GUI.InterfacePnl.InstructionsUpBtn.setEnabled(Admin.GUI.InterfacePnl.InstructionsList.getSelectedIndex() != 0);
-			Admin.GUI.InterfacePnl.InstructionsDownBtn.setEnabled(Admin.GUI.InterfacePnl.InstructionsList.getSelectedIndex() != Admin.GUI.InterfacePnl.InstructionsList.getItems().length-1);
+			Admin.GUI.InterfacePnl.InstructionsDownBtn.setEnabled(Admin.GUI.InterfacePnl.InstructionsList.getSelectedIndex() != Admin.GUI.InterfacePnl.InstructionsList.getItems().size()-1);
 		}
 		else {
 			Admin.GUI.InterfacePnl.InstructionsDeleteBtn.setEnabled(false);

@@ -1355,7 +1355,7 @@ public class InterfaceCode {
 		}
 		if (Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex() != -1){
 			int selected = Admin.GUI.InterfacePnl.SatelliteCommandList.getSelectedIndex();
-			String[] parameters = new String[Admin.GUI.InterfacePnl.SatelliteCommandList.getItems().length];
+			String[] parameters = new String[Admin.GUI.InterfacePnl.SatelliteCommandList.getItems().size()];
 			String[][] commands = new String[parameters.length][];
 			boolean[] bools = new boolean[parameters.length];
 			int x = 0;

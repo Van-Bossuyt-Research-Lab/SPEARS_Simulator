@@ -244,7 +244,7 @@ public class LandMapPanel extends Panel{
 	public void setRoverSwarm(ArrayList<RoverObject> rovers){
 		roverIcons = new ArrayList<RoverIcon>();
 		int x = 0;
-		while (x < roverIcons.size()){
+		while (x < rovers.size()){
 			roverIcons.add(new RoverIcon(rovers.get(x).getName(), rovers.get(x).getLocation(), rovers.get(x).getDirection()));
 			this.add(roverIcons.get(x));
 			this.setComponentZOrder(roverIcons.get(x), 0);
