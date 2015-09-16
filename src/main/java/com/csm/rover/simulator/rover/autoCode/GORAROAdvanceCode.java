@@ -2,6 +2,7 @@ package com.csm.rover.simulator.rover.autoCode;
 
 import java.awt.Point;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
@@ -81,21 +82,14 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 
 	@Override
 	public String nextCommand(long milliTime, DecimalPoint location,
-			double direction, double acceleration, double angular_acceleration,
-			double wheel_speed_FL, double wheel_speed_FR,
-			double wheel_speed_BL, double wheel_speed_BR,
-			double motor_current_FL, double motor_current_FR,
-			double motor_current_BL, double motor_current_BR,
-			double motor_temp_FL, double motor_temp_FR, double motor_temp_BL,
-			double motor_temp_BR, double battery_voltage,
-			double battery_current, double battery_temp, double battery_charge) 
+			double direction, Map<String, Double> parameters)
 	{
 		if (!runyet){
 			writeToLog(mentalityStr);
 			writeToLog("time\tX\tY\tZ\tscore\tcharge\tstate\thazard");
 			runyet = true;
 		}
-		writeToLog(milliTime + "\t" + formatDouble(location.getX()) + "\t" + formatDouble(location.getY()) + "\t" + formatDouble(Access.getMapHeightatPoint(location)) + "\t" + score + "\t" + formatDouble(battery_charge) + "\t" + state + "\t" + Access.getHazardValue(location));
+		writeToLog(milliTime + "\t" + formatDouble(location.getX()) + "\t" + formatDouble(location.getY()) + "\t" + formatDouble(Access.getMapHeightatPoint(location)) + "\t" + score + "\t" + formatDouble(parameters.get("battery_charge")) + "\t" + state + "\t" + Access.getHazardValue(location));
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
 			score += Access.getTargetValue(location);

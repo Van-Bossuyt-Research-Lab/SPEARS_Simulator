@@ -470,24 +470,7 @@ public class RoverObject implements Serializable {
 						Globals.TimeMillis,
 						physics.getLocation(),
 						physics.getDirection(),
-						physics.getAcceleration(),
-						physics.getAngularAcceleration(),
-						physics.getWheelSpeed(RoverWheels.FL),
-						physics.getWheelSpeed(RoverWheels.FR),
-						physics.getWheelSpeed(RoverWheels.BL),
-						physics.getWheelSpeed(RoverWheels.BR),
-						physics.getMotorCurrent(RoverWheels.FL),
-						physics.getMotorCurrent(RoverWheels.FR),
-						physics.getMotorCurrent(RoverWheels.BL),
-						physics.getMotorCurrent(RoverWheels.BR),
-						physics.getMotorTemp(RoverWheels.FL),
-						physics.getMotorTemp(RoverWheels.FR),
-						physics.getMotorTemp(RoverWheels.BL),
-						physics.getMotorTemp(RoverWheels.BR),
-						physics.getBatteryVoltage(),
-						physics.getBatteryCurrent(),
-						physics.getBatteryTemperature(),
-						physics.getBatteryCharge()
+						getAutonomousParameters()
 				);
 				//TODO switch all known commands
 				if (strcmp(cmd, "") == 0){ /*Do Nothing*/ }
@@ -842,7 +825,30 @@ public class RoverObject implements Serializable {
 			return 1;
 		}
 	}
-	
+
+	private Map<String, Double> getAutonomousParameters(){
+		Map<String, Double> params = new TreeMap<String, Double>();
+		params.put("acceleration", physics.getAcceleration());
+		params.put("angular_acceleration", physics.getAngularAcceleration());
+		params.put("wheel_speed_FL", physics.getWheelSpeed(RoverWheels.FL));
+		params.put("wheel_speed_FR", physics.getWheelSpeed(RoverWheels.FR));
+		params.put("wheel_speed_BL", physics.getWheelSpeed(RoverWheels.BL));
+		params.put("wheel_speed_BR", physics.getWheelSpeed(RoverWheels.BR));
+		params.put("motor_current_FL", physics.getMotorCurrent(RoverWheels.FL));
+		params.put("motor_current_FR", physics.getMotorCurrent(RoverWheels.FR));
+		params.put("motor_current_BL", physics.getMotorCurrent(RoverWheels.BL));
+		params.put("motor_current_BR", physics.getMotorCurrent(RoverWheels.BR));
+		params.put("motor_temp_FL", physics.getMotorTemp(RoverWheels.FL));
+		params.put("motor_temp_FR", physics.getMotorTemp(RoverWheels.FR));
+		params.put("motor_temp_BL", physics.getMotorTemp(RoverWheels.BL));
+		params.put("motor_temp_BR", physics.getMotorTemp(RoverWheels.BR));
+		params.put("battery_voltage", physics.getBatteryVoltage());
+		params.put("battery_current", physics.getBatteryCurrent());
+		params.put("battery_temp", physics.getBatteryTemperature());
+		params.put("battery_charge", physics.getBatteryCharge());
+		return params;
+	}
+
 //PHYSCIS Related Stuff *****************************************************************************************************************************************************************************************************
 	
 	public void addToSerialHistory(String out){

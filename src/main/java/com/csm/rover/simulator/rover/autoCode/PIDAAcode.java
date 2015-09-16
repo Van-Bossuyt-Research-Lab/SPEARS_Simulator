@@ -3,6 +3,8 @@ package com.csm.rover.simulator.rover.autoCode;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.wrapper.Access;
 
+import java.util.Map;
+
 public class PIDAAcode extends RoverAutonomusCode {
 
 	private static final long serialVersionUID = -6895122583195199637L;
@@ -158,24 +160,7 @@ public class PIDAAcode extends RoverAutonomusCode {
 			long milliTime,
 			DecimalPoint location,
 			double direction,
-			double acceleration,
-			double angular_acceleration,
-			double wheel_speed_FL,
-			double wheel_speed_FR,
-			double wheel_speed_BL,
-			double wheel_speed_BR,
-			double motor_current_FL,
-			double motor_current_FR,
-			double motor_current_BL,
-			double motor_current_BR,
-			double motor_temp_FL,
-			double motor_temp_FR,
-			double motor_temp_BL,
-			double motor_temp_BR,
-			double battery_voltage,
-			double battery_current,
-			double battery_temp,
-			double battery_charge
+			Map<String, Double> parameters
 	) {
 
 		//Write processing code here
@@ -185,12 +170,12 @@ public class PIDAAcode extends RoverAutonomusCode {
 		hazard=Access.isInHazard(location);
 		elevation=Access.getMapHeightatPoint(location);
 		//Battery hazard rate
-		HBatt=HazR(battery_temp,5,18);
+		HBatt=HazR(parameters.get("battery_temp"), 5, 18);
 		//Wheels hazard rates
-		HwFL=.12*HazR(motor_temp_FL,15,33);
-		HwFR=.12*HazR(motor_temp_FR,15,33);
-		HwBL=.12*HazR(motor_temp_BL,15,33);
-		HwBR=.12*HazR(motor_temp_BR,15,33);
+		HwFL=.12*HazR(parameters.get("motor_temp_FL"),15,33);
+		HwFR=.12*HazR(parameters.get("motor_temp_FR"),15,33);
+		HwBL=.12*HazR(parameters.get("motor_temp_BL"),15,33);
+		HwBR=.12*HazR(parameters.get("motor_temp_BR"),15,33);
 		//Hazard hazard rate
 		Hhzrd=0;
 		if (hazard){
@@ -199,11 +184,11 @@ public class PIDAAcode extends RoverAutonomusCode {
 		//Incline hazard rate
 		Hinc=HazR(Access.getMapInclineAtPoint(location, direction),0,5.1);
 		//Total Hazard rate
-		HRate=sumP(HBatt,HwFL,HwFR,HwBL,HwBR,Hhzrd,Hinc);
+		HRate=sumP(HBatt, HwFL, HwFR, HwBL, HwBR, Hhzrd, Hinc);
 		//Total Failure Rate
 		FRate=FailR(HRate,1);
 		writeToLog("RA" +","+state+","+MitAct+","+ milliTime +","+ location+","+ elevation+","+FRate+","+HRate+","+Hinc+","+Hhzrd+","+
-				motor_temp_FL+","+HwFL+","+motor_temp_FR+","+HwFR+","+motor_temp_BL+","+HwBL+","+motor_temp_BR+","+HwBR+","+battery_temp+","+HBatt);
+				parameters.get("motor_temp_FL")+","+HwFL+","+parameters.get("motor_temp_FR")+","+HwFR+","+parameters.get("motor_temp_BL")+","+HwBL+","+parameters.get("motor_temp_BR")+","+HwBR+","+parameters.get("battery_temp")+","+HBatt);
 				
 //This is where you should set the Acceptable level of risk
 //This is where you should determine if we have exceeded acceptable levels of risk
@@ -352,7 +337,7 @@ if (milliTime-rnTime>=500){
 				return "backward";
 			}else if (MitAct==3){
 				//determine if hot or cold
-				if (motor_temp_FL>=15){
+				if (parameters.get("motor_temp_FL")>=15){
 					dtime=10;
 					return "stop";
 				}else {
@@ -361,7 +346,7 @@ if (milliTime-rnTime>=500){
 				}
 			}else if (MitAct==4){
 				//determine if hot or cold
-				if (motor_temp_FR>=15){
+				if (parameters.get("motor_temp_FR")>=15){
 					dtime=10;
 					return "stop";
 				}else {
@@ -370,7 +355,7 @@ if (milliTime-rnTime>=500){
 				}
 			}else if (MitAct==5){
 				//determine if hot or cold
-				if (motor_temp_BL>=15){
+				if (parameters.get("motor_temp_BL")>=15){
 					dtime=10;
 					MitAct=0;
 					return "stop";
@@ -380,7 +365,7 @@ if (milliTime-rnTime>=500){
 				}
 			}else if (MitAct==6){
 				//determine if hot or cold
-				if (motor_temp_BR>=15){
+				if (parameters.get("motor_temp_BR")>=15){
 					dtime=10;
 					return "stop";
 				}else {
@@ -389,7 +374,7 @@ if (milliTime-rnTime>=500){
 				}
 			}else if (MitAct==7){
 				//determine if hot or cold
-				if (battery_temp>=5){
+				if (parameters.get("battery_temp")>=5){
 					dtime=10;
 					return "stop";
 				}else {

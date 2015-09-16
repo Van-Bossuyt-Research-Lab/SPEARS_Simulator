@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.rover.autoCode;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.wrapper.Access;
@@ -77,16 +78,9 @@ public class GORAROcode1 extends RoverAutonomusCode {
 
 	@Override
 	public String nextCommand(long milliTime, DecimalPoint location,
-			double direction, double acceleration, double angular_acceleration,
-			double wheel_speed_FL, double wheel_speed_FR,
-			double wheel_speed_BL, double wheel_speed_BR,
-			double motor_current_FL, double motor_current_FR,
-			double motor_current_BL, double motor_current_BR,
-			double motor_temp_FL, double motor_temp_FR, double motor_temp_BL,
-			double motor_temp_BR, double battery_voltage,
-			double battery_current, double battery_temp, double battery_charge) 
+			double direction, Map<String, Double> parameters)
 	{
-		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + Access.getMapHeightatPoint(location) + "\t" + score + "\t" + battery_charge + "\t" + state);
+		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + Access.getMapHeightatPoint(location) + "\t" + score + "\t" + parameters.get("battery_charge") + "\t" + state);
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
 			score += Access.getTargetValue(location);

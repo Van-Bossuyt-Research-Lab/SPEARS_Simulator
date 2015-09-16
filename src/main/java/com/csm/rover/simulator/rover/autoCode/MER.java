@@ -4,6 +4,8 @@ import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.wrapper.Access;
 import com.csm.rover.simulator.wrapper.Globals;
 
+import java.util.Map;
+
 public class MER extends RoverAutonomusCode {
 	
 	private static final long serialVersionUID = 1195207024217443714L;
@@ -28,15 +30,8 @@ public class MER extends RoverAutonomusCode {
 
 	@Override
 	public String nextCommand(long milliTime, DecimalPoint location,
-			double direction, double acceleration, double angular_acceleration,
-			double wheel_speed_FL, double wheel_speed_FR,
-			double wheel_speed_BL, double wheel_speed_BR,
-			double motor_current_FL, double motor_current_FR,
-			double motor_current_BL, double motor_current_BR,
-			double motor_temp_FL, double motor_temp_FR, double motor_temp_BL,
-			double motor_temp_BR, double battery_voltage,
-			double battery_current, double battery_temp, double battery_charge) {
-		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + Access.getMapHeightatPoint(location) + "\t" + score + "\t" + battery_charge + "\t" + (completed == targets.length));
+			double direction, Map<String, Double> parameters) {
+		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + Access.getMapHeightatPoint(location) + "\t" + score + "\t" + parameters.get("battery_charge") + "\t" + (completed == targets.length));
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (completed == targets.length){
 			return "stop";
