@@ -211,7 +211,7 @@ public class RoverHub extends Panel {
 		int x = 0;
 		while (x < numberOfDisplays){
 			if (inHUDmode){
-				displayWindows.get(x).update(HUDDisplayLinks.get(0));
+				displayWindows.get(x).update(HUDDisplayLinks.get(x));
 				if (x+1 == numberOfHUDDisplays){
 					break;
 				}
