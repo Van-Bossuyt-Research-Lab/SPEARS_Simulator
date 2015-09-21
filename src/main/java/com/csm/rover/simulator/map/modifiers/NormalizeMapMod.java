@@ -1,24 +1,29 @@
 package com.csm.rover.simulator.map.modifiers;
 
-import com.csm.rover.simulator.map.modifiers.MapModifier;
 import com.csm.rover.simulator.objects.ArrayGrid;
 
 public class NormalizeMapMod implements MapModifier {
 
     @Override
     public void modifyMap(ArrayGrid<Float> map) {
-        minval = getMin();
-        maxval = maxHeight;
-        x = 0;
-        while (x < this.values.length){
-            int y = 0;
-            while (y < this.values[0].length){
-                this.values[x][y] -= minval;
-                y++;
+        float minval = getMin(map);
+        for (int x = 0; x < map.getWidth(); x++){
+            for (int y = 0; y < map.getHeight(); y++){
+                map.put(x, y, map.get(x, y) - minval);
             }
-            x++;
         }
-        minval = 0;
+    }
+
+    private float getMin(ArrayGrid<Float> map){
+        float min = Float.MAX_VALUE;
+        for (int x = 0; x < map.getWidth(); x++){
+            for (int y = 0; y < map.getHeight(); y++){
+                if (map.get(x, y) < min){
+                    min = map.get(x, y);
+                }
+            }
+        }
+        return min;
     }
 
 }

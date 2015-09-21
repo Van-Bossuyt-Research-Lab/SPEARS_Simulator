@@ -19,7 +19,7 @@ public class ArrayGridTest {
 
     @Test
     public void testAddToBlank(){
-        grid.add(5, 4, "Hi");
+        grid.put(5, 4, "Hi");
 
         assertEquals(6, grid.getWidth());
         assertEquals(5, grid.getHeight());

@@ -2,12 +2,21 @@ package com.csm.rover.simulator.objects;
 
 import java.util.ArrayList;
 
-public class ArrayGrid<T> {
+public class ArrayGrid<T> implements Cloneable {
 
     private ArrayList<ArrayList<T>> grid;
 
     public ArrayGrid(){
         grid = new ArrayList<ArrayList<T>>();
+    }
+
+    public ArrayGrid(ArrayGrid<T> original){
+        grid = new ArrayList<ArrayList<T>>();
+        for (int x = 0; x < getWidth(); x++){
+            for (int y = 0; y < getHeight(); y++){
+                put(x, y, original.get(x, y));
+            }
+        }
     }
 
     public void fillToSize(int width, int height){
@@ -18,12 +27,12 @@ public class ArrayGrid<T> {
         grid = new ArrayList<ArrayList<T>>();
         for (int x = 0; x < width; x++){
             for (int y = 0; y < height; y++){
-                add(x, y, val);
+                put(x, y, val);
             }
         }
     }
 
-    public void add(int x, int y, T val){
+    public void put(int x, int y, T val){
         while (x >= getWidth()){
             addColumn(new ArrayList<T>());
         }
@@ -140,5 +149,10 @@ public class ArrayGrid<T> {
             out += row + "\n";
         }
         return out;
+    }
+
+    @Override
+    public ArrayGrid<T> clone(){
+        return new ArrayGrid<T>(this);
     }
 }

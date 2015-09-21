@@ -1,72 +1,69 @@
 package com.csm.rover.simulator.map.modifiers;
 
-import com.csm.rover.simulator.map.modifiers.MapModifier;
 import com.csm.rover.simulator.objects.ArrayGrid;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class PlasmaGeneratorMod implements MapModifier {
 
+    private double rough;
+
     private Random rnd = new Random();
 
+    public PlasmaGeneratorMod(double rough){
+        this.rough = rough;
+    }
 
     @Override
     public void modifyMap(ArrayGrid<Float> map) {
-        double rough = size * roughFactor;
-        this.layerSize = size;
-        this.rough = rough;
-        this.detail = det;
+        int size = getFractalLayerCount(map.getWidth());
+        double rough = this.rough;
+        double roughFactor = rough/size;
+
+        ArrayGrid<Float> values = new ArrayGrid<Float>();
         double seed = rnd.nextInt(30) * rnd.nextDouble();
-        float[][] values = new float[2][2];
-        values[0][0] = (float) Math.abs(seed + random());
-        values[0][1] = (float) Math.abs(seed + random());
-        values[1][0] = (float) Math.abs(seed + random());
-        values[1][1] = (float) Math.abs(seed + random());
-        int master = 0;
-        while (master <= size){
-            values = expand(values);
-            int x = 0;
-            while (x < values.length){
-                int y = 0;
-                while (y < values.length){
+        values.put(0, 0, (float) Math.abs(seed + random()));
+        values.put(0, 1, (float) Math.abs(seed + random()));
+        values.put(1, 0, (float) Math.abs(seed + random()));
+        values.put(1, 1, (float) Math.abs(seed + random()));
+        for (int master = 0; master <= size; master++){
+            expand(values);
+            for (int x = 0; x < values.getWidth(); x++){
+                for (int y = 0; y < values.getHeight(); y++){
                     if ((x+1) % 2 == 0){
                         if ((y+1) % 2 == 0){
-                            values[x][y] = center(values[x-1][y-1], values[x-1][y+1], values[x+1][y-1], values[x+1][y+1], rough);
+                            values.put(x, y, center(values.get(x - 1, y - 1), values.get(x - 1, y + 1), values.get(x + 1, y - 1), values.get(x + 1, y + 1), rough));
                         }
                         else {
-                            values[x][y] = midpoint(values[x-1][y], values[x+1][y], rough);
+                            values.put(x, y, midpoint(values.get(x - 1, y), values.get(x + 1, y), rough));
                         }
                     }
                     else {
                         if ((y+1) % 2 == 0){
-                            values[x][y] = midpoint(values[x][y-1], values[x][y+1], rough);
+                            values.put(x, y, midpoint(values.get(x, y - 1), values.get(x, y + 1), rough));
                         }
                     }
-                    y++;
                 }
-                x++;
             }
             rough -= roughFactor;
             if (rough < 0){
                 rough = 0;
             }
-            master++;
         }
     }
 
+    private int getFractalLayerCount(int size){
+        return (int)(Math.log(2*size-2)/Math.log(2.)) + 1;
+    }
+
     //part of the plasma fractal generation, pushes the array from |x|x|x| to |x|_|x|_|x|
-    private float[][] expand(float[][] values2){
-        float[][] out = new float[values2.length * 2 - 1][values2.length * 2 - 1];
-        int x = 0;
-        while (x < values2.length){
-            int y = 0;
-            while (y < values2.length){
-                out[x*2][y*2] = values2[x][y];
-                y++;
-            }
-            x++;
+    private void expand(ArrayGrid<Float> vals){
+        int size = vals.getWidth();
+        for (int i = size-1; i > 0; i--){
+            vals.addRowAt(i, new ArrayList<Float>());
+            vals.addColumnAt(i, new ArrayList<Float>());
         }
-        return out;
     }
 
     private float center(float a, float b, float c, float d, double rough){
