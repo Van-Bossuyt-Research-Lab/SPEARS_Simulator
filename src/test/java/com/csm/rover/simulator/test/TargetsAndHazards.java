@@ -4,19 +4,19 @@ import static org.junit.Assert.*;
 
 import java.awt.Point;
 
-import com.csm.rover.simulator.map.PlasmaPanel;
+import com.csm.rover.simulator.map.TerrainMap;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TargetsAndHazards {
 
-	static PlasmaPanel map;
+	static TerrainMap map;
 	
 	@BeforeClass
 	public static void setup(){
-		map = new PlasmaPanel();
-		map.genorateLandscape(7, 3, 0.01);
+		map = new TerrainMap();
+		map.generateLandscape(7, 3, 0.01);
 	}
 	
 	@Test

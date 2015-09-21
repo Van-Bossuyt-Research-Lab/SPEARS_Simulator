@@ -154,7 +154,7 @@ public class Admin {
 			}
 		}
 		else {
-			GUI.TerrainPnl.HeightMap.genorateLandscape(config.mapSize, config.mapDetail, config.mapRough);
+			GUI.TerrainPnl.HeightMap.generateLandscape(config.mapSize, config.mapDetail, config.mapRough);
 			if (config.monoTargets){
 				GUI.TerrainPnl.HeightMap.genorateTargets(config.targetDensity);
 			}

@@ -11,7 +11,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import com.csm.rover.simulator.map.LandMapPanel;
+import com.csm.rover.simulator.map.display.LandMapPanel;
 import com.csm.rover.simulator.map.PlanetParametersList;
 import com.csm.rover.simulator.objects.RunConfiguration;
 import com.csm.rover.simulator.control.InterfacePanel;

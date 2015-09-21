@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.map;
+package com.csm.rover.simulator.map.populators;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
 

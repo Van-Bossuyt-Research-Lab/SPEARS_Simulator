@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.map;
+package com.csm.rover.simulator.map.display;
 
 import java.awt.AlphaComposite;
 import java.awt.Composite;

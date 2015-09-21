@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.awt.Dimension;
 import java.awt.Point;
 
-import com.csm.rover.simulator.map.LandMapPanel;
+import com.csm.rover.simulator.map.display.LandMapPanel;
 import com.csm.rover.simulator.objects.DecimalPoint;
 
 import org.junit.Before;

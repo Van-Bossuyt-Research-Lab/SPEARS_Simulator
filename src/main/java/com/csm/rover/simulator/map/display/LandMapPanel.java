@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.map;
+package com.csm.rover.simulator.map.display;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -21,6 +21,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
+import com.csm.rover.simulator.map.PlanetParametersList;
+import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.map.display.RoverIcon;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.ImageFileFilter;
 import com.csm.rover.simulator.objects.MapFileFilter;
@@ -42,7 +45,7 @@ public class LandMapPanel extends Panel{
 	private int focusedRover;
 	private boolean focusEngauged = false;
 	
-	public PlasmaPanel HeightMap;
+	public TerrainMap HeightMap;
 	
 	private JPopupMenu MapOptionsPopMenu;
 	private JRadioButtonMenuItem rdbtnmntmShowTargets;
@@ -97,7 +100,7 @@ public class LandMapPanel extends Panel{
 				finder.setApproveButtonText("Save");
 				int option = finder.showSaveDialog(getParent());
 				if (option == JFileChooser.APPROVE_OPTION) {
-					HeightMap.SaveImage(HeightMap.getValues(), HeightMap.getDetail(), PlasmaPanel.REDtoGREEN, finder.getSelectedFile().getAbsolutePath());
+					HeightMap.SaveImage(HeightMap.getValues(), HeightMap.getDetail(), TerrainMap.REDtoGREEN, finder.getSelectedFile().getAbsolutePath());
 				}
 			}
 		});
@@ -124,7 +127,7 @@ public class LandMapPanel extends Panel{
 		roverIcons = new ArrayList<RoverIcon>();
 		this.params = params;
 		
-		HeightMap = new PlasmaPanel();
+		HeightMap = new TerrainMap();
 		HeightMap.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -133,7 +136,7 @@ public class LandMapPanel extends Panel{
 				}
 			}
 		});
-		HeightMap.genorateLandscape(mapSize, mapDetail, mapRough);
+		HeightMap.generateLandscape(mapSize, mapDetail, mapRough);
 		HeightMap.setResolution(53);
 		setFocusPoint(new DecimalPoint(HeightMap.getWidth()/HeightMap.getResolution()/2, HeightMap.getHeight()/HeightMap.getResolution()/2));
 		add(HeightMap);
