@@ -93,7 +93,7 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
 			score += Access.getTargetValue(location);
-			Point mapLoc = Admin.GUI.TerrainPnl.HeightMap.getMapSquare(location);
+			Point mapLoc = Admin.GUI.TerrainPnl.heightMap.getMapSquare(location);
 			visitedScience.add(new Point(mapLoc.x/3, mapLoc.y/3));
 			for (int x = 0; x < histories; x++){
 				for (int y = 0; y < sampleDirections; y++){
@@ -263,7 +263,7 @@ public class GORAROAdvanceCode extends RoverAutonomusCode {
 
 	private boolean hasUnvisitedScience(DecimalPoint loc){
 		if (Access.isAtTarget(loc)){
-			Point mapLoc = Admin.GUI.TerrainPnl.HeightMap.getMapSquare(loc);
+			Point mapLoc = Admin.GUI.TerrainPnl.heightMap.getMapSquare(loc);
 			return !visitedScience.contains(new Point(mapLoc.x/3, mapLoc.y/3));
 		}
 		return false;

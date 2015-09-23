@@ -55,19 +55,19 @@ public class Access {
 	}
 	
 	public static boolean isAtTarget(DecimalPoint loc){
-		return Admin.GUI.TerrainPnl.HeightMap.isPointOnTarget(loc);
+		return Admin.GUI.TerrainPnl.heightMap.isPointOnTarget(loc);
 	}
 	
 	public static int getTargetValue(DecimalPoint loc){
-		return Admin.GUI.TerrainPnl.HeightMap.getTargetValue(loc);
+		return Admin.GUI.TerrainPnl.heightMap.getTargetValue(loc);
 	}
 	
 	public static boolean isInHazard(DecimalPoint loc){
-		return Admin.GUI.TerrainPnl.HeightMap.isPointInHazard(loc);
+		return Admin.GUI.TerrainPnl.heightMap.isPointInHazard(loc);
 	}
 	
 	public static int getHazardValue(DecimalPoint loc){
-		return Admin.GUI.TerrainPnl.HeightMap.getHazardValue(loc);
+		return Admin.GUI.TerrainPnl.heightMap.getHazardValue(loc);
 	}
 	
 	public static void updateRoverLocation(String name, DecimalPoint loc, double dir){

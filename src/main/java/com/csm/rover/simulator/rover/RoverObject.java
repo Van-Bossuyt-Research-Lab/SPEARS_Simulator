@@ -237,7 +237,7 @@ public class RoverObject implements Serializable {
 						}
 						else if (strcmp(data, "score") == 0){
 							if (Access.isAtTarget(getLocation())){
-								this.visitedScience.add(Admin.GUI.TerrainPnl.HeightMap.getMapSquare(getLocation()));
+								this.visitedScience.add(Admin.GUI.TerrainPnl.heightMap.getMapSquare(getLocation()));
 								System.out.println("Aquired.  New Score = " + visitedScience.size());
 							}
 						}

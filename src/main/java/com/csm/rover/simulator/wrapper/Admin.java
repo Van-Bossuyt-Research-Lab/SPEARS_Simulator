@@ -144,7 +144,7 @@ public class Admin {
 				if (!config.mapFile.exists()){
 					throw new Exception();
 				}
-				GUI.TerrainPnl.HeightMap.loadMap(config.mapFile);
+				GUI.TerrainPnl.heightMap.loadMap(config.mapFile);
 				Globals.writeToLogFile("Start Up", "Using Map File: " + config.mapFile.getName());
 			}
 			catch (Exception e){
@@ -154,18 +154,18 @@ public class Admin {
 			}
 		}
 		else {
-			GUI.TerrainPnl.HeightMap.generateLandscape(config.mapSize, config.mapDetail, config.mapRough);
+			GUI.TerrainPnl.heightMap.generateLandscape(config.mapSize, config.mapDetail, config.mapRough);
 			if (config.monoTargets){
-				GUI.TerrainPnl.HeightMap.genorateTargets(config.targetDensity);
+				GUI.TerrainPnl.heightMap.genorateTargets(config.targetDensity);
 			}
 			else {
-				GUI.TerrainPnl.HeightMap.genorateValuedTargets(config.targetDensity);
+				GUI.TerrainPnl.heightMap.genorateValuedTargets(config.targetDensity);
 			}
 			if (config.monoHazards){
-				GUI.TerrainPnl.HeightMap.genorateHazards(config.hazardDensity);
+				GUI.TerrainPnl.heightMap.genorateHazards(config.hazardDensity);
 			}
 			else {
-				GUI.TerrainPnl.HeightMap.genorateValuedHazards(config.hazardDensity);
+				GUI.TerrainPnl.heightMap.genorateValuedHazards(config.hazardDensity);
 			}
 			Globals.writeToLogFile("Start Up", "Using Random Map");
 		}
