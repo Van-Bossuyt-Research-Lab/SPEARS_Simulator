@@ -6,6 +6,7 @@ import com.csm.rover.simulator.map.populators.MapTargetField;
 import com.csm.rover.simulator.objects.ArrayGrid;
 import com.csm.rover.simulator.objects.DecimalPoint;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -14,13 +15,7 @@ public class TerrainMap {
 	private ArrayGrid<Float> values;
 	private MapTargetField targets;
 	private MapHazardField hazards;
-	private boolean viewTargets = true;
-	private boolean viewHazards = true;
-	private boolean monoTargets = true;
-	private boolean monoHazards = true;
 	private int size;
-	private float minval;
-	private float maxval;
 	private float maxHeight = 4.5f;
 	private int detail = 3;
 
@@ -28,16 +23,52 @@ public class TerrainMap {
 	
 	public TerrainMap(){
         mapModifiers = new ArrayList<MapModifier>();
-	}
+        targets = new MapTargetField();
+        hazards = new MapHazardField();
+    }
 	
 	//Generates the height map using a plasma fractal
-	public void generateLandscape(){
+	public void generateLandscape(int size, int detail){
         values = new ArrayGrid<Float>();
+        this.size = size;
+        this.detail = detail;
         values.fillToSize(size * detail, size * detail);
         for (MapModifier mod : mapModifiers){
             mod.modifyMap(values);
         }
 	}
+
+    public void generateTargets(boolean mono, double density){
+        targets.generate(mono, getMapSize(), density);
+    }
+
+    public boolean isPointAtTarget(DecimalPoint pnt){
+        return targets.isPointMarked(getMapSquare(pnt));
+    }
+
+    public int getTargetValueAt(DecimalPoint pnt){
+        return targets.getValueAt(getMapSquare(pnt));
+    }
+
+    public MapTargetField getTargets(){
+        return targets;
+    }
+
+    public void generateHazards(boolean mono, double density){
+        hazards.generate(mono, getMapSize(), density);
+    }
+
+    public boolean isPointInHazard(DecimalPoint pnt){
+        return hazards.isPointMarked(getMapSquare(pnt));
+    }
+
+    public int getHazardValueAt(DecimalPoint pnt){
+        return hazards.getValueAt(getMapSquare(pnt));
+    }
+
+    public MapHazardField getHazards(){
+        return hazards;
+    }
 
     public void addMapModifier(MapModifier mod){
         mapModifiers.add(mod);
@@ -46,15 +77,17 @@ public class TerrainMap {
 	//force a height map into the display
 	public void setValues(ArrayGrid<Float> vals){
 		values = vals;
-		minval = getMin();
-		maxval = maxHeight;
 	}
 	
 	public ArrayGrid<Float> getValues(){
 		return values;
 	}
-	
-	private double getMax(){
+
+	public double getMax(){
+		return this.maxHeight;
+	}
+
+	public double getTrueMax(){
 		double max = 0;
 		for (int x = 0; x < values.getWidth(); x++){
 			for (int y = 0; y < values.getHeight(); y++){
@@ -66,7 +99,7 @@ public class TerrainMap {
 		return max;
 	}
 	
-	private float getMin(){
+	public double getMin(){
 		float min = Float.MAX_VALUE;
 		for (int x = 0; x < values.getWidth(); x++){
 			for (int y = 0; y < values.getHeight(); y++){
@@ -77,6 +110,11 @@ public class TerrainMap {
 		}
 		return min;
 	}
+
+    //returns the size of the map in meters (number of squares)
+    public Dimension getMapSize(){
+        return new Dimension(values.getWidth()/detail, values.getHeight()/detail);
+    }
 	
 	public int getDetail(){
 		return detail;

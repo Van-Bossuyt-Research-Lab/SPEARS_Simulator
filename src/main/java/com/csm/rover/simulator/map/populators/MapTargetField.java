@@ -1,52 +1,36 @@
 package com.csm.rover.simulator.map.populators;
 
-import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.GridList;
+import java.awt.Dimension;
 
-import java.awt.*;
+public class MapTargetField extends MapPopularsField {
 
-public class MapTargetField {
-
-    //force a target distribution
-    public void setTargets(Point[] targs){
-        targets = new GridList<Integer>();
-        monoTargets = true;
-        for (Point p : targs){
-            targets.put(10, p.x, p.y);
+    @Override
+    public void generate(boolean mono, Dimension mapSize, double density) {
+        if (mono){
+            generateTargets(mapSize, density);
         }
-        this.repaint();
-    }
-
-    public void setTargets(Point[] targs, int[] values){
-        monoTargets = false;
-        targets = new GridList<Integer>();
-        for (int i = 0; i < targs.length; i++){
-            targets.put(values[i], targs[i].x, targs[i].y);
+        else {
+            generateValuedTargets(mapSize, density);
         }
-        this.repaint();
-    }
-
-    //get the target distribution
-    public GridList<Integer> getTargets(){
-        return targets;
     }
 
     //Generate a target distribution
-    public void genorateTargets(double density){
-        targets = new GridList<Integer>();
-        monoTargets = true;
-        int size = (int)(values.length*values[0].length/(detail*detail)*density);
+    private void generateTargets(Dimension mapSize, double density){
+        values = new GridList<Integer>();
+        mono = true;
+        int size = (int)(mapSize.getWidth()*mapSize.getHeight()*density);
         int x = 0;
         while (x < size){
-            targets.put(10, rnd.nextInt(values.length/detail), rnd.nextInt(values.length/detail));
+            values.put(10, rnd.nextInt((int)mapSize.getWidth()), rnd.nextInt((int)mapSize.getHeight()));
             x++;
         }
     }
 
-    public void genorateValuedTargets(double density){
-        targets = new GridList<Integer>();
-        monoTargets = false;
-        int size = (int)(values.length*values[0].length/(detail*detail)*density);
+    private void generateValuedTargets(Dimension mapSize, double density){
+        values = new GridList<Integer>();
+        mono = true;
+        int size = (int)(mapSize.getWidth()*mapSize.getHeight()*density);
         int x = 0;
         while (x < size){
             int value;
@@ -81,38 +65,8 @@ public class MapTargetField {
             else {
                 value = 10;
             }
-            targets.put(value, rnd.nextInt(values.length/detail), rnd.nextInt(values.length/detail));
+            values.put(value, rnd.nextInt((int)mapSize.getWidth()), rnd.nextInt((int)mapSize.getHeight()));
             x++;
         }
     }
-
-    //is the given point a target
-    public boolean isPointOnTarget(DecimalPoint loc){
-        int x = (int) getMapSquare(loc).getX() / detail;
-        int y = (int) getMapSquare(loc).getY() / detail;
-        try {
-            return targets.get(x, y) > 0;
-        }
-        catch (NullPointerException e){
-            return false;
-        }
-        catch (ArrayIndexOutOfBoundsException e){
-            return false;
-        }
-    }
-
-    public int getTargetValue(DecimalPoint loc){
-        int x = (int) getMapSquare(loc).getX() / detail;
-        int y = (int) getMapSquare(loc).getY() / detail;
-        try {
-            return targets.get(x, y);
-        }
-        catch (NullPointerException e){
-            return 0;
-        }
-        catch (ArrayIndexOutOfBoundsException e){
-            return 0;
-        }
-    }
-
 }

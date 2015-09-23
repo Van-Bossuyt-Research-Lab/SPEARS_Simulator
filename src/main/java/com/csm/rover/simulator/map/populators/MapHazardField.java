@@ -1,27 +1,36 @@
 package com.csm.rover.simulator.map.populators;
 
 import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
 import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.GridList;
 
-import java.awt.*;
+import java.awt.Dimension;
 
-public class MapHazardField {
+public class MapHazardField extends MapPopularsField {
 
-    //Generate random hazards
-    public void genorateHazards(double density){
-        this.hazards = new int[this.values.length/detail][this.values[0].length/detail];
-        monoHazards = true;
-        Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)*density)];
-        for (int x = 0; x < hazards.length; x++){
-            hazards[x] = new Hazard(new DecimalPoint(values.length/detail*rnd.nextDouble()-values.length/detail/2, values.length/detail*rnd.nextDouble()-values.length/detail/2), 5*rnd.nextDouble()+1, 10);
+    @Override
+    public void generate(boolean mono, Dimension mapSize, double density) {
+        if (mono){
+            generateHazards(mapSize, density);
         }
-        for (int i = 0; i < values.length/detail; i++){
-            for (int j = 0; j < values[0].length/detail; j++){
-                int x = i - values.length/detail/2;
-                int y = values.length/detail/2 - j;
+        else {
+            generateValuedHazards(mapSize, density);
+        }
+    }
+
+    private void generateHazards(Dimension mapSize, double density){
+        values = new GridList<Integer>();
+        mono = true;
+        Hazard[] hazards = new Hazard[(int)(mapSize.getWidth()*mapSize.getHeight()*density)];
+        for (int x = 0; x < hazards.length; x++){
+            hazards[x] = new Hazard(new DecimalPoint(mapSize.getWidth()*rnd.nextDouble(), mapSize.getHeight()*rnd.nextDouble()), 5*rnd.nextDouble()+1, 10);
+        }
+        for (int x = 0; x < mapSize.getWidth(); x++){
+            for (int y = 0; y < mapSize.getHeight(); y++){
                 for (Hazard hazard : hazards) {
                     if (hazard.isPointWithin(new DecimalPoint(x, y))) {
-                        this.hazards[i][j] = hazard.getValue();
+                        values.put(hazard.getValue(), x, y);
                         break;
                     }
                 }
@@ -29,78 +38,58 @@ public class MapHazardField {
         }
     }
 
-    public void genorateValuedHazards(double density){
-        monoHazards = false;
-        TerrainMap hazMap = new TerrainMap();
-        hazMap.generateLandscape(layerSize, detail, 2.6);
-        this.hazards = new int[this.values.length/detail][this.values[0].length/detail];
-        double max = hazMap.getMax()+0.001;
-        for (int i = 0; i < hazards.length; i++){
-            for (int j = 0; j < hazards[0].length; j++){
-                hazards[i][j] = (int)(hazMap.values[i][j]/max*5);
+    private void generateValuedHazards(Dimension mapSize, double density){
+        mono = false;
+        TerrainMap hazMap = new TerrainMap((int)mapSize.getWidth(), 1);
+        hazMap.addMapModifier(new PlasmaGeneratorMod(2.6));
+        hazMap.generateLandscape();
+        values = new GridList<Integer>();
+        double max = hazMap.getTrueMax()+0.001;
+        for (int x = 0; x < hazMap.getValues().getWidth(); x++){
+            for (int y = 0; y < hazMap.getValues().getHeight(); y++){
+                values.put((int)(hazMap.getValueAtLocation(x, y)/max*5), x, y);
             }
         }
-        Hazard[] hazards = new Hazard[(int)(values.length*values[0].length/(detail*detail)*density*2.5)];
+        Hazard[] hazards = new Hazard[(int)(mapSize.getWidth()*mapSize.getHeight()*density)];
         for (int x = 0; x < hazards.length; x++){
-            hazards[x] = new Hazard(new DecimalPoint(values.length/detail*rnd.nextDouble()-values.length/detail/2, values.length/detail*rnd.nextDouble()-values.length/detail/2), 5*rnd.nextDouble()+1, rnd.nextInt(5)+1);
+            hazards[x] = new Hazard(new DecimalPoint(mapSize.getWidth()*rnd.nextDouble(), mapSize.getHeight()*rnd.nextDouble()), 5*rnd.nextDouble()+1, rnd.nextInt(5)+1);
         }
-        for (int i = 0; i < values.length/detail; i++){
-            for (int j = 0; j < values[0].length/detail; j++){
-                int x = i - values.length/detail/2;
-                int y = values.length/detail/2 - j;
+        for (int x = 0; x < mapSize.getWidth(); x++){
+            for (int y = 0; y < mapSize.getHeight(); y++){
+                int sum = 0;
+                int count = 0;
                 for (Hazard hazard : hazards) {
                     if (hazard.isPointWithin(new DecimalPoint(x, y))) {
-                        this.hazards[i][j] += hazard.getValue();
-                        break;
+                        sum += hazard.getValue();
+                        count++;
                     }
+                }
+                if (count > 0){
+                    values.put(((int)Math.round(sum/(double)count) + values.get(x, y)), x, y);
                 }
             }
         }
     }
+}
 
-    public void setHazards(Point[] hzds){
-        hazards = new int[this.values.length/detail][this.values[0].length/detail];
-        monoHazards = true;
-        for (Point p : hzds){
-            hazards[p.x][p.y] = 10;
-        }
-        this.repaint();
+class Hazard {
+
+    private DecimalPoint position;
+    private double radius;
+    private int scale;
+
+    public Hazard(DecimalPoint pos, double r, int scale){
+        position = pos;
+        radius = r;
+        this.scale = scale;
     }
 
-    public void setHazards(int[][] values){
-        hazards = values;
-        monoHazards = false;
+    public boolean isPointWithin(DecimalPoint pnt){
+        return Math.sqrt(Math.pow(position.getX()-pnt.getX(), 2) + Math.pow(position.getY()-pnt.getY(), 2)) <= radius;
     }
 
-    //get the hazard list
-    public int[][] getHazards(){
-        return hazards;
-    }
-
-    //is the given point in a hazard
-    public boolean isPointInHazard(DecimalPoint loc){
-        int x = (int) getMapSquare(loc).getX() / detail;
-        int y = (int) getMapSquare(loc).getY() / detail;
-        try {
-            return hazards[x][y] > 0;
-        }
-        catch (NullPointerException e){
-            return false;
-        }
-        catch (ArrayIndexOutOfBoundsException e){
-            return true;
-        }
-    }
-
-    public int getHazardValue(DecimalPoint loc){
-        int x = (int) getMapSquare(loc).getX() / detail;
-        int y = (int) getMapSquare(loc).getY() / detail;
-        try {
-            return hazards[x][y];
-        }
-        catch (ArrayIndexOutOfBoundsException e){
-            return 10;
-        }
+    public int getValue(){
+        return scale;
     }
 
 }
