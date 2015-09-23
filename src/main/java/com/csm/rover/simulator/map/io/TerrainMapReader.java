@@ -1,14 +1,17 @@
 package com.csm.rover.simulator.map.io;
 
-import java.awt.*;
+import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.objects.ArrayGrid;
+
+import java.awt.Point;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class TerrainMapReader {
-    private String fileID = "%&$#";
+    private static String fileID = "__^__";
 
-    public void loadMap(File file) throws Exception {
+    public static TerrainMap loadMap(File file) throws Exception {
         try {
             Scanner data = new Scanner(file);
 
@@ -21,19 +24,18 @@ public class TerrainMapReader {
             int width = data.nextInt();
             int height = data.nextInt();
             int detail = data.nextInt();
-            setDetail(detail);
 
-            float[][] values = new float[height][width];
-            for (int i = 0; i < height; i++){
-                float[] row = new float[width];
-                for (int j = 0; j < width; j++){
-                    row[j] = data.nextFloat();
+            TerrainMap map = new TerrainMap(width, detail);
+
+            ArrayGrid<Float> values = new ArrayGrid<Float>();
+            for (int y = 0; y < height; y++){
+                for (int x = 0; x < width; x++){
+                    values.fillToSize(x, y, data.nextFloat());
                 }
-                values[i] = row;
             }
-            this.setValues(values);
+            map.setValues(values);
 
-            boolean mono = data.next().equals("m");
+            boolean monoTarget = data.next().equals("m");
             int targs = data.nextInt();
             if (targs > 0){
                 Point[] targets = new Point[targs];
@@ -42,47 +44,45 @@ public class TerrainMapReader {
                     int y = data.nextInt();
                     targets[i] = new Point(x, y);
                 }
-                if (mono){
-                    this.setTargets(targets);
+                if (monoTarget){
+                    map.getTargets().setValues(targets);
                 }
                 else {
                     int[] targVals = new int[targs];
                     for (int i = 0; i < targVals.length; i++){
                         targVals[i] = data.nextInt();
                     }
-                    this.setTargets(targets, targVals);
+                    map.getTargets().setValues(targets, targVals);
                 }
             }
 
-            if (data.next().equals("m")){
-                int hzdrs = data.nextInt();
-                if (hzdrs > 0){
-                    Point[] hazards = new Point[hzdrs];
-                    for (int i = 0; i < hazards.length; i++){
-                        int x = data.nextInt();
-                        int y = data.nextInt();
-                        hazards[i] = new Point(x, y);
-                    }
-                    this.setHazards(hazards);
+            boolean monoHazard = data.next().equals("m");
+            int hzrds = data.nextInt();
+            if (hzrds > 0){
+                Point[] hazards = new Point[hzrds];
+                for (int i = 0; i < hazards.length; i++){
+                    int x = data.nextInt();
+                    int y = data.nextInt();
+                    hazards[i] = new Point(x, y);
                 }
-            }
-            else {
-                width = data.nextInt();
-                height = data.nextInt();
-                int[][] hazVals = new int[width][height];
-                for (int i = 0; i < height; i++){
-                    int[] row = new int[width];
-                    for (int j = 0; j < width; j++){
-                        row[j] = data.nextInt();
-                    }
-                    hazVals[i] = row;
+                if (monoHazard){
+                    map.getHazards().setValues(hazards);
                 }
-                this.setHazards(hazVals);
+                else {
+                    int[] hzrdVals = new int[targs];
+                    for (int i = 0; i < hzrdVals.length; i++){
+                        hzrdVals[i] = data.nextInt();
+                    }
+                    map.getHazards().setValues(hazards, hzrdVals);
+                }
             }
 
             data.close();
-        } catch (FileNotFoundException e) {
+            return map;
+        }
+        catch (FileNotFoundException e) {
             e.printStackTrace();
+            throw e;
         }
     }
 
