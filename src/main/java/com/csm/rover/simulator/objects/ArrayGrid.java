@@ -10,11 +10,24 @@ public class ArrayGrid<T> implements Cloneable {
         grid = new ArrayList<ArrayList<T>>();
     }
 
+    public ArrayGrid(T[][] values){
+        loadFromArray(values);
+    }
+
     public ArrayGrid(ArrayGrid<T> original){
         grid = new ArrayList<ArrayList<T>>();
         for (int x = 0; x < getWidth(); x++){
             for (int y = 0; y < getHeight(); y++){
                 put(x, y, original.get(x, y));
+            }
+        }
+    }
+
+    public void loadFromArray(T[][] values){
+        grid = new ArrayList<ArrayList<T>>();
+        for (int x = 0; x < values.length; x++){
+            for (int y = 0; y < values[x].length; y++){
+                put(x, y, values[x][y]);
             }
         }
     }
@@ -90,7 +103,7 @@ public class ArrayGrid<T> implements Cloneable {
     }
 
     public T get(int x, int y){
-        if (x < getWidth() && y < getHeight()){
+        if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()){
             return grid.get(x).get(y);
         }
         else {
@@ -99,7 +112,7 @@ public class ArrayGrid<T> implements Cloneable {
     }
 
     public ArrayList<T> getColumn(int x){
-        if (x < getWidth()){
+        if (x >= 0 && x < getWidth()){
             return grid.get(x);
         }
         else {
@@ -108,7 +121,7 @@ public class ArrayGrid<T> implements Cloneable {
     }
 
     public ArrayList<T> getRow(int y){
-        if (y < getHeight()){
+        if (y >= 0 && y < getHeight()){
             ArrayList<T> row = new ArrayList<T>();
             for (ArrayList<T> col : grid){
                 row.add(col.get(y));
@@ -131,6 +144,14 @@ public class ArrayGrid<T> implements Cloneable {
         else {
             return 0;
         }
+    }
+
+    public int size(){
+        return getWidth()*getHeight();
+    }
+
+    public boolean isEmpty(){
+        return size() == 0;
     }
 
     @Override
