@@ -40,9 +40,9 @@ public class MapHazardField extends MapPopularsField {
 
     private void generateValuedHazards(Dimension mapSize, double density){
         mono = false;
-        TerrainMap hazMap = new TerrainMap((int)mapSize.getWidth(), 1);
+        TerrainMap hazMap = new TerrainMap();
         hazMap.addMapModifier(new PlasmaGeneratorMod(2.6));
-        hazMap.generateLandscape();
+        hazMap.generateLandscape((int)mapSize.getWidth(), 1);
         values = new GridList<Integer>();
         double max = hazMap.getTrueMax()+0.001;
         for (int x = 0; x < hazMap.getValues().getWidth(); x++){

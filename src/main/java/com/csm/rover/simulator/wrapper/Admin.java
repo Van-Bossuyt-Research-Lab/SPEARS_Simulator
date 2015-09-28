@@ -1,24 +1,23 @@
 package com.csm.rover.simulator.wrapper;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Random;
-import java.util.TreeMap;
-
 import com.csm.rover.simulator.control.InterfaceCode;
 import com.csm.rover.simulator.control.PopUp;
+import com.csm.rover.simulator.map.io.TerrainMapReader;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.objects.RunConfiguration;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.rover.autoCode.*;
-import com.csm.rover.simulator.rover.phsicsModels.*;
+import com.csm.rover.simulator.rover.phsicsModels.FailOnHazard;
+import com.csm.rover.simulator.rover.phsicsModels.RiskOnHazard;
+import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.satellite.SatelliteAutonomusCode;
 import com.csm.rover.simulator.satellite.SatelliteObject;
 import com.csm.rover.simulator.satellite.SatelliteParametersList;
 import com.csm.rover.simulator.visual.Form;
+
+import java.io.File;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 
@@ -144,7 +143,7 @@ public class Admin {
 				if (!config.mapFile.exists()){
 					throw new Exception();
 				}
-				GUI.TerrainPnl.heightMap.loadMap(config.mapFile);
+				GUI.TerrainPnl.heightMap = TerrainMapReader.loadMap(config.mapFile);
 				Globals.writeToLogFile("Start Up", "Using Map File: " + config.mapFile.getName());
 			}
 			catch (Exception e){
@@ -154,18 +153,18 @@ public class Admin {
 			}
 		}
 		else {
-			GUI.TerrainPnl.heightMap.generateLandscape(config.mapSize, config.mapDetail, config.mapRough);
+			GUI.TerrainPnl.heightMap.generateLandscape(config.mapSize, config.mapDetail);
 			if (config.monoTargets){
-				GUI.TerrainPnl.heightMap.genorateTargets(config.targetDensity);
+				GUI.TerrainPnl.heightMap.generateTargets(true, config.targetDensity);
 			}
 			else {
-				GUI.TerrainPnl.heightMap.genorateValuedTargets(config.targetDensity);
+				GUI.TerrainPnl.heightMap.generateTargets(false, config.targetDensity);
 			}
 			if (config.monoHazards){
-				GUI.TerrainPnl.heightMap.genorateHazards(config.hazardDensity);
+				GUI.TerrainPnl.heightMap.generateHazards(true, config.hazardDensity);
 			}
 			else {
-				GUI.TerrainPnl.heightMap.genorateValuedHazards(config.hazardDensity);
+				GUI.TerrainPnl.heightMap.generateHazards(false, config.hazardDensity);
 			}
 			Globals.writeToLogFile("Start Up", "Using Random Map");
 		}

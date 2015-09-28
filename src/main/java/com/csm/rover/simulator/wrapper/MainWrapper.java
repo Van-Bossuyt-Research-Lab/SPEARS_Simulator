@@ -1,43 +1,23 @@
 package com.csm.rover.simulator.wrapper;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Cursor;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.UIManager;
-import javax.swing.JCheckBox;
-import javax.swing.JTextField;
-import javax.swing.JTabbedPane;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.JScrollPane;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-
-import com.csm.rover.simulator.visual.Panel;
-import com.csm.rover.simulator.visual.ZList;
+import com.csm.rover.simulator.objects.MapFileFilter;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.satellite.SatelliteObject;
-import com.csm.rover.simulator.objects.MapFileFilter;
-
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
+import com.csm.rover.simulator.visual.Panel;
+import com.csm.rover.simulator.visual.ZList;
 import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.*;
+import java.util.ArrayList;
 
 public class MainWrapper extends Panel {
 
@@ -327,7 +307,7 @@ public class MainWrapper extends Panel {
 		MapSizeSpnr = new JSpinner();
 		MapSizeSpnr.setBounds(162, 105, 80, 25);
 		selectionPlasmaPnl.add(MapSizeSpnr);
-		MapSizeSpnr.setModel(new SpinnerNumberModel(10, 7, 13, 1));
+		MapSizeSpnr.setModel(new SpinnerNumberModel(700, 50, 2000, 10));
 		MapSizeSpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		
 		ValuedTargetsChk = new JCheckBox("Use Valued Targets");

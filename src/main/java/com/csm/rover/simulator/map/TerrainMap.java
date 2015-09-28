@@ -5,6 +5,7 @@ import com.csm.rover.simulator.map.populators.MapHazardField;
 import com.csm.rover.simulator.map.populators.MapTargetField;
 import com.csm.rover.simulator.objects.ArrayGrid;
 import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.FloatArrayArrayGrid;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -29,10 +30,10 @@ public class TerrainMap {
 	
 	//Generates the height map using a plasma fractal
 	public void generateLandscape(int size, int detail){
-        values = new ArrayGrid<Float>();
-        this.size = size;
+        values = new FloatArrayArrayGrid();
+        this.size = size*detail;
         this.detail = detail;
-        values.fillToSize(size * detail, size * detail);
+        values.fillToSize(this.size, this.size, 0f);
         for (MapModifier mod : mapModifiers){
             mod.modifyMap(values);
         }
@@ -75,7 +76,9 @@ public class TerrainMap {
     }
 
 	//force a height map into the display
-	public void setValues(ArrayGrid<Float> vals){
+	public void setValues(int size, int detail, ArrayGrid<Float> vals){
+		this.size = size;
+		this.detail = detail;
 		values = vals;
 	}
 	

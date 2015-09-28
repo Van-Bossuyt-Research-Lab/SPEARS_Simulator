@@ -1,14 +1,14 @@
 package com.csm.rover.simulator.wrapper;
 
+import com.csm.rover.simulator.control.InstructionObj;
+import com.csm.rover.simulator.control.InterfaceCode;
+import com.csm.rover.simulator.map.PlanetParametersList;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.rover.RoverObject;
+
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
-
-import com.csm.rover.simulator.control.InstructionObj;
-import com.csm.rover.simulator.control.InterfaceCode;
-import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.rover.RoverObject;
-import com.csm.rover.simulator.map.PlanetParametersList;
 
 //TODO get rid of this class
 public class Access {
@@ -55,11 +55,11 @@ public class Access {
 	}
 	
 	public static boolean isAtTarget(DecimalPoint loc){
-		return Admin.GUI.TerrainPnl.heightMap.isPointOnTarget(loc);
+		return Admin.GUI.TerrainPnl.heightMap.isPointAtTarget(loc);
 	}
 	
 	public static int getTargetValue(DecimalPoint loc){
-		return Admin.GUI.TerrainPnl.heightMap.getTargetValue(loc);
+		return Admin.GUI.TerrainPnl.heightMap.getTargetValueAt(loc);
 	}
 	
 	public static boolean isInHazard(DecimalPoint loc){
@@ -67,7 +67,7 @@ public class Access {
 	}
 	
 	public static int getHazardValue(DecimalPoint loc){
-		return Admin.GUI.TerrainPnl.heightMap.getHazardValue(loc);
+		return Admin.GUI.TerrainPnl.heightMap.getHazardValueAt(loc);
 	}
 	
 	public static void updateRoverLocation(String name, DecimalPoint loc, double dir){

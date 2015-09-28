@@ -31,13 +31,13 @@ public class LandMapPanel extends Panel{
 
 	private PlanetParametersList params;
 
-	private int mapSize = 7;
+	private int mapSize = 33;
 	private int mapDetail = 3;
 	private double mapRough = 0.03;
 	
 	private DecimalPoint focusPoint; //the center point of the display stored as a grid point, not a location point
 	private int focusedRover;
-	private boolean focusEngauged = false;
+	private boolean focusEngaged = false;
 	
 	public TerrainMap heightMap;
 	public MapDisplayPanel mapPanel;
@@ -67,7 +67,7 @@ public class LandMapPanel extends Panel{
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
-					focusEngauged = !focusEngauged;
+					focusEngaged = !focusEngaged;
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
@@ -139,8 +139,8 @@ public class LandMapPanel extends Panel{
                 }
             }
         });
+		mapPanel.setTerrainMap(heightMap);
 		mapPanel.setResolution(53);
-        mapPanel.setTerrainMap(heightMap);
 		setFocusPoint(new DecimalPoint(mapPanel.getWidth() / mapPanel.getResolution() / 2, mapPanel.getHeight() / mapPanel.getResolution() / 2));
 		add(mapPanel);
 		
@@ -155,44 +155,44 @@ public class LandMapPanel extends Panel{
 					break;
 				case KeyEvent.VK_LEFT:
 					setFocusPoint(new DecimalPoint((int)focusPoint.getX()-1, (int)focusPoint.getY()));
-					focusEngauged = false;
+					focusEngaged = false;
 					break;
 				case KeyEvent.VK_RIGHT:
 					setFocusPoint(new DecimalPoint((int)focusPoint.getX()+1, (int)focusPoint.getY()));
-					focusEngauged = false;
+					focusEngaged = false;
 					break;
 				case KeyEvent.VK_UP:
 					setFocusPoint(new DecimalPoint((int)focusPoint.getX(), (int)focusPoint.getY()+1));
-					focusEngauged = false;
+					focusEngaged = false;
 					break;
 				case KeyEvent.VK_DOWN:
 					setFocusPoint(new DecimalPoint((int)focusPoint.getX(), (int)focusPoint.getY()-1));
-					focusEngauged = false;
+					focusEngaged = false;
 					break;
 				case KeyEvent.VK_PAGE_UP:
 					try {
-						if (focusEngauged){
+						if (focusEngaged){
 							focusedRover = (focusedRover + 1) % roverIcons.size();
 						}
 						Access.setFocusDisplayHUD(focusedRover);
 						setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
-						focusEngauged = true;
+						focusEngaged = true;
 					} catch (Exception ex) { ex.printStackTrace(); }
 					break;					
 				case KeyEvent.VK_PAGE_DOWN:
 					try {
-						if (focusEngauged){
+						if (focusEngaged){
 							focusedRover = (roverIcons.size() + focusedRover - 1) % roverIcons.size();
 						}
 						Access.setFocusDisplayHUD(focusedRover);
 						setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
-						focusEngauged = true;
+						focusEngaged = true;
 					} catch (Exception ex) { ex.printStackTrace(); }
 				break;
 				case KeyEvent.VK_SPACE:
 					try {
 						setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
-						focusEngauged = !focusEngauged;
+						focusEngaged = !focusEngaged;
 					} catch (Exception ex) { ex.printStackTrace(); }
 					break;
 				}
@@ -266,7 +266,7 @@ public class LandMapPanel extends Panel{
 		while (x < roverIcons.size()){
 			if (roverIcons.get(x).getName().equals(name)){
 				roverIcons.get(x).updatePlacement(loc, dir);
-				if (focusEngauged && x == focusedRover){
+				if (focusEngaged && x == focusedRover){
 					setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
 				}
 				redraw();

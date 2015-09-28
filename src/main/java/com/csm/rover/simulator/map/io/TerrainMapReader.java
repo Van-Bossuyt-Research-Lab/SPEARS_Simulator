@@ -2,6 +2,7 @@ package com.csm.rover.simulator.map.io;
 
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.ArrayGrid;
+import com.csm.rover.simulator.objects.FloatArrayArrayGrid;
 
 import java.awt.Point;
 import java.io.File;
@@ -25,15 +26,15 @@ public class TerrainMapReader {
             int height = data.nextInt();
             int detail = data.nextInt();
 
-            TerrainMap map = new TerrainMap(width, detail);
+            TerrainMap map = new TerrainMap();
 
-            ArrayGrid<Float> values = new ArrayGrid<Float>();
+            ArrayGrid<Float> values = new FloatArrayArrayGrid();
             for (int y = 0; y < height; y++){
                 for (int x = 0; x < width; x++){
                     values.fillToSize(x, y, data.nextFloat());
                 }
             }
-            map.setValues(values);
+            map.setValues(width, detail, values);
 
             boolean monoTarget = data.next().equals("m");
             int targs = data.nextInt();

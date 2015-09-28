@@ -1,12 +1,12 @@
 package com.csm.rover.simulator.wrapper;
 
+import com.csm.rover.simulator.objects.FreeThread;
+import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.objects.ThreadItem;
+import com.csm.rover.simulator.visual.AccelPopUp;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.csm.rover.simulator.objects.FreeThread;
-import com.csm.rover.simulator.objects.ThreadItem;
-import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.visual.AccelPopUp;
 
 //TODO make into singleton
 public class Globals {
@@ -218,7 +218,7 @@ public class Globals {
 		try {
 			threads.get(name).markFinished();
 			threads.get(name).advance();
-		} catch (NullPointerException e) { System.err.println("In thread " + name); e.printStackTrace(); }
+		} catch (NullPointerException e) { };//System.err.println("In thread " + name); e.printStackTrace(); }
 		if (name.equals("milli-clock") || milliDone){
 			for (Object o : threads.keySet()){
 				String key = (String) o;
