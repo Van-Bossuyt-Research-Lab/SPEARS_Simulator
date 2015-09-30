@@ -3,7 +3,6 @@ package com.csm.rover.simulator.map.modifiers;
 import com.csm.rover.simulator.objects.ArrayGrid;
 import com.csm.rover.simulator.objects.FloatArrayArrayGrid;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public class PlasmaGeneratorMod implements MapModifier {
@@ -67,10 +66,12 @@ public class PlasmaGeneratorMod implements MapModifier {
 
     //part of the plasma fractal generation, pushes the array from |x|x|x| to |x|_|x|_|x|
     private void expand(ArrayGrid<Float> vals){
-        int size = vals.getWidth();
-        for (int i = size-1; i > 0; i--){
-            vals.addRowAt(i, new ArrayList<Float>());
-            vals.addColumnAt(i, new ArrayList<Float>());
+        int width = vals.getWidth();
+        int height = vals.getHeight();
+        for (int x = width-1; x >=0; x--){
+            for (int y = height-1; y >= 0; y--){
+                vals.put(x*2, y*2, vals.get(x, y));
+            }
         }
     }
 

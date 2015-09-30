@@ -154,18 +154,9 @@ public class Admin {
 		}
 		else {
 			GUI.TerrainPnl.heightMap.generateLandscape(config.mapSize, config.mapDetail);
-			if (config.monoTargets){
-				GUI.TerrainPnl.heightMap.generateTargets(true, config.targetDensity);
-			}
-			else {
-				GUI.TerrainPnl.heightMap.generateTargets(false, config.targetDensity);
-			}
-			if (config.monoHazards){
-				GUI.TerrainPnl.heightMap.generateHazards(true, config.hazardDensity);
-			}
-			else {
-				GUI.TerrainPnl.heightMap.generateHazards(false, config.hazardDensity);
-			}
+			GUI.TerrainPnl.heightMap.generateTargets(config.monoTargets, config.targetDensity);
+			GUI.TerrainPnl.heightMap.generateHazards(config.monoHazards, config.hazardDensity);
+			GUI.TerrainPnl.mapPanel.setSize(0, 0); //forces the map panel to auto resize
 			Globals.writeToLogFile("Start Up", "Using Random Map");
 		}
 		

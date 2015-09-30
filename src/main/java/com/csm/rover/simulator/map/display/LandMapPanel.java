@@ -97,7 +97,7 @@ public class LandMapPanel extends Panel{
                 finder.setApproveButtonText("Save");
                 int option = finder.showSaveDialog(getParent());
                 if (option == JFileChooser.APPROVE_OPTION) {
-                    TerrainMapWriter.SaveImage(heightMap, MapDisplayPanel.REDtoGREEN, finder.getSelectedFile().getAbsolutePath());
+                    TerrainMapWriter.SaveImage(heightMap, TerrainMapWriter.REDtoGREEN, finder.getSelectedFile().getAbsolutePath());
                 }
             }
         });

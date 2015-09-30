@@ -2,7 +2,6 @@ package com.csm.rover.simulator.map.io;
 
 
 import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.map.display.MapDisplayPanel;
 import com.csm.rover.simulator.objects.ArrayGrid;
 import com.csm.rover.simulator.wrapper.Globals;
 
@@ -17,6 +16,8 @@ import java.io.IOException;
 
 public class TerrainMapWriter {
     private static String fileID = "__^__";
+
+    public static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
 
     public static void SaveImage(TerrainMap map, int scheme, String filepath){
         int gridSize = 15;
@@ -48,7 +49,7 @@ public class TerrainMapWriter {
 
     private static Color getColor(double numb, int currentColorScheme, double minval, double maxval) {
         switch (currentColorScheme){
-            case MapDisplayPanel.REDtoGREEN:
+            case REDtoGREEN:
                 double scaled = numb / maxval * 100;
                 int red, green = 0, blue = 0;
                 if (scaled < 25){
@@ -78,10 +79,10 @@ public class TerrainMapWriter {
                 catch (Exception e){
                     return Color.CYAN;
                 }
-            case MapDisplayPanel.BLACKtoWHITE:
+            case BLACKtoWHITE:
                 int x = (int) Math.round((numb - minval) / maxval * 255);
                 return new Color(x, x, x);
-            case MapDisplayPanel.BLUEtoWHITE:
+            case BLUEtoWHITE:
                 int y = (int) Math.round((numb - minval) / maxval * 255);
                 return new Color(y, y, 255);
             default:

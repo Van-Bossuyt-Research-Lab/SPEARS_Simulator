@@ -5,7 +5,6 @@ import com.csm.rover.simulator.map.TerrainMap;
 import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -17,9 +16,6 @@ public class MapDisplayPanel extends JPanel {
 
     private boolean viewTargets = true;
     private boolean viewHazards = true;
-
-    private int currentColorScheme = 0;
-    public static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
 
     public MapDisplayPanel(){
         this.setBounds(0, 0, 100, 100);
@@ -37,53 +33,81 @@ public class MapDisplayPanel extends JPanel {
         });
     }
 
-    //paint
+    //paint the map
+    //kind long and ugly, I know, but necessary for performance
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         int detail = terrainMap.getDetail();
         try {
             if (!terrainMap.getValues().isEmpty()){
-                int xstart = (-this.getLocation().x / squareResolution - 1) * detail;
+                int xstart = (-this.getLocation().x / squareResolution - 1);
+                int xend = xstart + (this.getParent().getWidth() / squareResolution + 3);
                 if (xstart < 0){
                     xstart = 0;
                 }
-                int xend = xstart + (this.getParent().getWidth() / squareResolution + 3) * detail;
-                if (xend > terrainMap.getValues().getWidth()){
-                    xend = terrainMap.getValues().getWidth();
+                if (xend > terrainMap.getMapSize().getWidth()){
+                    xend = (int)terrainMap.getMapSize().getWidth();
                 }
-                int ystart = (-this.getLocation().y / squareResolution - 1) * detail;
+                int ystart = (-this.getLocation().y / squareResolution - 1);
+                int yend = ystart + (this.getParent().getHeight() / squareResolution + 4);
                 if (ystart < 0){
                     ystart = 0;
                 }
-                int yend = ystart + (this.getParent().getHeight() / squareResolution + 4) * detail;
-                if (yend > terrainMap.getValues().getHeight()){
-                    yend = terrainMap.getValues().getHeight();
+                if (yend > terrainMap.getMapSize().getHeight()){
+                    yend = (int)terrainMap.getMapSize().getHeight();
                 }
-                for (int x = xstart; x < xend; x += detail){
-                    for (int y = ystart; y < yend; y += detail){
+                for (int x = xstart; x < xend; x++){
+                    for (int y = ystart; y < yend; y++){
                         Color color = null;
-                        if (viewTargets && terrainMap.getTargets().isPointMarked(new Point(x, y))){
-                            color = getTargetColor(terrainMap.getTargets().getValueAt(new Point(x, y)));
+                        int value;
+                        if (viewTargets){
+                            value = terrainMap.getTargets().getValueAt(x, y);
+                            color = value == 0 ?
+                                    null :
+                                    new Color(
+                                    Color.MAGENTA.getRed()*(value+5)/15,
+                                    Color.MAGENTA.getGreen()*(value+5)/15,
+                                    Color.MAGENTA.getBlue()*(value+5)/15
+                            );
                         }
-                        else if (viewHazards && terrainMap.getHazards().isPointMarked(new Point(x, y))){
-                            color = getHazardColor(terrainMap.getHazards().getValueAt(new Point(x, y)));
+                        if (viewHazards && color == null){
+                            value = terrainMap.getHazards().getValueAt(x, y);
+                            color = value == 0 ?
+                                    null :
+                                    new Color((11-value)*20+100, (11-value)*20+100, (11-value)*20+100);
                         }
                         if (color == null){
-                            color = getColor(terrainMap.getValueAtLocation(x/detail, y/detail));
+                            double scaled = terrainMap.getValues().get(x * detail, y * detail) / terrainMap.getMax() * 100;
+                            int red, green = 0, blue = 0;
+                            if (scaled < 25){
+                                red = (int) ((scaled)/25*255);
+                            }
+                            else if (scaled < 50){
+                                red = 255;
+                                green = (int) ((scaled-25)/25*255);
+                            } else if (scaled < 75) {
+                                red = (int) ((25-(scaled-50))/25*255);
+                                green = 255;
+                            }
+                            else if (scaled < 100){
+                                red = (int) ((scaled-75)/25*255);
+                                green = 255;
+                                blue = red;
+                            }
+                            else {
+                                red = 255;
+                                green = 255;
+                                blue = 255;
+                            }
+                            color = new Color(red, green, blue);
                         }
+
                         g.setColor(color);
-                        g.fillRect(x * squareResolution / detail, y * squareResolution / detail, squareResolution, squareResolution);
-                        switch (currentColorScheme){
-                            case REDtoGREEN:
-                            case BLUEtoWHITE:
-                                g.setColor(Color.DARK_GRAY);
-                                break;
-                            case BLACKtoWHITE:
-                                g.setColor(new Color(240, 250, 0));
-                                break;
-                        }
-                        g.drawRect(x * squareResolution / detail, y * squareResolution / detail, squareResolution, squareResolution);
+                        g.fillRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
+
+                        g.setColor(Color.DARK_GRAY);
+                        g.drawRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
                     }
                 }
             }
@@ -92,75 +116,12 @@ public class MapDisplayPanel extends JPanel {
         }
     }
 
-    private Color getColor(double numb) {
-        double maxval = terrainMap.getMax();
-        double minval = terrainMap.getMin();
-        switch (currentColorScheme){
-            case REDtoGREEN:
-                double scaled = numb / maxval * 100;
-                int red, green = 0, blue = 0;
-                if (scaled < 25){
-                    red = (int) ((scaled)/25*255);
-                }
-                else if (scaled < 50){
-                    red = 255;
-                    green = (int) ((scaled-25)/25*255);
-                }
-                else if (scaled < 75){
-                    red =  (int) ((25-(scaled-50))/25*255);
-                    green = 255;
-                }
-                else if (scaled < 100){
-                    red = (int) ((scaled-75)/25*255);
-                    green = 255;
-                    blue = red;
-                }
-                else {
-                    red = 255;
-                    green = 255;
-                    blue = 255;
-                }
-                try{
-                    return new Color(red, green, blue);
-                }
-                catch (Exception e){
-                    return Color.CYAN;
-                }
-            case BLACKtoWHITE:
-                int x = (int) Math.round((numb - minval) / maxval * 255);
-                return new Color(x, x, x);
-            case BLUEtoWHITE:
-                int y = (int) Math.round((numb - minval) / maxval * 255);
-                return new Color(y, y, 255);
-            default:
-                return null;
-        }
-    }
-
-    public Color getTargetColor(int value){
-        return new Color(
-                Color.MAGENTA.getRed()*(value+5)/15,
-                Color.MAGENTA.getGreen()*(value+5)/15,
-                Color.MAGENTA.getBlue()*(value+5)/15
-        );
-    }
-
-    public Color getHazardColor(int value){
-        int value2 = (11-value)*20+100;
-        return new Color(value2, value2, value2);
-    }
-
     public void setTerrainMap(TerrainMap map){
         this.terrainMap = map;
     }
 
     public TerrainMap getTerrainMap(){
         return this.terrainMap;
-    }
-
-    public void setColorScheme(int which){
-        currentColorScheme = which;
-        this.repaint();
     }
 
     public void setTargetsVisible(boolean b){

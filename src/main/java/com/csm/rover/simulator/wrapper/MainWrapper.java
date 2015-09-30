@@ -261,7 +261,7 @@ public class MainWrapper extends Panel {
 		MapDetailSpnr = new JSpinner();
 		MapDetailSpnr.setBounds(462, 105, 80, 25);
 		selectionPlasmaPnl.add(MapDetailSpnr);
-		MapDetailSpnr.setModel(new SpinnerNumberModel(3, 1, 9, 1));
+		MapDetailSpnr.setModel(new SpinnerNumberModel(3, 1, 5, 1));
 		MapDetailSpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 
 		JLabel mapDetailLbl = new JLabel("Map Detail:");
@@ -307,7 +307,7 @@ public class MainWrapper extends Panel {
 		MapSizeSpnr = new JSpinner();
 		MapSizeSpnr.setBounds(162, 105, 80, 25);
 		selectionPlasmaPnl.add(MapSizeSpnr);
-		MapSizeSpnr.setModel(new SpinnerNumberModel(700, 50, 2000, 10));
+		MapSizeSpnr.setModel(new SpinnerNumberModel(170, 50, 800, 10));
 		MapSizeSpnr.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		
 		ValuedTargetsChk = new JCheckBox("Use Valued Targets");
