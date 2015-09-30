@@ -6,7 +6,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.util.Random;
 
-public abstract class MapPopularsField {
+public abstract class MapPopulatorsField {
 
     protected GridList<Integer> values;
 
@@ -16,7 +16,7 @@ public abstract class MapPopularsField {
 
     protected int defaultVal = 0;
 
-    public MapPopularsField(){
+    public MapPopulatorsField(){
         values = new GridList<Integer>();
         mono = true;
         rnd = new Random();
@@ -49,8 +49,12 @@ public abstract class MapPopularsField {
 
     //is the given point a target
     public boolean isPointMarked(Point loc){
+        return isPointMarked((int)loc.getX(), (int)loc.getY());
+    }
+
+    public boolean isPointMarked(int x, int y){
         try {
-            return values.get((int)loc.getX(), (int)loc.getY()) > 0;
+            return values.get(x, y) > 0;
         }
         catch (NullPointerException e){
             return false;
@@ -61,8 +65,12 @@ public abstract class MapPopularsField {
     }
 
     public int getValueAt(Point loc){
+        return getValueAt((int)loc.getX(), (int)loc.getY());
+    }
+
+    public int getValueAt(int x, int y){
         try {
-            return values.get((int)loc.getX(), (int)loc.getY());
+            return values.get(x, y);
         }
         catch (NullPointerException e){
             return defaultVal;

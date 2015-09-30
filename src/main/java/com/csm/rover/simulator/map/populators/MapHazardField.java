@@ -7,7 +7,7 @@ import com.csm.rover.simulator.objects.GridList;
 
 import java.awt.Dimension;
 
-public class MapHazardField extends MapPopularsField {
+public class MapHazardField extends MapPopulatorsField {
 
     @Override
     public void generate(boolean mono, Dimension mapSize, double density) {

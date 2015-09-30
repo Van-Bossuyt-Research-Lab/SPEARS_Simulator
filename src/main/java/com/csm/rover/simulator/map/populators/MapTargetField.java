@@ -3,7 +3,7 @@ package com.csm.rover.simulator.map.populators;
 import com.csm.rover.simulator.objects.GridList;
 import java.awt.Dimension;
 
-public class MapTargetField extends MapPopularsField {
+public class MapTargetField extends MapPopulatorsField {
 
     @Override
     public void generate(boolean mono, Dimension mapSize, double density) {
