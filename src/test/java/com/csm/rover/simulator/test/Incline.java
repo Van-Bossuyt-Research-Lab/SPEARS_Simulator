@@ -28,11 +28,11 @@ public class Incline {
 	
 	@Test
 	public void test() {
-		//System.out.println(map.getHeight(new DecimalPoint(0, 0)) + " - " + map.getHeight(new DecimalPoint(0.01, 0)));		
-		assertEquals(Math.PI/4., map.getIncline(new DecimalPoint(0, 0), 0), 0.07);
-		assertEquals(-Math.PI/4., map.getIncline(new DecimalPoint(0, 0), Math.PI), 0.07);
-		assertEquals(0, map.getIncline(new DecimalPoint(0, 0), Math.PI/2.), 0.07);
-		assertEquals(0, map.getIncline(new DecimalPoint(0, 0), 3*Math.PI/2), 0.07);		
+		//System.out.println(map.getHeightAt(new DecimalPoint(0, 0)) + " - " + map.getHeightAt(new DecimalPoint(0.01, 0)));
+		assertEquals(Math.PI/4., map.heightMap.getIncline(new DecimalPoint(0, 0), 0), 0.07);
+		assertEquals(-Math.PI/4., map.heightMap.getIncline(new DecimalPoint(0, 0), Math.PI), 0.07);
+		assertEquals(0, map.heightMap.getIncline(new DecimalPoint(0, 0), Math.PI/2.), 0.07);
+		assertEquals(0, map.heightMap .getIncline(new DecimalPoint(0, 0), 3*Math.PI/2), 0.07);
 	}
 	
 	@Test

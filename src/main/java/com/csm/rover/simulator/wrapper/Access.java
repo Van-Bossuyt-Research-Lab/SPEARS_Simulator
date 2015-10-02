@@ -39,15 +39,15 @@ public class Access {
 	}
 	
 	public static double getMapInclineAtPoint(DecimalPoint loc, double dir){
-		return Admin.GUI.TerrainPnl.getIncline(loc, dir);
+		return Admin.GUI.TerrainPnl.heightMap.getIncline(loc, dir);
 	}
 	
 	public static double getMapCrossSlopeAtPoint(DecimalPoint loc, double dir){
-		return Admin.GUI.TerrainPnl.getCrossSlope(loc, dir);
+		return Admin.GUI.TerrainPnl.heightMap.getCrossSlope(loc, dir);
 	}
 	
 	public static double getMapHeightatPoint(DecimalPoint loc){
-		return Admin.GUI.TerrainPnl.getHeight(loc);
+		return Admin.GUI.TerrainPnl.heightMap.getHeightAt(loc);
 	}
 	
 	public static double getMapTemperatureAtPoint(DecimalPoint loc){

@@ -136,6 +136,44 @@ public class TerrainMap {
 		return values.get(x, y);
 	}
 
+    //returns the height of the map at the given point
+    public double getHeightAt(DecimalPoint loc){
+        Point mapSquare = getMapSquare(loc);
+        int x = (int) mapSquare.getX();
+        int y = (int) mapSquare.getY();
+        DecimalPoint lifePnt = new DecimalPoint(loc.getX() + getMapSize().getWidth()/2.0, getMapSize().getHeight()/2.0 - loc.getY());
+        double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (1000/detail)) / 1000.0 * detail;
+        double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (1000/detail)) / 1000.0 * detail;
+        return getIntermediateValue(values.get(x, y), values.get(x + 1, y), values.get(x, y + 1), values.get(x + 1, y + 1), locx, locy);
+    }
+
+    //returns the angle which the rover is facing
+    public double getIncline(DecimalPoint loc, double dir){
+        double radius = 0.1;
+        double h0 = getHeightAt(loc);
+        DecimalPoint loc2 = loc.offset(radius*Math.cos(dir), radius*Math.sin(dir));
+        double hnew = getHeightAt(loc2);
+        return Math.atan((hnew - h0) / radius);
+    }
+
+    //returns the angle perpendicular to the direction the rover is facing
+    public double getCrossSlope(DecimalPoint loc, double dir){
+        return getIncline(loc, (dir - Math.PI / 2.0 + Math.PI * 2) % (2 * Math.PI));
+    }
+
+    // interpolates between the corners of a square to find mid-range values
+    private double getIntermediateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
+        if (relativex > relativey){ //top right triangle
+            return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
+        }
+        else if (relativex < relativey){ //bottom left triangle
+            return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey + topleft;
+        }
+        else { //center line
+            return ((bottomright - topleft) * relativex + topleft);
+        }
+    }
+
 	public void setDetail(int detail) {
 		this.detail = detail;
 	}

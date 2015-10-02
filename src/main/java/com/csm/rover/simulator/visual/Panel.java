@@ -1,15 +1,11 @@
 package com.csm.rover.simulator.visual;
 
+import com.csm.rover.simulator.wrapper.Globals;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-
-import com.csm.rover.simulator.wrapper.Globals;
 
 public class Panel extends JPanel{
 
@@ -125,5 +121,24 @@ public class Panel extends JPanel{
 	
 	public int getTopOfPage(){
 		return titleLbl.getHeight() + titleLbl.getY();
+	}
+
+
+	protected static void addPopup(Component component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			private void showMenu(MouseEvent e) {
+				popup.show(e.getComponent(), e.getX()-5, e.getY()-5);
+			}
+		});
 	}
 }

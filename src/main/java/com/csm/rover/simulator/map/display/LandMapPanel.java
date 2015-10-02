@@ -2,27 +2,21 @@ package com.csm.rover.simulator.map.display;
 
 import com.csm.rover.simulator.map.PlanetParametersList;
 import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.map.io.TerrainMapWriter;
 import com.csm.rover.simulator.map.modifiers.NormalizeMapMod;
 import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
 import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
 import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.objects.ImageFileFilter;
-import com.csm.rover.simulator.objects.MapFileFilter;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.wrapper.Access;
 
-import javax.swing.JFileChooser;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.event.*;
-import java.io.File;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 
 public class LandMapPanel extends Panel{
@@ -34,6 +28,8 @@ public class LandMapPanel extends Panel{
 	private int mapSize = 33;
 	private int mapDetail = 3;
 	private double mapRough = 0.03;
+    private int initial_map_res = 53;
+    private int map_zoom = 5;
 	
 	private DecimalPoint focusPoint; //the center point of the display stored as a grid point, not a location point
 	private int focusedRover;
@@ -42,10 +38,6 @@ public class LandMapPanel extends Panel{
 	public TerrainMap heightMap;
 	public MapDisplayPanel mapPanel;
 	
-	private JPopupMenu mapOptionsPopMenu;
-	private JRadioButtonMenuItem rdbtnmntmShowTargets;
-	private JRadioButtonMenuItem rdbtnmntmShowHazards;
-	
 	private ArrayList<RoverIcon> roverIcons;
 
 	public LandMapPanel(Dimension size, PlanetParametersList params){
@@ -53,73 +45,7 @@ public class LandMapPanel extends Panel{
 		setBackground(Color.GRAY);
 		super.hasImage = false;
 
-		mapOptionsPopMenu = new JPopupMenu();
-		mapOptionsPopMenu.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseExited(MouseEvent e) {
-				mapOptionsPopMenu.setVisible(false);
-			}
-		});
-		addPopup(this, mapOptionsPopMenu);
-
-		JMenuItem mntmShowFocusedRover = new JMenuItem("Show Focused Rover");
-		mntmShowFocusedRover.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
-					focusEngaged = !focusEngaged;
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-		});
-		mapOptionsPopMenu.add(mntmShowFocusedRover);
-
-		JMenuItem mntmSaveMapFile = new JMenuItem("Save Map File");
-		mntmSaveMapFile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser finder = new JFileChooser();
-				finder.setFileFilter(new MapFileFilter());
-				finder.setApproveButtonText("Save");
-				int option = finder.showSaveDialog(getParent());
-				if (option == JFileChooser.APPROVE_OPTION) {
-					TerrainMapWriter.saveMap(heightMap, new File(finder.getSelectedFile().getAbsolutePath() + ".map"));
-				}
-			}
-		});
-		mapOptionsPopMenu.add(mntmSaveMapFile);
-
-		JMenuItem mntmSaveMapImage = new JMenuItem("Save Map Image");
-		mntmSaveMapImage.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser finder = new JFileChooser();
-                finder.setFileFilter(new ImageFileFilter());
-                finder.setApproveButtonText("Save");
-                int option = finder.showSaveDialog(getParent());
-                if (option == JFileChooser.APPROVE_OPTION) {
-                    TerrainMapWriter.SaveImage(heightMap, TerrainMapWriter.REDtoGREEN, finder.getSelectedFile().getAbsolutePath());
-                }
-            }
-        });
-		mapOptionsPopMenu.add(mntmSaveMapImage);
-		
-		rdbtnmntmShowTargets = new JRadioButtonMenuItem("Show Targets");
-		rdbtnmntmShowTargets.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                mapPanel.setTargetsVisible(rdbtnmntmShowTargets.isSelected());
-            }
-        });
-		rdbtnmntmShowTargets.setSelected(true);
-		mapOptionsPopMenu.add(rdbtnmntmShowTargets);
-		
-		rdbtnmntmShowHazards = new JRadioButtonMenuItem("Show Hazards");
-		rdbtnmntmShowHazards.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                mapPanel.setHazardsVisible(rdbtnmntmShowHazards.isSelected());
-            }
-        });
-		rdbtnmntmShowHazards.setSelected(true);
-		mapOptionsPopMenu.add(rdbtnmntmShowHazards);
+		addPopup(this, new MapOptionsMenu(this));
 		
 		roverIcons = new ArrayList<RoverIcon>();
 		this.params = params;
@@ -131,16 +57,8 @@ public class LandMapPanel extends Panel{
 		heightMap.generateLandscape(mapSize, mapDetail);
 
         mapPanel = new MapDisplayPanel();
-        mapPanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                if (arg0.getButton() == MouseEvent.BUTTON3) {
-                    mapOptionsPopMenu.show(mapPanel, arg0.getX() - 5, arg0.getY() - 5);
-                }
-            }
-        });
 		mapPanel.setTerrainMap(heightMap);
-		mapPanel.setResolution(53);
+        mapPanel.setResolution(initial_map_res);
 		setFocusPoint(new DecimalPoint(mapPanel.getWidth() / mapPanel.getResolution() / 2, mapPanel.getHeight() / mapPanel.getResolution() / 2));
 		add(mapPanel);
 		
@@ -178,7 +96,7 @@ public class LandMapPanel extends Panel{
 						setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
 						focusEngaged = true;
 					} catch (Exception ex) { ex.printStackTrace(); }
-					break;					
+					break;
 				case KeyEvent.VK_PAGE_DOWN:
 					try {
 						if (focusEngaged){
@@ -204,12 +122,10 @@ public class LandMapPanel extends Panel{
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent arg0) {
 				if (arg0.getPreciseWheelRotation() < 0){
-                    mapPanel.setResolution(mapPanel.getResolution()+5);
+                    mapPanel.setResolution(mapPanel.getResolution()+map_zoom);
 				}
 				else {
-					if (mapPanel.getResolution()-5 > 0){
-                        mapPanel.setResolution(mapPanel.getResolution()-5);
-					}
+					mapPanel.setResolution(mapPanel.getResolution()-map_zoom);
 				}
 				redraw();
 			}
@@ -228,6 +144,15 @@ public class LandMapPanel extends Panel{
 	private void setFocusPoint(DecimalPoint focus){
 		focusPoint = focus;
 		redraw();
+	}
+
+	protected void centerOnFocusedRover(){
+		try {
+			setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
+			focusEngaged = !focusEngaged;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 	//replaces the height map with the focus point in the center
@@ -285,63 +210,8 @@ public class LandMapPanel extends Panel{
 		);
 	}
 	
-	//returns the height of the map at the given point
-	public double getHeight(DecimalPoint loc){
-		Point mapSquare = heightMap.getMapSquare(loc);
-		int x = (int) mapSquare.getX();
-		int y = (int) mapSquare.getY();
-		DecimalPoint lifePnt = new DecimalPoint(loc.getX() + mapPanel.getWidth()/ mapPanel.getResolution() / 2.0, mapPanel.getWidth()/ mapPanel.getResolution() / 2.0 - loc.getY());
-		double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (1000/ heightMap.getDetail())) / 1000.0 * heightMap.getDetail();
-		double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (1000/ heightMap.getDetail())) / 1000.0 * heightMap.getDetail();
-		return getIntermediateValue(heightMap.getValueAtLocation(x, y), heightMap.getValueAtLocation(x + 1, y), heightMap.getValueAtLocation(x, y + 1), heightMap.getValueAtLocation(x + 1, y + 1), locx, locy);
-	}
-	
-	//returns the angle which the rover is facing
-	public double getIncline(DecimalPoint loc, double dir){
-		double radius = 0.1;
-		double h0 = getHeight(loc);
-		DecimalPoint loc2 = loc.offset(radius*Math.cos(dir), radius*Math.sin(dir));
-		double hnew = getHeight(loc2);
-		return Math.atan((hnew-h0)/radius);
-	}
-	
-	//returns the angle perpendicular to the direction the rover is facing
-	public double getCrossSlope(DecimalPoint loc, double dir){
-		return getIncline(loc, (dir-Math.PI/2.0+Math.PI*2)%(2*Math.PI));
-	}
-	
 	// retrieve temperature from a coordinate, with interpolation
 	public double getTemperature(DecimalPoint loc){ 
 		return -30;
-	}
-	
-	// interpolates between the corners of a square to find mid-range values
-	public double getIntermediateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
-		if (relativex > relativey){ //top right triangle
-			return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
-		}
-		else if (relativex < relativey){ //bottom left triangle
-			return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey + topleft;
-		}
-		else { //center line
-			return ((bottomright - topleft) * relativex + topleft);
-		}
-	}
-	private static void addPopup(Component component, final JPopupMenu popup) {
-		component.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					showMenu(e);
-				}
-			}
-			public void mouseReleased(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					showMenu(e);
-				}
-			}
-			private void showMenu(MouseEvent e) {
-				popup.show(e.getComponent(), e.getX(), e.getY());
-			}
-		});
 	}
 }
