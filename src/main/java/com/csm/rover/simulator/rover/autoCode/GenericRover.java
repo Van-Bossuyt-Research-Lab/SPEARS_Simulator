@@ -4,7 +4,7 @@ import com.csm.rover.simulator.objects.DecimalPoint;
 
 import java.util.Map;
 
-public class GenericRover extends RoverAutonomusCode {
+public class GenericRover extends RoverAutonomousCode {
 
 	private static final long serialVersionUID = -5883548370057346938L;
 	

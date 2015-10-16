@@ -1,29 +1,22 @@
 package com.csm.rover.simulator.objects;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Map;
-
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.satellite.SatelliteObject;
+import com.csm.rover.simulator.wrapper.NamesAndTags;
+
+import java.io.*;
+import java.util.ArrayList;
 
 public class RunConfiguration implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private String fileCode = "yeti";
+	private String fileCode = "ent";
 	
 	public boolean mapFromFile;
-	public Map<String, String> roverNames;
+	public NamesAndTags namesAndTags;
 	public ArrayList<RoverObject> rovers;
-	public Map<String, String> satelliteNames;
 	public ArrayList<SatelliteObject> satellites;
-	public ArrayList<String> tags;
 	public File mapFile;
 	public double mapRough;
 	public int mapSize;
@@ -35,32 +28,36 @@ public class RunConfiguration implements Serializable {
 	public boolean accelerated;
 	public int runtime;
 	
-	public RunConfiguration(Map<String, String> roverNames,
-			ArrayList<RoverObject> rovers, Map<String, String> satelliteNames,
-			ArrayList<SatelliteObject> satellites, ArrayList<String> tags, File mapFile,
+	public RunConfiguration(NamesAndTags namesAndTags,
+							ArrayList<RoverObject> rovers,
+							ArrayList<SatelliteObject> satellites,
+							File mapFile,
 			boolean accelerated, int runtime) {
 		mapFromFile = true;
-		this.roverNames = roverNames;
+		this.namesAndTags = namesAndTags;
 		this.rovers = rovers;
-		this.satelliteNames = satelliteNames;
 		this.satellites = satellites;
-		this.tags = tags;
 		this.mapFile = mapFile;
 		this.accelerated = accelerated;
 		this.runtime = runtime;
 	}
 
-	public RunConfiguration(Map<String, String> roverNames,
-			ArrayList<RoverObject> rovers, Map<String, String> satelliteNames,
-			ArrayList<SatelliteObject> satellites, ArrayList<String> tags, double mapRough,
-			int mapSize, int mapDetail, double targetDensity,
-			double hazardDensity, boolean monoTargets, boolean monoHazards, boolean accelerated, int runtime) {
+	public RunConfiguration(NamesAndTags namesAndTags,
+                            ArrayList<RoverObject> rovers,
+							ArrayList<SatelliteObject> satellites,
+                            double mapRough,
+							int mapSize,
+							int mapDetail,
+							double targetDensity,
+							double hazardDensity,
+							boolean monoTargets,
+							boolean monoHazards,
+							boolean accelerated,
+							int runtime) {
 		mapFromFile = false;
-		this.roverNames = roverNames;
+		this.namesAndTags = namesAndTags;
 		this.rovers = rovers;
-		this.satelliteNames = satelliteNames;
 		this.satellites = satellites;
-		this.tags = tags;
 		this.mapRough = mapRough;
 		this.mapSize = mapSize;
 		this.mapDetail = mapDetail;
@@ -80,11 +77,9 @@ public class RunConfiguration implements Serializable {
 			throw new Exception("Invalid File Version");
 		}
 		this.mapFromFile = input.mapFromFile;
-		this.roverNames = input.roverNames;
+		this.namesAndTags = input.namesAndTags;
 		this.rovers = input.rovers;
-		this.satelliteNames = input.satelliteNames;
 		this.satellites = input.satellites;
-		this.tags = input.tags;
 		this.mapFile = input.mapFile;
 		this.mapRough = input.mapRough;
 		this.mapSize = input.mapSize;

@@ -1,8 +1,8 @@
 package com.csm.rover.simulator.objects;
 
-import java.io.Serializable;
-
 import com.csm.rover.simulator.wrapper.Globals;
+
+import java.io.Serializable;
 
 public class ThreadItem implements Serializable {
 	
@@ -38,7 +38,7 @@ public class ThreadItem implements Serializable {
 	}
 
 	public void advance(){
-		next = Globals.TimeMillis + delay;
+		next = Globals.getInstance().timeMillis + delay;
 	}
 	
 	public long getNext() {

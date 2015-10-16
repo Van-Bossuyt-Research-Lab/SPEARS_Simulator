@@ -1,5 +1,10 @@
 package com.csm.rover.simulator.satellite;
 
+import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.visual.LEDIndicator;
+import com.csm.rover.simulator.visual.Panel;
+
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -9,17 +14,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-
-import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.visual.LEDIndicator;
-import com.csm.rover.simulator.visual.Panel;
 
 public class SatelliteHub extends Panel{
 	
@@ -65,9 +59,10 @@ public class SatelliteHub extends Panel{
 	private LEDIndicator[] UnusedLED7 = new LEDIndicator[numberOfDisplays];
 	private JLabel[] UnusedLbl7 = new JLabel[numberOfDisplays];
 
-	public SatelliteHub(Dimension size){
+	public SatelliteHub(Dimension size, ArrayList<SatelliteObject> satellites){
 		super(size, "Satellite Hub");
-		
+		this.satellites = satellites;
+
 		standardDisplayLinks = new int[1][numberOfDisplays];
 		int x = 0;
 		while (x < numberOfDisplays){
@@ -315,29 +310,26 @@ public class SatelliteHub extends Panel{
 				updateDisplays();
 			}
 		}, SynchronousThread.FOREVER, "Satellite Hub Update");
-		for (SatelliteObject sat : satellites){
-			sat.start();
-		}
 	}
-	
-	//adds the rover objects to the hub
-	public void setSatellites(ArrayList<SatelliteObject> sats){
-		this.satellites = sats;
 
-		standardDisplayLinks = new int[sats.size()][numberOfDisplays];
-		int x = 0;
-		while (x < sats.size()){
-			//set the first n displays to the the nth rover
-			standardDisplayLinks[x/numberOfDisplays][x%numberOfDisplays] = x;
-			x++;
-		}
-		while (x < numberOfDisplays*standardDisplayLinks.length){
-			standardDisplayLinks[x/numberOfDisplays][x%numberOfDisplays] = -1;
-			x++;
-		}
-		
-		updateDisplays();
-	}
+	//adds the rover objects to the hub
+//	public void setSatellites(ArrayList<SatelliteObject> sats){
+//		this.satellites = sats;
+//
+//		standardDisplayLinks = new int[sats.size()][numberOfDisplays];
+//		int x = 0;
+//		while (x < sats.size()){
+//			//set the first n displays to the the nth rover
+//			standardDisplayLinks[x/numberOfDisplays][x%numberOfDisplays] = x;
+//			x++;
+//		}
+//		while (x < numberOfDisplays*standardDisplayLinks.length){
+//			standardDisplayLinks[x/numberOfDisplays][x%numberOfDisplays] = -1;
+//			x++;
+//		}
+//
+//		updateDisplays();
+//	}
 	
 	public void updateDisplays(){
 		//TODO Satellite Value Displays

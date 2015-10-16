@@ -23,10 +23,10 @@ public class PlasmaGeneratorMod implements MapModifier {
 
         ArrayGrid<Float> values = new FloatArrayArrayGrid();
         double seed = rnd.nextInt(30) * rnd.nextDouble();
-        values.put(0, 0, (float) Math.abs(seed + random()));
-        values.put(0, 1, (float) Math.abs(seed + random()));
-        values.put(1, 0, (float) Math.abs(seed + random()));
-        values.put(1, 1, (float) Math.abs(seed + random()));
+        values.put(0, 0, (float) Math.abs(seed + random()/5.));
+        values.put(0, 1, (float) Math.abs(seed + random()/5.));
+        values.put(1, 0, (float) Math.abs(seed + random()/5.));
+        values.put(1, 1, (float) Math.abs(seed + random()/5.));
         for (int master = 1; master < size; master++){
             expand(values);
             for (int x = 0; x < values.getWidth(); x++){
@@ -84,7 +84,7 @@ public class PlasmaGeneratorMod implements MapModifier {
     }
 
     private float random(){
-        float out = (float) (rough*10*rnd.nextDouble());
+        float out = (float) (10*rnd.nextDouble());
         if (rnd.nextBoolean()){
             out *= -1;
         }

@@ -1,168 +1,162 @@
 package com.csm.rover.simulator.visual;
 
-import java.awt.*;
-
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-
-import com.csm.rover.simulator.map.display.LandMapPanel;
-import com.csm.rover.simulator.map.PlanetParametersList;
-import com.csm.rover.simulator.objects.RunConfiguration;
 import com.csm.rover.simulator.control.InterfacePanel;
-import com.csm.rover.simulator.control.PopUp;
+import com.csm.rover.simulator.map.display.LandMapPanel;
 import com.csm.rover.simulator.rover.RoverHub;
 import com.csm.rover.simulator.satellite.SatelliteHub;
-import com.csm.rover.simulator.wrapper.Access;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.MainWrapper;
 
-import java.io.File;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 //TODO make into a signularity thingy
 public class Form extends JFrame {
 	
 	private static final long serialVersionUID = 5065827458217177853L;
 
-	static final int WRAPPER = 0, MAP = 1, ROVER = 2, ORBIT = 3, SATELLITE = 4, INTERFACE = 5;
-	
-	static public Form frame;
-	private static Dimension screenSize;
+	private static Optional<Form> singleton_instance = Optional.empty();
+
+	static final int STARTUP = -1, WRAPPER = 0, MAP = 1, ROVER = 2, ORBIT = 3, SATELLITE = 4, INTERFACE = 5;
+
 	private int currentScreen = 0;
 
-	public MainWrapper WrapperPnl;
-	public Panel OrbitalPnl;
-	public LandMapPanel TerrainPnl;
-	public InterfacePanel InterfacePnl;
-	public RoverHub RoverHubPnl;
-	public SatelliteHub SatelliteHubPnl;
+    private JPanel contentPane;
+    private StartupPanel startupPanel;
+	private MainWrapper wrapperPnl;
+	private Panel orbitalPnl;
+	private LandMapPanel terrainPnl;
+	private InterfacePanel interfacePnl;
+	private RoverHub roverHubPnl;
+	private SatelliteHub satelliteHubPnl;
 	
-	private int currentPage = WRAPPER;
+	private int currentPage = STARTUP;
 
-	public static void main(String[] args) {
-		boolean go = false;
-		File config = new File("default.cfg");
-		if (config.exists()){
-			if ((new PopUp()).showConfirmDialog("A quick run configuration file has been found.  Would you like to run the simulator from the file?", "Quick Run", PopUp.YES_NO_OPTIONS) == PopUp.YES_OPTION){
-				go = true;
-			}
-		}
-		final boolean goFin = go;
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-					frame = new Form();
-					com.csm.rover.simulator.wrapper.Admin.align();
-					frame.setUndecorated(true);
-					frame.setSize(screenSize);
-				    frame.setVisible(true);
-				    frame.setResizable(false);
-				    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                    //frame.showOnScreen(frame.currentScreen);
-				    if (goFin){
-				    	Access.CODE.beginSimulation(new RunConfiguration(new File("default.cfg")));
-				    }
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	public Form() {
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowOpened(WindowEvent arg0) {
-				Access.CODE.wakeUp();
-			}
-		});
+	public Form(Dimension screenSize, StartupPanel startupPanel) {
+        this.setVisible(false);
+        setUndecorated(true);
+		setSize(screenSize);
+		setVisible(true);
+		setResizable(false);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.startupPanel = startupPanel;
+		//getInstance().showOnScreen(frame.currentScreen);
+//		addWindowListener(new WindowAdapter() {
+//			@Override
+//			public void windowOpened(WindowEvent arg0) {
+//				CODE.wakeUp();
+//			}
+//		});
 		KeyboardFocusManager masterKeyManager = KeyboardFocusManager
 				.getCurrentKeyboardFocusManager();
-		masterKeyManager.addKeyEventDispatcher(new KeyDispatcher());
+		masterKeyManager.addKeyEventDispatcher(new KeyDispatcher(this));
 		initialize();
 	}
-	
+
+    public void setRunTimePanels(MainWrapper WrapperPnl,
+                                 Panel OrbitalPnl,
+                                 LandMapPanel TerrainPnl,
+                                 InterfacePanel InterfacePnl,
+                                 RoverHub RoverHubPnl,
+                                 SatelliteHub SatelliteHubPnl){
+        this.wrapperPnl = WrapperPnl;
+        this.orbitalPnl = OrbitalPnl;
+        this.terrainPnl = TerrainPnl;
+        this.interfacePnl = InterfacePnl;
+        this.roverHubPnl = RoverHubPnl;
+        this.satelliteHubPnl = SatelliteHubPnl;
+
+        this.startupPanel.setVisible(false);
+        this.remove(startupPanel);
+
+        wrapperPnl.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                wrapperPnl.requestFocus();
+            }
+        });
+        wrapperPnl.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
+        contentPane.add(wrapperPnl);
+
+        orbitalPnl.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                orbitalPnl.requestFocus();
+            }
+        });
+        orbitalPnl.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
+        orbitalPnl.setVisible(false);
+        contentPane.add(orbitalPnl);
+
+        roverHubPnl.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                roverHubPnl.requestFocus();
+            }
+        });
+        roverHubPnl.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
+        roverHubPnl.setVisible(false);
+        contentPane.add(roverHubPnl);
+
+        terrainPnl.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                terrainPnl.requestFocus();
+            }
+        });
+        terrainPnl.setBackground(Color.BLACK);
+        terrainPnl.setVisible(false);
+        contentPane.add(terrainPnl);
+
+        interfacePnl.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                interfacePnl.requestFocus();
+            }
+        });
+        interfacePnl.setImage(new ImageIcon(getClass().getResource("/images/Background.png")));
+        interfacePnl.setVisible(false);
+        contentPane.add(interfacePnl);
+
+        satelliteHubPnl.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                satelliteHubPnl.requestFocus();
+            }
+        });
+        satelliteHubPnl.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
+        satelliteHubPnl.setVisible(false);
+        contentPane.add(satelliteHubPnl);
+
+        currentPage = WRAPPER;
+    }
+
 	private void initialize(){
 		UIManager.put("TabbedPane.contentOpaque", false);
 		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/GPS.png")));
 		setTitle("PHM Simulator");
 		setLocation(0, 0);
-		JPanel contentPane = new JPanel();
+		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
-		WrapperPnl = new MainWrapper(screenSize);
-		WrapperPnl.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				WrapperPnl.requestFocus();
-			}
-		});
-		WrapperPnl.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
-		contentPane.add(WrapperPnl);
-		
-		OrbitalPnl = new Panel(screenSize, "Orbital View");
-		OrbitalPnl.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				OrbitalPnl.requestFocus();
-			}
-		});
-		OrbitalPnl.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
-		OrbitalPnl.setVisible(false);
-		contentPane.add(OrbitalPnl);
-		
-		TerrainPnl = new LandMapPanel(screenSize, new PlanetParametersList());
-		TerrainPnl.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				TerrainPnl.requestFocus();
-			}
-		});
-		TerrainPnl.setBackground(Color.BLACK);
-		TerrainPnl.setVisible(false);
-		contentPane.add(TerrainPnl);
-		
-		InterfacePnl = new InterfacePanel(screenSize);
-		InterfacePnl.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				InterfacePnl.requestFocus();
-			}
-		});
-		InterfacePnl.setImage(new ImageIcon(getClass().getResource("/images/Background.png")));
-		InterfacePnl.setVisible(false);
-		contentPane.add(InterfacePnl);
-		
-		RoverHubPnl = new RoverHub(screenSize);
-		RoverHubPnl.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				RoverHubPnl.requestFocus();
-			}
-		});
-		RoverHubPnl.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
-		RoverHubPnl.setVisible(false);
-		contentPane.add(RoverHubPnl);
-		
-		SatelliteHubPnl = new SatelliteHub(screenSize);
-		SatelliteHubPnl.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				SatelliteHubPnl.requestFocus();
-			}
-		});
-		SatelliteHubPnl.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
-		SatelliteHubPnl.setVisible(false);
-		contentPane.add(SatelliteHubPnl);
+
+        startupPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                startupPanel.requestFocus();
+            }
+        });
+        startupPanel.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
+        startupPanel.setVisible(true);
+        startupPanel.setLocation(0, 0);
+        contentPane.add(startupPanel);
 	}
 	
 	public void exit(){
@@ -175,55 +169,54 @@ public class Form extends JFrame {
 	}
 	
 	public void MasterKeyHandler(KeyEvent arg0){
+        //TODO Optimize and Clean up
 		if (arg0.isControlDown()){
 			switch (currentPage){
 			case WRAPPER:
-				if (arg0.isControlDown()){
-					switch (arg0.getKeyCode()){
-					case KeyEvent.VK_LEFT:
-						WrapperPnl.setVisible(false);
-						TerrainPnl.setVisible(true);
-						TerrainPnl.requestFocus();
-						currentPage = MAP;
-						break;
-					case KeyEvent.VK_RIGHT:
-						WrapperPnl.setVisible(false);
-						OrbitalPnl.setVisible(true);
-						OrbitalPnl.requestFocus();
-						currentPage = ORBIT;
-						break;
-					case KeyEvent.VK_UP:
-						WrapperPnl.setVisible(false);
-						InterfacePnl.setVisible(true);
-						InterfacePnl.requestFocus();
-						currentPage = INTERFACE;
-						break;
-					}
-				}
+                switch (arg0.getKeyCode()){
+                case KeyEvent.VK_LEFT:
+                    wrapperPnl.setVisible(false);
+                    terrainPnl.setVisible(true);
+                    terrainPnl.requestFocus();
+                    currentPage = MAP;
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    wrapperPnl.setVisible(false);
+                    orbitalPnl.setVisible(true);
+                    orbitalPnl.requestFocus();
+                    currentPage = ORBIT;
+                    break;
+                case KeyEvent.VK_UP:
+                    wrapperPnl.setVisible(false);
+                    interfacePnl.setVisible(true);
+                    interfacePnl.requestFocus();
+                    currentPage = INTERFACE;
+                    break;
+                }
 				break;
 			case MAP:
 				switch (arg0.getKeyCode()){
 				case KeyEvent.VK_RIGHT:
-					TerrainPnl.setVisible(false);
-					RoverHubPnl.setInHUDMode(false);
-					RoverHubPnl.setVisible(false);
-					WrapperPnl.setVisible(true);
-					WrapperPnl.requestFocus();
+					terrainPnl.setVisible(false);
+					roverHubPnl.setInHUDMode(false);
+					roverHubPnl.setVisible(false);
+					wrapperPnl.setVisible(true);
+					wrapperPnl.requestFocus();
 					currentPage = WRAPPER;
 					break;
 				case KeyEvent.VK_DOWN:
-					TerrainPnl.setVisible(false);
-					RoverHubPnl.setInHUDMode(false);
-					RoverHubPnl.setVisible(true);
-					RoverHubPnl.requestFocus();
+					terrainPnl.setVisible(false);
+					roverHubPnl.setInHUDMode(false);
+					roverHubPnl.setVisible(true);
+					roverHubPnl.requestFocus();
 					currentPage = ROVER;
 					break;
 				case KeyEvent.VK_UP:
-					TerrainPnl.setVisible(false);
-					RoverHubPnl.setInHUDMode(false);
-					RoverHubPnl.setVisible(false);
-					InterfacePnl.setVisible(true);
-					InterfacePnl.requestFocus();
+					terrainPnl.setVisible(false);
+					roverHubPnl.setInHUDMode(false);
+					roverHubPnl.setVisible(false);
+					interfacePnl.setVisible(true);
+					interfacePnl.requestFocus();
 					currentPage = INTERFACE;
 					break;
 				}
@@ -231,15 +224,15 @@ public class Form extends JFrame {
 			case ROVER:
 				switch (arg0.getKeyCode()){
 				case KeyEvent.VK_RIGHT:
-					RoverHubPnl.setVisible(false);
-					WrapperPnl.setVisible(true);
-					WrapperPnl.requestFocus();
+					roverHubPnl.setVisible(false);
+					wrapperPnl.setVisible(true);
+					wrapperPnl.requestFocus();
 					currentPage = WRAPPER;
 					break;
 				case KeyEvent.VK_UP:
-					RoverHubPnl.setVisible(false);
-					TerrainPnl.setVisible(true);
-					TerrainPnl.requestFocus();
+					roverHubPnl.setVisible(false);
+					terrainPnl.setVisible(true);
+					terrainPnl.requestFocus();
 					currentPage = MAP;
 					break;
 				}
@@ -247,21 +240,21 @@ public class Form extends JFrame {
 			case ORBIT:
 				switch (arg0.getKeyCode()){
 				case KeyEvent.VK_LEFT:
-					OrbitalPnl.setVisible(false);
-					WrapperPnl.setVisible(true);
-					WrapperPnl.requestFocus();
+					orbitalPnl.setVisible(false);
+					wrapperPnl.setVisible(true);
+					wrapperPnl.requestFocus();
 					currentPage = WRAPPER;
 					break;
 				case KeyEvent.VK_DOWN:
-					OrbitalPnl.setVisible(false);
-					SatelliteHubPnl.setVisible(true);
-					SatelliteHubPnl.requestFocus();
+					orbitalPnl.setVisible(false);
+					satelliteHubPnl.setVisible(true);
+					satelliteHubPnl.requestFocus();
 					currentPage = SATELLITE;
 					break;
 				case KeyEvent.VK_UP:
-					OrbitalPnl.setVisible(false);
-					InterfacePnl.setVisible(true);
-					InterfacePnl.requestFocus();
+					orbitalPnl.setVisible(false);
+					interfacePnl.setVisible(true);
+					interfacePnl.requestFocus();
 					currentPage = INTERFACE;
 					break;
 				}
@@ -269,15 +262,15 @@ public class Form extends JFrame {
 			case SATELLITE:
 				switch (arg0.getKeyCode()){
 				case KeyEvent.VK_LEFT:
-					SatelliteHubPnl.setVisible(false);
-					WrapperPnl.setVisible(true);
-					WrapperPnl.requestFocus();
+					satelliteHubPnl.setVisible(false);
+					wrapperPnl.setVisible(true);
+					wrapperPnl.requestFocus();
 					currentPage = WRAPPER;
 					break;
 				case KeyEvent.VK_UP:
-					SatelliteHubPnl.setVisible(false);
-					OrbitalPnl.setVisible(true);
-					OrbitalPnl.requestFocus();
+					satelliteHubPnl.setVisible(false);
+					orbitalPnl.setVisible(true);
+					orbitalPnl.requestFocus();
 					currentPage = ORBIT;
 					break;
 				}
@@ -285,27 +278,31 @@ public class Form extends JFrame {
 			case INTERFACE:
 				switch (arg0.getKeyCode()){
 				case KeyEvent.VK_DOWN:
-					InterfacePnl.setVisible(false);
-					WrapperPnl.setVisible(true);
-					WrapperPnl.requestFocus();
+					interfacePnl.setVisible(false);
+					wrapperPnl.setVisible(true);
+					wrapperPnl.requestFocus();
 					currentPage = WRAPPER;
 					break;
 				case KeyEvent.VK_LEFT:
-					InterfacePnl.setVisible(false);
-					TerrainPnl.setVisible(true);
-					TerrainPnl.requestFocus();
+					interfacePnl.setVisible(false);
+					terrainPnl.setVisible(true);
+					terrainPnl.requestFocus();
 					currentPage = MAP;
 					break;
 				case KeyEvent.VK_RIGHT:
-					InterfacePnl.setVisible(false);
-					OrbitalPnl.setVisible(true);
-					OrbitalPnl.requestFocus();
+					interfacePnl.setVisible(false);
+					orbitalPnl.setVisible(true);
+					orbitalPnl.requestFocus();
 					currentPage = ORBIT;
 					break;
 				}
 				break;
 			}
 		}
+        else {
+            startupPanel.setBounds(0, 0, getWidth(), getHeight());
+            startupPanel.setVisible(true);
+        }
 	}
 
 	public void changeWindow(){
@@ -324,16 +321,37 @@ public class Form extends JFrame {
 			gs[0].setFullScreenWindow( this );
 		}
 		else{
-            Globals.reportError("Form", "No Screens Found", new RuntimeException("No Screens Found"));
+            Globals.getInstance().reportError("Form", "showOnScreen", new RuntimeException("No Screens Found"));
 		}
 	}
 
 
+    public void focusOnTerrain() {
+        terrainPnl.requestFocus();
+    }
 }
 
 class KeyDispatcher implements KeyEventDispatcher {
+	private long lastEvent = 0;
+	private int lastCode = 0;
+
+    private Form GUI;
+
+    public KeyDispatcher(Form gui){
+        GUI = gui;
+    }
+
+	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
-		Access.handleGlobalKeyEvent(e);
+		if (System.currentTimeMillis()-lastEvent > 300 || lastCode != e.getKeyCode()){
+			lastEvent = System.currentTimeMillis();
+			lastCode = e.getKeyCode();
+			GUI.MasterKeyHandler(e);
+		}
+		else {
+			lastEvent = System.currentTimeMillis();
+			lastCode = e.getKeyCode();
+		}
 		return false;
 	}
 }

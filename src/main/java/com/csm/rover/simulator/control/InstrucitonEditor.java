@@ -1,32 +1,16 @@
 package com.csm.rover.simulator.control;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
-import java.awt.Font;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.JCheckBox;
-
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
-
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.ZList;
-import com.csm.rover.simulator.wrapper.Access;
 
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -212,7 +196,7 @@ public class InstrucitonEditor extends JDialog {
 				instructions[x] = new InstructionObj(cropStringArray(tableStrings[x]), ParameterTitles.getValueAt(x), parameterBools[x]);
 				x++;
 			}
-			Access.InstructionEditorFinish(AddRoverChk.isSelected(), AddSatelliteChk.isSelected(), TitleTxt.getText(), instructions);
+			InterfaceAccess.InstructionEditorFinish(AddRoverChk.isSelected(), AddSatelliteChk.isSelected(), TitleTxt.getText(), instructions);
 			this.setVisible(false);
 		}
 		else {

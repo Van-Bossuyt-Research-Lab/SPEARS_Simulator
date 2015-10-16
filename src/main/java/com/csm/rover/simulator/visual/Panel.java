@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 public class Panel extends JPanel{
 
@@ -21,10 +22,10 @@ public class Panel extends JPanel{
 		super.setSize(size);
 		super.setLocation(0, 0);
 		super.setLayout(null);
-		inialize(title);
+		initialize(title);
 	}
 	
-	private void inialize(String title) {
+	private void initialize(String title) {
 		titleLbl = new JLabel(title);
 		titleLbl.setLocation(20, 10);
 		titleLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 25));
@@ -50,7 +51,9 @@ public class Panel extends JPanel{
         exitBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                Form.frame.exit();
+                if (getForm().isPresent()){
+					getForm().get().exit();
+				}
             }
         });
         add(exitBtn);
@@ -67,7 +70,9 @@ public class Panel extends JPanel{
         changeBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                Form.frame.changeWindow();
+				if (getForm().isPresent()) {
+					getForm().get().changeWindow();
+				}
             }
         });
         add(changeBtn);
@@ -84,7 +89,9 @@ public class Panel extends JPanel{
 		minimizeBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				Form.frame.minimize();
+				if (getForm().isPresent()) {
+					getForm().get().minimize();
+				}
 			}
 		});
 		add(minimizeBtn);
@@ -123,6 +130,9 @@ public class Panel extends JPanel{
 		return titleLbl.getHeight() + titleLbl.getY();
 	}
 
+    public Rectangle getWorkingBounds(){
+        return new Rectangle(0, getTopOfPage(), getWidth(), getWorkingHeight());
+    }
 
 	protected static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
@@ -140,5 +150,16 @@ public class Panel extends JPanel{
 				popup.show(e.getComponent(), e.getX()-5, e.getY()-5);
 			}
 		});
+	}
+
+	protected Optional<Form> getForm(){
+		Container comp = this;
+		while (comp.getParent() != null){
+			comp = comp.getParent();
+			if (comp instanceof Form){
+				return Optional.of((Form)comp);
+			}
+		}
+		return Optional.empty();
 	}
 }

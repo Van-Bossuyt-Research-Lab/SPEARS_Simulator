@@ -1,21 +1,15 @@
 package com.csm.rover.simulator.visual;
 
+import com.csm.rover.simulator.wrapper.Admin;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.JProgressBar;
-
-import com.csm.rover.simulator.wrapper.Admin;
+import java.awt.event.ActionListener;
 
 public class AccelPopUp extends JDialog {
 
@@ -75,7 +69,7 @@ public class AccelPopUp extends JDialog {
 		JButton btnAbort = new JButton("Abort");
 		btnAbort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Admin.GUI.exit();
+                Admin.getCurrentInterface().exit();
 			}
 		});
 		btnAbort.setBounds(197, 133, 89, 23);

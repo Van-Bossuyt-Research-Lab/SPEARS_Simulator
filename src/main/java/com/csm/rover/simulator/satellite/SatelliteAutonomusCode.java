@@ -1,9 +1,9 @@
 package com.csm.rover.simulator.satellite;
 
-import java.io.Serializable;
-
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.wrapper.Globals;
+
+import java.io.Serializable;
 
 public abstract class SatelliteAutonomusCode implements Serializable {
 	
@@ -45,7 +45,7 @@ public abstract class SatelliteAutonomusCode implements Serializable {
 	}
 	
 	protected void writeToLog(String message){
-		Globals.writeToLogFile(satelliteName + ":" + name + " - Autonomous Code", message);
+		Globals.getInstance().writeToLogFile(satelliteName + ":" + name + " - Autonomous Code", message);
 	}
 	
 }

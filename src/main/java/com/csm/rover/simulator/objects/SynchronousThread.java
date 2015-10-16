@@ -1,11 +1,14 @@
 package com.csm.rover.simulator.objects;
 
-import java.io.Serializable;
 import com.csm.rover.simulator.wrapper.Globals;
+import java.io.Serializable;
+
 
 public class SynchronousThread extends Thread implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	
+	private Globals GLOBAL;
 	
 	private int delay;
 	private Runnable action;
@@ -17,21 +20,23 @@ public class SynchronousThread extends Thread implements Serializable {
 	
 	public SynchronousThread(int interval, Runnable run, int times, String name){
 		super.setName(name);
+		GLOBAL = Globals.getInstance();
 		delay = interval;
 		action = run;
 		actions = times;
 		forever = (times == FOREVER);
-		Globals.registerNewThread(name, delay, this);
+		GLOBAL.registerNewThread(name, delay, this);
 		this.start();
 	}
 	
 	public SynchronousThread(int interval, Runnable run, int times, String name, boolean start){
 		super.setName(name);
+        GLOBAL = Globals.getInstance();
 		delay = interval;
 		action = run;
 		actions = times;
 		forever = (times == FOREVER);
-		Globals.registerNewThread(name, delay, this);
+		GLOBAL.registerNewThread(name, delay, this);
 		if (start){
 			this.start();
 		}
@@ -46,13 +51,13 @@ public class SynchronousThread extends Thread implements Serializable {
 				catch (InterruptedException e) {
 					running = true;
 					if (stopped){
-						Globals.checkOutThread(getName());
+						GLOBAL.checkOutThread(getName());
 						return;
 					}
-					if (Globals.getThreadRunPermission(getName())){
-						Globals.threadIsRunning(getName());
+					if (GLOBAL.getThreadRunPermission(getName())){
+						GLOBAL.threadIsRunning(getName());
 						action.run();
-						Globals.threadCheckIn(getName());
+						GLOBAL.threadCheckIn(getName());
 						if (!forever){
 							actions--;
 						}
@@ -61,7 +66,7 @@ public class SynchronousThread extends Thread implements Serializable {
 				}
 			}			
 		}
-		Globals.checkOutThread(getName());
+		GLOBAL.checkOutThread(getName());
 		return;
 	}
 	

@@ -1,5 +1,13 @@
 package com.csm.rover.simulator.rover;
 
+import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.rover.autoCode.RoverAutonomousCode;
+import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
+import com.csm.rover.simulator.wrapper.Globals;
+import com.csm.rover.simulator.wrapper.SerialBuffers;
+
 import java.awt.Point;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -8,24 +16,19 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.rover.autoCode.RoverAutonomusCode;
-import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
-import com.csm.rover.simulator.wrapper.Access;
-import com.csm.rover.simulator.wrapper.Admin;
-import com.csm.rover.simulator.wrapper.Globals;
-
 //TODO actually debug instructions
 //TODO make for modular for OCP, SRP
 public class RoverObject implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
+	private static TerrainMap MAP;
+    private static SerialBuffers serialBuffers;
+
 	private String name;
 	private String IDcode;
 	private RoverPhysicsModel physics;
-	private RoverAutonomusCode autoCode;
+	private RoverAutonomousCode autoCode;
 	
 	@SuppressWarnings("unused")
 	private boolean connected = false; // Can the ground station hear/talk to us
@@ -37,7 +40,7 @@ public class RoverObject implements Serializable {
 	private boolean hasInstructions = false; // has a list of instructions on file
 	private String instructions = ""; // the list of instructions
 	private int instructsComplete = 0; // how many items on the list have we done
-	private long timeOfLastCmd = Globals.TimeMillis; // how long since the ground station talked last
+	private long timeOfLastCmd = Globals.getInstance().timeMillis; // how long since the ground station talked last
 	private boolean waiting = false; // are we waiting
 	private long cmdWaitTime = 0; // how long to wait
 	private boolean run_auto = false; // are we running autonomously
@@ -76,7 +79,7 @@ public class RoverObject implements Serializable {
 	private String serialHistory = "";
 	private Map<String, Boolean> LEDs = new TreeMap<String, Boolean>();
 	
-	public RoverObject(String name, String ID, RoverPhysicsModel param, RoverAutonomusCode code, DecimalPoint loc, double dir, double temp){
+	public RoverObject(String name, String ID, RoverPhysicsModel param, RoverAutonomousCode code, DecimalPoint loc, double dir, double temp){
 		this.name = name;
 		IDcode = ID;
 		physics = param;
@@ -88,52 +91,62 @@ public class RoverObject implements Serializable {
 		LEDs.put("Instructions", false);
 		LEDs.put("Autonomus", false);
 	}
+
+    public static void setTerrainMap(TerrainMap map){
+        MAP = map;
+        RoverAutonomousCode.setTerrainMap(map);
+        RoverPhysicsModel.setTerrainMap(map);
+    }
+    
+    public static void setSerialBuffers(SerialBuffers buffers){
+        serialBuffers = buffers;
+    }
 	
 	public void start(){
 		new SynchronousThread(100, new Runnable(){
 			public void run(){
-				//System.out.println(name + "-CODE\t" + Globals.TimeMillis);
+				//System.out.println(name + "-CODE\t" + Globals.getInstance().timeMillis);
 				excecuteCode();
 			}
 		},
 		SynchronousThread.FOREVER, name+"-code");
 		physics.start();
-		timeOfLastCmd = Globals.TimeMillis;
+		timeOfLastCmd = Globals.getInstance().timeMillis;
 	}
 	
 	private void excecuteCode(){
 		try {
-			//Globals.writeToLogFile(this.name, Globals.TimeMillis + "\t" + physics.getLocation().getX() + "\t" + physics.getLocation().getY() + "\t" + Access.getMapHeightatPoint(physics.getLocation()) + "\t" + visitedScience.size()*10 + "\t" + physics.getBatteryCharge());
+			//Globals.getInstance().writeToLogFile(this.name, Globals.getInstance().timeMillis + "\t" + physics.getLocation().getX() + "\t" + physics.getLocation().getY() + "\t" + Access.getMapHeightatPoint(physics.getLocation()) + "\t" + visitedScience.size()*10 + "\t" + physics.getBatteryCharge());
 			try {
 				motorVoltage = (float) getBatteryVoltage(); // check battery voltage
 				if (motorVoltage < 0.0001){
-					Globals.writeToLogFile("Rover", "Rover out of Power:\t" + Globals.TimeMillis);
+					Globals.getInstance().writeToLogFile("Rover", "Rover out of Power:\t" + Globals.getInstance().timeMillis);
 				}
 				motorCurrent = (float) getBatteryCurrent(); // measure current draw				
 				if (checkCurrent){
-					currentIntegral += motorCurrent * (Globals.TimeMillis - lastCurrentCheck); // predict life (really simply)
-					lastCurrentCheck = Globals.TimeMillis;
-					averageCurrent = currentIntegral / (Globals.TimeMillis - startCurretIntegral);
+					currentIntegral += motorCurrent * (Globals.getInstance().timeMillis - lastCurrentCheck); // predict life (really simply)
+					lastCurrentCheck = Globals.getInstance().timeMillis;
+					averageCurrent = currentIntegral / (Globals.getInstance().timeMillis - startCurretIntegral);
 				}
 			} catch (Exception e) {
-				Globals.reportError("RoverCode", "runCode - voltage", e);
+				Globals.getInstance().reportError("RoverCode", "runCode - voltage", e);
 			}
 			
-			if (Globals.RFAvailable(IDcode) > 1) { // if there is a message
+			if (serialBuffers.RFAvailable(IDcode) > 1) { // if there is a message
 				delay(500);
-				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
+				char[] id = strcat((char)serialBuffers.ReadSerial(IDcode), (char)serialBuffers.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
 															// go is set to false if the first read is not IDcode 
 															// to prevent starting a message not intended for the rover 
 															// from within the body of another message
-					Globals.ReadSerial(IDcode); // white space
-					tag = (char) Globals.ReadSerial(IDcode); // get type tag
-					if (Globals.RFAvailable(IDcode) > 0) { // if there is more to the message
+					serialBuffers.ReadSerial(IDcode); // white space
+					tag = (char) serialBuffers.ReadSerial(IDcode); // get type tag
+					if (serialBuffers.RFAvailable(IDcode) > 0) { // if there is more to the message
 						run_auto = false; // stop running autonomously
 						data[0] = tag; // tag is not actually import, just read the entire body of the message
 						index++;
-						while (Globals.RFAvailable(IDcode) > 0 && index < data.length-1) { //read in message body
-							data[index] = (char) Globals.ReadSerial(IDcode);
+						while (serialBuffers.RFAvailable(IDcode) > 0 && index < data.length-1) { //read in message body
+							data[index] = (char) serialBuffers.ReadSerial(IDcode);
 							index++;
 						}
 						data[index] = '\0'; // end of string
@@ -205,13 +218,13 @@ public class RoverObject implements Serializable {
 						} 
 						else if (strcmp(data, "instructions") == 0) { // if we are recieving instructions
 							instructions = ""; // clear existing "file"
-							while (Globals.RFAvailable(IDcode) == 0) { // wait for transmission to start
+							while (serialBuffers.RFAvailable(IDcode) == 0) { // wait for transmission to start
 								delay(5);
 							}
 							delay(1000); // begin syncopation of read/write
-							while (Globals.RFAvailable(IDcode) > 0) { 
-								while (Globals.RFAvailable(IDcode) > 0) {
-									instructions += (char) Globals.ReadSerial(IDcode); // read in character, add to list
+							while (serialBuffers.RFAvailable(IDcode) > 0) { 
+								while (serialBuffers.RFAvailable(IDcode) > 0) {
+									instructions += (char) serialBuffers.ReadSerial(IDcode); // read in character, add to list
 								}
 								delay(2000); // continue syncopation, we want to avoid the incoming message running out of room in the buffer
 							}
@@ -236,8 +249,8 @@ public class RoverObject implements Serializable {
 							sendSerial("s1 g %");
 						}
 						else if (strcmp(data, "score") == 0){
-							if (Access.isAtTarget(getLocation())){
-								this.visitedScience.add(Admin.GUI.TerrainPnl.heightMap.getMapSquare(getLocation()));
+							if (MAP.isPointAtTarget(getLocation())){
+								this.visitedScience.add(MAP.getMapSquare(getLocation()));
 								System.out.println("Aquired.  New Score = " + visitedScience.size());
 							}
 						}
@@ -270,16 +283,16 @@ public class RoverObject implements Serializable {
 					data = new char[data.length]; // reset data array
 					index = 0;
 					tag = '\0';
-					timeOfLastCmd = Globals.TimeMillis; // reset time since command
+					timeOfLastCmd = Globals.getInstance().timeMillis; // reset time since command
 					if (moving){
-				        cmdWaitTime += Globals.TimeMillis + 60000; // reset command wait
+				        cmdWaitTime += Globals.getInstance().timeMillis + 60000; // reset command wait
 					}
 				} 
 				else { // the message wasn't for us
 					go = false; // ignore it
-					int waiting = Globals.RFAvailable(IDcode);
+					int waiting = serialBuffers.RFAvailable(IDcode);
 					while (waiting > 0) { // delete it
-						Globals.ReadSerial(IDcode);
+						serialBuffers.ReadSerial(IDcode);
 						waiting--;
 					}
 				}
@@ -289,7 +302,7 @@ public class RoverObject implements Serializable {
 			}
 			
 			// Listening for response
-			if (Globals.TimeMillis - timeSinceMessage > responseWaitTime && waitingForResponse){ // if waiting and appropriate time has passed
+			if (Globals.getInstance().timeMillis - timeSinceMessage > responseWaitTime && waitingForResponse){ // if waiting and appropriate time has passed
 				waitingForResponse = false; // we're no longer waiting
 				// switch possible responses
 				if (desiredResponse == '*'){
@@ -303,13 +316,13 @@ public class RoverObject implements Serializable {
 			}
 
 			// Autonomous and Instruction handling
-			if (Globals.TimeMillis - timeOfLastCmd > 60000){ // if it has been a minute since we heard from them
+			if (Globals.getInstance().timeMillis - timeOfLastCmd > 60000){ // if it has been a minute since we heard from them
 				//System.out.println(this.name);
 				if (hasInstructions && !mute) { // if we have instructions, can send things
 					LEDs.put("Instructions", true);
 					LEDs.put("Autonomus", false);
 					run_auto = false; // don't run autonomously
-					if (!waiting || (Globals.TimeMillis > cmdWaitTime)) { // if we're not waiting or have waiting long enough
+					if (!waiting || (Globals.getInstance().timeMillis > cmdWaitTime)) { // if we're not waiting or have waiting long enough
 						waiting = false;
 						String cmd = ""; // the command
 						int x = 0;
@@ -385,7 +398,7 @@ public class RoverObject implements Serializable {
 								if (temperatureData.equals("")){ // if there is not an existing "file," create one
 						    		temperatureData += "Graph Title,Temperatures," + "Vertical Units,*C," + "Horizontal Units,s," + "Label,\nSys Time,Temperature,";
 						    	}
-						    	temperatureData += Globals.TimeMillis + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
+						    	temperatureData += Globals.getInstance().timeMillis + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
 						    }
 						    else if (strcmp(cmd, "sendTemp") == 0){ // report temperature
 						    	sendSerial("s1 g }"); // mute the ground so they can't interrupt
@@ -406,7 +419,7 @@ public class RoverObject implements Serializable {
 						    }
 						    else if (strcmp(cmd, "delay1") == 0) { // wait a second
 						    	waiting = true;
-								cmdWaitTime = Globals.TimeMillis + 1000;
+								cmdWaitTime = Globals.getInstance().timeMillis + 1000;
 							}
 							else if (strcmp(cmd, "report") == 0) { // report completion of instructions to ground
 								if (sendSerial("s1 g n Rover Instructs Done")) { // if we're not muted
@@ -467,7 +480,7 @@ public class RoverObject implements Serializable {
 				LEDs.put("Instructions", false);
 				
 				String cmd = autoCode.nextCommand(
-						Globals.TimeMillis,
+						Globals.getInstance().timeMillis,
 						physics.getLocation(),
 						physics.getDirection(),
 						getAutonomousParameters()
@@ -525,7 +538,7 @@ public class RoverObject implements Serializable {
 					if (temperatureData.equals("")){ // if there is not an existing "file," create one
 			    		temperatureData += "Graph Title,Temperatures," + "Vertical Units,*C," + "Horizontal Units,s," + "Label,\nSys Time,Temperature,";
 			    	}
-			    	temperatureData += Globals.TimeMillis + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
+			    	temperatureData += Globals.getInstance().timeMillis + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
 			    }
 			    else if (strcmp(cmd, "sendTemp") == 0){ // report temperature
 			    	sendSerial("s1 g }"); // mute the ground so they can't interrupt
@@ -546,7 +559,7 @@ public class RoverObject implements Serializable {
 			    }
 			    else if (strcmp(cmd.substring(0, 5), "delay") == 0) { // wait a second
 			    	waiting = true;
-					cmdWaitTime = Globals.TimeMillis + Integer.parseInt(cmd.substring(5, cmd.length()));
+					cmdWaitTime = Globals.getInstance().timeMillis + Integer.parseInt(cmd.substring(5, cmd.length()));
 				}
 			    else if (strcmp(cmd.substring(0, 7), "chngmtr") == 0){ //to change motor speed "chngmtr*###" where *=motorID and ###=new power
 			    	int motor = cmd.charAt(7);
@@ -578,43 +591,43 @@ public class RoverObject implements Serializable {
 			    	}
 			    }
 				
-				/*if (Globals.TimeMillis >= autoWaitUntil){
+				/*if (Globals.getInstance().timeMillis >= autoWaitUntil){
 					driveSpinCCW();
 					// EOL Calculation
 					setEOL(resistanceP*capacitanceB*ln(motorVoltage/(motorCurrent*(resistanceP+resistanceCP+resistanceS))), "battery");
-					Globals.writeToLogFile("PHM Calc", "Time Elapsed:\t" + (Globals.TimeMillis-this.startCurretIntegral) + "\tEOL:\t" + getEndOfLife("battery") + "\tMotor Voltage:\t" + motorVoltage + "\tMotor Current:\t" + motorCurrent);
-					autoWaitUntil = Globals.TimeMillis + 600000;
+					Globals.getInstance().writeToLogFile("PHM Calc", "Time Elapsed:\t" + (Globals.getInstance().timeMillis-this.startCurretIntegral) + "\tEOL:\t" + getEndOfLife("battery") + "\tMotor Voltage:\t" + motorVoltage + "\tMotor Current:\t" + motorCurrent);
+					autoWaitUntil = Globals.getInstance().timeMillis + 600000;
 				}
 				else {
-					//System.out.println(Globals.TimeMillis + " < " + autoWaitUntil);
+					//System.out.println(Globals.getInstance().timeMillis + " < " + autoWaitUntil);
 				}
 				
-				if (Globals.TimeMillis - this.lastLogWrite > 10*60*1000){
-					Globals.writeToLogFile("Autonomus", "Battery Voltage = " + getBatteryVoltage() + " V\t\tSOC = " + getSOC() + "%");
-					lastLogWrite = Globals.TimeMillis;
+				if (Globals.getInstance().timeMillis - this.lastLogWrite > 10*60*1000){
+					Globals.getInstance().writeToLogFile("Autonomus", "Battery Voltage = " + getBatteryVoltage() + " V\t\tSOC = " + getSOC() + "%");
+					lastLogWrite = Globals.getInstance().timeMillis;
 				}
 				
 				if (Access.isAtTarget(location) && !atTarget){
 					atTarget = true;
 					driveStop();
 					takePicture();
-					timeOfLastCmd = Globals.TimeMillis;
-					autoWaitUntil = Globals.TimeMillis + 1000;
+					timeOfLastCmd = Globals.getInstance().timeMillis;
+					autoWaitUntil = Globals.getInstance().timeMillis + 1000;
 					
 				}
 				else {
 					atTarget = false;
 				}
-				if (Globals.TimeMillis >= autoWaitUntil){
+				if (Globals.getInstance().timeMillis >= autoWaitUntil){
 					actionCounter++;
 					int step = actionCounter % 2;
 					if (step == 0){
 						driveTurnFR();
-						autoWaitUntil = Globals.TimeMillis + 2000;
+						autoWaitUntil = Globals.getInstance().timeMillis + 2000;
 					}
 					else if (step == 1){
 						driveForward();
-						autoWaitUntil = Globals.TimeMillis + 4*1000;
+						autoWaitUntil = Globals.getInstance().timeMillis + 4*1000;
 					}							
 				}*/
 				
@@ -636,7 +649,7 @@ public class RoverObject implements Serializable {
 		} catch (Exception e) {
 			// something went wrong
 			System.out.println("Error in Rover Run Code");
-			Globals.reportError("RoverCode", "runCode - code", e);
+			Globals.getInstance().reportError("RoverCode", "runCode - code", e);
 		}
 	}
 	
@@ -652,7 +665,7 @@ public class RoverObject implements Serializable {
 			while (hold != -1) { // send the file in 60 byte chunks
 				index = 0;
 				while (index < 60 && hold != -1) {
-					Globals.writeToSerial((byte) hold, IDcode);
+					serialBuffers.writeToSerial((byte) hold, IDcode);
 					hold = data.read();
 					index++;
 				}
@@ -660,7 +673,7 @@ public class RoverObject implements Serializable {
 			}
 		}
 		catch (Exception e){
-			Globals.reportError("RoverCode", "takePicture", e);
+			Globals.getInstance().reportError("RoverCode", "takePicture", e);
 		}
 	}
 	
@@ -740,7 +753,7 @@ public class RoverObject implements Serializable {
 	
 	// set up waiting for a response
 	private void setWaitForResponse(char listen, long timeToWait){
-		timeSinceMessage = Globals.TimeMillis; // when was the out message sent
+		timeSinceMessage = Globals.getInstance().timeMillis; // when was the out message sent
 		desiredResponse = listen; // what are we listening for
 		responseWaitTime = timeToWait; // how long should we wait for it
 		waitingForResponse = true; // we are waiting
@@ -754,17 +767,17 @@ public class RoverObject implements Serializable {
 				if (message[x] == '\0') { // while not the end of string
 					break;
 				}
-				Globals.writeToSerial(message[x], IDcode); // Write to Serial one char at a time
+				serialBuffers.writeToSerial(message[x], IDcode); // Write to Serial one char at a time
 				delay(1);
 				x++;
 			}
 			addToSerialHistory(mess);
-			Globals.writeToLogFile(name+" Serial", "Message Sent: \'" + mess + "\'");
+			Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
 			return true;
 		} 
 		else {
 			addToSerialHistory("Surpressed: " + mess);
-			Globals.writeToLogFile(name+" Serial", "Message Surpressed: \'" + mess + "\'");
+			Globals.getInstance().writeToLogFile(name + " Serial", "Message Surpressed: \'" + mess + "\'");
 			return false;
 		}
 	}
@@ -775,25 +788,25 @@ public class RoverObject implements Serializable {
 
 	private boolean sendSerial(char mess) {
 		if (!mute) {
-			Globals.writeToSerial(mess, IDcode);
+			serialBuffers.writeToSerial(mess, IDcode);
 			addToSerialHistory(mess + "");
-			Globals.writeToLogFile(name+" Serial", "Message Sent: \'" + mess + "\'");
+			Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
 			return true;
 		} else {
 			addToSerialHistory("Supressed: " + mess);
-			Globals.writeToLogFile(name+" Serial", "Message Sent: \'" + mess + "\'");
+			Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
 			return false;
 		}
 	}
 
 	private void delay(int length) { //put the thread to sleep for a bit
-		String newname = Globals.delayThread(Thread.currentThread().getName(), length);
-		while (!Globals.getThreadRunPermission(newname)) {}
-		Globals.threadDelayComplete(Thread.currentThread().getName());
+		String newname = Globals.getInstance().delayThread(Thread.currentThread().getName(), length);
+		while (!Globals.getInstance().getThreadRunPermission(newname)) {}
+		Globals.getInstance().threadDelayComplete(Thread.currentThread().getName());
 	}
 	
 	private double getTemperature(){ // read temperature from the "sensor"
-		return Globals.addErrorToMeasurement(0, .5);//WrapperMain.MAP.getTemperatureAtLoc(), 0.73);
+		return Globals.getInstance().addErrorToMeasurement(0, .5);//WrapperMain.MAP.getTemperatureAtLoc(), 0.73);
 	}
 	
 	private int strcmp(char[] first, String second) { // see if 2 strings are equal
@@ -808,7 +821,7 @@ public class RoverObject implements Serializable {
 				return 0;
 			}
 		} catch (Exception e) {
-			Globals.reportError("RoverCode", "strcmp", e);
+			Globals.getInstance().reportError("RoverCode", "strcmp", e);
 		}
 		return 1;
 	}
@@ -852,7 +865,7 @@ public class RoverObject implements Serializable {
 //PHYSCIS Related Stuff *****************************************************************************************************************************************************************************************************
 	
 	public void addToSerialHistory(String out){
-		serialHistory += out + "\t\t\t" + Globals.TimeMillis + "\n";
+		serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis + "\n";
 	}
 	
 	public String getName(){

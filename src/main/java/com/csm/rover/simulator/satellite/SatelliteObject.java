@@ -1,5 +1,9 @@
 package com.csm.rover.simulator.satellite;
 
+import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.wrapper.Globals;
+import com.csm.rover.simulator.wrapper.SerialBuffers;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -7,14 +11,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import com.csm.rover.simulator.wrapper.Globals;
-import com.csm.rover.simulator.objects.SynchronousThread;
-
 @SuppressWarnings("unused")
 public class SatelliteObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+    private static SerialBuffers serialBuffers;
+    
 	private String name;
 	private String IDcode;
 	private SatelliteParametersList params;
@@ -46,6 +49,10 @@ public class SatelliteObject implements Serializable {
 		this.params = params;
 		autoCode = code;
 	}
+
+    public static void setSerialBuffers(SerialBuffers buffers){
+        serialBuffers = buffers;
+    }
 	
 	public void start(){
 		new SynchronousThread(100, new Runnable(){
@@ -73,25 +80,25 @@ public class SatelliteObject implements Serializable {
 	
 	public void excecuteCode(){
 		try {
-			if (Globals.RFAvailable(IDcode) > 1) { // if there is a message
+			if (serialBuffers.RFAvailable(IDcode) > 1) { // if there is a message
 				delay(500);
-				char[] id = strcat((char)Globals.ReadSerial(IDcode), (char)Globals.ReadSerial(IDcode));
+				char[] id = strcat((char)serialBuffers.ReadSerial(IDcode), (char)serialBuffers.ReadSerial(IDcode));
 				if (strcmp(id, IDcode) == 0) { // if the message is for us and are we allowed to read it
 					delay(500);
-					Globals.ReadSerial(IDcode); // white space
-					tag[0] = (char) Globals.ReadSerial(IDcode); // message type tag
+					serialBuffers.ReadSerial(IDcode); // white space
+					tag[0] = (char) serialBuffers.ReadSerial(IDcode); // message type tag
 					if (tag[0] == 'r'){
-						tag[1] = (char) Globals.ReadSerial(IDcode); //number of rover
+						tag[1] = (char) serialBuffers.ReadSerial(IDcode); //number of rover
 						index = 3;
 					}
 					else {
 						tag[1] = '\0';
 						index = 2;
 					}
-					Globals.ReadSerial(IDcode); // white space
+					serialBuffers.ReadSerial(IDcode); // white space
 					data[index-1] = ' '; // fills in for message forward
-					while (Globals.RFAvailable(IDcode) > 0){
-						data[index] = (char) Globals.ReadSerial(IDcode); // read message body
+					while (serialBuffers.RFAvailable(IDcode) > 0){
+						data[index] = (char) serialBuffers.ReadSerial(IDcode); // read message body
 						index++;
 					}
 					data[index] = '\0'; // end string
@@ -126,14 +133,14 @@ public class SatelliteObject implements Serializable {
 						}
 						else if (strcmp(data, "[o]") == 0){ // receive and forward image
 							byte[] data = new byte[0]; // output data
-							while (Globals.RFAvailable(IDcode) == 0) { // wait for transmission to start
+							while (serialBuffers.RFAvailable(IDcode) == 0) { // wait for transmission to start
 								delay(5);
 							}
 							delay(1000); // syncopate
 							int index = 0;
-							while (Globals.RFAvailable(IDcode) > 0) { // read data in 60 byte chunks
-								while (Globals.RFAvailable(IDcode) > 0) {
-									data = Augment(data, Globals.ReadSerial(IDcode));
+							while (serialBuffers.RFAvailable(IDcode) > 0) { // read data in 60 byte chunks
+								while (serialBuffers.RFAvailable(IDcode) > 0) {
+									data = Augment(data, serialBuffers.ReadSerial(IDcode));
 									index++;
 								}
 								delay(2000); // continue syncapation for smooth data transmission
@@ -149,7 +156,7 @@ public class SatelliteObject implements Serializable {
 							while (x < data.length) {
 								index = 0;
 								while ((index < 60) && x < data.length) { // send data in 60 byte chunks
-									Globals.writeToSerial(data[x], IDcode);
+									serialBuffers.writeToSerial(data[x], IDcode);
 									index++;
 									x++;
 								}
@@ -161,11 +168,11 @@ public class SatelliteObject implements Serializable {
 							String data = "";
 							index = 0;
 						    char buffer;
-						    while (Globals.RFAvailable(IDcode) == 0) {}
+						    while (serialBuffers.RFAvailable(IDcode) == 0) {}
 							delay(1000);
-							while (Globals.RFAvailable(IDcode) > 0){
-								while (Globals.RFAvailable(IDcode) > 0){
-								    buffer = (char)Globals.ReadSerial(IDcode);
+							while (serialBuffers.RFAvailable(IDcode) > 0){
+								while (serialBuffers.RFAvailable(IDcode) > 0){
+								    buffer = (char)serialBuffers.ReadSerial(IDcode);
 								    data += buffer;
 								    index++;
 							    }
@@ -194,17 +201,17 @@ public class SatelliteObject implements Serializable {
 					    }
 						else if (strcmp(data, "instructions") == 0){ // is recieving instructions
 							instructions = ""; // create new "file"
-							while (Globals.RFAvailable(IDcode) == 0) { // wait for transmission to start
+							while (serialBuffers.RFAvailable(IDcode) == 0) { // wait for transmission to start
 								delay(5);
 							}
 							delay(1000); // syncopate
-							while (Globals.RFAvailable(IDcode) > 0){
-								while (Globals.RFAvailable(IDcode) > 0){
-									instructions += (char)Globals.ReadSerial(IDcode); // read in byte at a time, add to file
+							while (serialBuffers.RFAvailable(IDcode) > 0){
+								while (serialBuffers.RFAvailable(IDcode) > 0){
+									instructions += (char)serialBuffers.ReadSerial(IDcode); // read in byte at a time, add to file
 									try {
 										Thread.sleep(1);
 									} catch (Exception e) {
-										Globals.reportError("SatelliteCode", "runCode - Instructions", e);
+										Globals.getInstance().reportError("SatelliteCode", "runCode - Instructions", e);
 									}
 								}
 								delay(2000);
@@ -221,7 +228,7 @@ public class SatelliteObject implements Serializable {
 							while (x < instructions.length()) {
 								index = 0;
 								while ((index < 60) && (x < instructions.length())){
-									Globals.writeToSerial(instructions.charAt(x), IDcode); // send instructions to rover 60 byte chunks
+									serialBuffers.writeToSerial(instructions.charAt(x), IDcode); // send instructions to rover 60 byte chunks
 									index++;
 									x++;
 								}
@@ -243,7 +250,7 @@ public class SatelliteObject implements Serializable {
 				}
 			}
 			
-			if (System.currentTimeMillis() - timeSinceCmd > (60000 / Globals.getTimeScale()) && hasInstructions){ // if it has been a minute, and we have instructions
+			if (System.currentTimeMillis() - timeSinceCmd > (60000 / Globals.getInstance().getTimeScale()) && hasInstructions){ // if it has been a minute, and we have instructions
 				// run instructions
 				String cmd = ""; // command
 				int x = 0;
@@ -285,7 +292,7 @@ public class SatelliteObject implements Serializable {
 		}
 		catch (Exception e){
 			System.out.println("Error in Satellite Code");
-			Globals.reportError("SatObject", "run", e);
+			Globals.getInstance().reportError("SatObject", "run", e);
 		}
 	}
 		
@@ -301,7 +308,7 @@ public class SatelliteObject implements Serializable {
 		  while (hold != -1) { // while there still is data
 			  index = 0;
 			  while (index < 60 && hold != -1) {
-				  Globals.writeToSerial((byte) hold, IDcode); // send data in 60 byte chunks
+				  serialBuffers.writeToSerial((byte) hold, IDcode); // send data in 60 byte chunks
 				  hold = data.read();
 				  index++;
 			  }  
@@ -311,7 +318,7 @@ public class SatelliteObject implements Serializable {
 		  sendSerial("r {"); // unmute ground
 		}
 		catch (Exception e){
-			Globals.reportError("Satellite", "takePicture()", e);
+			Globals.getInstance().reportError("Satellite", "takePicture()", e);
 		}
 	}
 	
@@ -321,9 +328,9 @@ public class SatelliteObject implements Serializable {
 	}
 
 	private void delay(int length) { // sleep thread for a bit
-		String newname = Globals.delayThread(Thread.currentThread().getName(), length);
-		while (!Globals.getThreadRunPermission(newname)) {}
-		Globals.threadDelayComplete(Thread.currentThread().getName());
+		String newname = Globals.getInstance().delayThread(Thread.currentThread().getName(), length);
+		while (!Globals.getInstance().getThreadRunPermission(newname)) {}
+		Globals.getInstance().threadDelayComplete(Thread.currentThread().getName());
 	}
 
 	boolean sendSerial(String mess){
@@ -337,20 +344,20 @@ public class SatelliteObject implements Serializable {
 			if (message[x] == '\0'){ // while not end of string
 				break;
 			}
-			Globals.writeToSerial(message[x], IDcode); // Write to Serial one char at a time
+			serialBuffers.writeToSerial(message[x], IDcode); // Write to Serial one char at a time
 			print += message[x];
 			delay(1);
 			x++;
 		}
 		addToSerialHistory(print);
-		Globals.writeToLogFile(name+" Serial", "Message Sent: \'" + print + "\'");
+		Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + print + "\'");
 		return true;
 	}
 
 	boolean sendSerial(char mess){
-		Globals.writeToSerial(mess, IDcode);
+		serialBuffers.writeToSerial(mess, IDcode);
 		addToSerialHistory(mess + "");
-		Globals.writeToLogFile(name+" Serial", "Message Sent: \'" + mess + "\'");
+        Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
 		return true;
 	}
 	
@@ -367,7 +374,7 @@ public class SatelliteObject implements Serializable {
 			return 0;
 		}
 		catch (Exception e){
-			Globals.reportError("SatelliteCode", "strcmp", e);
+			Globals.getInstance().reportError("SatelliteCode", "strcmp", e);
 			return 1;
 		}
 	}
@@ -388,7 +395,7 @@ public class SatelliteObject implements Serializable {
 	}
 	
 	public void addToSerialHistory(String out){
-		serialHistory += out + "\t\t\t" + Globals.TimeMillis + "\n";
+		serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis + "\n";
 	}
 	
 	public String getSerialHistory(){

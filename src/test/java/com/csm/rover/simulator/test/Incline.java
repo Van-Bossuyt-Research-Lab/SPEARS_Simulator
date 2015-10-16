@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.test;
 
+import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.map.display.LandMapPanel;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.FloatArrayArrayGrid;
@@ -17,13 +18,14 @@ public class Incline {
 	
 	@Before
 	public void set(){
-		map = new LandMapPanel(new Dimension(100, 100), null);
-		map.heightMap.setValues(4, 1, new FloatArrayArrayGrid(new Float[][]{
-				{ 0f, 0f, 0f, 0f },
-				{ 1f, 1f, 1f, 1f },
-				{ 2f, 2f, 2f, 2f },
-				{ 3f, 3f, 3f, 3f }
-		}));
+        TerrainMap terrainMap = new TerrainMap();
+        terrainMap.setValues(4, 1, new FloatArrayArrayGrid(new Float[][]{
+                { 0f, 0f, 0f, 0f },
+                { 1f, 1f, 1f, 1f },
+                { 2f, 2f, 2f, 2f },
+                { 3f, 3f, 3f, 3f }
+        }));
+		map = new LandMapPanel(new Dimension(100, 100), null, null, null, terrainMap);
 	}
 	
 	@Test

@@ -2,13 +2,10 @@ package com.csm.rover.simulator.map.display;
 
 import com.csm.rover.simulator.map.PlanetParametersList;
 import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.map.modifiers.NormalizeMapMod;
-import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
-import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
 import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.rover.RoverHub;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.visual.Panel;
-import com.csm.rover.simulator.wrapper.Access;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -22,6 +19,8 @@ import java.util.ArrayList;
 public class LandMapPanel extends Panel{
 	
 	private static final long serialVersionUID = 3715566110839859923L;
+
+	private RoverHub roverHubPnl;
 
 	private PlanetParametersList params;
 
@@ -40,21 +39,18 @@ public class LandMapPanel extends Panel{
 	
 	private ArrayList<RoverIcon> roverIcons;
 
-	public LandMapPanel(Dimension size, PlanetParametersList params){
-		super(size /*new Dimension(700, 500)*/, "Terrain View");
+	public LandMapPanel(Dimension size, PlanetParametersList params, RoverHub roverHub, ArrayList<RoverObject> rovers, TerrainMap map){
+        super(size /*new Dimension(700, 500)*/, "Terrain View");
 		setBackground(Color.GRAY);
 		super.hasImage = false;
 
+        this.roverHubPnl = roverHub;
 		addPopup(this, new MapOptionsMenu(this));
 		
 		roverIcons = new ArrayList<RoverIcon>();
 		this.params = params;
 		
-		heightMap = new TerrainMap();
-		heightMap.addMapModifier(new PlasmaGeneratorMod(mapRough));
-		heightMap.addMapModifier(new SurfaceSmoothMod());
-		heightMap.addMapModifier(new NormalizeMapMod());
-		heightMap.generateLandscape(mapSize, mapDetail);
+		heightMap = map;
 
         mapPanel = new MapDisplayPanel();
 		mapPanel.setTerrainMap(heightMap);
@@ -69,7 +65,8 @@ public class LandMapPanel extends Panel{
 				Integer key = e.getKeyCode();
 				switch (key) {
 				case KeyEvent.VK_H:
-					Access.toggleHUDonMap();
+                    roverHubPnl.setInHUDMode(!roverHubPnl.isInHUDMode());
+            		roverHubPnl.setVisible(!roverHubPnl.isVisible());
 					break;
 				case KeyEvent.VK_LEFT:
 					setFocusPoint(new DecimalPoint((int)focusPoint.getX()-1, (int)focusPoint.getY()));
@@ -92,7 +89,7 @@ public class LandMapPanel extends Panel{
 						if (focusEngaged){
 							focusedRover = (focusedRover + 1) % roverIcons.size();
 						}
-						Access.setFocusDisplayHUD(focusedRover);
+                        roverHubPnl.setFocusedRover(focusedRover);
 						setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
 						focusEngaged = true;
 					} catch (Exception ex) { ex.printStackTrace(); }
@@ -102,7 +99,7 @@ public class LandMapPanel extends Panel{
 						if (focusEngaged){
 							focusedRover = (roverIcons.size() + focusedRover - 1) % roverIcons.size();
 						}
-						Access.setFocusDisplayHUD(focusedRover);
+                        roverHubPnl.setFocusedRover(focusedRover);
 						setFocusPoint(roverIcons.get(focusedRover).getMapLocation());
 						focusEngaged = true;
 					} catch (Exception ex) { ex.printStackTrace(); }
@@ -130,7 +127,9 @@ public class LandMapPanel extends Panel{
 				redraw();
 			}
 		});
-		
+
+		this.setRoverSwarm(rovers);
+
 		setFocusPoint(new DecimalPoint(0, 0));
 		redraw();
 	}
@@ -211,7 +210,8 @@ public class LandMapPanel extends Panel{
 	}
 	
 	// retrieve temperature from a coordinate, with interpolation
-	public double getTemperature(DecimalPoint loc){ 
+	public double getTemperature(DecimalPoint loc){
+		//TODO add temp map
 		return -30;
 	}
 }

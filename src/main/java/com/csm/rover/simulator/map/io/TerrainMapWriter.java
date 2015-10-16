@@ -39,7 +39,7 @@ public class TerrainMapWriter {
                 ImageIO.write(image, "png", output);
             }
             else {
-                Globals.reportError("TerrainMap", "Failed to create image file on map images save", null);
+                Globals.getInstance().reportError("TerrainMap", "Failed to create image file on map images save", null);
             }
         }
         catch (IOException e) {

@@ -1,11 +1,10 @@
 package com.csm.rover.simulator.rover.autoCode;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.wrapper.Access;
 
 import java.util.Map;
 
-public class PIDAAcontrol extends RoverAutonomusCode {
+public class PIDAAcontrol extends RoverAutonomousCode {
 
 	private static final long serialVersionUID = 4160697317388735672L;
 
@@ -102,12 +101,12 @@ public class PIDAAcontrol extends RoverAutonomusCode {
 		//log
 		
 //This is where you should calculate the status of the system
-		hazard=Access.isInHazard(location);
+		hazard=MAP.isPointInHazard(location);
 		hzrate=HZRT(location);
-		elevation=Access.getMapHeightatPoint(location);
+		elevation=MAP.getHeightAt(location);
 		//Battery hazard rate
-		writeToLog(milliTime + "\t" + formatDouble(location.getX()) + "\t" + formatDouble(location.getY()) + "\t" + formatDouble(Access.getMapHeightatPoint(location)) + 
-				"\t" + direction + "\t" + state + "\t" + TrgtN + "\t" + Access.getHazardValue(location) +"\t"+HZRT(location));
+		writeToLog(milliTime + "\t" + formatDouble(location.getX()) + "\t" + formatDouble(location.getY()) + "\t" + formatDouble(MAP.getHeightAt(location)) +
+				"\t" + direction + "\t" + state + "\t" + TrgtN + "\t" + MAP.getHazardValueAt(location) +"\t"+HZRT(location));
 //State 0 set heading
 		if(state==0){
 			//Set direction 
@@ -216,7 +215,7 @@ public class PIDAAcontrol extends RoverAutonomusCode {
 		double hzrd;
 		double hzrate;
 		
-		hzrd=Access.getHazardValue(loc);
+		hzrd=MAP.getHazardValueAt(loc);
 		
 		hzrate=-0.00009*Math.pow(hzrd,5)+0.0036*Math.pow(hzrd,4)-0.05*Math.pow(hzrd,3)+0.2937*Math.pow(hzrd,2)-0.5274*hzrd+0.3;
 				

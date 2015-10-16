@@ -1,5 +1,13 @@
 package com.csm.rover.simulator.rover;
 
+import com.csm.rover.simulator.control.InterfaceCode;
+import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.visual.Panel;
+import com.csm.rover.simulator.wrapper.SerialBuffers;
+
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -7,23 +15,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-
-import com.csm.rover.simulator.control.InterfaceCode;
-import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.visual.Panel;
-import com.csm.rover.simulator.wrapper.Access;
-import com.csm.rover.simulator.wrapper.Globals;
 
 public class RoverHub extends Panel {
 	
 	private static final long serialVersionUID = 1L;
-	
+
+	private SerialBuffers serialBuffers;
 	private ArrayList<RoverObject> rovers;
 	private boolean inHUDmode = false;
 	private Map<Integer, Map<Integer, Integer>> standardDisplayLinks;
@@ -41,8 +40,9 @@ public class RoverHub extends Panel {
 	private JComboBox<String> rovSelect;
 	private JTextField commandInput;
 
-	public RoverHub(Dimension size){
+	public RoverHub(Dimension size, SerialBuffers serialBuffers, ArrayList<RoverObject> rovers, TerrainMap map){
 		super(size, "Rover Hub");
+		this.serialBuffers = serialBuffers;
 
         standardDisplayLinks = new TreeMap<Integer, Map<Integer, Integer>>();
         for (int x = 0; x < numberOfPages; x++){
@@ -61,9 +61,9 @@ public class RoverHub extends Panel {
             HUDDisplayLinks.put(x, -1);
         }
 
-		this.rovers = new ArrayList<RoverObject>();
+		this.rovers = rovers;
 
-		initialize();
+		initialize(map);
 		this.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent arg0) {
@@ -79,8 +79,11 @@ public class RoverHub extends Panel {
 							updateDisplays();
 						}
 					}
-				} else {
-					Access.requestFocusToMap();
+				}
+				else {
+					if (getForm().isPresent()){
+						getForm().get().focusOnTerrain();
+					}
 				}
 			}
 		});
@@ -88,10 +91,10 @@ public class RoverHub extends Panel {
 		setVisible(false);
 	}
 	
-	private void initialize(){
+	private void initialize(TerrainMap map){
 		for (int x = 0; x < numberOfDisplays; x++){
             final int a = x;
-            RoverDisplayWindow displayWindow = new RoverDisplayWindow();
+            RoverDisplayWindow displayWindow = new RoverDisplayWindow(map);
 			displayWindow.setRoverList(rovers);
 			displayWindow.addPageForwardAction(new ActionListener() {
                 @Override
@@ -121,7 +124,7 @@ public class RoverHub extends Panel {
 					char[] out = (satSelect.getSelectedItem() + " " + rovSelect.getSelectedItem() + " " + commandInput.getText()).toCharArray();
 					commandInput.setText("");
 					for (char c : out){
-						Globals.writeToSerial(c, InterfaceCode.IDcode);
+						serialBuffers.writeToSerial(c, InterfaceCode.IDcode);
 					}
 				}
 				else if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
@@ -153,13 +156,9 @@ public class RoverHub extends Panel {
 				updateDisplays();
 			}
 		}, SynchronousThread.FOREVER, "Rover Hub Update");
-		int x = 0;
-		for (RoverObject rover : rovers){
-			rover.start();
-		}
 	}
 	
-	public void setIdentifiers(Collection<String> rovs, Collection<String> sats){
+	public void setIdentifiers(ArrayList<String> rovs, ArrayList<String> sats){
 		rovSelect.removeAllItems();
 		for (Object rov : rovs){
 			rovSelect.addItem((String)rov);
@@ -182,7 +181,6 @@ public class RoverHub extends Panel {
 		for (RoverObject rover : rovers){
 			this.rovers.add(rover);
 		}
-		Access.addRoversToMap(rovers);
 
 		int x = 0;
 		while (x < rovers.size()){

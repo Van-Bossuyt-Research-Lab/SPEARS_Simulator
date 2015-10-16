@@ -1,7 +1,7 @@
 package com.csm.rover.simulator.objects;
 
-import java.io.Serializable;
 import com.csm.rover.simulator.wrapper.Globals;
+import java.io.Serializable;
 
 public class FreeThread extends Thread implements Serializable {
 
@@ -37,7 +37,7 @@ public class FreeThread extends Thread implements Serializable {
 		while (actions > 0 || forever){
 			if (delay > 0){
 				try{
-					Thread.sleep((long)((delay)/Globals.getTimeScale()), (int)(((delay)/Globals.getTimeScale()-(int)((delay)/Globals.getTimeScale()))*1000000));
+					Thread.sleep((long)((delay)/ Globals.getInstance().getTimeScale()), (int)(((delay)/Globals.getInstance().getTimeScale()-(int)((delay)/Globals.getInstance().getTimeScale()))*1000000));
 				}
 				catch (InterruptedException e) {
 					return;

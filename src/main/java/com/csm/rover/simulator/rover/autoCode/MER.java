@@ -1,12 +1,11 @@
 package com.csm.rover.simulator.rover.autoCode;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.wrapper.Access;
 import com.csm.rover.simulator.wrapper.Globals;
 
 import java.util.Map;
 
-public class MER extends RoverAutonomusCode {
+public class MER extends RoverAutonomousCode {
 	
 	private static final long serialVersionUID = 1195207024217443714L;
 
@@ -31,13 +30,13 @@ public class MER extends RoverAutonomusCode {
 	@Override
 	public String nextCommand(long milliTime, DecimalPoint location,
 			double direction, Map<String, Double> parameters) {
-		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + Access.getMapHeightatPoint(location) + "\t" + score + "\t" + parameters.get("battery_charge") + "\t" + (completed == targets.length));
+		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + MAP.getHeightAt(location) + "\t" + score + "\t" + parameters.get("battery_charge") + "\t" + (completed == targets.length));
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (completed == targets.length){
 			return "stop";
 		}
 		if (Math.abs(targets[completed].getX() - location.getX()) < 0.25 && Math.abs(targets[completed].getY() - location.getY()) < 0.25){
-			score += Access.getTargetValue(location);
+			score += MAP.getTargetValueAt(location);
 			completed++;
 		}
 		double targetAngle = Math.atan((targets[completed].getY() - location.getY()) / (double)(targets[completed].getX() - location.getX()));
@@ -46,11 +45,11 @@ public class MER extends RoverAutonomusCode {
 		}
 		targetAngle = (targetAngle + 2*Math.PI) % (2*Math.PI);
 		//System.out.println(targetAngle + "\t" + (targets[completed].getY() - location.getY()) + "\t" + (targets[completed].getX() - location.getX()));
-		if (Math.abs(Globals.subtractAngles(targetAngle, direction)) < ANGLE_ERROR){
+		if (Math.abs(Globals.getInstance().subtractAngles(targetAngle, direction)) < ANGLE_ERROR){
 			return "move";
 		}
 		else {
-			if (Globals.subtractAngles(targetAngle, direction) > 0){
+			if (Globals.getInstance().subtractAngles(targetAngle, direction) > 0){
 				return "spin_cw";
 			}
 			else {
@@ -60,7 +59,7 @@ public class MER extends RoverAutonomusCode {
 	}
 
 	@Override
-	public RoverAutonomusCode clone() {
+	public RoverAutonomousCode clone() {
 		return new MER(this);
 	}
 

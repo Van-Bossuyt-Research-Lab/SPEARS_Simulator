@@ -1,53 +1,30 @@
 package com.csm.rover.simulator.control;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.SystemColor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.Set;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.ImageButton;
 import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.visual.ZList;
-import com.csm.rover.simulator.wrapper.Access;
 import com.csm.rover.simulator.wrapper.Globals;
+import com.csm.rover.simulator.wrapper.SerialBuffers;
+
+import javax.swing.*;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 //TODO pop out option
 //TODO more adaptable 'plug in' interface like communication style
 public class InterfacePanel extends Panel{
 
 	private static final long serialVersionUID = -2554090286918354434L;
+
+	public InterfaceCode CODE;
 	
 	JPanel ProgramBtnsPnl;
 		ImageButton LinkBtn;
@@ -121,17 +98,17 @@ public class InterfacePanel extends Panel{
 	JMenuItem OverrideMuteOptn;
 	private boolean CursorInMuteOptn = false;
 
-	public InterfacePanel(Dimension size) {
+	public InterfacePanel(Dimension size, SerialBuffers serialBuffers) {
 		super(size, "Control Interface");
+		CODE = InterfaceAccess.setCode(this, serialBuffers);
 		super.titleLbl.setVisible(false);
 		super.postScript.setVisible(false);
 		super.background = new ImageIcon(getClass().getResource("/images/Background.png"));
-		initalize();
+		initialize();
 		alignComponents();
 	}
 	
-	private void initalize(){
-		
+	private void initialize(){
 		OverrideMuteOptn = new JMenuItem("Override Mute");
 		OverrideMuteOptn.addMouseListener(new MouseAdapter() {
 			@Override
@@ -151,7 +128,7 @@ public class InterfacePanel extends Panel{
 		OverrideMuteOptn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				OverrideMuteOptn.setVisible(false);
-				Access.INTERFACE.muted = false;
+				InterfaceAccess.CODE.muted = false;
 				MuteIcon.setVisible(false);
 			}
 		});
@@ -175,7 +152,7 @@ public class InterfacePanel extends Panel{
 		LinkBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				Access.INTERFACE.resetConnection();
+				InterfaceAccess.CODE.resetConnection();
 			}
 		});
 		LinkBtn.setImage(new ImageIcon(getClass().getResource("/icons/Earth_Up.png")));
@@ -185,7 +162,7 @@ public class InterfacePanel extends Panel{
 		PingBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				Access.INTERFACE.pingRover();
+				InterfaceAccess.CODE.pingRover();
 			}
 		});
 		PingBtn.setImage(new ImageIcon(getClass().getResource("/icons/Wi-Fi.png")));
@@ -200,7 +177,7 @@ public class InterfacePanel extends Panel{
 		MailBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				Access.INTERFACE.OpenRecievedFiles();
+				InterfaceAccess.CODE.OpenRecievedFiles();
 			}
 		});
 		ProgramBtnsPnl.add(MailBtn);
@@ -213,7 +190,7 @@ public class InterfacePanel extends Panel{
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (!MessageBtn.getText().equals("")){
-					Access.sendMsg(JOptionPane.showInputDialog(getParent().getParent(), "Enter a Command:", "Write to Serial", JOptionPane.PLAIN_MESSAGE));
+					InterfaceAccess.sendMsg(JOptionPane.showInputDialog(getParent().getParent(), "Enter a Command:", "Write to Serial", JOptionPane.PLAIN_MESSAGE));
 				}
 			}
 		});
@@ -226,7 +203,7 @@ public class InterfacePanel extends Panel{
 		CommentBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				Access.addNoteToLog("User", JOptionPane.showInputDialog(getParent().getParent(), "Note for log:", "Data Log Edit", JOptionPane.PLAIN_MESSAGE));
+				InterfaceAccess.addNoteToLog("User", JOptionPane.showInputDialog(getParent().getParent(), "Note for log:", "Data Log Edit", JOptionPane.PLAIN_MESSAGE));
 			}
 		});
 		ProgramBtnsPnl.add(CommentBtn);
@@ -253,7 +230,7 @@ public class InterfacePanel extends Panel{
 				try {
 					Desktop.getDesktop().open(new File("").getAbsoluteFile());
 				} catch (IOException e) {
-					Globals.reportError("InterfacePanel", "folderBtn_Clicked", e);
+					Globals.getInstance().reportError("InterfacePanel", "folderBtn_Clicked", e);
 				}
 			}
 		});
@@ -267,7 +244,7 @@ public class InterfacePanel extends Panel{
 		PortSelectCombo.setBounds(570, 20, 85, 20);
 		PortSelectCombo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Access.COMPortChanged();
+				InterfaceAccess.COMPortChanged();
 			}
 		});
 		ProgramBtnsPnl.add(PortSelectCombo);
@@ -339,7 +316,7 @@ public class InterfacePanel extends Panel{
 			@Override
 			public void keyPressed(KeyEvent arg0) {
 				if (arg0.getKeyCode() == 10){
-					Access.sendRoverMsg();
+					InterfaceAccess.sendRoverMsg();
 				}
 			}
 		});
@@ -351,7 +328,7 @@ public class InterfacePanel extends Panel{
 		RoverSendBtn = new JButton("Send");
 		RoverSendBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Access.sendRoverMsg();
+				InterfaceAccess.sendRoverMsg();
 			}
 		});
 		RoverSendBtn.setOpaque(false);
@@ -363,7 +340,7 @@ public class InterfacePanel extends Panel{
 		RoverDeleteLink.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Access.roverLinkClicked(2);
+				InterfaceAccess.roverLinkClicked(2);
 			}
 		});
 		RoverDeleteLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -376,7 +353,7 @@ public class InterfacePanel extends Panel{
 		RoverEditLink.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Access.roverLinkClicked(1);
+				InterfaceAccess.roverLinkClicked(1);
 			}
 		});
 		RoverEditLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -389,7 +366,7 @@ public class InterfacePanel extends Panel{
 		RoverAddLink.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				Access.roverLinkClicked(0);
+				InterfaceAccess.roverLinkClicked(0);
 			}
 		});
 		RoverAddLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -403,7 +380,7 @@ public class InterfacePanel extends Panel{
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (RoverPageLeftBtn.isEnabled()){
-					Access.roverActionsPageChanged(-1);
+					InterfaceAccess.roverActionsPageChanged(-1);
 				}
 			}
 		});
@@ -420,7 +397,7 @@ public class InterfacePanel extends Panel{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (RoverPageRightBtn.isEnabled()){
-					Access.roverActionsPageChanged(1);
+					InterfaceAccess.roverActionsPageChanged(1);
 				}
 			}
 		});
@@ -451,7 +428,7 @@ public class InterfacePanel extends Panel{
 				@Override
 				public void mouseClicked(MouseEvent e){
 					if (RoverBtns[hold].isEnabled()){
-						Access.actionButtonClicked(0, hold);
+						InterfaceAccess.actionButtonClicked(0, hold);
 					}
 				}
 			});
@@ -489,7 +466,7 @@ public class InterfacePanel extends Panel{
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == 10){
-					Access.sendSatMessage();
+					InterfaceAccess.sendSatMessage();
 				}
 			}
 		});
@@ -501,7 +478,7 @@ public class InterfacePanel extends Panel{
 		SatSendBtn = new JButton("Send");
 		SatSendBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Access.sendSatMessage();
+				InterfaceAccess.sendSatMessage();
 			}
 		});
 		SatSendBtn.setOpaque(false);
@@ -513,7 +490,7 @@ public class InterfacePanel extends Panel{
 		SatAddLink.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Access.satLinkClicked(0);
+				InterfaceAccess.satLinkClicked(0);
 			}
 		});
 		SatAddLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -526,7 +503,7 @@ public class InterfacePanel extends Panel{
 		SatEditLink.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Access.satLinkClicked(1);
+				InterfaceAccess.satLinkClicked(1);
 			}
 		});
 		SatEditLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -539,7 +516,7 @@ public class InterfacePanel extends Panel{
 		SatDeleteLink.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Access.satLinkClicked(2);
+				InterfaceAccess.satLinkClicked(2);
 			}
 		});
 		SatDeleteLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -553,7 +530,7 @@ public class InterfacePanel extends Panel{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (SatPageLeftBtn.isEnabled()){
-					Access.satelliteActionsPageChanged(-1);
+					InterfaceAccess.satelliteActionsPageChanged(-1);
 				}
 			}
 		});
@@ -569,7 +546,7 @@ public class InterfacePanel extends Panel{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (SatPageRightBtn.isEnabled()){
-					Access.satelliteActionsPageChanged(1);
+					InterfaceAccess.satelliteActionsPageChanged(1);
 				}
 			}
 		});
@@ -599,7 +576,7 @@ public class InterfacePanel extends Panel{
 				@Override
 				public void mouseClicked(MouseEvent e){
 					if (SatBtns[hold].isEnabled()){
-						Access.actionButtonClicked(1, hold);
+						InterfaceAccess.actionButtonClicked(1, hold);
 					}
 				}
 			});
@@ -626,7 +603,7 @@ public class InterfacePanel extends Panel{
 		RoverCommandsList.setLocation(10, 39);
 		RoverCommandsList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent arg0) {
-				Access.RoverListChanged();
+				InterfaceAccess.RoverListChanged();
 			}
 		});
 		RoverCommandsList.setBackground(new Color(240, 240, 240));
@@ -637,7 +614,7 @@ public class InterfacePanel extends Panel{
 		SatelliteCommandList.setLocation(157, 47);
 		SatelliteCommandList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				Access.SatelliteListChanged();
+				InterfaceAccess.SatelliteListChanged();
 			}
 		});
 		SatelliteCommandList.setFont(new Font("Iskoola Pota", Font.PLAIN, 15));
@@ -666,7 +643,7 @@ public class InterfacePanel extends Panel{
 		ParameterList.setLocation(304, 47);
 		ParameterList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				Access.ParametersListChanged();
+				InterfaceAccess.ParametersListChanged();
 			}
 		});
 		ParameterList.setFont(new Font("Iskoola Pota", Font.PLAIN, 15));
@@ -678,7 +655,7 @@ public class InterfacePanel extends Panel{
 		InstructionsList.setLocation(451, 39);
 		InstructionsList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				Access.InstructionListChanged();
+				InterfaceAccess.InstructionListChanged();
 			}
 		});
 		InstructionsList.setFont(new Font("Iskoola Pota", Font.PLAIN, 15));
@@ -688,7 +665,7 @@ public class InterfacePanel extends Panel{
 		InstructionsSubmitBtn = new JButton("Submit");
 		InstructionsSubmitBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Access.SubmitInstructionClicked();
+				InterfaceAccess.SubmitInstructionClicked();
 			}
 		});
 		InstructionsSubmitBtn.setEnabled(false);
@@ -700,7 +677,7 @@ public class InterfacePanel extends Panel{
 		InstructionsDeleteBtn = new JButton("Delete");
 		InstructionsDeleteBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Access.InstructionModClicked(0);
+				InterfaceAccess.InstructionModClicked(0);
 			}
 		});
 		InstructionsDeleteBtn.setEnabled(false);
@@ -712,7 +689,7 @@ public class InterfacePanel extends Panel{
 		InstructionsEditBtn = new JButton("Edit");
 		InstructionsEditBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Access.InstructionModClicked(1);
+				InterfaceAccess.InstructionModClicked(1);
 			}
 		});
 		InstructionsEditBtn.setEnabled(false);
@@ -724,7 +701,7 @@ public class InterfacePanel extends Panel{
 		InstructionsUpBtn = new JButton("Move Up");
 		InstructionsUpBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Access.InstructionModClicked(2);
+				InterfaceAccess.InstructionModClicked(2);
 			}
 		});
 		InstructionsUpBtn.setEnabled(false);
@@ -736,7 +713,7 @@ public class InterfacePanel extends Panel{
 		InstructionsDownBtn = new JButton("Move Down");
 		InstructionsDownBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Access.InstructionModClicked(3);
+				InterfaceAccess.InstructionModClicked(3);
 			}
 		});
 		InstructionsDownBtn.setEnabled(false);
@@ -778,7 +755,7 @@ public class InterfacePanel extends Panel{
 		InstructionAddBtn = new JButton("Add");
 		InstructionAddBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Access.AddInstructionClicked();
+				InterfaceAccess.AddInstructionClicked();
 			}
 		});
 		InstructionAddBtn.setOpaque(false);
@@ -792,7 +769,7 @@ public class InterfacePanel extends Panel{
 		AddInstructionLink.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				Access.INTERFACE.addInstructionToList();
+				InterfaceAccess.CODE.addInstructionToList();
 			}
 		});
 		AddInstructionLink.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -806,7 +783,7 @@ public class InterfacePanel extends Panel{
 		EditInstructionLink.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Access.INTERFACE.editInstructionInList();
+				InterfaceAccess.CODE.editInstructionInList();
 			}
 		});
 		EditInstructionLink.setEnabled(false);
@@ -819,7 +796,7 @@ public class InterfacePanel extends Panel{
 		CancelInstructsBtn = new JButton("Cancel All");
 		CancelInstructsBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Access.cancelInstructs_Clicked();
+				InterfaceAccess.cancelInstructs_Clicked();
 			}
 		});
 		CancelInstructsBtn.setOpaque(false);
@@ -900,7 +877,7 @@ public class InterfacePanel extends Panel{
 		StatusPnl.add(StatusArmPower);
 	}
 	
-	public void setNamesLists(Set<String> rovers, Set<String> sats){
+	public void setNamesLists(ArrayList<String> rovers, ArrayList<String> sats){
 		RoverSelectionCombo.setModel(new DefaultComboBoxModel<String>(rovers.toArray(new String[rovers.size()])));
 		SatSelectionCombo.setModel(new DefaultComboBoxModel<String>(sats.toArray(new String[sats.size()])));
 	}

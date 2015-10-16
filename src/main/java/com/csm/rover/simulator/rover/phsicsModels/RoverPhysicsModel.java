@@ -1,13 +1,15 @@
 package com.csm.rover.simulator.rover.phsicsModels;
 
-import java.io.Serializable;
-
+import com.csm.rover.simulator.map.PlanetParametersList;
+import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.rover.MotorState;
 import com.csm.rover.simulator.rover.RoverWheels;
-import com.csm.rover.simulator.wrapper.Access;
+import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
+
+import java.io.Serializable;
 
 //TODO add implementation with better time stepping
 public class RoverPhysicsModel implements Serializable, Cloneable {
@@ -15,7 +17,11 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
 	private final int FL = 0, FR = 1, BL = 2, BR = 3;
-	
+
+    //TODO variable planet params
+	private PlanetParametersList planetParams = new PlanetParametersList();
+	protected static TerrainMap MAP;
+
 	protected String roverName;
 	public final double time_step = 0.01; // time step of physics, in seconds
 	
@@ -82,6 +88,10 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	protected double slip_velocity = 0; //m/s
 	
 	public RoverPhysicsModel() {}
+
+    public static void setTerrainMap(TerrainMap map){
+        MAP = map;
+    }
 	
 	protected RoverPhysicsModel(RoverPhysicsModel origin){
 		roverName = origin.roverName;
@@ -124,11 +134,11 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 			public void run(){
 				try {
 					excecute();
-					//System.out.println(roverName + "-physics\t" + Globals.TimeMillis);
+					//System.out.println(roverName + "-physics\t" + Globals.getInstance.timeMillis);
 					//RoverEvents.updateStats();
 				}
 				catch (Exception e){
-					Globals.reportError("RoverDriveModel", "execute", e);
+					Globals.getInstance().reportError("RoverDriveModel", "execute", e);
 				}
 			}
 		},
@@ -167,7 +177,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		slip[BL] = friction_s * (wheel_speed[BL]*wheel_radius - speed);
 		slip[BR] = friction_s * (wheel_speed[BR]*wheel_radius - speed);
 		// Acceleration changes based on forces
-		acceleration = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - Access.getPlanetParameters().getgrav_accel()*Math.sin(Access.getMapInclineAtPoint(location, direction));
+		acceleration = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - planetParams.getgrav_accel()*Math.sin(MAP.getIncline(location, direction));
 		angular_acceleration = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
 		// Speed changes based on Acceleration
 		speed += acceleration * time_step;
@@ -177,7 +187,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 			//System.out.println(round(wheel_speed[BL]) + " rad/s -> " + round(slip[BL]) + " N -> " + round(angular_acceleration) + " rad/s^2 -> " + round(angular_velocity) + " rad/s");
 			//System.out.println(round(wheel_speed[BR]) + " rad/s -> " + round(slip[BR]) + " N");
 		// Calculate the amount the rover slips sideways
-		slip_acceleration = (-friction_gr*slip_velocity*4 - rover_mass*Access.getPlanetParameters().getgrav_accel()*Math.sin(Access.getMapCrossSlopeAtPoint(location, direction)) / rover_mass);
+		slip_acceleration = (-friction_gr*slip_velocity*4 - rover_mass*planetParams.getgrav_accel()*Math.sin(MAP.getCrossSlope(location, direction)) / rover_mass);
 		slip_velocity += slip_acceleration * time_step;
 		// Calculate new location
 		location.offsetThis(speed*time_step*Math.cos(direction), speed*time_step*(Math.sin(direction)));
@@ -185,7 +195,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
 		direction = (direction + angular_velocity*time_step + 2*Math.PI) % (2*Math.PI);
 		// report new location to map
-		Access.updateRoverLocation(roverName, location, direction);
+        Admin.getCurrentInterface().updateRover(roverName, location, direction);
 		
 		//Determining the current of the battery and the change in the stored charge
 		if (motor_current[FL]*motor_states[FL] <= 0){
@@ -208,19 +218,22 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		battery_voltage = battery_charge/capacitance_battery - battery_cp_charge/capacitance_cp - resistance_s*battery_current;
 		SOC = 1 - (battery_max_charge - battery_charge) / battery_max_charge;
 			//System.out.println("Vb: " + battery_voltage + "\tVm: " + getMotorVoltage(FR) + "\tQcp: " + battery_cp_charge + "\tIb: " + battery_current + "\tIm: " + motor_current[FR]);
-		
+
+		//TODO temp map stuff here
+		double temperature = -30;
+
 		//Determining the temperature of the battery
-		battery_temperature += ((resistance_parasite*Math.pow(battery_change-battery_current, 2) + resistance_s*Math.pow(battery_current, 2) + getcapacitance_cp()*Math.pow(battery_current-cp_change, 2)) - battery_heat_transfer*(battery_temperature - Access.getMapTemperatureAtPoint(location)) / battery_thermal_cap) * time_step;
+		battery_temperature += ((resistance_parasite*Math.pow(battery_change-battery_current, 2) + resistance_s*Math.pow(battery_current, 2) + getcapacitance_cp()*Math.pow(battery_current-cp_change, 2)) - battery_heat_transfer*(battery_temperature - temperature) / battery_thermal_cap) * time_step;
 		//Determining the temperature of the motor coils
 		winding_temp[FL] += ((motor_resistance*Math.pow(motor_current[FL], 2) - winding_heat_transfer*(winding_temp[FL] - motor_temp[FL])) / winding_thermal_cap) * time_step;
 		winding_temp[FR] += ((motor_resistance*Math.pow(motor_current[FR], 2) - winding_heat_transfer*(winding_temp[FR] - motor_temp[FR])) / winding_thermal_cap) * time_step;
 		winding_temp[BL] += ((motor_resistance*Math.pow(motor_current[BL], 2) - winding_heat_transfer*(winding_temp[BL] - motor_temp[BL])) / winding_thermal_cap) * time_step;
 		winding_temp[BR] += ((motor_resistance*Math.pow(motor_current[BR], 2) - winding_heat_transfer*(winding_temp[BR] - motor_temp[BR])) / winding_thermal_cap) * time_step;
 		//Determining the surface temperature of the motor
-		motor_temp[FL] += ((winding_heat_transfer*(winding_temp[FL] - motor_temp[FL]) - motor_surface_heat_transfer*(motor_temp[FL] - Access.getMapTemperatureAtPoint(location))) / motor_thermal_cap) * time_step;
-		motor_temp[FR] += ((winding_heat_transfer*(winding_temp[FR] - motor_temp[FR]) - motor_surface_heat_transfer*(motor_temp[FR] - Access.getMapTemperatureAtPoint(location))) / motor_thermal_cap) * time_step;
-		motor_temp[BL] += ((winding_heat_transfer*(winding_temp[BL] - motor_temp[BL]) - motor_surface_heat_transfer*(motor_temp[BL] - Access.getMapTemperatureAtPoint(location))) / motor_thermal_cap) * time_step;
-		motor_temp[BR] += ((winding_heat_transfer*(winding_temp[BR] - motor_temp[BR]) - motor_surface_heat_transfer*(motor_temp[BR] - Access.getMapTemperatureAtPoint(location))) / motor_thermal_cap) * time_step;				
+		motor_temp[FL] += ((winding_heat_transfer*(winding_temp[FL] - motor_temp[FL]) - motor_surface_heat_transfer*(motor_temp[FL] - temperature)) / motor_thermal_cap) * time_step;
+		motor_temp[FR] += ((winding_heat_transfer*(winding_temp[FR] - motor_temp[FR]) - motor_surface_heat_transfer*(motor_temp[FR] - temperature)) / motor_thermal_cap) * time_step;
+		motor_temp[BL] += ((winding_heat_transfer*(winding_temp[BL] - motor_temp[BL]) - motor_surface_heat_transfer*(motor_temp[BL] - temperature)) / motor_thermal_cap) * time_step;
+		motor_temp[BR] += ((winding_heat_transfer*(winding_temp[BR] - motor_temp[BR]) - motor_surface_heat_transfer*(motor_temp[BR] - temperature)) / motor_thermal_cap) * time_step;
 	}
 	
 	@Override

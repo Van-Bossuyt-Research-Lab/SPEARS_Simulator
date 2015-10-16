@@ -1,14 +1,19 @@
 package com.csm.rover.simulator.rover;
 
+import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.visual.LEDIndicator;
-import com.csm.rover.simulator.wrapper.Access;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class RoverDisplayWindow extends JPanel {
+
+    private TerrainMap map;
 
     private ArrayList<RoverObject> rovers = new ArrayList<RoverObject>();
     private int roverLock = -1;
@@ -25,7 +30,7 @@ public class RoverDisplayWindow extends JPanel {
     private JTextArea TemperatureStatsLbl = new JTextArea();
     private LEDIndicator MuteLED = new LEDIndicator();
     private LEDIndicator InstructionsLED = new LEDIndicator();
-    private LEDIndicator AutonomusLED = new LEDIndicator();
+    private LEDIndicator AutonomousLED = new LEDIndicator();
     private JLabel UnusedLbl1 = new JLabel();
     private LEDIndicator UnusedLED1 = new LEDIndicator();
     private JLabel UnusedLbl2 = new JLabel();
@@ -40,6 +45,8 @@ public class RoverDisplayWindow extends JPanel {
     private LEDIndicator UnusedLED6 = new LEDIndicator();
     private JLabel UnusedLbl7 = new JLabel();
     private LEDIndicator UnusedLED7 = new LEDIndicator();
+    
+    private Font font = new Font("Bookman Old Style", Font.PLAIN, 13);
 
     private String movementPattern = "X: %s m\tAngular Spin FL: %s \u00B0/s" +
             "\nY: %s m" + "\tAngular Spin FR: %s \u00B0/s" +
@@ -73,9 +80,10 @@ public class RoverDisplayWindow extends JPanel {
             "\n\nBattery Temperature: %s \u00B0c" +
             "\n\nAir Temperature: %s \u00B0c";
 
-    public RoverDisplayWindow(){
+    public RoverDisplayWindow(TerrainMap map){
         initialize();
         setToBlank();
+        this.map = map;
     }
     
     private void initialize() {
@@ -115,7 +123,7 @@ public class RoverDisplayWindow extends JPanel {
         scrollPane.setViewportView(SerialHistoryLbl);
         SerialHistoryLbl.setOpaque(false);
         SerialHistoryLbl.setEditable(false);
-        SerialHistoryLbl.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        SerialHistoryLbl.setFont(font);
 
         JScrollPane scrollPane_1 = new JScrollPane();
         scrollPane_1.setOpaque(false);
@@ -123,7 +131,7 @@ public class RoverDisplayWindow extends JPanel {
 
         MovementStatsLbl = new JTextArea();
         MovementStatsLbl.setTabSize(20);
-        MovementStatsLbl.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        MovementStatsLbl.setFont(font);
         MovementStatsLbl.setOpaque(false);
         MovementStatsLbl.setWrapStyleWord(true);
         MovementStatsLbl.setLineWrap(true);
@@ -136,7 +144,7 @@ public class RoverDisplayWindow extends JPanel {
 
         ElectricalStatsLbl = new JTextArea();
         ElectricalStatsLbl.setTabSize(20);
-        ElectricalStatsLbl.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        ElectricalStatsLbl.setFont(font);
         ElectricalStatsLbl.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         ElectricalStatsLbl.setEditable(false);
         ElectricalStatsLbl.setLineWrap(true);
@@ -152,7 +160,7 @@ public class RoverDisplayWindow extends JPanel {
         TemperatureStatsLbl.setWrapStyleWord(true);
         TemperatureStatsLbl.setEditable(false);
         TemperatureStatsLbl.setTabSize(14);
-        TemperatureStatsLbl.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        TemperatureStatsLbl.setFont(font);
         TemperatureStatsLbl.setLineWrap(true);
         temperatureScroll.setViewportView(TemperatureStatsLbl);
 
@@ -166,7 +174,7 @@ public class RoverDisplayWindow extends JPanel {
         LEDPnl.add(MuteLED);
 
         JLabel muteLbl = new JLabel("Muted");
-        muteLbl.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        muteLbl.setFont(font);
         muteLbl.setBounds(50, 19, 107, 14);
         LEDPnl.add(muteLbl);
 
@@ -176,17 +184,17 @@ public class RoverDisplayWindow extends JPanel {
         LEDPnl.add(InstructionsLED);
 
         JLabel instructionsLbl = new JLabel("Instructions");
-        instructionsLbl.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        instructionsLbl.setFont(font);
         instructionsLbl.setBounds(50, 60, 107, 14);
         LEDPnl.add(instructionsLbl);
 
-        AutonomusLED = new LEDIndicator();
-        AutonomusLED.setLEDColor(LEDIndicator.PURPLE);
-        AutonomusLED.setBounds(10, 93, 30, 30);
-        LEDPnl.add(AutonomusLED);
+        AutonomousLED = new LEDIndicator();
+        AutonomousLED.setLEDColor(LEDIndicator.PURPLE);
+        AutonomousLED.setBounds(10, 93, 30, 30);
+        LEDPnl.add(AutonomousLED);
 
         JLabel autonomusLbl = new JLabel("Autonomus");
-        autonomusLbl.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        autonomusLbl.setFont(font);
         autonomusLbl.setBounds(50, 101, 107, 14);
         LEDPnl.add(autonomusLbl);
 
@@ -197,7 +205,7 @@ public class RoverDisplayWindow extends JPanel {
         LEDPnl.add(UnusedLED1);
 
         UnusedLbl1 = new JLabel("unused");
-        UnusedLbl1.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        UnusedLbl1.setFont(font);
         UnusedLbl1.setBounds(50, 142, 107, 14);
         LEDPnl.add(UnusedLbl1);
 
@@ -208,7 +216,7 @@ public class RoverDisplayWindow extends JPanel {
         LEDPnl.add(UnusedLED2);
 
         UnusedLbl2 = new JLabel("unused");
-        UnusedLbl2.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        UnusedLbl2.setFont(font);
         UnusedLbl2.setBounds(50, 183, 107, 14);
         LEDPnl.add(UnusedLbl2);
 
@@ -219,7 +227,7 @@ public class RoverDisplayWindow extends JPanel {
         LEDPnl.add(UnusedLED3);
 
         UnusedLbl3 = new JLabel("unused");
-        UnusedLbl3.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        UnusedLbl3.setFont(font);
         UnusedLbl3.setBounds(257, 19, 107, 14);
         LEDPnl.add(UnusedLbl3);
 
@@ -230,7 +238,7 @@ public class RoverDisplayWindow extends JPanel {
         LEDPnl.add(UnusedLED4);
 
         UnusedLbl4 = new JLabel("unused");
-        UnusedLbl4.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        UnusedLbl4.setFont(font);
         UnusedLbl4.setBounds(257, 60, 107, 14);
         LEDPnl.add(UnusedLbl4);
 
@@ -241,7 +249,7 @@ public class RoverDisplayWindow extends JPanel {
         LEDPnl.add(UnusedLED5);
 
         UnusedLbl5 = new JLabel("unused");
-        UnusedLbl5.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        UnusedLbl5.setFont(font);
         UnusedLbl5.setBounds(257, 101, 107, 14);
         LEDPnl.add(UnusedLbl5);
 
@@ -252,7 +260,7 @@ public class RoverDisplayWindow extends JPanel {
         LEDPnl.add(UnusedLED6);
 
         UnusedLbl6 = new JLabel("unused");
-        UnusedLbl6.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        UnusedLbl6.setFont(font);
         UnusedLbl6.setBounds(257, 142, 107, 14);
         LEDPnl.add(UnusedLbl6);
 
@@ -263,7 +271,7 @@ public class RoverDisplayWindow extends JPanel {
         LEDPnl.add(UnusedLED7);
 
         UnusedLbl7 = new JLabel("unused");
-        UnusedLbl7.setFont(new Font("Bookman Old Style", Font.PLAIN, 13));
+        UnusedLbl7.setFont(font);
         UnusedLbl7.setBounds(257, 183, 107, 14);
         LEDPnl.add(UnusedLbl7);
     }
@@ -300,9 +308,9 @@ public class RoverDisplayWindow extends JPanel {
                 formatDouble(Math.toDegrees(rover.getWheelSpeed(RoverWheels.BR))),
                 formatDouble(rover.getSpeed()),
                 formatDouble(Math.cos(rover.getDirection()) * rover.getSpeed()),
-                formatDouble(Math.toDegrees(Access.getMapInclineAtPoint(rover.getLocation(), rover.getDirection()))),
+                formatDouble(Math.toDegrees(map.getIncline(rover.getLocation(), rover.getDirection()))),
                 formatDouble(Math.sin(rover.getDirection()) * rover.getSpeed()),
-                formatDouble(Math.toDegrees(Access.getMapCrossSlopeAtPoint(rover.getLocation(), rover.getDirection()))),
+                formatDouble(Math.toDegrees(map.getCrossSlope(rover.getLocation(), rover.getDirection()))),
                 formatDouble(Math.toDegrees(rover.getAngularVelocity())),
                 formatDouble(rover.getSlipVelocity()),
                 formatDouble(rover.getAcceleration()),
@@ -328,10 +336,10 @@ public class RoverDisplayWindow extends JPanel {
                 formatDouble(rover.getMotorTemp(RoverWheels.BL)),
                 formatDouble(rover.getMotorTemp(RoverWheels.BR)),
                 formatDouble(rover.getBatteryTemperature()),
-                formatDouble(Access.getMapTemperatureAtPoint(rover.getLocation()))));
+                formatDouble(-30))); //TODO add temp map
         MuteLED.setSelected(rover.getLEDisLit("Mute"));
         InstructionsLED.setSelected(rover.getLEDisLit("Instructions"));
-        AutonomusLED.setSelected(rover.getLEDisLit("Autonomus"));
+        AutonomousLED.setSelected(rover.getLEDisLit("Autonomus"));
     }
 
     private void setToBlank() {
@@ -342,7 +350,7 @@ public class RoverDisplayWindow extends JPanel {
         TemperatureStatsLbl.setText(String.format(temperaturePattern, null, null, null, null, null, null));
         MuteLED.setSelected(false);
         InstructionsLED.setSelected(false);
-        AutonomusLED.setSelected(false);
+        AutonomousLED.setSelected(false);
     }
 
     public void setRoverList(ArrayList<RoverObject> rovers){

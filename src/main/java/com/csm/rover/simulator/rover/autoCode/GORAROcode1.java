@@ -1,13 +1,12 @@
 package com.csm.rover.simulator.rover.autoCode;
 
+import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.wrapper.Globals;
+
 import java.util.ArrayList;
 import java.util.Map;
 
-import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.wrapper.Access;
-import com.csm.rover.simulator.wrapper.Globals;
-
-public class GORAROcode1 extends RoverAutonomusCode {
+public class GORAROcode1 extends RoverAutonomousCode {
 	
 	private static final long serialVersionUID = -7214933982888683962L;
 	
@@ -80,10 +79,10 @@ public class GORAROcode1 extends RoverAutonomusCode {
 	public String nextCommand(long milliTime, DecimalPoint location,
 			double direction, Map<String, Double> parameters)
 	{
-		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + Access.getMapHeightatPoint(location) + "\t" + score + "\t" + parameters.get("battery_charge") + "\t" + state);
+		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + MAP.getHeightAt(location) + "\t" + score + "\t" + parameters.get("battery_charge") + "\t" + state);
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
-			score += Access.getTargetValue(location);
+			score += MAP.getTargetValueAt(location);
 			visitedScience.add(location.clone());
 			for (int x = 0; x < histories; x++){
 				for (int y = 0; y < sampleDirections; y++){
@@ -136,7 +135,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 				
 				//if there is a hazard at the point get less excited
 				int hazard = 0;
-				if (Access.isInHazard(examine)){
+				if (MAP.isPointInHazard(examine)){
 					hazard = 1;
 				}
 				
@@ -156,7 +155,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 				double hazardArea = 0;
 				for (double radius = sampleRadius; radius <= averagingRadius; radius += averagingRStep){
 					for (double phi = -averagingAngle/2.0; phi <= averagingAngle/2.0; phi += averagingPStep){
-						if (Access.isInHazard(location.offset(radius*Math.cos(theta+phi), radius*Math.sin(theta+phi)))){
+						if (MAP.isPointInHazard(location.offset(radius * Math.cos(theta + phi), radius * Math.sin(theta + phi)))){
 							hazardArea += sampleRadius/radius;
 							hazards[i] += 1;
 						}
@@ -165,7 +164,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 				hazardArea /= averagingRadius*averagingAngle;
 				
 				//work required to move the same translational distance increases proportional to the tangent of the slope
-				double energyCost = Math.tan((Access.getMapHeightatPoint(examine)-Access.getMapHeightatPoint(location)) / sampleRadius);
+				double energyCost = Math.tan((MAP.getHeightAt(examine)-MAP.getHeightAt(location)) / sampleRadius);
 				
 				//calculate the potential of the point
 				potentials[histories-1][i] = mentality[0]*science - mentality[1]*hazard + mentality[2]*scienceArea - mentality[3]*hazardArea - mentality[4]*energyCost;
@@ -183,7 +182,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 		
 			targetDirection = maxDirection;
 			state++;
-			if (Globals.subtractAngles(direction, targetDirection) < 0){
+			if (Globals.getInstance().subtractAngles(direction, targetDirection) < 0){
 				return "spin_cw";
 			}
 			else {
@@ -195,7 +194,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 				return "move"; 
 			}
 			else {
-				if (Globals.subtractAngles(direction, targetDirection) < 0){
+				if (Globals.getInstance().subtractAngles(direction, targetDirection) < 0){
 					return "spin_cw";
 				}
 				else {
@@ -220,7 +219,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 	}
 
 	private boolean hasUnvisitedScience(DecimalPoint loc){
-		if (Access.isAtTarget(loc)){
+		if (MAP.isPointAtTarget(loc)){
 			for (DecimalPoint past : visitedScience){
 				if (Math.sqrt(Math.pow(loc.getX()-past.getX(), 2) + Math.pow(loc.getY()-past.getY(), 2)) < 3){
 					return false;
@@ -232,7 +231,7 @@ public class GORAROcode1 extends RoverAutonomusCode {
 	}
 	
 	@Override
-	public RoverAutonomusCode clone() {
+	public RoverAutonomousCode clone() {
 		return new GORAROcode1(this);
 	}
 

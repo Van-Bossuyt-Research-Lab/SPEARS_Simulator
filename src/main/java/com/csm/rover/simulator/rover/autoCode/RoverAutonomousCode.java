@@ -1,31 +1,34 @@
 package com.csm.rover.simulator.rover.autoCode;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Map;
-
+import com.csm.rover.simulator.control.InterfaceAccess;
+import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.wrapper.Access;
 import com.csm.rover.simulator.wrapper.Globals;
 
-public abstract class RoverAutonomusCode implements Serializable, Cloneable {
+import java.io.*;
+import java.util.Map;
+
+public abstract class RoverAutonomousCode implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
-	
+
+	protected static TerrainMap MAP;
+
 	private String name;
 	private String roverName;
 	
 	private File logFile;
 	
-	public RoverAutonomusCode(String name, String rover){
+	public RoverAutonomousCode(String name, String rover){
 		this.name = name;
 		roverName = rover;
 	}
+
+    public static void setTerrainMap(TerrainMap map){
+        MAP = map;
+    }
 	
-	public RoverAutonomusCode(RoverAutonomusCode rac){
+	public RoverAutonomousCode(RoverAutonomousCode rac){
 		this.name = rac.name;
 		this.roverName = rac.roverName;
 	}
@@ -49,20 +52,20 @@ public abstract class RoverAutonomusCode implements Serializable, Cloneable {
 	protected void writeToLog(String message){
 		try {
 			BufferedWriter write = new BufferedWriter(new FileWriter(logFile, true));
-			write.write(message + "\t\t" + Access.INTERFACE.DateTime.toString("[MM/dd/yyyy hh:mm:ss.") + (Globals.TimeMillis%1000) + "]\r\n");
+			write.write(message + "\t\t" + InterfaceAccess.CODE.DateTime.toString("[MM/dd/yyyy hh:mm:ss.") + (Globals.getInstance().timeMillis %1000) + "]\r\n");
 			write.flush();
 			write.close();
 		}
 		catch (NullPointerException e){
 			if (!tried){
 				tried = true;
-				logFile = new File("Logs/" + roverName + " Log " + Access.INTERFACE.DateTime.toString("MM-dd-yyyy hh-mm") + ".txt");
-				Globals.writeToLogFile(roverName, "Writing rover's autonomous log file to: " + logFile.getAbsolutePath());
+				logFile = new File("Logs/" + roverName + " Log " + InterfaceAccess.CODE.DateTime.toString("MM-dd-yyyy hh-mm") + ".txt");
+				Globals.getInstance().writeToLogFile(roverName, "Writing rover's autonomous log file to: " + logFile.getAbsolutePath());
 				writeToLog(message);
 			}
 			else {
 				e.printStackTrace();
-				Globals.writeToLogFile(roverName, "Rover's autonomous log file failed to initalize.");
+				Globals.getInstance().writeToLogFile(roverName, "Rover's autonomous log file failed to initalize.");
 			}
 		}
 		catch (IOException e){
@@ -70,6 +73,6 @@ public abstract class RoverAutonomusCode implements Serializable, Cloneable {
 		}
 	}
 	
-	public abstract RoverAutonomusCode clone();
+	public abstract RoverAutonomousCode clone();
 	
 }

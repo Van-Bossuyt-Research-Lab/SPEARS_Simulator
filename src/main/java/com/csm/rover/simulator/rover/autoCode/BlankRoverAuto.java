@@ -4,7 +4,7 @@ import com.csm.rover.simulator.objects.DecimalPoint;
 
 import java.util.Map;
 
-public class BlankRoverAuto extends RoverAutonomusCode {
+public class BlankRoverAuto extends RoverAutonomousCode {
 
 	private static final long serialVersionUID = 4270320886718139449L;
 
@@ -21,7 +21,7 @@ public class BlankRoverAuto extends RoverAutonomusCode {
 	}
 
 	@Override
-	public RoverAutonomusCode clone() {
+	public RoverAutonomousCode clone() {
 		return new BlankRoverAuto();
 	}
 

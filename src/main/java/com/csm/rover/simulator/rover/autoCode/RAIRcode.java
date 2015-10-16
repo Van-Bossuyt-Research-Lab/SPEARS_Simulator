@@ -1,11 +1,10 @@
 package com.csm.rover.simulator.rover.autoCode;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.wrapper.Access;
 
 import java.util.Map;
 
-public class RAIRcode extends RoverAutonomusCode {
+public class RAIRcode extends RoverAutonomousCode {
 
 	private static final long serialVersionUID = 3569422948902188816L;
 
@@ -136,8 +135,8 @@ public class RAIRcode extends RoverAutonomusCode {
 
 		//Write processing code here
 		//log
-		boolean hazard=Access.isInHazard(location);
-		double elevation=Access.getMapHeightatPoint(location);
+		boolean hazard=MAP.isPointInHazard(location);
+		double elevation=MAP.getHeightAt(location);
 		writeToLog("RA" +","+state+","+ milliTime +","+ location+","+ elevation+","+direction+","+parameters.get("motor_temp_FL")+","+parameters.get("motor_temp_FR")+","+parameters.get("motor_temp_BL")+","+parameters.get("motor_temp_BR")+","+parameters.get("battery_temp")+","+parameters.get("battery_charge")+","+hazard);
 				
 			//determine variables: arc angle range theta, number of angle increments n, distance checked d, 
@@ -150,7 +149,7 @@ public class RAIRcode extends RoverAutonomusCode {
 		double delta_X=Trgt.getX()-location.getX();
 		double delta_Y=Trgt.getY()-location.getY();
 		double delta_L=Math.sqrt(Math.pow(delta_X, 2)+Math.pow(delta_Y, 2));
-		double delta_Z=Access.getMapHeightatPoint(Trgt)-Access.getMapHeightatPoint(location);
+		double delta_Z=MAP.getHeightAt(Trgt)-MAP.getHeightAt(location);
 		
 			//determine angle between A and B 
 			//	arc tangent of opposite/adjacent set as phi
@@ -408,7 +407,7 @@ if (milliTime-rnTime>=500){
 		double delta_X=Trgt.getX()-loc.getX();
 		double delta_Y=Trgt.getY()-loc.getY();
 		double delta_L=Math.sqrt(Math.pow(delta_X, 2)+Math.pow(delta_Y, 2));
-		double delta_Z=Access.getMapHeightatPoint(Trgt)-Access.getMapHeightatPoint(loc);
+		double delta_Z=MAP.getHeightAt(Trgt)-MAP.getHeightAt(loc);
 				
 		//target climb angle
 		double theta=Math.atan(delta_Z/delta_L);
@@ -419,11 +418,11 @@ if (milliTime-rnTime>=500){
 		double Pt_Y=pnt.getY()-loc.getY();
 		double Pd_L=Math.sqrt(Math.pow(Pd_X, 2)+Math.pow(Pd_Y, 2));
 		double Pt_L=Math.sqrt(Math.pow(Pt_X, 2)+Math.pow(Pt_Y, 2));
-		double Pt_Z=Access.getMapHeightatPoint(pnt)-Access.getMapHeightatPoint(loc);
+		double Pt_Z=MAP.getHeightAt(pnt)-MAP.getHeightAt(loc);
 		double thetaP=Math.atan(Pt_Z/Pt_L);
 		
 		//determine if ground cover is safe
-		boolean hzrd=Access.isInHazard(pnt);
+		boolean hzrd=MAP.isPointInHazard(pnt);
 		if (hzrd){
 			hzrds=10;
 		} else{
@@ -442,7 +441,7 @@ if (milliTime-rnTime>=500){
 		DecimalPoint intpnt;
 		intpnt=loc.offset(Pt_X/2,Pt_Y/2);
 		double intPt_L=Math.sqrt(Math.pow(Pt_X/2, 2)+Math.pow(Pt_Y/2, 2));
-		double intPt_Z=Access.getMapHeightatPoint(intpnt)-Access.getMapHeightatPoint(loc);
+		double intPt_Z=MAP.getHeightAt(intpnt)-MAP.getHeightAt(loc);
 		double intTheta=Math.atan(intPt_Z/intPt_L);
 		if (intTheta>=0.15){
 			intslopehzrd=100;
@@ -463,7 +462,7 @@ if (milliTime-rnTime>=500){
 			double delta_X=Trgt.getX()-loc.getX();
 			double delta_Y=Trgt.getY()-loc.getY();
 			double delta_L=Math.sqrt(Math.pow(delta_X, 2)+Math.pow(delta_Y, 2));
-			double delta_Z=Access.getMapHeightatPoint(Trgt)-Access.getMapHeightatPoint(loc);
+			double delta_Z=MAP.getHeightAt(Trgt)-MAP.getHeightAt(loc);
 			
 			//target drive direction
 			double phi=Math.atan(delta_Y/delta_X);
@@ -475,9 +474,9 @@ if (milliTime-rnTime>=500){
 			double Pt_X=pnt.getX()-loc.getX();
 			double Pt_Y=pnt.getY()-loc.getY();
 			double Pd_L=Math.sqrt(Math.pow(Pd_X, 2)+Math.pow(Pd_Y, 2));
-			double Pd_Z=Access.getMapHeightatPoint(Trgt)-Access.getMapHeightatPoint(pnt);
+			double Pd_Z=MAP.getHeightAt(Trgt)-MAP.getHeightAt(pnt);
 			double Pt_L=Math.sqrt(Math.pow(Pt_X, 2)+Math.pow(Pt_Y, 2));
-			double Pt_Z=Access.getMapHeightatPoint(pnt)-Access.getMapHeightatPoint(loc);
+			double Pt_Z=MAP.getHeightAt(pnt)- MAP.getHeightAt(loc);
 			double phiP=Math.atan(Pd_Y/Pd_X);
 			double thetaP=Math.atan(Pt_Z/Pt_L);
 			
