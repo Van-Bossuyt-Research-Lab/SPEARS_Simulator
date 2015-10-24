@@ -6,9 +6,9 @@ import objects.DecimalPoint;
 import rover.RoverAutonomusCode;
 import wrapper.Access;
 
-public class RAIRcodeRA extends RoverAutonomusCode {
+public class RAIRcodeRTF extends RoverAutonomusCode {
 
-	public RAIRcodeRA(RAIRcodeRA in) {
+	public RAIRcodeRTF(RAIRcodeRTF in) {
 		super(in);
 		this.phiBound = in.phiBound;
 		this.tphi = in.tphi;
@@ -106,14 +106,14 @@ public class RAIRcodeRA extends RoverAutonomusCode {
 		long rnTime=0;
 		long rnTimeb;
 		long checkTime=0;
-		DecimalPoint checkPoint=new DecimalPoint(-170,-170);
+		DecimalPoint checkPoint=new DecimalPoint(0,0);
 		
 		//State set
 		int state=0;
 		int substate3=0;
 		
 		//Target location 
-		DecimalPoint Trgt=new DecimalPoint(-30,-30);
+		DecimalPoint Trgt=new DecimalPoint(100,100);
 		//Risk Tolerance Factor
 		long riskTolerance=10;
 
@@ -121,7 +121,7 @@ public class RAIRcodeRA extends RoverAutonomusCode {
 		private int action = 0;
 		private int seconds = 1;
 		
-		public RAIRcodeRA(){
+		public RAIRcodeRTF(){
 			super("RAIR", "RAIR");
 
 		}
@@ -153,9 +153,9 @@ public class RAIRcodeRA extends RoverAutonomusCode {
 
 		//Write processing code here
 		//log
-		boolean hazard=Access.isInHazard(location);
-		double elevation=Access.getMapHeightatPoint(location);
-		writeToLog(riskTolerance +","+state+","+ milliTime +","+ location+","+ elevation+","+direction+","+motor_temp_FL+","+motor_temp_FR+","+motor_temp_BL+","+motor_temp_BR+","+battery_temp+","+battery_charge+","+hazard);
+		//boolean hazard=Access.isInHazard(location);
+		//double elevation=Access.getMapHeightatPoint(location);
+		writeToLog(riskTolerance +"\t"+state+"\t"+ milliTime +"\t"+ formatDouble(location.getX()) +"\t"+ formatDouble(location.getY()) +"\t"+ formatDouble(Access.getMapHeightatPoint(location))+"\t"+direction+"\t"+motor_temp_FL+"\t"+motor_temp_FR+"\t"+motor_temp_BL+"\t"+motor_temp_BR+"\t"+battery_temp+"\t"+battery_charge+"\t"+HZRT(location));
 				
 			//determine variables: arc angle range theta, number of angle increments n, distance checked d, 
 				
@@ -175,7 +175,18 @@ public class RAIRcodeRA extends RoverAutonomusCode {
 			//optimal climb angle
 		double theta=Math.atan(delta_Z/delta_L);
 		
-		
+		if (milliTime-checkTime>=150000){
+			//if distance travelled is greater than 10 meters
+			if (pythagorean(location,checkPoint)>=10){
+				checkPoint=location;
+			} else {
+				//if distance travelled is less that 10 meters
+				//enter state 3
+				state=3;
+				substate3=1;
+				checkTime=milliTime;
+			}
+		}
 		
 if (milliTime-rnTime>=500){
 //State 0 determines is the route selection state
@@ -292,8 +303,118 @@ if (milliTime-rnTime>=500){
 				state=0;
 				return "stop";
 			}
-
+//State 3 is the hole escape state
+		} else if (state==3){
+			if (substate3==1){
+				//P1
+				DecimalPoint loc=location;
+				DecimalPoint P1;
+				P1=location.offset(D1);
+				S1=FastRoute(P1,loc);
+				
+				//P2
+				DecimalPoint P2;
+				P2=location.offset(D2);
+				S2=FastRoute(P2,loc);
+				
+				//P3
+				DecimalPoint P3;
+				P3=location.offset(D3);
+				S3=FastRoute(P3,loc);
+				
+				//P4
+				DecimalPoint P4;
+				P4=location.offset(D4);
+				S4=FastRoute(P4,loc);
+				
+				//P5
+				DecimalPoint P5;
+				P5=location.offset(D5);
+				S5=FastRoute(P5,loc);
+				
+				//P6
+				DecimalPoint P6;
+				P6=location.offset(D6);
+				S6=FastRoute(P6,loc);
+				
+				//P7
+				DecimalPoint P7;
+				P7=location.offset(D7);
+				S7=FastRoute(P7,loc);
+				
+				//P8
+				DecimalPoint P8;
+				P8=location.offset(D8);
+				S8=FastRoute(P8,loc);
+				
+				//P9
+				DecimalPoint P9;
+				P9=location.offset(D9);
+				S9=FastRoute(P9,loc);
+				
+				//P10
+				DecimalPoint P10;
+				P10=location.offset(D10);
+				S10=FastRoute(P10,loc);
+				
+				//P11
+				DecimalPoint P11;
+				P11=location.offset(D11);
+				S11=FastRoute(P11,loc);
+				
+				//P12
+				DecimalPoint P12;
+				P12=location.offset(D12);
+				S12=FastRoute(P12,loc);
+				
+				//P13
+				DecimalPoint P13;
+				P13=location.offset(D13);
+				S13=FastRoute(P13,loc);
+				
+				//P14
+				DecimalPoint P14;
+				P14=location.offset(D14);
+				S14=FastRoute(P14,loc);
+				
+				//P15
+				DecimalPoint P15;
+				P15=location.offset(D15);
+				S15=FastRoute(P15,loc);
+				
+				//P16
+				DecimalPoint P16;
+				P16=location.offset(D16);
+				S16=FastRoute(P16,loc);
+				
+				substate3=2;
+				tphi=minscore(S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16);
+			} else if (substate3==2){
+				//Determine if current angle is outside of desired range 
+				if (direction>=(tphi+phiBound)){
+					return "spin_cw";
+				} else if (direction<=(tphi-phiBound)){
+					return "spin_ccw";
+				} else {
+					substate3=3;
+					rnTimeb=milliTime;
+				}
+			} else if (substate3==3){
+				if ((milliTime-rnTimeb)<=30000){
+					return "move";
+				} else {
+					state=0;
+					return "stop";
+				}
+			}
+			//if checkPoint to location is less than 5m drive in direction towards point
+			//check is have travelled 5 m
+			//if have not travelled 5 m determine direction towards goal
+			//turn to face direction towards goal
+			//drive until has moved 5m 
+			//use some sort of substate maybe?
 		}
+		
 }
 
 		return "delay100";
@@ -440,7 +561,7 @@ if (milliTime-rnTime>=500){
 		//determine if ground cover is safe
 		boolean hzrd=Access.isInHazard(pnt);
 		if (hzrd){
-			hzrds=10;
+			hzrds=HZRT(pnt);
 		} else{
 			hzrds=0;
 		}
@@ -506,8 +627,50 @@ if (milliTime-rnTime>=500){
 			return score;
 		}
 		
-		public RAIRcodeRA clone(){
-			return new RAIRcodeRA(this);
+		//Method for calculating hazard rate instantaneously 
+		private double HZRT(DecimalPoint loc){
+			
+			double hzrd;
+			double hzrate;
+			
+			hzrd=Access.getHazardValue(loc);
+			
+			hzrate=-0.00009*Math.pow(hzrd,5)+0.0036*Math.pow(hzrd,4)-0.05*Math.pow(hzrd,3)+0.2937*Math.pow(hzrd,2)-0.5274*hzrd+0.3;
+					
+			return hzrate;
+		}
+		
+		private String formatDouble(double in){ 
+			String out = "";
+			if (Math.abs(in) < Integer.MAX_VALUE/1000){
+				if (in < 0){
+					in *= -1;
+					out = "-";
+				}
+				int whole = (int)in;
+				out += whole;
+				int part = (int)((in * 1000) - whole*1000);
+				if (part == 0){
+					out += ".000";
+				}
+				else if (part < 10){
+					out += "." + part + "00";
+				}
+				else if (part < 100){
+					out += "." + part + "0";
+				}
+				else {
+					out += "." + part;
+				}
+			}
+			else {
+				out = (int)in + "";
+			}
+			return out;
+		}
+		
+		public RAIRcodeRTF clone(){
+			return new RAIRcodeRTF(this);
 		}
 
 }

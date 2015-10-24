@@ -55,9 +55,10 @@ public class Admin {
 		addItemToSelectionList(		"RAIR Control", new RAIRcodeControl());
 		addItemToSelectionList(		"RAIR Risk Averse", new RAIRcodeRA());
 		addItemToSelectionList(		"RAIR Risk Seeking", new RAIRcodeRS());
-		addItemToSelectionList(		"RAIR Risk Temper", new RAIRcodeRT());	
-		addItemToSelectionList(		"PIDAA",		new PIDAAcode3());
-		addItemToSelectionList(	"PIDAA CONTROL", new PIDAAcontrol());
+		addItemToSelectionList(		"RAIR Risk Temper", new RAIRcodeRT());
+		addItemToSelectionList(		"RAIR Risk Tolerance Factor", new RAIRcodeRTF());
+//		addItemToSelectionList(		"PIDAA",		new PIDAAcode3());
+//		addItemToSelectionList(	"PIDAA CONTROL", new PIDAAcontrol());
 		addItemToSelectionList(		"GORARO Simp",	new GORAROcode1());
 		addItemToSelectionList(		"GORARO Adv A",	new GORAROAdvanceCode(new double[]{
 				10000, 84.2892, 567.513, 7.37412, 0
