@@ -7,3 +7,6 @@ Logs/*
 Data/*
 /bin/
 default.cfg
+.idea/*
+target/*
+*.iml
