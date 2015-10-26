@@ -2,6 +2,7 @@ package com.csm.rover.simulator.visual;
 
 import com.csm.rover.simulator.control.InterfacePanel;
 import com.csm.rover.simulator.map.display.LandMapPanel;
+import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.rover.RoverHub;
 import com.csm.rover.simulator.satellite.SatelliteHub;
 import com.csm.rover.simulator.wrapper.Globals;
@@ -13,18 +14,16 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Optional;
 
 //TODO make into a signularity thingy
 public class Form extends JFrame {
 	
 	private static final long serialVersionUID = 5065827458217177853L;
 
-	private static Optional<Form> singleton_instance = Optional.empty();
-
 	static final int STARTUP = -1, WRAPPER = 0, MAP = 1, ROVER = 2, ORBIT = 3, SATELLITE = 4, INTERFACE = 5;
 
 	private int currentScreen = 0;
+    private boolean splash = false;
 
     private JPanel contentPane;
     private StartupPanel startupPanel;
@@ -38,24 +37,17 @@ public class Form extends JFrame {
 	private int currentPage = STARTUP;
 
 	public Form(Dimension screenSize, StartupPanel startupPanel) {
-        this.setVisible(false);
         setUndecorated(true);
+        showSplash();
 		setSize(screenSize);
-		setVisible(true);
 		setResizable(false);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.startupPanel = startupPanel;
-		//getInstance().showOnScreen(frame.currentScreen);
-//		addWindowListener(new WindowAdapter() {
-//			@Override
-//			public void windowOpened(WindowEvent arg0) {
-//				CODE.wakeUp();
-//			}
-//		});
 		KeyboardFocusManager masterKeyManager = KeyboardFocusManager
 				.getCurrentKeyboardFocusManager();
 		masterKeyManager.addKeyEventDispatcher(new KeyDispatcher(this));
 		initialize();
+        showForm();
 	}
 
     public void setRunTimePanels(MainWrapper WrapperPnl,
@@ -144,8 +136,8 @@ public class Form extends JFrame {
 		setLocation(0, 0);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
 		contentPane.setLayout(null);
+        setContentPane(contentPane);
 
         startupPanel.addMouseListener(new MouseAdapter() {
             @Override
@@ -156,9 +148,34 @@ public class Form extends JFrame {
         startupPanel.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
         startupPanel.setVisible(true);
         startupPanel.setLocation(0, 0);
-        contentPane.add(startupPanel);
 	}
-	
+
+    private void showSplash(){
+        splash = true;
+        setOpacity(0.5f);
+    }
+
+    private void showForm(){
+        new FreeThread(2000, new Runnable() {
+            @Override
+            public void run() {
+                splash = false;
+                contentPane.add(startupPanel);
+                repaint();
+                setOpacity(1);
+            }
+        }, 1, "splash");
+    }
+
+    @Override
+    public void paint(Graphics g){
+        super.paint(g);
+        if (splash){
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/spears logo.PNG"));
+            g.drawImage(icon.getImage(), (getWidth()-icon.getIconWidth())/2, (getHeight()-icon.getIconHeight())/2, null);
+        }
+    }
+
 	public void exit(){
 		//exit procedures
 		System.exit(0);
@@ -324,7 +341,6 @@ public class Form extends JFrame {
             Globals.getInstance().reportError("Form", "showOnScreen", new RuntimeException("No Screens Found"));
 		}
 	}
-
 
     public void focusOnTerrain() {
         terrainPnl.requestFocus();
