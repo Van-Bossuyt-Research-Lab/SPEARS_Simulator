@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 //TODO make into singleton
 public class Globals {
 
-	public static String versionNumber = "2.2.1";
+	public static String versionNumber = "2.3.0";
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;
