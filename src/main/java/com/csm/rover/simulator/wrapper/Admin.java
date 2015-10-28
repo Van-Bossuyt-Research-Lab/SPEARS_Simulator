@@ -14,13 +14,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Optional;
 
-//TODO make into a signularity thingy
 public class Admin {
 
 //	public static Form GUI;
 	private Globals GLOBAL;
-
-	private int queue_key = "qwert".hashCode();
 
     private static HumanInterfaceAbstraction HI;
 
@@ -55,8 +52,7 @@ public class Admin {
 			//TODO Load from console config things
 		}
 	}
-	
-	//TODO Add items for rover and satellite option here using addItemToSelectionList
+
 	//TODO clean up this interface for OCP
 	private Admin(){
 		GLOBAL = Globals.getInstance();

@@ -90,7 +90,6 @@ public class MainWrapper extends Panel {
 	}
 
     private void createSerialDisplays(){
-        //TODO consolidate to 1 array for labels
         serialHistory = new ArrayList<ArrayList<String>>();
         for ( int x = 0; x < serialBuffers.size(); x++){
             serialHistory.add(new ArrayList<String>());

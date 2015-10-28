@@ -9,7 +9,6 @@ import com.csm.rover.simulator.visual.AccelPopUp;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-//TODO make into singleton
 public class Globals {
 
 	public static String versionNumber = "2.3.0";

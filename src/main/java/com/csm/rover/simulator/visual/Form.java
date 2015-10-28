@@ -15,7 +15,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-//TODO make into a signularity thingy
 public class Form extends JFrame {
 	
 	private static final long serialVersionUID = 5065827458217177853L;
