@@ -41,7 +41,7 @@ public class Admin {
 			if (go) {
 				//TODO run without gui
 				try {
-					admin.beginSimulation(new RunConfiguration(new File("default.cfg")));
+					admin.beginSimulation(new RunConfiguration(config));
 				}
 				catch (Exception e){
 					Globals.getInstance().reportError("Admin", "main", e);
@@ -49,9 +49,26 @@ public class Admin {
 			}
 		}
 		else {
-			//TODO Load from console config things
+			HI = new HiCmd();
+            File cfgFile = new File(args[0]);
+            if (cfgFile.exists() && getFileType(cfgFile).equals("cfg")){
+                try {
+                    admin.beginSimulation(new RunConfiguration(cfgFile));
+                }
+                catch (Exception e){
+                    Globals.getInstance().reportError("Admin", "main", e);
+                }
+            }
+            else {
+                System.err.println("Expected a valid file path to a .cfg file.  Got: \"" + cfgFile.getAbsolutePath() + "\"");
+            }
 		}
 	}
+
+    private static String getFileType(File file){
+        String filename = file.getName();
+        return filename.substring(filename.lastIndexOf(".")+1, filename.length());
+    }
 
 	//TODO clean up this interface for OCP
 	private Admin(){
