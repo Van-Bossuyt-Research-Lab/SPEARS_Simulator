@@ -547,7 +547,7 @@ public class StartupPanel extends Panel {
                 namebase = "Rover";
             }
             String newName = namebase + " " + numb;
-            while (asList(RoverList.getItems()).contains(newName)){
+            while (RoverList.getItems().contains(newName)){
                 numb++;
                 newName = namebase + " " + numb;
             }
@@ -578,7 +578,7 @@ public class StartupPanel extends Panel {
                 //TODO change to code name
                 String newName = "Satellite " + numb;
                 //newName = (String)GUI.SatAutonomusCodeList.getSelectedItem() + " " + numb;
-                while (asList(SatelliteList.getItems()).contains(newName)){
+                while (SatelliteList.getItems().contains(newName)){
                     numb++;
                     newName = "Satellite " + numb;
                     //newName = (String)GUI.SatAutonomusCodeList.getSelectedItem() + " " + numb;
