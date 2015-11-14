@@ -1,10 +1,10 @@
-package com.csm.rover.simulator.sub;
+package com.csm.rover.simulator.sub.physicsModels;
 
 import java.io.Serializable;
-import com.csm.rover.simulator.objects.DecimalPoint;
+
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.rover.MotorState;
-import com.csm.rover.simulator.wrapper.Admin;
+import com.csm.rover.simulator.sub.subProp;
 import com.csm.rover.simulator.wrapper.Globals;
 
 

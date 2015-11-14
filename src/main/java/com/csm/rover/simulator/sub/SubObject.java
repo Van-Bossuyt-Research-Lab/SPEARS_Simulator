@@ -1,12 +1,11 @@
 package com.csm.rover.simulator.sub;
 
 import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.sub.subProp;
+import com.csm.rover.simulator.sub.physicsModels.SubPhysicsModel;
+import com.csm.rover.simulator.sub.subAuto.SubAutonomousCode;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
-import com.csm.rover.simulator.sub.SubPhysicsModel;
 import com.csm.rover.simulator.rover.MotorState;
 import java.awt.Point;
 import java.io.InputStream;
@@ -27,7 +26,7 @@ public class SubObject implements Serializable {
 
     private String name;
     private String IDcode;
-    private com.csm.rover.simulator.sub.SubPhysicsModel physics;
+    private SubPhysicsModel physics;
     private SubAutonomousCode autoCode;
 
     @SuppressWarnings("unused")
@@ -79,14 +78,14 @@ public class SubObject implements Serializable {
     private String serialHistory = "";
     private Map<String, Boolean> LEDs = new TreeMap<String, Boolean>();
 
-    public SubObject(String name, String ID, SubPhysicsModel param, subAutonomousCode code, double[] loc, double dir, double temp){
+    public SubObject(String name, String ID, SubPhysicsModel param, SubAutonomousCode code, double[] loc, double dir, double temp){
         this.name = name;
         IDcode = ID;
         physics = param;
         autoCode = code;
         physics.initalizeConditions(name, physics.getbattery_max_charge(), temp);
         physics.setLocation(loc);
-        physics.setDirection(dir);
+        physics.setDirection_(dir);
         LEDs.put("Mute", false);
         LEDs.put("Instructions", false);
         LEDs.put("Autonomus", false);
@@ -94,7 +93,7 @@ public class SubObject implements Serializable {
 
     public static void setTerrainMap(TerrainMap map){
         MAP = map;
-        subAutonomousCode.setTerrainMap(map);
+        SubAutonomousCode.setTerrainMap(map);
         SubPhysicsModel.setTerrainMap(map);
     }
 
