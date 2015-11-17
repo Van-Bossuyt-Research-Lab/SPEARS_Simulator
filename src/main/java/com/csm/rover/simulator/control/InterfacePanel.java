@@ -177,7 +177,7 @@ public class InterfacePanel extends Panel{
 		MailBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				InterfaceAccess.CODE.OpenRecievedFiles();
+				InterfaceAccess.CODE.OpenReceivedFiles();
 			}
 		});
 		ProgramBtnsPnl.add(MailBtn);

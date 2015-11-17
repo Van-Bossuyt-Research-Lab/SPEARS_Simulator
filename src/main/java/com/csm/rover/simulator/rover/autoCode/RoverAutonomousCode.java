@@ -4,11 +4,15 @@ import com.csm.rover.simulator.control.InterfaceAccess;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.wrapper.Globals;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.Map;
 
 public abstract class RoverAutonomousCode implements Serializable, Cloneable {
+	private static final Logger LOG = LogManager.getLogger(RoverAutonomousCode.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -60,12 +64,12 @@ public abstract class RoverAutonomousCode implements Serializable, Cloneable {
 			if (!tried){
 				tried = true;
 				logFile = new File("Logs/" + roverName + " Log " + InterfaceAccess.CODE.DateTime.toString("MM-dd-yyyy hh-mm") + ".txt");
-				Globals.getInstance().writeToLogFile(roverName, "Writing rover's autonomous log file to: " + logFile.getAbsolutePath());
+				LOG.log(Level.INFO, "Writing rover {}'s autonomous log file to: {}", roverName, logFile.getAbsolutePath());
 				writeToLog(message);
 			}
 			else {
 				e.printStackTrace();
-				Globals.getInstance().writeToLogFile(roverName, "Rover's autonomous log file failed to initalize.");
+				LOG.log(Level.ERROR, "Rover {}'s autonomous log file failed to initalize.", roverName);
 			}
 		}
 		catch (IOException e){

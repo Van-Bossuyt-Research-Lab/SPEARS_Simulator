@@ -31,10 +31,6 @@ public class InterfaceAccess {
         CODE.advanceActionPage(dir, 1);
     }
 
-    public static void addNoteToLog(String from, String note){
-        CODE.writeToLog(from, note);
-    }
-
     public static void sendMsg(String msg){
         CODE.writeToSerial(msg);
     }
@@ -120,10 +116,6 @@ public class InterfaceAccess {
 
     public static void InstructionEditorFinish(boolean addRover, boolean addSat, String title, InstructionObj[] instruct){
         CODE.addInstructionsToList2(addRover, addSat, title, instruct);
-    }
-
-    public static File getLogFile(){
-        return CODE.getLogFile();
     }
 
 }
