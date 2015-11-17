@@ -14,6 +14,9 @@ import com.csm.rover.simulator.satellite.SatelliteParametersList;
 import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -32,6 +35,7 @@ import java.util.TreeMap;
 import static java.util.Arrays.asList;
 
 public class StartupPanel extends Panel {
+    private static final Logger LOG = LogManager.getLogger(StartupPanel.class);
 
     Random rnd = new Random();
 
@@ -588,7 +592,7 @@ public class StartupPanel extends Panel {
             }
         }
         catch (Exception e) {
-            GLOBAL.reportError("Admin", "addSatellitetoList", e);
+            LOG.log(Level.ERROR, "Failed to add Satellite to list", e);
         }
     }
 
