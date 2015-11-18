@@ -181,6 +181,7 @@ public class Form extends JFrame {
 
 	public void exit(){
 		//exit procedures
+		LOG.log(Level.INFO, "Exiting SPEARS");
 		System.exit(0);
 	}
 	

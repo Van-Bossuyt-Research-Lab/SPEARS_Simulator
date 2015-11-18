@@ -33,6 +33,7 @@ public class Admin {
 
 	public static void main(String[] args) {
 		Admin admin = getInstance();
+		LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
 		if (args.length == 0) {
             HI = new HiForm();
 			boolean go = false;
