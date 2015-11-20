@@ -7,6 +7,9 @@ import com.csm.rover.simulator.rover.RoverHub;
 import com.csm.rover.simulator.satellite.SatelliteHub;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.MainWrapper;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -16,6 +19,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class Form extends JFrame {
+	private static final Logger LOG = LogManager.getFormatterLogger(Form.class);
 	
 	private static final long serialVersionUID = 5065827458217177853L;
 
@@ -177,6 +181,7 @@ public class Form extends JFrame {
 
 	public void exit(){
 		//exit procedures
+		LOG.log(Level.INFO, "Exiting SPEARS");
 		System.exit(0);
 	}
 	
@@ -337,7 +342,7 @@ public class Form extends JFrame {
 			gs[0].setFullScreenWindow( this );
 		}
 		else{
-            Globals.getInstance().reportError("Form", "showOnScreen", new RuntimeException("No Screens Found"));
+			LOG.log(Level.ERROR, "showOnScreen reports no screens", new RuntimeException("No Screens Found"));
 		}
 	}
 
