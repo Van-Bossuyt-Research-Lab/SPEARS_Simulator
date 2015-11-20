@@ -1,8 +1,9 @@
 package com.csm.rover.simulator.wrapper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class NamesAndTags {
+public class NamesAndTags implements Serializable {
 
     private ArrayList<String> groundNames, groundTags, roverNames, roverTags, satelliteNames, satelliteTags;
 

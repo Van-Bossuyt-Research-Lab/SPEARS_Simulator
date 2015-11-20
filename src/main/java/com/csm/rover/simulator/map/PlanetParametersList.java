@@ -1,6 +1,8 @@
 package com.csm.rover.simulator.map;
 
-public class PlanetParametersList {
+import java.io.Serializable;
+
+public class PlanetParametersList implements Serializable {
 	
 	private final double G = 6.674*Math.pow(10, -11);
 
