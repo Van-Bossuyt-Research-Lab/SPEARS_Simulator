@@ -4,6 +4,9 @@ package com.csm.rover.simulator.map.io;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.ArrayGrid;
 import com.csm.rover.simulator.wrapper.Globals;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -15,6 +18,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class TerrainMapWriter {
+    private static final Logger LOG = LogManager.getLogger(TerrainMapWriter.class);
+
     private static String fileID = "__^__";
 
     public static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
@@ -39,7 +44,7 @@ public class TerrainMapWriter {
                 ImageIO.write(image, "png", output);
             }
             else {
-                Globals.getInstance().reportError("TerrainMap", "Failed to create image file on map images save", null);
+                LOG.log(Level.ERROR, "Failed to create image file on map images save");
             }
         }
         catch (IOException e) {

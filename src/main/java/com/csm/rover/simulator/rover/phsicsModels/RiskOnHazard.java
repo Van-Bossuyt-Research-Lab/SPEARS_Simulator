@@ -25,7 +25,6 @@ public class RiskOnHazard extends RoverPhysicsModel {
 		}
 		super.excecute();
 		if (!failed && rnd.nextInt((int)(10000/super.time_step*60)) < Math.pow(MAP.getHazardValueAt(location), 3)){ //a level 10 Hazard gives 10% chance of failure a minute, a level 1 hazard gives 0.01% chance of failure per minute
-			Globals.getInstance().writeToLogFile(roverName, Globals.getInstance().timeMillis + "\tRover failed in level " + MAP.getHazardValueAt(location) + " Hazard.");
 			failed = true;
 		}
 	}

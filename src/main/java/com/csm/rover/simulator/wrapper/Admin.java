@@ -9,12 +9,16 @@ import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
 import com.csm.rover.simulator.objects.RunConfiguration;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.satellite.SatelliteObject;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Optional;
 
 public class Admin {
+	private static final Logger LOG = LogManager.getFormatterLogger(Admin.class);
 
 //	public static Form GUI;
 	private Globals GLOBAL;
@@ -29,6 +33,7 @@ public class Admin {
 
 	public static void main(String[] args) {
 		Admin admin = getInstance();
+		LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
 		if (args.length == 0) {
             HI = new HiForm();
 			boolean go = false;
@@ -44,7 +49,7 @@ public class Admin {
 					admin.beginSimulation(new RunConfiguration(new File("default.cfg")));
 				}
 				catch (Exception e){
-					Globals.getInstance().reportError("Admin", "main", e);
+					LOG.log(Level.ERROR, "Simulator failed to start", e);
 				}
 			}
 		}
@@ -92,11 +97,10 @@ public class Admin {
 					throw new Exception();
 				}
 				terrainMap = TerrainMapReader.loadMap(config.mapFile);
-				GLOBAL.writeToLogFile("Start Up", "Using Map File: " + config.mapFile.getName());
+				LOG.log(Level.INFO, "Start Up: Using map file: {}", config.mapFile.getName());
 			}
 			catch (Exception e){
-				System.err.println("Invalid Map File");
-				e.printStackTrace();
+				LOG.log(Level.WARN, "Start Up: Invalid map file", e);
 				return;
 			}
 		}
@@ -107,14 +111,14 @@ public class Admin {
             terrainMap.generateLandscape(config.mapSize, config.mapDetail);
 			terrainMap.generateTargets(config.monoTargets, config.targetDensity);
 			terrainMap.generateHazards(config.monoHazards, config.hazardDensity);
-			GLOBAL.writeToLogFile("Start Up", "Using Random Map");
+			LOG.log(Level.INFO, "Startup: Using random map");
 		}
         RoverObject.setTerrainMap(terrainMap);
 
         HI.initialize(config.namesAndTags, serialBuffers, rovers, satellites, terrainMap);
 
 		if (config.accelerated){
-			GLOBAL.writeToLogFile("Start Up", "Accelerating Simulation");
+			LOG.log(Level.INFO, "Start Up: Accelerating Simulation");
             HI.viewAccelerated(config.runtime);
 		}
 

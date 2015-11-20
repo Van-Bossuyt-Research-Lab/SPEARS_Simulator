@@ -1,18 +1,21 @@
 package com.csm.rover.simulator.wrapper;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.*;
 
 public class SerialBuffers {
+    private static final Logger LOG = LogManager.getFormatterLogger(SerialBuffers.class);
 
     private Map<String, Queue<Byte>> serialBuffers; // the buffer for messages
 
-    private Globals global;
     private HumanInterfaceAbstraction hi;
 
     public SerialBuffers(ArrayList<String> IDs, HumanInterfaceAbstraction hi){
         serialBuffers = new HashMap<String, Queue<Byte>>();
         initializeLists(IDs);
-        global = Globals.getInstance();
         this.hi = hi;
     }
 
@@ -29,7 +32,7 @@ public class SerialBuffers {
                     serialBuffers.get(id).add(write);
                 }
                 else {
-                    global.writeToLogFile(id, "Failed to receive: " + (char) write + ", full buffer.");
+                    LOG.log(Level.WARN, id + "Failed to receive: " + (char) write + ", full buffer.");
                 }
             }
         }
@@ -76,13 +79,6 @@ public class SerialBuffers {
         return this.serialBuffers.size();
     }
 
-    @SuppressWarnings("unused")
-    private void printBuffers(){
-        for (Map.Entry<String, Queue<Byte>> entry : serialBuffers.entrySet()){
-            global.writeToLogFile("Timing", entry.getKey() + ": " + entry.getValue().toString());
-        }
-    }
-
     ArrayList<Queue<Byte>> getSerialQueues(){
         try {
             ArrayList<Queue<Byte>> out = new ArrayList<Queue<Byte>>(serialBuffers.size());
@@ -96,7 +92,7 @@ public class SerialBuffers {
             return out;
         }
         catch (Exception e){
-            global.reportError("Globals", "getSerialQueues", e);
+            LOG.log(Level.ERROR, "serialQueues failed to copy", e);
             e.printStackTrace();
             return null;
         }
