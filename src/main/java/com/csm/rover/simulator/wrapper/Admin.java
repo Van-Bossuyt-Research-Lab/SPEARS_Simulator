@@ -35,6 +35,7 @@ public class Admin {
 		Admin admin = getInstance();
 		LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
 		if (args.length == 0) {
+			LOG.log(Level.INFO, "Starting simulator in GUI mode");
             HI = new HiForm();
 			boolean go = false;
 			File config = new File("default.cfg");
@@ -54,6 +55,7 @@ public class Admin {
 			}
 		}
 		else {
+			LOG.log(Level.INFO, "Stating simulator in Command Line mode");
 			HI = new HiCmd();
             File cfgFile = new File(args[0]);
             if (cfgFile.exists() && getFileType(cfgFile).equals("cfg")){
@@ -61,7 +63,7 @@ public class Admin {
                     admin.beginSimulation(new RunConfiguration(cfgFile));
                 }
                 catch (Exception e){
-                    Globals.getInstance().reportError("Admin", "main", e);
+                    LOG.log(Level.ERROR, "cfg file failed to initiate", e);
                 }
             }
             else {
