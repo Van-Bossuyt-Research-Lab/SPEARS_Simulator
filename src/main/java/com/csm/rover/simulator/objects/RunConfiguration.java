@@ -84,6 +84,8 @@ public class RunConfiguration implements Serializable {
 		this.mapRough = input.mapRough;
 		this.mapSize = input.mapSize;
 		this.mapDetail = input.mapDetail;
+		this.monoTargets = input.monoTargets;
+		this.monoHazards = input.monoHazards;
 		this.targetDensity = input.targetDensity;
 		this.hazardDensity = input.hazardDensity;
 		this.accelerated = input.accelerated;
