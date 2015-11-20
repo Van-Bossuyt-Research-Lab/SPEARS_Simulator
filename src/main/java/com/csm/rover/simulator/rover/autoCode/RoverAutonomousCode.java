@@ -2,13 +2,20 @@ package com.csm.rover.simulator.rover.autoCode;
 
 import com.csm.rover.simulator.control.InterfaceAccess;
 import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.wrapper.Globals;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import java.io.*;
 import java.util.Map;
 
 public abstract class RoverAutonomousCode implements Serializable, Cloneable {
+	private static final Logger LOG = LogManager.getLogger(RoverAutonomousCode.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -59,18 +66,24 @@ public abstract class RoverAutonomousCode implements Serializable, Cloneable {
 		catch (NullPointerException e){
 			if (!tried){
 				tried = true;
-				logFile = new File("Logs/" + roverName + " Log " + InterfaceAccess.CODE.DateTime.toString("MM-dd-yyyy hh-mm") + ".txt");
-				Globals.getInstance().writeToLogFile(roverName, "Writing rover's autonomous log file to: " + logFile.getAbsolutePath());
+				logFile = new File(generateFilepath());
+				logFile.getParentFile().mkdirs();
+				LOG.log(Level.INFO, "Writing rover {}'s autonomous log file to: {}", roverName, logFile.getAbsolutePath());
 				writeToLog(message);
 			}
 			else {
 				e.printStackTrace();
-				Globals.getInstance().writeToLogFile(roverName, "Rover's autonomous log file failed to initalize.");
+				LOG.log(Level.ERROR, "Rover {}'s autonomous log file failed to initialize.", roverName);
 			}
 		}
 		catch (IOException e){
 			e.printStackTrace();
 		}
+	}
+
+	private String generateFilepath(){
+		DateTime date = new DateTime();
+		return String.format("%s/%s_%s.log", DatedFileAppenderImpl.Log_File_Name, roverName, date.toString(DateTimeFormat.forPattern("MM-dd-yyyy_HH.mm")));
 	}
 	
 	public abstract RoverAutonomousCode clone();

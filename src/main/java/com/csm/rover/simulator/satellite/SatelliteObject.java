@@ -3,6 +3,9 @@ package com.csm.rover.simulator.satellite;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.InputStream;
@@ -13,6 +16,7 @@ import java.util.TreeMap;
 
 @SuppressWarnings("unused")
 public class SatelliteObject implements Serializable {
+	private static final Logger LOG = LogManager.getLogger(SatelliteObject.class);
 
 	private static final long serialVersionUID = 1L;
 	
@@ -211,7 +215,7 @@ public class SatelliteObject implements Serializable {
 									try {
 										Thread.sleep(1);
 									} catch (Exception e) {
-										Globals.getInstance().reportError("SatelliteCode", "runCode - Instructions", e);
+										LOG.log(Level.ERROR, "Satellite {} failed to sleep", name);
 									}
 								}
 								delay(2000);
@@ -291,8 +295,7 @@ public class SatelliteObject implements Serializable {
 			}
 		}
 		catch (Exception e){
-			System.out.println("Error in Satellite Code");
-			Globals.getInstance().reportError("SatObject", "run", e);
+			LOG.log(Level.ERROR, "Error in Satellite Run Code: " + name, e);
 		}
 	}
 		
@@ -318,7 +321,7 @@ public class SatelliteObject implements Serializable {
 		  sendSerial("r {"); // unmute ground
 		}
 		catch (Exception e){
-			Globals.getInstance().reportError("Satellite", "takePicture()", e);
+			LOG.log(Level.ERROR, String.format("Error occurred for satellite %s taking a picture", name), e);
 		}
 	}
 	
@@ -350,14 +353,14 @@ public class SatelliteObject implements Serializable {
 			x++;
 		}
 		addToSerialHistory(print);
-		Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + print + "\'");
+		LOG.log(Level.INFO, "Satellite {} sent serial message \"{}\"", name, message);
 		return true;
 	}
 
 	boolean sendSerial(char mess){
 		serialBuffers.writeToSerial(mess, IDcode);
 		addToSerialHistory(mess + "");
-        Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+		LOG.log(Level.INFO, "Satellite {} sent serial message \'{}\'", name, mess);
 		return true;
 	}
 	
@@ -374,7 +377,7 @@ public class SatelliteObject implements Serializable {
 			return 0;
 		}
 		catch (Exception e){
-			Globals.getInstance().reportError("SatelliteCode", "strcmp", e);
+			LOG.log(Level.ERROR, "strcmp error", e);
 			return 1;
 		}
 	}
