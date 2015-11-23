@@ -624,6 +624,18 @@ public class InterfacePanel extends Panel{
 		SatelliteCommandList.setFont(new Font("Iskoola Pota", Font.PLAIN, 15));
 		SatelliteCommandList.setBackground(SystemColor.menu);
 		InstructionsPnl.add(SatelliteCommandList);
+
+		ParameterList = new ZList();
+		ParameterList.setSize(137, 69);
+		ParameterList.setLocation(304, 47);
+		ParameterList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				InterfaceAccess.ParametersListChanged();
+			}
+		});
+		ParameterList.setFont(new Font("Iskoola Pota", Font.PLAIN, 15));
+		ParameterList.setBackground(SystemColor.menu);
+		InstructionsPnl.add(ParameterList);
 		
 		ParameterTxt = new JTextField();
 		ParameterTxt.addComponentListener(new ComponentAdapter() {
@@ -641,18 +653,6 @@ public class InterfacePanel extends Panel{
 		ParameterTxt.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		ParameterTxt.setBounds(304, 127, 137, 25);
 		InstructionsPnl.add(ParameterTxt);
-		
-		ParameterList = new ZList();
-		ParameterList.setSize(137, 69);
-		ParameterList.setLocation(304, 47);
-		ParameterList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				InterfaceAccess.ParametersListChanged();
-			}
-		});
-		ParameterList.setFont(new Font("Iskoola Pota", Font.PLAIN, 15));
-		ParameterList.setBackground(SystemColor.menu);
-		InstructionsPnl.add(ParameterList);
 		
 		InstructionsList = new ZList();
 		InstructionsList.setSize(117, 113);
