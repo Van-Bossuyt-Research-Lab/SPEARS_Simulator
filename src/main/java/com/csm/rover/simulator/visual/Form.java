@@ -151,6 +151,7 @@ public class Form extends JFrame {
         startupPanel.setImage(new ImageIcon(getClass().getResource("/images/Light Background.jpg")));
         startupPanel.setVisible(true);
         startupPanel.setLocation(0, 0);
+		startupPanel.repaint();
 	}
 
     private void showSplash(){
@@ -164,8 +165,9 @@ public class Form extends JFrame {
             public void run() {
                 splash = false;
                 contentPane.add(startupPanel);
+				setOpacity(1);
                 repaint();
-                setOpacity(1);
+				startupPanel.RuntimeSpnr.validate();
             }
         }, 1, "splash");
     }
