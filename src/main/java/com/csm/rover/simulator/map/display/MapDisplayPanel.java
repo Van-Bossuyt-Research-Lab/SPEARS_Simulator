@@ -73,7 +73,7 @@ public class MapDisplayPanel extends JPanel {
                         }
                         if (viewHazards && color == null){
                             value = terrainMap.getHazards().getValueAt(x, y);
-                            color = value == 0 ?
+                            color = value <= 5 ?
                                     null :
                                     new Color((11-value)*20+100, (11-value)*20+100, (11-value)*20+100);
                         }
