@@ -1,6 +1,5 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.control.InterfaceAccess;
 import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.ThreadItem;
@@ -9,7 +8,8 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Globals {
@@ -43,7 +43,7 @@ public class Globals {
 		if (accel){
 			timeScale = time_accelerant;
 		}
-		InterfaceAccess.CODE.clock.start();
+//		InterfaceAccess.CODE.clock.start();
 		ThreadItem.offset = 0;
 		new FreeThread(0, new Runnable(){
 			public void run(){
