@@ -85,7 +85,7 @@ public class SubObject implements Serializable {
         autoCode = code;
         physics.initalizeConditions(name, physics.getbattery_max_charge(), temp);
         physics.setLocation(loc);
-        physics.setDirection_(dir);
+        physics.setDirection_xy(dir);
         LEDs.put("Mute", false);
         LEDs.put("Instructions", false);
         LEDs.put("Autonomus", false);
