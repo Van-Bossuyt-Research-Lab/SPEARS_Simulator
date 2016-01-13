@@ -2,10 +2,10 @@ package com.csm.rover.simulator.control;
 
 import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.objects.ZDate;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
+import jdk.nashorn.internal.objects.Global;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,8 +31,6 @@ public class InterfaceCode {
     private SerialBuffers serialBuffers;
 
 	private String connectedPort = "COM13";
-	public ZDate DateTime;
-	public SynchronousThread clock;
 	public static String IDcode = "g";
 	
 	private int connectionTime = 0;
@@ -74,11 +72,8 @@ public class InterfaceCode {
 		GUI = gui;
         pageLength = GUI.RoverBtns.length;
         this.serialBuffers = serialBuffers;
-		DateTime = new ZDate();
-		DateTime.setFormat("[hh:mm:ss]");
-		clock = new SynchronousThread(1000, new Runnable(){
+		GLOBAL.addClockIncrementEvent(new Runnable(){
 			public void run(){
-				DateTime.advanceClock();
 				if (Connected){
 					countSec++;
 					if (countSec == 0){
@@ -91,7 +86,7 @@ public class InterfaceCode {
 					GUI.ConnectionLbl.setText("Not Connected");
 				}
 			}
-		}, SynchronousThread.FOREVER, "clock", false);
+		});
 		initalize();
 	}
 	
@@ -186,7 +181,7 @@ public class InterfaceCode {
 							public void run() {
 								Connected = true;
 								GUI.ConnectionLbl.setText("Connected for 0 min.");
-								GUI.SerialDisplayLbl.setText(GUI.SerialDisplayLbl.getText() + "Rover Connected: " + DateTime.toString("hh:mm:ss") + "\n");
+								GUI.SerialDisplayLbl.setText(GUI.SerialDisplayLbl.getText() + "Rover Connected: " + GLOBAL.dateTime.toString("hh:mm:ss") + "\n");
 								(new PopUp()).showConfirmDialog("Rover connected.", "Ping Confirm", PopUp.DEFAULT_OPTIONS);
 							}
 						}, "ping-return");
@@ -887,7 +882,7 @@ public class InterfaceCode {
 				}
 				if (index == length){
 					File image = new File("");
-					image = new File(image.getAbsoluteFile() + "\\Photos\\IMAGE " + DateTime.toString("MM-dd hh-mm") + ".jpg");
+					image = new File(image.getAbsoluteFile() + "\\Photos\\IMAGE " + GLOBAL.dateTime.toString("MM-dd hh-mm") + ".jpg");
 					FileOutputStream fos = new FileOutputStream(image);
 					fos.write(bytes);
 					receivedFiles = Augment(receivedFiles, image.getAbsolutePath());
@@ -957,7 +952,7 @@ public class InterfaceCode {
                 }
                 if (index == length){
                     File image = new File("");
-                    image = new File(image.getAbsoluteFile() + "\\Data\\DATA " + DateTime.toString("MM-dd hh-mm") + ".CSV");
+                    image = new File(image.getAbsoluteFile() + "\\Data\\DATA " + GLOBAL.dateTime.toString("MM-dd hh-mm") + ".CSV");
                     FileOutputStream fos = new FileOutputStream(image);
                     fos.write(bytes);
                     receivedFiles = Augment(receivedFiles, image.getAbsolutePath());
