@@ -31,7 +31,7 @@ public class TerrainMapReader {
             ArrayGrid<Float> values = new FloatArrayArrayGrid();
             for (int y = 0; y < height; y++){
                 for (int x = 0; x < width; x++){
-                    values.fillToSize(x, y, data.nextFloat());
+                    values.put(x, y, data.nextFloat());
                 }
             }
             map.setValues(width, detail, values);
