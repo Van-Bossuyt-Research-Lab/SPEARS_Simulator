@@ -29,8 +29,8 @@ public class TerrainMapReader {
             TerrainMap map = new TerrainMap();
 
             ArrayGrid<Float> values = new FloatArrayArrayGrid();
-            for (int y = 0; y < height; y++){
-                for (int x = 0; x < width; x++){
+            for (int x = 0; x < width; x++){
+                for (int y = 0; y < height; y++){
                     values.put(x, y, data.nextFloat());
                 }
             }
