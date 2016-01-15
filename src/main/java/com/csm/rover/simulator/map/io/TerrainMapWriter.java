@@ -3,7 +3,6 @@ package com.csm.rover.simulator.map.io;
 
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.ArrayGrid;
-import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -108,6 +107,7 @@ public class TerrainMapWriter {
                 }
                 write.write('\n');
             }
+            write.write("\n");
 
             if (map.getTargets().isMono()){
                 write.write("m");
@@ -123,6 +123,7 @@ public class TerrainMapWriter {
                     write.write(val + "\n");
                 }
             }
+            write.write("\n");
 
             if (map.getHazards().isMono()){
                 write.write("m");
@@ -134,7 +135,7 @@ public class TerrainMapWriter {
             write.write("\n" + map.getHazards().getValues().size() + "\n");
             write.write(map.getHazards().getValues().genorateList() + "\n");
             if (!map.getHazards().isMono()){
-                for (Integer val : map.getTargets().getValues().getValues()){
+                for (Integer val : map.getHazards().getValues().getValues()){
                     write.write(val + "\n");
                 }
             }

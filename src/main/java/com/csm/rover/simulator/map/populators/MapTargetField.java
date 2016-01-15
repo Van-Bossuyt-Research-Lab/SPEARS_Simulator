@@ -29,7 +29,7 @@ public class MapTargetField extends MapPopulatorsField {
 
     private void generateValuedTargets(Dimension mapSize, double density){
         values = new GridList<Integer>();
-        mono = true;
+        mono = false;
         int size = (int)(mapSize.getWidth()*mapSize.getHeight()*density);
         int x = 0;
         while (x < size){

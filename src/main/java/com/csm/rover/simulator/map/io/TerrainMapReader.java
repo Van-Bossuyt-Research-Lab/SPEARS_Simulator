@@ -70,7 +70,7 @@ public class TerrainMapReader {
                     map.getHazards().setValues(hazards);
                 }
                 else {
-                    int[] hzrdVals = new int[targs];
+                    int[] hzrdVals = new int[hzrds];
                     for (int i = 0; i < hzrdVals.length; i++){
                         hzrdVals[i] = data.nextInt();
                     }
