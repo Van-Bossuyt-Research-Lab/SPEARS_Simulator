@@ -21,10 +21,9 @@ public class TerrainMapWriter {
 
     private static String fileID = "__^__";
 
-    public static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
-
     public static void SaveImage(TerrainMap map, String filepath, boolean targets, boolean hazards, boolean gridlines){
         LOG.log(Level.INFO, "Saving map image to {}", filepath);
+        LOG.log(Level.DEBUG, "Saving map with targets:{}, hazards:{}, gridlines:{}", targets, hazards, gridlines);
         int gridSize = 15;
         ArrayGrid<Float> fs = map.getValues();
         int detail = map.getDetail();
