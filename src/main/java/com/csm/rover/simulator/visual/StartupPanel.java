@@ -32,8 +32,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import static java.util.Arrays.asList;
-
 public class StartupPanel extends Panel {
     private static final Logger LOG = LogManager.getLogger(StartupPanel.class);
 
@@ -534,7 +532,7 @@ public class StartupPanel extends Panel {
             int mapDetail = (Integer) MapDetailSpnr.getValue();
             double targetDensity = (Double) TargetDensitySpnr.getValue()/1000.;
             double hazardDensity = (Double) HazardDensitySpnr.getValue()/1000.;
-            boolean monoTargets = !ValuedTargetsChk.isSelected(); //cause the for says use and the computer reads not using
+            boolean monoTargets = !ValuedTargetsChk.isSelected(); //cause the form says use and the computer reads not using
             boolean monoHazards = !ValuedHazardsChk.isSelected();
             return new RunConfiguration(namesAndTags, rovers, satellites, mapRough,
                     mapSize, mapDetail, targetDensity, hazardDensity, monoTargets,
