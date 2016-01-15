@@ -3,7 +3,6 @@ package com.csm.rover.simulator.map.io;
 
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.ArrayGrid;
-import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,6 +24,7 @@ public class TerrainMapWriter {
     public static final int REDtoGREEN = 0, BLACKtoWHITE = 1, BLUEtoWHITE = 2;
 
     public static void SaveImage(TerrainMap map, int scheme, String filepath){
+        LOG.log(Level.INFO, "Saving map image to {}", filepath);
         int gridSize = 15;
         ArrayGrid<Float> fs = map.getValues();
         int detail = map.getDetail();
@@ -50,6 +50,7 @@ public class TerrainMapWriter {
         catch (IOException e) {
             e.printStackTrace();
         }
+        LOG.log(Level.INFO, "Map image save complete");
     }
 
     private static Color getColor(double numb, int currentColorScheme, double minval, double maxval) {
@@ -96,6 +97,7 @@ public class TerrainMapWriter {
     }
 
     public static void saveMap(TerrainMap map, File file){
+        LOG.log(Level.INFO, "Saving map file to {}", file.getAbsolutePath());
         try {
             BufferedWriter write = new BufferedWriter(new FileWriter(file, true));
 
@@ -108,6 +110,7 @@ public class TerrainMapWriter {
                 }
                 write.write('\n');
             }
+            write.write("\n");
 
             if (map.getTargets().isMono()){
                 write.write("m");
@@ -123,6 +126,7 @@ public class TerrainMapWriter {
                     write.write(val + "\n");
                 }
             }
+            write.write("\n");
 
             if (map.getHazards().isMono()){
                 write.write("m");
@@ -134,7 +138,7 @@ public class TerrainMapWriter {
             write.write("\n" + map.getHazards().getValues().size() + "\n");
             write.write(map.getHazards().getValues().genorateList() + "\n");
             if (!map.getHazards().isMono()){
-                for (Integer val : map.getTargets().getValues().getValues()){
+                for (Integer val : map.getHazards().getValues().getValues()){
                     write.write(val + "\n");
                 }
             }
@@ -143,8 +147,9 @@ public class TerrainMapWriter {
             write.close();
         }
         catch (Exception e) {
-            e.printStackTrace();
+            LOG.log(Level.ERROR, "Map file sve failed", e);
         }
+        LOG.log(Level.INFO, "Finished saving map file");
     }
 
 }
