@@ -4,10 +4,15 @@ import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.satellite.SatelliteObject;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 
 public class HiCmd implements HumanInterfaceAbstraction {
+    private final static Logger LOG = LogManager.getLogger(HiCmd.class);
+
     @Override
     public void initialize(NamesAndTags namesAndTags, SerialBuffers buffers, ArrayList<RoverObject> rovers, ArrayList<SatelliteObject> satellites, TerrainMap map) {
 
@@ -44,12 +49,14 @@ public class HiCmd implements HumanInterfaceAbstraction {
     }
 
     @Override
-    public void viewAccelerated(int runtime) {
+    public void viewAccelerated(int runtime, double accelerant) {
 
     }
 
     @Override
     public void exit() {
-
+        //exit procedures
+        LOG.log(Level.INFO, "Exiting SPEARS");
+        System.exit(0);
     }
 }

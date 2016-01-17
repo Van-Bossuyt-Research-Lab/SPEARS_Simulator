@@ -4,7 +4,6 @@ import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.ThreadItem;
 import com.csm.rover.simulator.objects.ZDate;
-import com.csm.rover.simulator.visual.AccelPopUp;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +29,6 @@ public class Globals {
 	private boolean milliDone = false;
 	
 	private int exitTime = -1;
-	private AccelPopUp informer;
 
     public ZDate dateTime;
     public SynchronousThread clock;
@@ -132,19 +130,18 @@ public class Globals {
 		}
 	}
 	
-	public void setUpAcceleratedRun(int runtime){
+	public void setUpAcceleratedRun(final HumanInterfaceAbstraction HI, int runtime){
 		exitTime = runtime;
-		informer = new AccelPopUp(exitTime, (int) (exitTime/time_accelerant/60000));
+        HI.viewAccelerated(exitTime, time_accelerant);
 		new FreeThread(1000, new Runnable(){
 			public void run(){
-				informer.update((int) timeMillis);
 				if (timeMillis >= exitTime){
 					//Maybe not working? was an error
 					LOG.log(Level.INFO, "Exiting");
-					System.exit(0);
+					HI.exit();
 				}
 			}
-		}, FreeThread.FOREVER, "accel-pop-up");
+		}, FreeThread.FOREVER, "accel-handler");
 	}
 	
 	public void registerNewThread(String name, int delay, SynchronousThread thread){

@@ -27,7 +27,7 @@ public interface HumanInterfaceAbstraction {
 
     void updateSerialBuffers();
 
-    void viewAccelerated(int runtime);
+    void viewAccelerated(int runtime, double accelerant);
 
     void exit();
 

@@ -138,7 +138,7 @@ public class Admin {
 
 		if (config.accelerated){
 			LOG.log(Level.INFO, "Start Up: Accelerating Simulation");
-            HI.viewAccelerated(config.runtime);
+            Globals.getInstance().setUpAcceleratedRun(HI, 3600000 * config.runtime);
 		}
 
         for (RoverObject rover : rovers){
