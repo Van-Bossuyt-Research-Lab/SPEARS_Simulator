@@ -1,6 +1,5 @@
 package com.csm.rover.simulator.rover.autoCode;
 
-import com.csm.rover.simulator.control.InterfaceAccess;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
 import com.csm.rover.simulator.objects.DecimalPoint;
@@ -59,7 +58,7 @@ public abstract class RoverAutonomousCode implements Serializable, Cloneable {
 	protected void writeToLog(String message){
 		try {
 			BufferedWriter write = new BufferedWriter(new FileWriter(logFile, true));
-			write.write(message + "\t\t" + InterfaceAccess.CODE.DateTime.toString("[MM/dd/yyyy hh:mm:ss.") + (Globals.getInstance().timeMillis %1000) + "]\r\n");
+			write.write(message + "\t\t" + new DateTime().toString(DateTimeFormat.forPattern("[MM/dd/yyyy hh:mm:ss.")) + (Globals.getInstance().timeMillis %1000) + "]\r\n");
 			write.flush();
 			write.close();
 		}
@@ -67,13 +66,12 @@ public abstract class RoverAutonomousCode implements Serializable, Cloneable {
 			if (!tried){
 				tried = true;
 				logFile = new File(generateFilepath());
-				logFile.getParentFile().mkdirs();
+                logFile.getParentFile().mkdirs();
 				LOG.log(Level.INFO, "Writing rover {}'s autonomous log file to: {}", roverName, logFile.getAbsolutePath());
 				writeToLog(message);
 			}
 			else {
-				e.printStackTrace();
-				LOG.log(Level.ERROR, "Rover {}'s autonomous log file failed to initialize.", roverName);
+                LOG.log(Level.ERROR, "Rover " + roverName + "'s autonomous log file failed to initialize.", e);
 			}
 		}
 		catch (IOException e){

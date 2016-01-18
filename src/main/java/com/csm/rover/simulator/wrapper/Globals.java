@@ -1,15 +1,16 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.control.InterfaceAccess;
 import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.ThreadItem;
-import com.csm.rover.simulator.visual.AccelPopUp;
+import com.csm.rover.simulator.objects.ZDate;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Globals {
@@ -28,22 +29,43 @@ public class Globals {
 	private boolean milliDone = false;
 	
 	private int exitTime = -1;
-	private AccelPopUp informer;
+
+    public ZDate dateTime;
+    public SynchronousThread clock;
+    private ArrayList<Runnable> clockEvents;
 	
 	private static Globals singleton_instance = null;
 	public static Globals getInstance(){
 		if (singleton_instance == null){
 			singleton_instance = new Globals();
+            singleton_instance.clock = new SynchronousThread(1000, new Runnable(){
+                public void run(){
+                    singleton_instance.dateTime.advanceClock();
+                    for (Runnable event : singleton_instance.clockEvents){
+                        event.run();
+                    }
+                }
+            }, SynchronousThread.FOREVER, "clock", false);
 		}
 		return singleton_instance;
 	}
+
+    public Globals(){
+        clockEvents = new ArrayList<Runnable>();
+        dateTime = new ZDate();
+        dateTime.setFormat("[hh:mm:ss]");
+    }
+
+    public void addClockIncrementEvent(Runnable event){
+        clockEvents.add(event);
+    }
 	
 	public void startTime(boolean accel){
 		begun = true;
 		if (accel){
 			timeScale = time_accelerant;
 		}
-		InterfaceAccess.CODE.clock.start();
+        clock.start();
 		ThreadItem.offset = 0;
 		new FreeThread(0, new Runnable(){
 			public void run(){
@@ -108,19 +130,18 @@ public class Globals {
 		}
 	}
 	
-	public void setUpAcceleratedRun(int runtime){
+	public void setUpAcceleratedRun(final HumanInterfaceAbstraction HI, int runtime){
 		exitTime = runtime;
-		informer = new AccelPopUp(exitTime, (int) (exitTime/time_accelerant/60000));
+        HI.viewAccelerated(exitTime, time_accelerant);
 		new FreeThread(1000, new Runnable(){
 			public void run(){
-				informer.update((int) timeMillis);
 				if (timeMillis >= exitTime){
 					//Maybe not working? was an error
 					LOG.log(Level.INFO, "Exiting");
-					System.exit(0);
+					HI.exit();
 				}
 			}
-		}, FreeThread.FOREVER, "accel-pop-up");
+		}, FreeThread.FOREVER, "accel-handler");
 	}
 	
 	public void registerNewThread(String name, int delay, SynchronousThread thread){

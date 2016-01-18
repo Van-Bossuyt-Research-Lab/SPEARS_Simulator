@@ -35,6 +35,7 @@ public class Admin {
 		Admin admin = getInstance();
 		LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
 		if (args.length == 0) {
+			LOG.log(Level.INFO, "Starting simulator in GUI mode");
             HI = new HiForm();
 			boolean go = false;
 			File config = new File("default.cfg");
@@ -44,19 +45,39 @@ public class Admin {
 				}
 			}
 			if (go) {
-				//TODO run without gui
 				try {
-					admin.beginSimulation(new RunConfiguration(new File("default.cfg")));
+					admin.beginSimulation(new RunConfiguration(config));
 				}
 				catch (Exception e){
 					LOG.log(Level.ERROR, "Simulator failed to start", e);
+					System.exit(2);
 				}
 			}
 		}
 		else {
-			//TODO Load from console config things
+			LOG.log(Level.INFO, "Stating simulator in Command Line mode");
+			HI = new HiCmd();
+            File cfgFile = new File(args[0]);
+            if (cfgFile.exists() && getFileType(cfgFile).equals("cfg")){
+                try {
+                    admin.beginSimulation(new RunConfiguration(cfgFile));
+                }
+                catch (Exception e){
+                    LOG.log(Level.ERROR, "cfg file failed to initiate", e);
+					System.exit(2);
+                }
+            }
+            else {
+                System.err.println("Expected a valid file path to a .cfg file.  Got: \"" + cfgFile.getAbsolutePath() + "\"");
+				System.exit(3);
+            }
 		}
 	}
+
+    private static String getFileType(File file){
+        String filename = file.getName();
+        return filename.substring(filename.lastIndexOf(".")+1, filename.length());
+    }
 
 	//TODO clean up this interface for OCP
 	private Admin(){
@@ -77,7 +98,6 @@ public class Admin {
     }
 
 	public void beginSimulation(RunConfiguration config){
-		//TODO add option to toggle time shifted executions
 		if (config.rovers.size() == 0 ||config.satellites.size() == 0){
 			System.err.println("Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;
@@ -119,7 +139,7 @@ public class Admin {
 
 		if (config.accelerated){
 			LOG.log(Level.INFO, "Start Up: Accelerating Simulation");
-            HI.viewAccelerated(config.runtime);
+            Globals.getInstance().setUpAcceleratedRun(HI, 3600000 * config.runtime);
 		}
 
         for (RoverObject rover : rovers){
