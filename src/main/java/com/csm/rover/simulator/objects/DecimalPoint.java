@@ -7,11 +7,12 @@ public class DecimalPoint implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private double x, y;
+	private double x, y, z;
 	
 	public DecimalPoint(){
 		x = 0;
 		y = 0;
+		z = 0;
 	}
 	
 	public DecimalPoint(double x, double y){
@@ -19,6 +20,17 @@ public class DecimalPoint implements Serializable, Cloneable {
 		this.y = y;
 	}
 	
+	public DecimalPoint(int x, int y, int z){
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+	public DecimalPoint(double x, double y, double z){
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
 	public DecimalPoint(int x, int y){
 		this.x = x;
 		this.y = y;
@@ -30,6 +42,9 @@ public class DecimalPoint implements Serializable, Cloneable {
 	
 	public double getY(){
 		return y;
+	}
+	public double getZ(){
+		return z;
 	}
 	
 	public int roundX(){

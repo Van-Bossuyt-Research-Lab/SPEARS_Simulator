@@ -40,6 +40,8 @@ public abstract class SubAutonomousCode implements Serializable, Cloneable {
             Map<String, Double> parameters
     );
 
+    abstract public String nextCommand();
+
     public void setRoverName(String name){
         roverName = name;
     }

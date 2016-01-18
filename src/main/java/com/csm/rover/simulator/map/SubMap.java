@@ -12,6 +12,7 @@ import com.csm.rover.simulator.objects.FloatArrayArrayArrayGrid;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SubMap {
 
@@ -31,7 +32,10 @@ public class SubMap {
 
     //Generates a 3D map of 0 for water 1 for rock (all water right now)
     public void generatePool(int size, int detail){
-        values = new ArrayGrid3D<int>();
+        List<Integer> values_x = new ArrayGrid3D<Integer>();
+        List<Integer> values_y = new ArrayList<Integer>();
+        List<Integer> values_z = new ArrayList<Integer>();
+
 
         this.size = size*detail;
         this.detail = detail;
@@ -39,9 +43,6 @@ public class SubMap {
 
     }
 
-    public void generateTargets(boolean mono, double density){
-        targets.generate(mono, getMapSize(), density);
-    }
 
     public boolean isPointAtTarget(DecimalPoint pnt){
         return targets.isPointMarked(getMapSquare(pnt));
@@ -55,9 +56,6 @@ public class SubMap {
         return targets;
     }
 
-    public void generateHazards(boolean mono, double density){
-        hazards.generate(mono, getMapSize(), density);
-    }
 
     public boolean isPointInHazard(DecimalPoint pnt){
         return hazards.isPointMarked(getMapSquare(pnt));

@@ -3,7 +3,7 @@ import java.util.ArrayList;
 /**
  * Created by PHM-Lab2 on 1/12/2016.
  */
-public interface ArrayGrid3D<T> {
+public interface ArrayGrid3D<T> extends Cloneable {
 
     void loadFromArray(T[][][] values);
 
@@ -11,7 +11,7 @@ public interface ArrayGrid3D<T> {
 
     void fillToSize(int width, int height,  int length, T val);
 
-    void put(int x, int y, int z, T val);
+    void put(int X, int Y, int Z, T val);
 
     void addColumn(ArrayList<T> col);
 
@@ -36,6 +36,12 @@ public interface ArrayGrid3D<T> {
     int getHeight();
 
     int getLength();
+
+    int getX();
+
+    int getY();
+
+    int getZ();
 
     int size();
 
