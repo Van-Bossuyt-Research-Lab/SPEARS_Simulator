@@ -12,3 +12,5 @@ default.cfg
 target/*
 /target/
 .settings/*
+/out/
+*.MF
