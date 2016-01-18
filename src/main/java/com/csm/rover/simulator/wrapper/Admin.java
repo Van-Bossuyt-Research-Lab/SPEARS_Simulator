@@ -45,12 +45,12 @@ public class Admin {
 				}
 			}
 			if (go) {
-				//TODO run without gui
 				try {
 					admin.beginSimulation(new RunConfiguration(config));
 				}
 				catch (Exception e){
 					LOG.log(Level.ERROR, "Simulator failed to start", e);
+					System.exit(2);
 				}
 			}
 		}
@@ -64,10 +64,12 @@ public class Admin {
                 }
                 catch (Exception e){
                     LOG.log(Level.ERROR, "cfg file failed to initiate", e);
+					System.exit(2);
                 }
             }
             else {
                 System.err.println("Expected a valid file path to a .cfg file.  Got: \"" + cfgFile.getAbsolutePath() + "\"");
+				System.exit(3);
             }
 		}
 	}
@@ -96,7 +98,6 @@ public class Admin {
     }
 
 	public void beginSimulation(RunConfiguration config){
-		//TODO add option to toggle time shifted executions
 		if (config.rovers.size() == 0 ||config.satellites.size() == 0){
 			System.err.println("Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;
