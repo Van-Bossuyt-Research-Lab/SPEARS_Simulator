@@ -134,7 +134,7 @@ public class Form extends JFrame {
 	private void initialize(){
 		UIManager.put("TabbedPane.contentOpaque", false);
 		
-		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/GPS.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/SPEARS icon.png")));
 		setTitle("PHM Simulator");
 		setLocation(0, 0);
 		contentPane = new JPanel();
