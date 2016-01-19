@@ -134,7 +134,7 @@ public class Form extends JFrame {
 	private void initialize(){
 		UIManager.put("TabbedPane.contentOpaque", false);
 		
-		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/GPS.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/SPEARS icon.png")));
 		setTitle("PHM Simulator");
 		setLocation(0, 0);
 		contentPane = new JPanel();
@@ -176,7 +176,7 @@ public class Form extends JFrame {
     public void paint(Graphics g){
         super.paint(g);
         if (splash){
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/spears logo.PNG"));
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/spears logo.png"));
             g.drawImage(icon.getImage(), (getWidth()-icon.getIconWidth())/2, (getHeight()-icon.getIconHeight())/2, null);
         }
     }
