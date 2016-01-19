@@ -5,10 +5,10 @@ import java.util.ArrayList;
  */
 public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
 
-    private float[][][] grid;
+    private float[][][] grid3;
 
     public FloatArrayArrayArrayGrid(){
-        grid = new float[0][0][0];
+        grid3 = new float[0][0][0];
     }
 
     public FloatArrayArrayArrayGrid(Float[][] values){
@@ -16,40 +16,37 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
     }
 
     public FloatArrayArrayArrayGrid(FloatArrayArrayGrid original){
-        grid = original.grid.clone();
+        grid3 = original.grid3.clone();
     }
 
-    @Override
     public void loadFromArray(Float[][][] values) {
-        grid = new float[values.length][values[0].length][values[0][0].length];
+        grid3 = new float[values.length][values[0].length][values[0][0].length];
         for (int x = 0; x < values.length; x++) {
             for (int y = 0; y < values[x].length; y++) {
                 for (int z = 0; z < values[x][y].length; z++) {
-                    grid[x][y][z] = values[x][y][z];
+                    grid3[x][y][z] = values[x][y][z];
                 }
             }
         }
     }
 
-    @Override
     public void fillToSize(int width, int height, int length) {
         fillToSize(width, height, length, 0f);
     }
 
-    @Override
     public void fillToSize(int width, int height,int length, Float val) {
-        grid = new float[width][height][length];
+        grid3 = new float[width][height][length];
         for (int x = 0; x < width; x++){
             for (int y = 0; y < height; y++){
                 for (int z = 0; y < length; z++) {
-                    grid[x][y][z] = val;
+                    grid3[x][y][z] = val;
                 }
             }
         }
     }
 
-    @Override
-    public void put(int x, int y, Float val){
+
+    public void put(int x, int y, int z, Float val){
         while (x >= getWidth()){
             addColumn(new ArrayList<Float>());
         }
@@ -59,38 +56,42 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
         while (z >= getLength()){
             addRow(new ArrayList<Float>());
         }
-        grid[x][y][z] = val;
+        grid3[x][y][z] = val;
     }
 
-    @Override
     public void addColumn(ArrayList<Float> col){
         addColumnAt(getWidth(), col);
     }
 
     @Override
-    public void addColumnAt(int x, ArrayList<Float> col){
+    public void addColumnAt(int x, int y, ArrayList<Float> col){
         while (getWidth() < x){
             addColumn(new ArrayList<Float>());
         }
         normalizeColumn(col);
 
-        float[][] grid2 = new float[getWidth()+1][getHeight()];
+        float[][][] grid2 = new float[getWidth()+1][getHeight()][getLength()];
         int i = 0;
+        int j =0;
         while (i < x){
-            grid2[i] = grid[i];
+            j =0;
+            while (j < y) {
+                grid2[i] = grid3[i];
+                j++;
+            }
             i++;
         }
-        for (int j = 0; j < getHeight(); j++){
-            grid2[i][j] = col.get(j);
+
+        for (int k = 0; k < getHeight(); k++){
+            grid2[i][j][k] = col.get(k);
         }
-        while (i < grid.length){
-            grid2[i+1] = grid[i];
+        while (i < grid3.length){
+            grid2[i+1] = grid3[i];
             i++;
         }
-        grid = grid2;
+        grid3 = grid2;
     }
 
-    @Override
     public void addRow(ArrayList<Float> row){
         addRowAt(getHeight(), row);
     }
@@ -107,7 +108,7 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
         int j = 0;
         while (j < y){
             for (int x = 0; x < getWidth(); x++){
-                grid2[x][j] = grid[x][j];
+                grid2[x][j] = grid3[x][j];
             }
             j++;
         }
@@ -116,11 +117,11 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
         }
         while (j < getHeight()){
             for (int x = 0; x < getWidth(); x++){
-                grid2[x][j+1] = grid[x][j];
+                grid2[x][j+1] = grid3[x][j];
             }
             j++;
         }
-        grid = grid2;
+        grid3 = grid2;
     }
 
     private void normalizeRow(ArrayList<Float> row){
@@ -133,7 +134,7 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
     }
 
     private void normalizeColumn(ArrayList<Float> col){
-        if (grid.length > 0){
+        if (grid3.length > 0){
             while (col.size() < getHeight()){
                 col.add(0f);
             }
@@ -146,7 +147,7 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
     @Override
     public Float get(int x, int y){
         if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()){
-            return grid[x][y];
+            return grid3[x][y][z];
         }
         else {
             throw new ArrayIndexOutOfBoundsException(String.format("The point (%d, %d) is out of bounds.  Expected a point within {%d, %d}.", x, y, getWidth(), getHeight()));
@@ -156,8 +157,8 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
     @Override
     public ArrayList<Float> getColumn(int x){
         if (x >= 0 && x < getWidth()){
-            ArrayList<Float> col = new ArrayList<Float>(grid[x].length);
-            for (float val : grid[x]){
+            ArrayList<Float> col = new ArrayList<Float>(grid3[x].length);
+            for (float val : grid3[x]){
                 col.add(val);
             }
             return col;
@@ -171,7 +172,7 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
     public ArrayList<Float> getRow(int y){
         if (y >= 0 && y < getHeight()){
             ArrayList<Float> row = new ArrayList<Float>();
-            for (float[] col : grid){
+            for (float[][] col : grid3){
                 row.add(col[y]);
             }
             return row;
@@ -181,22 +182,26 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
         }
     }
 
-    @Override
+
     public int getWidth() {
-        return grid.length;
+        return grid3.length;
     }
 
-    @Override
+
     public int getHeight() {
-        return grid.length == 0 ? 0 : grid[0].length;
+        return grid3.length == 0 ? 0 : grid3[0].length;
     }
 
-    @Override
+    public int getLength() {
+        return grid3[0].length == 0 ? 0 : grid3[0][0].length;
+    }
+
+
     public int size() {
         return getWidth()*getHeight();
     }
 
-    @Override
+
     public boolean isEmpty() {
         return size() == 0;
     }

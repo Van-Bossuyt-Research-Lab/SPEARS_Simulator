@@ -1,7 +1,7 @@
 package com.csm.rover.simulator.sub.subAuto;
 
 import com.csm.rover.simulator.control.InterfaceAccess;
-import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.wrapper.Globals;
 
@@ -12,7 +12,7 @@ public abstract class SubAutonomousCode implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
 
-    protected static TerrainMap MAP;
+    protected static SubMap SMAP;
 
     private String name;
     private String roverName;
@@ -24,8 +24,8 @@ public abstract class SubAutonomousCode implements Serializable, Cloneable {
         roverName = rover;
     }
 
-    public static void setTerrainMap(TerrainMap map){
-        MAP = map;
+    public static void setSubMap(SubMap map){
+        SMAP = map;
     }
 
     public SubAutonomousCode(SubAutonomousCode rac){

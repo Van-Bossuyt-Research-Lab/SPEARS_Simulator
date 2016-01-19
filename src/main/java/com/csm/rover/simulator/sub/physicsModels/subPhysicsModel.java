@@ -2,6 +2,7 @@ package com.csm.rover.simulator.sub.physicsModels;
 
 import java.io.Serializable;
 
+import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.rover.MotorState;
 import com.csm.rover.simulator.sub.subProp;
@@ -10,9 +11,10 @@ import com.csm.rover.simulator.wrapper.Globals;
 
 
 
-public class SubPhysicsModel implements Serializable, Cloneable {
+public class subPhysicsModel implements Serializable, Cloneable {
 
 	private static final long serialversionUID = 1L;
+	protected static SubMap SMAP;
 
 	private final int L = 0, R = 1, F = 3, B = 4;
 
@@ -91,10 +93,10 @@ public class SubPhysicsModel implements Serializable, Cloneable {
 	protected double drag_z = 0;
 
 
-	public SubPhysicsModel() {
+	public subPhysicsModel() {
 	}
 
-	protected SubPhysicsModel(SubPhysicsModel origin) {
+	protected subPhysicsModel(subPhysicsModel origin) {
 		subName = origin.subName;
 		battery_max_charge = origin.battery_max_charge;
 		motor_power = origin.motor_power.clone();
@@ -454,4 +456,6 @@ public class SubPhysicsModel implements Serializable, Cloneable {
 	public void setDirection_xy(double dir) {
 		theta = dir;
 	}
+
+	public static void setSubMap(SubMap map){ SMAP = map;}
 }

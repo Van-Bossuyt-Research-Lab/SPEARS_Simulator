@@ -32,9 +32,8 @@ public class SubMap {
 
     //Generates a 3D map of 0 for water 1 for rock (all water right now)
     public void generatePool(int size, int detail){
-        List<Integer> values_x = new ArrayGrid3D<Integer>();
-        List<Integer> values_y = new ArrayList<Integer>();
-        List<Integer> values_z = new ArrayList<Integer>();
+       new FloatArrayArrayArrayGrid();
+
 
 
         this.size = size*detail;
@@ -140,4 +139,5 @@ public class SubMap {
     public void setDetail(int detail) {
         this.detail = detail;
     }
+
 }

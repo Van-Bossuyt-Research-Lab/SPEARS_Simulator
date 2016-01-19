@@ -1,8 +1,9 @@
 package com.csm.rover.simulator.sub;
 
+import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.sub.physicsModels.SubPhysicsModel;
+import com.csm.rover.simulator.sub.physicsModels.subPhysicsModel;
 import com.csm.rover.simulator.sub.subAuto.SubAutonomousCode;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
@@ -21,12 +22,12 @@ public class SubObject implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static TerrainMap MAP;
+    private static SubMap MAP;
     private static SerialBuffers serialBuffers;
 
     private String name;
     private String IDcode;
-    private SubPhysicsModel physics;
+    private subPhysicsModel physics;
     private SubAutonomousCode autoCode;
 
     @SuppressWarnings("unused")
@@ -78,7 +79,7 @@ public class SubObject implements Serializable {
     private String serialHistory = "";
     private Map<String, Boolean> LEDs = new TreeMap<String, Boolean>();
 
-    public SubObject(String name, String ID, SubPhysicsModel param, SubAutonomousCode code, double[] loc, double dir, double temp){
+    public SubObject(String name, String ID, subPhysicsModel param, SubAutonomousCode code, double[] loc, double dir, double temp){
         this.name = name;
         IDcode = ID;
         physics = param;
@@ -91,10 +92,9 @@ public class SubObject implements Serializable {
         LEDs.put("Autonomus", false);
     }
 
-    public static void setTerrainMap(TerrainMap map){
-        MAP = map;
-        SubAutonomousCode.setTerrainMap(map);
-        SubPhysicsModel.setSubMap(map);
+    public static void setSubMap(SubMap map){
+        SubAutonomousCode.setSubMap(map);
+        subPhysicsModel.setSubMap(map);
     }
 
     public static void setSerialBuffers(SerialBuffers buffers){
@@ -220,12 +220,15 @@ public class SubObject implements Serializable {
                             } else if (strcmp(data, "auto") == 0) { // force into autonomous mode
                                 run_auto = true;
                                 sendSerial("s1 g %");
+                                /*
                             } else if (strcmp(data, "score") == 0) {
                                 if (MAP.isPointAtTarget(getLocation())) {
                                     this.visitedScience.add(MAP.getMapSquare(getLocation()));
                                     System.out.println("Aquired.  New Score = " + visitedScience.size());
                                 }
+                                */
                             }
+
                         }
                         // if there isn't more to the message interpret the tag
                         else if (tag == '#') { // message confirmation from ground
@@ -577,10 +580,13 @@ public class SubObject implements Serializable {
 			 */
             } catch (Exception e) {
                 // something went wrong
-                System.out.println("Error in Rover Run Code");
-                Globals.getInstance().reportError("RoverCode", "runCode - code", e);
+                System.out.println("Error in Sub Run Code");
+                Globals.getInstance().reportError("SubCode", "runCode - code", e);
             }
-        } catch ;
+        } catch (Exception f){
+            System.out.println("Something's bad");
+            Globals.getInstance().reportError("SubCode", "runCode - code", f);
+        }
     }
 
     private void takePicture() { // take a picture
@@ -810,7 +816,7 @@ public class SubObject implements Serializable {
         return LEDs.get(name);
     }
 
-    public SubPhysicsModel getParameters(){
+    public subPhysicsModel getParameters(){
         return physics;
     }
 
