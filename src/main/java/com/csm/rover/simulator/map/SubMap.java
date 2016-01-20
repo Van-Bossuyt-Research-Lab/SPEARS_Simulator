@@ -106,8 +106,8 @@ public class SubMap {
         return new Point(outx, outy);
     }
 
-    public double getValueAtLocation(int x, int y){
-        return values.get(x, y);
+    public double getValueAtLocation(int x, int y, int z){
+        return values.get(x, y,z);
     }
 
     //returns the height of the map at the given point

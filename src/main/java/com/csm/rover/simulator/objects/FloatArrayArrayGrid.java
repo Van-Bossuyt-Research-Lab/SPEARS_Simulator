@@ -18,7 +18,7 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
         grid = original.grid.clone();
     }
 
-    @Override
+
     public void loadFromArray(Float[][] values) {
         grid = new float[values.length][values[0].length];
         for (int x = 0; x < values.length; x++){
@@ -28,12 +28,12 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
         }
     }
 
-    @Override
+
     public void fillToSize(int width, int height) {
         fillToSize(width, height, 0f);
     }
 
-    @Override
+
     public void fillToSize(int width, int height, Float val) {
         grid = new float[width][height];
         for (int x = 0; x < width; x++){
@@ -43,7 +43,6 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
         }
     }
 
-    @Override
     public void put(int x, int y, Float val){
         while (x >= getWidth()){
             addColumn(new ArrayList<Float>());
@@ -54,12 +53,12 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
         grid[x][y] = val;
     }
 
-    @Override
+
     public void addColumn(ArrayList<Float> col){
         addColumnAt(getWidth(), col);
     }
 
-    @Override
+
     public void addColumnAt(int x, ArrayList<Float> col){
         while (getWidth() < x){
             addColumn(new ArrayList<Float>());
@@ -82,12 +81,12 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
         grid = grid2;
     }
 
-    @Override
+
     public void addRow(ArrayList<Float> row){
         addRowAt(getHeight(), row);
     }
 
-    @Override
+
     public void addRowAt(int y, ArrayList<Float> row){
         normalizeRow(row);
         while (getHeight() < y){
@@ -135,7 +134,7 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
         }
     }
 
-    @Override
+
     public Float get(int x, int y){
         if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()){
             return grid[x][y];
@@ -145,7 +144,7 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
         }
     }
 
-    @Override
+
     public ArrayList<Float> getColumn(int x){
         if (x >= 0 && x < getWidth()){
             ArrayList<Float> col = new ArrayList<Float>(grid[x].length);
@@ -159,7 +158,7 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
         }
     }
 
-    @Override
+
     public ArrayList<Float> getRow(int y){
         if (y >= 0 && y < getHeight()){
             ArrayList<Float> row = new ArrayList<Float>();
@@ -173,22 +172,22 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
         }
     }
 
-    @Override
+
     public int getWidth() {
         return grid.length;
     }
 
-    @Override
+
     public int getHeight() {
         return grid.length == 0 ? 0 : grid[0].length;
     }
 
-    @Override
+
     public int size() {
         return getWidth()*getHeight();
     }
 
-    @Override
+
     public boolean isEmpty() {
         return size() == 0;
     }

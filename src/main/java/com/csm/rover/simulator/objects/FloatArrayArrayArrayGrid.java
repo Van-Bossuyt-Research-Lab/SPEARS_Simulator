@@ -3,7 +3,7 @@ import java.util.ArrayList;
 /**
  * Created by PHM-Lab2 on 1/12/2016.
  */
-public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
+public class FloatArrayArrayArrayGrid {
 
     private float[][][] grid3;
 
@@ -11,13 +11,14 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
         grid3 = new float[0][0][0];
     }
 
-    public FloatArrayArrayArrayGrid(Float[][] values){
+    public FloatArrayArrayArrayGrid(Float[][][] values){
         loadFromArray(values);
     }
-
+/*
     public FloatArrayArrayArrayGrid(FloatArrayArrayGrid original){
         grid3 = original.grid3.clone();
     }
+    */
 
     public void loadFromArray(Float[][][] values) {
         grid3 = new float[values.length][values[0].length][values[0][0].length];
@@ -60,10 +61,10 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
     }
 
     public void addColumn(ArrayList<Float> col){
-        addColumnAt(getWidth(), col);
+        addColumnAt(getWidth(), getLength(), col);
     }
 
-    @Override
+
     public void addColumnAt(int x, int y, ArrayList<Float> col){
         while (getWidth() < x){
             addColumn(new ArrayList<Float>());
@@ -93,31 +94,31 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
     }
 
     public void addRow(ArrayList<Float> row){
-        addRowAt(getHeight(), row);
+        addRowAt(getHeight(), getWidth(),row);
     }
 
-    @Override
-    public void addRowAt(int y, ArrayList<Float> row){
+
+    public void addRowAt(int z, int y, ArrayList<Float> row){
         normalizeRow(row);
         while (getHeight() < y){
             addRow(new ArrayList<Float>());
         }
         normalizeRow(row);
 
-        float[][] grid2 = new float[getWidth()][getHeight()+1];
+        float[][][] grid2 = new float[getWidth()][getHeight()+1][getLength()];
         int j = 0;
         while (j < y){
             for (int x = 0; x < getWidth(); x++){
-                grid2[x][j] = grid3[x][j];
+                grid2[z][x][j] = grid3[z][x][j];
             }
             j++;
         }
         for (int x = 0; x < getWidth(); x++){
-            grid2[x][y] = row.get(x);
+            grid2[z][x][y] = row.get(x);
         }
         while (j < getHeight()){
             for (int x = 0; x < getWidth(); x++){
-                grid2[x][j+1] = grid3[x][j];
+                grid2[z][x][j+1] = grid3[z][x][j];
             }
             j++;
         }
@@ -144,8 +145,8 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
         }
     }
 
-    @Override
-    public Float get(int x, int y){
+
+    public Float get(int x, int y, int z){
         if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()){
             return grid3[x][y][z];
         }
@@ -154,11 +155,10 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
         }
     }
 
-    @Override
-    public ArrayList<Float> getColumn(int x){
+    public ArrayList<Float> getColumn(int x, int y){
         if (x >= 0 && x < getWidth()){
-            ArrayList<Float> col = new ArrayList<Float>(grid3[x].length);
-            for (float val : grid3[x]){
+            ArrayList<Float> col = new ArrayList<Float>(grid3[x][y].length);
+            for (float val : grid3[x][y]){
                 col.add(val);
             }
             return col;
@@ -168,12 +168,11 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
         }
     }
 
-    @Override
-    public ArrayList<Float> getRow(int y){
+    public ArrayList<Float> getRow(int y, int z){
         if (y >= 0 && y < getHeight()){
             ArrayList<Float> row = new ArrayList<Float>();
             for (float[][] col : grid3){
-                row.add(col[y]);
+                row.add(col[y][z]);
             }
             return row;
         }
@@ -205,9 +204,10 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid<Float> {
     public boolean isEmpty() {
         return size() == 0;
     }
-
+/*
     @Override
     public ArrayGrid<Float> clone() {
         return new FloatArrayArrayGrid(this);
     }
+    */
 }

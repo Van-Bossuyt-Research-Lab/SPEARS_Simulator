@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.sub;
 
 import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.visual.LEDIndicator;
 
 import javax.swing.*;
@@ -11,9 +12,9 @@ import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class RoverDisplayWindow extends JPanel {
+public class SubDisplayWindow extends JPanel {
 
-    private TerrainMap map;
+    private SubMap map;
 
     private ArrayList<SubObject> subs = new ArrayList<SubObject>();
     private int subLock = -1;
@@ -80,7 +81,7 @@ public class RoverDisplayWindow extends JPanel {
             "\n\nBattery Temperature: %s \u00B0c" +
             "\n\nAir Temperature: %s \u00B0c";
 
-    public RoverDisplayWindow(TerrainMap map){
+    public SubDisplayWindow(SubMap map){
         initialize();
         setToBlank();
         this.map = map;
@@ -280,7 +281,7 @@ public class RoverDisplayWindow extends JPanel {
         if (subLock != -1) {
             whichSub = subLock;
         }
-        if (whichSub == -1 || rovers.size() == 0) {
+        if (whichSub == -1 || subs.size() == 0) {
             setToBlank();
             PageLeftBtn.setEnabled(false);
             PageRightBtn.setEnabled(subs.size() != 0);
@@ -296,38 +297,41 @@ public class RoverDisplayWindow extends JPanel {
         tabbedPane.setVisible(true);
 
         SubObject sub = subs.get(whichRover);
-        RoverNameLbl.setText(sub.getName());
+        SubNameLbl.setText(sub.getName());
         SerialHistoryLbl.setText(sub.getSerialHistory());
         MovementStatsLbl.setText(String.format(movementPattern,
-                formatDouble(sub.getLocation().getX()),
+                formatDouble(sub.getLocation()[0]),
                 formatDouble(Math.toDegrees(sub.getPropSpeed(subProp.F))),
-                formatDouble(sub.getLocation().getY()),
+                formatDouble(sub.getLocation()[1]),
                 formatDouble(Math.toDegrees(sub.getPropSpeed(subProp.B))),
-                formatDouble(Math.toDegrees(sub.getDirection())),
+                formatDouble(Math.toDegrees(sub.getTheta())),
                 formatDouble(Math.toDegrees(sub.getPropSpeed(subProp.L))),
                 formatDouble(Math.toDegrees(sub.getPropSpeed(subProp.R))),
                 formatDouble(sub.getSpeed()),
-                formatDouble(Math.cos(sub.getDirection()) * sub.getSpeed()),
-                formatDouble(Math.toDegrees(map.getIncline(sub.getLocation(), sub.getDirection()))),
-                formatDouble(Math.sin(sub.getDirection()) * sub.getSpeed()),
-                formatDouble(Math.toDegrees(map.getCrossSlope(sub.getLocation(), sub.getDirection()))),
+                formatDouble(Math.cos(sub.getTheta()) * sub.getSpeed()),
+                formatDouble(Math.sin(sub.getTheta()) * sub.getSpeed()),
                 formatDouble(Math.toDegrees(sub.getAngularVelocity_xy())),
                 formatDouble(sub.getAcceleration_xy()),
-                formatDouble(Math.toDegrees(sub.getAngularAcceleration_xy())),
+                formatDouble(Math.toDegrees(sub.getAngularAcceleration_xy()))));
+        /*
         ElectricalStatsLbl.setText(String.format(electricalPattern,
                 formatDouble(Math.abs(sub.getMotorCurrent(subProp.F))),
                 formatDouble(Math.abs(sub.getMotorCurrent(subProp.B))),
                 formatDouble(Math.abs(sub.getMotorCurrent(subProp.L))),
                 formatDouble(Math.abs(sub.getMotorCurrent(subProp.R))),
+
                 TemperatureStatsLbl.setText(String.format(temperaturePattern,
                         formatDouble(sub.getMotorTemp(subProp.F)),
                         formatDouble(sub.getMotorTemp(subProp.B)),
                         formatDouble(sub.getMotorTemp(subProp.L)),
                         formatDouble(sub.getMotorTemp(subProp.R)),
-                        formatDouble(-30))); //TODO add temp map
-        MuteLED.setSelected(sub.getLEDisLit("Mute"));
-        InstructionsLED.setSelected(sub.getLEDisLit("Instructions"));
-        AutonomousLED.setSelected(sub.getLEDisLit("Autonomus"));
+                        formatDouble(-30),
+
+        )), //TODO add temp map
+        MuteLED.setSelected(sub.getLEDisLit("Mute")),
+        InstructionsLED.setSelected(sub.getLEDisLit("Instructions")),
+        AutonomousLED.setSelected(sub.getLEDisLit("Autonomus"))));
+        */
     }
 
     private void setToBlank() {
