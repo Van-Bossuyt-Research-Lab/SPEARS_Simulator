@@ -43,9 +43,5 @@ public abstract class SatelliteAutonomusCode implements Serializable {
 	public String getName(){
 		return name;
 	}
-	
-	protected void writeToLog(String message){
-		Globals.getInstance().writeToLogFile(satelliteName + ":" + name + " - Autonomous Code", message);
-	}
-	
+
 }

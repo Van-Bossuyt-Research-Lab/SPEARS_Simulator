@@ -3,6 +3,9 @@ package com.csm.rover.simulator.map.io;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.ArrayGrid;
 import com.csm.rover.simulator.objects.FloatArrayArrayGrid;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.Point;
 import java.io.File;
@@ -10,15 +13,19 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class TerrainMapReader {
+    private static final Logger LOG = LogManager.getLogger(TerrainMapReader.class);
+
     private static String fileID = "__^__";
 
     public static TerrainMap loadMap(File file) throws Exception {
+        LOG.log(Level.INFO, "Loading map file from {}", file.getAbsolutePath());
         try {
             Scanner data = new Scanner(file);
 
             String ver = data.next();
             if (!ver.equals(fileID)){
                 data.close();
+                LOG.log(Level.ERROR, "Throwing invalid file version");
                 throw new Exception("Invalid File Version");
             }
 
@@ -29,9 +36,9 @@ public class TerrainMapReader {
             TerrainMap map = new TerrainMap();
 
             ArrayGrid<Float> values = new FloatArrayArrayGrid();
-            for (int y = 0; y < height; y++){
-                for (int x = 0; x < width; x++){
-                    values.fillToSize(x, y, data.nextFloat());
+            for (int x = 0; x < width; x++){
+                for (int y = 0; y < height; y++){
+                    values.put(x, y, data.nextFloat());
                 }
             }
             map.setValues(width, detail, values);
@@ -70,7 +77,7 @@ public class TerrainMapReader {
                     map.getHazards().setValues(hazards);
                 }
                 else {
-                    int[] hzrdVals = new int[targs];
+                    int[] hzrdVals = new int[hzrds];
                     for (int i = 0; i < hzrdVals.length; i++){
                         hzrdVals[i] = data.nextInt();
                     }
@@ -79,10 +86,11 @@ public class TerrainMapReader {
             }
 
             data.close();
+            LOG.log(Level.INFO, "Completed loading map from file");
             return map;
         }
         catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LOG.log(Level.ERROR, "Throwing file not found");
             throw e;
         }
     }

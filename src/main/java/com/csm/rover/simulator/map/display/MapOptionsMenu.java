@@ -63,7 +63,7 @@ public class MapOptionsMenu extends JPopupMenu{
                 finder.setApproveButtonText("Save");
                 int option = finder.showSaveDialog(getParent());
                 if (option == JFileChooser.APPROVE_OPTION) {
-                    TerrainMapWriter.SaveImage(mapPanel.heightMap, TerrainMapWriter.REDtoGREEN, finder.getSelectedFile().getAbsolutePath());
+                    TerrainMapWriter.SaveImage(mapPanel.heightMap, finder.getSelectedFile().getAbsolutePath(), rdbtnmntmShowTargets.isSelected(), rdbtnmntmShowHazards.isSelected(), false);
                 }
             }
         });

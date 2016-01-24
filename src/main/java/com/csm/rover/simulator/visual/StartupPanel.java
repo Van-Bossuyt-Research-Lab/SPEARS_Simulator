@@ -14,6 +14,9 @@ import com.csm.rover.simulator.satellite.SatelliteParametersList;
 import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -29,9 +32,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import static java.util.Arrays.asList;
-
 public class StartupPanel extends Panel {
+    private static final Logger LOG = LogManager.getLogger(StartupPanel.class);
 
     Random rnd = new Random();
 
@@ -530,7 +532,7 @@ public class StartupPanel extends Panel {
             int mapDetail = (Integer) MapDetailSpnr.getValue();
             double targetDensity = (Double) TargetDensitySpnr.getValue()/1000.;
             double hazardDensity = (Double) HazardDensitySpnr.getValue()/1000.;
-            boolean monoTargets = !ValuedTargetsChk.isSelected(); //cause the for says use and the computer reads not using
+            boolean monoTargets = !ValuedTargetsChk.isSelected(); //cause the form says use and the computer reads not using
             boolean monoHazards = !ValuedHazardsChk.isSelected();
             return new RunConfiguration(namesAndTags, rovers, satellites, mapRough,
                     mapSize, mapDetail, targetDensity, hazardDensity, monoTargets,
@@ -547,7 +549,7 @@ public class StartupPanel extends Panel {
                 namebase = "Rover";
             }
             String newName = namebase + " " + numb;
-            while (asList(RoverList.getItems()).contains(newName)){
+            while (RoverList.getItems().contains(newName)){
                 numb++;
                 newName = namebase + " " + numb;
             }
@@ -578,7 +580,7 @@ public class StartupPanel extends Panel {
                 //TODO change to code name
                 String newName = "Satellite " + numb;
                 //newName = (String)GUI.SatAutonomusCodeList.getSelectedItem() + " " + numb;
-                while (asList(SatelliteList.getItems()).contains(newName)){
+                while (SatelliteList.getItems().contains(newName)){
                     numb++;
                     newName = "Satellite " + numb;
                     //newName = (String)GUI.SatAutonomusCodeList.getSelectedItem() + " " + numb;
@@ -588,7 +590,7 @@ public class StartupPanel extends Panel {
             }
         }
         catch (Exception e) {
-            GLOBAL.reportError("Admin", "addSatellitetoList", e);
+            LOG.log(Level.ERROR, "Failed to add Satellite to list", e);
         }
     }
 

@@ -6,6 +6,7 @@ import com.csm.rover.simulator.map.PlanetParametersList;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.map.display.LandMapPanel;
 import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.rover.RoverHub;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.rover.autoCode.*;
@@ -16,6 +17,7 @@ import com.csm.rover.simulator.satellite.SatelliteAutonomusCode;
 import com.csm.rover.simulator.satellite.SatelliteHub;
 import com.csm.rover.simulator.satellite.SatelliteObject;
 import com.csm.rover.simulator.satellite.SatelliteParametersList;
+import com.csm.rover.simulator.visual.AccelPopUp;
 import com.csm.rover.simulator.visual.Form;
 import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.visual.StartupPanel;
@@ -37,6 +39,8 @@ public class HiForm implements HumanInterfaceAbstraction {
     private InterfacePanel interfacePnl;
     private RoverHub roverHubPnl;
     private SatelliteHub satelliteHubPnl;
+
+    private AccelPopUp informer;
 
     public HiForm(){
         init = false;
@@ -188,10 +192,15 @@ public class HiForm implements HumanInterfaceAbstraction {
     }
 
     @Override
-    public void viewAccelerated(int runtime) {
+    public void viewAccelerated(int runtime, double accelerant) {
         if (init){
             GUI.setVisible(false);
-            Globals.getInstance().setUpAcceleratedRun(3600000 * runtime);
+            informer = new AccelPopUp(runtime, (int) (runtime/accelerant/60000));
+            new FreeThread(1000, new Runnable(){
+                public void run(){
+                    informer.update((int) Globals.getInstance().timeMillis);
+                }
+            }, FreeThread.FOREVER, "accel-pop-up");
         }
     }
 
