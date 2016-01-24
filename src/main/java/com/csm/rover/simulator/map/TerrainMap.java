@@ -6,12 +6,16 @@ import com.csm.rover.simulator.map.populators.MapTargetField;
 import com.csm.rover.simulator.objects.ArrayGrid;
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.FloatArrayArrayGrid;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 
 public class TerrainMap {
+    private static final Logger LOG = LogManager.getLogger(TerrainMap.class);
 	
 	private ArrayGrid<Float> values;
 	private MapTargetField targets;
@@ -144,7 +148,14 @@ public class TerrainMap {
         DecimalPoint lifePnt = new DecimalPoint(loc.getX() + getMapSize().getWidth()/2.0, getMapSize().getHeight()/2.0 - loc.getY());
         double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (1000/detail)) / 1000.0 * detail;
         double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (1000/detail)) / 1000.0 * detail;
-        return getIntermediateValue(values.get(x, y), values.get(x + 1, y), values.get(x, y + 1), values.get(x + 1, y + 1), locx, locy);
+        try {
+            return getIntermediateValue(values.get(x, y), values.get(x + 1, y), values.get(x, y + 1), values.get(x + 1, y + 1), locx, locy);
+        }
+        catch (NullPointerException e){
+            LOG.log(Level.FATAL, "Rover fell of the map", e);
+            System.exit(1);
+            return 0;
+        }
     }
 
     //returns the angle which the rover is facing
