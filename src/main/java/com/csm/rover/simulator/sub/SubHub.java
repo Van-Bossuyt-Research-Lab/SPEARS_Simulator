@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.sub;
 
 import com.csm.rover.simulator.control.InterfaceCode;
+import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.Panel;
@@ -40,8 +41,8 @@ public class SubHub extends Panel {
     private JComboBox<String> rovSelect;
     private JTextField commandInput;
 
-    public SubHub(Dimension size, SerialBuffers serialBuffers, ArrayList<SubObject> rovers, TerrainMap map){
-        super(size, "Rover Hub");
+    public SubHub(Dimension size, SerialBuffers serialBuffers, ArrayList<SubObject> subs, SubMap map){
+        super(size, "Sub Hub");
         this.serialBuffers = serialBuffers;
 
         standardDisplayLinks = new TreeMap<Integer, Map<Integer, Integer>>();
@@ -91,11 +92,11 @@ public class SubHub extends Panel {
         setVisible(false);
     }
 
-    private void initialize(TerrainMap map){
+    private void initialize(SubMap map){
         for (int x = 0; x < numberOfDisplays; x++){
             final int a = x;
             SubDisplayWindow displayWindow = new SubDisplayWindow(map);
-            displayWindow.setSubList(rovers);
+            displayWindow.setSubList(subs);
             displayWindow.addPageForwardAction(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
