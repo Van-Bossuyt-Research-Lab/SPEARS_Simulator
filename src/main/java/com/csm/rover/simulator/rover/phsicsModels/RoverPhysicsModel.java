@@ -8,11 +8,15 @@ import com.csm.rover.simulator.rover.MotorState;
 import com.csm.rover.simulator.rover.RoverWheels;
 import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 
 //TODO add implementation with better time stepping
 public class RoverPhysicsModel implements Serializable, Cloneable {
+	private static final Logger LOG = LogManager.getLogger(RoverPhysicsModel.class);
 
 	private static final long serialVersionUID = 1L;
 	
@@ -138,7 +142,7 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 					//RoverEvents.updateStats();
 				}
 				catch (Exception e){
-					Globals.getInstance().reportError("RoverDriveModel", "execute", e);
+					LOG.log(Level.ERROR, String.format("Rover %s failed to execute", roverName), e);
 				}
 			}
 		},

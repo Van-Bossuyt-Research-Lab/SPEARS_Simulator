@@ -7,6 +7,9 @@ import com.csm.rover.simulator.rover.autoCode.RoverAutonomousCode;
 import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.Point;
 import java.io.InputStream;
@@ -19,6 +22,7 @@ import java.util.TreeMap;
 //TODO actually debug instructions
 //TODO make for modular for OCP, SRP
 public class RoverObject implements Serializable {
+	private static final Logger LOG = LogManager.getLogger(RoverObject.class);
 	
 	private static final long serialVersionUID = 1L;
 
@@ -120,7 +124,7 @@ public class RoverObject implements Serializable {
 			try {
 				motorVoltage = (float) getBatteryVoltage(); // check battery voltage
 				if (motorVoltage < 0.0001){
-					Globals.getInstance().writeToLogFile("Rover", "Rover out of Power:\t" + Globals.getInstance().timeMillis);
+					LOG.log(Level.INFO, "{}: Rover ran out of power", name);
 				}
 				motorCurrent = (float) getBatteryCurrent(); // measure current draw				
 				if (checkCurrent){
@@ -129,7 +133,7 @@ public class RoverObject implements Serializable {
 					averageCurrent = currentIntegral / (Globals.getInstance().timeMillis - startCurretIntegral);
 				}
 			} catch (Exception e) {
-				Globals.getInstance().reportError("RoverCode", "runCode - voltage", e);
+				LOG.log(Level.ERROR, "{}: Error in voltage check", name);
 			}
 			
 			if (serialBuffers.RFAvailable(IDcode) > 1) { // if there is a message
@@ -649,7 +653,7 @@ public class RoverObject implements Serializable {
 		} catch (Exception e) {
 			// something went wrong
 			System.out.println("Error in Rover Run Code");
-			Globals.getInstance().reportError("RoverCode", "runCode - code", e);
+			LOG.log(Level.ERROR, name + ": Error in run code", e);
 		}
 	}
 	
@@ -673,7 +677,7 @@ public class RoverObject implements Serializable {
 			}
 		}
 		catch (Exception e){
-			Globals.getInstance().reportError("RoverCode", "takePicture", e);
+			LOG.log(Level.ERROR, name + ": Error taking picture", e);
 		}
 	}
 	
@@ -772,12 +776,12 @@ public class RoverObject implements Serializable {
 				x++;
 			}
 			addToSerialHistory(mess);
-			Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+			LOG.log(Level.INFO, "{}: Sent serial message \"{}\"", name, mess);
 			return true;
 		} 
 		else {
-			addToSerialHistory("Surpressed: " + mess);
-			Globals.getInstance().writeToLogFile(name + " Serial", "Message Surpressed: \'" + mess + "\'");
+			addToSerialHistory("Suppressed: " + mess);
+			LOG.log(Level.INFO, "{}: Suppressed serial message \"{}\"", name, mess);
 			return false;
 		}
 	}
@@ -790,11 +794,11 @@ public class RoverObject implements Serializable {
 		if (!mute) {
 			serialBuffers.writeToSerial(mess, IDcode);
 			addToSerialHistory(mess + "");
-			Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+			LOG.log(Level.INFO, "{}: Sent serial message \'{}\'", name, mess);
 			return true;
 		} else {
 			addToSerialHistory("Supressed: " + mess);
-			Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+			LOG.log(Level.INFO, "{}: Suppressed serial message \'{}\'", name, mess);
 			return false;
 		}
 	}
@@ -821,7 +825,7 @@ public class RoverObject implements Serializable {
 				return 0;
 			}
 		} catch (Exception e) {
-			Globals.getInstance().reportError("RoverCode", "strcmp", e);
+			LOG.log(Level.ERROR, "Error in strcmp", e);
 		}
 		return 1;
 	}

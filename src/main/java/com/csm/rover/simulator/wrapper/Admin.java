@@ -9,18 +9,19 @@ import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
 import com.csm.rover.simulator.objects.RunConfiguration;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.satellite.SatelliteObject;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Optional;
 
-//TODO make into a signularity thingy
 public class Admin {
+	private static final Logger LOG = LogManager.getFormatterLogger(Admin.class);
 
 //	public static Form GUI;
 	private Globals GLOBAL;
-
-	private int queue_key = "qwert".hashCode();
 
     private static HumanInterfaceAbstraction HI;
 
@@ -32,7 +33,9 @@ public class Admin {
 
 	public static void main(String[] args) {
 		Admin admin = getInstance();
+		LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
 		if (args.length == 0) {
+			LOG.log(Level.INFO, "Starting simulator in GUI mode");
             HI = new HiForm();
 			boolean go = false;
 			File config = new File("default.cfg");
@@ -42,21 +45,40 @@ public class Admin {
 				}
 			}
 			if (go) {
-				//TODO run without gui
 				try {
-					admin.beginSimulation(new RunConfiguration(new File("default.cfg")));
+					admin.beginSimulation(new RunConfiguration(config));
 				}
 				catch (Exception e){
-					Globals.getInstance().reportError("Admin", "main", e);
+					LOG.log(Level.ERROR, "Simulator failed to start", e);
+					System.exit(2);
 				}
 			}
 		}
 		else {
-			//TODO Load from console config things
+			LOG.log(Level.INFO, "Stating simulator in Command Line mode");
+			HI = new HiCmd();
+            File cfgFile = new File(args[0]);
+            if (cfgFile.exists() && getFileType(cfgFile).equals("cfg")){
+                try {
+                    admin.beginSimulation(new RunConfiguration(cfgFile));
+                }
+                catch (Exception e){
+                    LOG.log(Level.ERROR, "cfg file failed to initiate", e);
+					System.exit(2);
+                }
+            }
+            else {
+                System.err.println("Expected a valid file path to a .cfg file.  Got: \"" + cfgFile.getAbsolutePath() + "\"");
+				System.exit(3);
+            }
 		}
 	}
-	
-	//TODO Add items for rover and satellite option here using addItemToSelectionList
+
+    private static String getFileType(File file){
+        String filename = file.getName();
+        return filename.substring(filename.lastIndexOf(".")+1, filename.length());
+    }
+
 	//TODO clean up this interface for OCP
 	private Admin(){
 		GLOBAL = Globals.getInstance();
@@ -76,7 +98,6 @@ public class Admin {
     }
 
 	public void beginSimulation(RunConfiguration config){
-		//TODO add option to toggle time shifted executions
 		if (config.rovers.size() == 0 ||config.satellites.size() == 0){
 			System.err.println("Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;
@@ -96,11 +117,10 @@ public class Admin {
 					throw new Exception();
 				}
 				terrainMap = TerrainMapReader.loadMap(config.mapFile);
-				GLOBAL.writeToLogFile("Start Up", "Using Map File: " + config.mapFile.getName());
+				LOG.log(Level.INFO, "Start Up: Using map file: {}", config.mapFile.getName());
 			}
 			catch (Exception e){
-				System.err.println("Invalid Map File");
-				e.printStackTrace();
+				LOG.log(Level.WARN, "Start Up: Invalid map file", e);
 				return;
 			}
 		}
@@ -111,15 +131,15 @@ public class Admin {
             terrainMap.generateLandscape(config.mapSize, config.mapDetail);
 			terrainMap.generateTargets(config.monoTargets, config.targetDensity);
 			terrainMap.generateHazards(config.monoHazards, config.hazardDensity);
-			GLOBAL.writeToLogFile("Start Up", "Using Random Map");
+			LOG.log(Level.INFO, "Startup: Using random map");
 		}
         RoverObject.setTerrainMap(terrainMap);
 
         HI.initialize(config.namesAndTags, serialBuffers, rovers, satellites, terrainMap);
 
 		if (config.accelerated){
-			GLOBAL.writeToLogFile("Start Up", "Accelerating Simulation");
-            HI.viewAccelerated(config.runtime);
+			LOG.log(Level.INFO, "Start Up: Accelerating Simulation");
+            Globals.getInstance().setUpAcceleratedRun(HI, 3600000 * config.runtime);
 		}
 
         for (RoverObject rover : rovers){

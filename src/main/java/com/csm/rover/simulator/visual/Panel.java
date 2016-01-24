@@ -32,7 +32,9 @@ public class Panel extends JPanel{
 		titleLbl.setSize((int) titleLbl.getPreferredSize().getWidth() + 5, (int) titleLbl.getPreferredSize().getHeight() + 5);
 		this.add(titleLbl);
 
-		postScript = new JLabel("Colorado School of Mines     Prognostics and Health Management Project     System Simulator v" + Globals.versionNumber);
+        String spacer = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+
+		postScript = new JLabel("<HTML>CSM PHM Lab" + spacer + "<b>SPEARS</b>" + spacer + "v" + Globals.versionNumber + "</HTML>");
 		postScript.setFont(new Font("Trebuchet MS", Font.PLAIN, 16));
 		postScript.setSize((int) postScript.getPreferredSize().getWidth() + 5, (int) postScript.getPreferredSize().getHeight() + 5);
 		postScript.setLocation((this.getWidth() - postScript.getWidth()) / 2, this.getHeight() - postScript.getHeight() - 10);
@@ -112,7 +114,12 @@ public class Panel extends JPanel{
 			}
 		}
 	}
-	
+
+    @Override
+    public String toString(){
+        return String.format("GUI Panel of title \"%s\"", titleLbl.getText());
+    }
+
 	public void setImage(ImageIcon icon){
 		background = icon;
 		hasImage = icon != null;

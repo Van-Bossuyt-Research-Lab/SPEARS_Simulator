@@ -2,10 +2,13 @@ package com.csm.rover.simulator.control;
 
 import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.objects.ZDate;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
+import jdk.nashorn.internal.objects.Global;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -21,15 +24,13 @@ import java.util.Scanner;
 //TODO change implementation to allow for 'plug in' communications
 //TODO update the actual console code to look like this
 public class InterfaceCode {
+	private static final Logger LOG = LogManager.getLogger(InterfaceCode.class);
 
 	private InterfacePanel GUI;
     private Globals GLOBAL = Globals.getInstance();
     private SerialBuffers serialBuffers;
 
-    private File logFile;
 	private String connectedPort = "COM13";
-	public ZDate DateTime;
-	public SynchronousThread clock;
 	public static String IDcode = "g";
 	
 	private int connectionTime = 0;
@@ -71,11 +72,8 @@ public class InterfaceCode {
 		GUI = gui;
         pageLength = GUI.RoverBtns.length;
         this.serialBuffers = serialBuffers;
-		DateTime = new ZDate();
-		DateTime.setFormat("[hh:mm:ss]");
-		clock = new SynchronousThread(1000, new Runnable(){
+		GLOBAL.addClockIncrementEvent(new Runnable(){
 			public void run(){
-				DateTime.advanceClock();
 				if (Connected){
 					countSec++;
 					if (countSec == 0){
@@ -88,7 +86,7 @@ public class InterfaceCode {
 					GUI.ConnectionLbl.setText("Not Connected");
 				}
 			}
-		}, SynchronousThread.FOREVER, "clock", false);
+		});
 		initalize();
 	}
 	
@@ -117,23 +115,7 @@ public class InterfaceCode {
 			}
 		}
 		catch (Exception e){
-			GLOBAL.reportError("InterfaceCode", "initalize - mkdir", e);
-		}
-		try {
-			logFile = new File("Logs\\Log File " + DateTime.toString("MM-dd-yyyy hh-mm") + ".txt");
-			int ver = 0;
-			while (logFile.exists()){
-				ver++;
-				logFile = new File("Logs\\Log File " + DateTime.toString("MM-dd-yyyy hh-mm") + " (" + ver + ").txt");
-			}
-			if (!logFile.createNewFile()){
-				throw new IOException("Failed to create new log file");
-			}
-			BufferedWriter write = new BufferedWriter(new FileWriter(logFile));
-			write.write("CSM PHM Rover System Simulator Log " + DateTime.toString("on MM-dd-yyyy at hh:mm") + "\r\n\r\n");
-			write.close();
-		} catch (Exception e) {
-			GLOBAL.reportError("InterfaceCode", "initalize - createLog", e);
+			LOG.log(Level.ERROR, "Tried and failed to create directory structure", e);
 		}
 		FileInputStream fis = null;
 		ObjectInputStream in = null;
@@ -199,7 +181,7 @@ public class InterfaceCode {
 							public void run() {
 								Connected = true;
 								GUI.ConnectionLbl.setText("Connected for 0 min.");
-								GUI.SerialDisplayLbl.setText(GUI.SerialDisplayLbl.getText() + "Rover Connected: " + DateTime.toString("hh:mm:ss") + "\n");
+								GUI.SerialDisplayLbl.setText(GUI.SerialDisplayLbl.getText() + "Rover Connected: " + GLOBAL.dateTime.toString("hh:mm:ss") + "\n");
 								(new PopUp()).showConfirmDialog("Rover connected.", "Ping Confirm", PopUp.DEFAULT_OPTIONS);
 							}
 						}, "ping-return");
@@ -236,13 +218,13 @@ public class InterfaceCode {
 		connectionTime = 0;
 		connectedPort = (String)GUI.PortSelectCombo.getSelectedItem();
 		GUI.ConnectionLbl.setText("Connected for " + connectionTime + " min.");
-		writeToLog("COM Port", "Connection Changed to " + connectedPort);
+		LOG.log(Level.INFO, "COM port connection changed to {}", connectedPort);
 		resetConnection();
 	}
 
 	public void writeToSerial(String msg){
 		if (Connected && !muted){
-			writeToLog("Interface Serial", "Command sent: \'" + msg + "\'");
+			LOG.log(Level.INFO, "Sent serial message \"{}\"", msg);
 			char[] output = msg.toCharArray();
 			int x = 0;
 			while (x < output.length){
@@ -255,7 +237,7 @@ public class InterfaceCode {
 	
 	public void writeToSerial(String msg, boolean override){
 		if ((Connected || override) && !muted){
-			writeToLog("Interface Serial", "Command sent: \'" + msg + "\'");
+			LOG.log(Level.INFO, "Sent serial message \"{}\" with override: {}", msg, override);
 			char[] output = msg.toCharArray();
 			int x = 0;
 			while (x < output.length){
@@ -291,7 +273,7 @@ public class InterfaceCode {
 							x++;
 						}
 						GUI.SerialDisplayLbl.setText(GUI.SerialDisplayLbl.getText() + "Recieved: " + data + "\n");
-						writeToLog("Serial Reader", "Recieved Note: " + data);
+						LOG.log(Level.INFO, "Received serial note \"{}\"", data);
 					}
 					else if (input[2] == 'i'){
 						receivingFile = true;
@@ -299,24 +281,29 @@ public class InterfaceCode {
 						if (filelength < 0){
 							filelength += 65536;
 						}
+						LOG.log(Level.INFO, "Received photo notice");
 						ReadPhoto(filelength);
 					}
 					else if (input[2] == '}'){
 						muted = true;
 						GUI.MuteIcon.setVisible(true);
+						LOG.log(Level.INFO, "Ground station muted");
 					}
 					else if (input[2] == '{'){
 						muted = false;
 						GUI.MuteIcon.setVisible(false);
+						LOG.log(Level.INFO, "Ground station un-muted");
 					}
 					else if (input[2] == '*'){
 						GUI.SerialDisplayLbl.setText(GUI.SerialDisplayLbl.getText() + "The rover has pinged the ground station.\n");
+						LOG.log(Level.INFO, "Rover pinged the ground station");
 						writeToSerial(tagMessage("*", 'r'));
 					}
 				}
 				else {
 					if (Arrays.equals(input, "Data Could Not be Parsed\n".toCharArray())){
 						GUI.SerialDisplayLbl.setText(GUI.SerialDisplayLbl.getText() + "Data Could Not be Parsed\n");
+						LOG.log(Level.INFO, "Received serail message could not be parsed");
 					}
 				}
 			}
@@ -855,7 +842,7 @@ public class InterfaceCode {
 				}
 				delay(20);
 				GUI.SerialDisplayLbl.setText(GUI.SerialDisplayLbl.getText() + "Receiving Image.\n");
-				writeToLog("Photo Reciever", "Receiving Image");
+				LOG.log(Level.INFO, "Ground station receiving photo");
 				String text = GUI.SerialDisplayLbl.getText();
 				byte[] bytes = new byte[length];
 				char[] progress = new char[length / 500 + 1];
@@ -876,7 +863,7 @@ public class InterfaceCode {
 							bytes[index] = serialBuffers.ReadSerial(IDcode);
 						}
 						catch (ArrayIndexOutOfBoundsException e){
-							GLOBAL.reportError("InterfaceCode", "ReadPhoto - e", e);
+                            LOG.log(Level.ERROR, "Failed to read photo", e);
 							break;
 						}
 						if (index % 500 == 0 && index != 0){
@@ -895,23 +882,24 @@ public class InterfaceCode {
 				}
 				if (index == length){
 					File image = new File("");
-					image = new File(image.getAbsoluteFile() + "\\Photos\\IMAGE " + DateTime.toString("MM-dd hh-mm") + ".jpg");
+					image = new File(image.getAbsoluteFile() + "\\Photos\\IMAGE " + GLOBAL.dateTime.toString("MM-dd hh-mm") + ".jpg");
 					FileOutputStream fos = new FileOutputStream(image);
 					fos.write(bytes);
 					receivedFiles = Augment(receivedFiles, image.getAbsolutePath());
 					fos.close();
-					writeToLog("Interface", "Recieved Image.  Stored in: " + image.getAbsolutePath());
+					LOG.log(Level.INFO, "Received photo file stored in: {}", image.getAbsoluteFile());
 					receivingFile = false;
 					GUI.SerialDisplayLbl.setText(text + "Done.\n");
 					GUI.MailBtn.setIcon(new ImageIcon(getClass().getResource("/icons/Mail_Message.png")));
 				}
 				else {
 					GUI.SerialDisplayLbl.setText(text + "Image transfer failed, incomplete size requirement.\n");
-					writeToLog("Interface", "Image transfer failed due to incomplete size requirement.");
+                    LOG.log(Level.WARN, "Failed to copy image due to size req.");
 				}
 			}	
 			catch(Exception ex) {
-				GLOBAL.reportError("InterfaceCode", "readPhoto - ex", ex);
+                LOG.log(Level.ERROR, "Failed to read photo", ex);
+
 			}
 		}
 	}
@@ -927,7 +915,7 @@ public class InterfaceCode {
 				}
                 delay(20);
                 GUI.SerialDisplayLbl.setText(GUI.SerialDisplayLbl.getText() + "Receiving Data.\n");
-                writeToLog("Date Reciever", "Receiving Data File");
+                LOG.log(Level.INFO, "Ground station receiving data file");
                 String text = GUI.SerialDisplayLbl.getText();
                 byte[] bytes = new byte[length];
                 char[] progress = new char[length / 100 + 1];
@@ -947,7 +935,7 @@ public class InterfaceCode {
                             bytes[index] = serialBuffers.ReadSerial(IDcode);
                         }
                         catch (ArrayIndexOutOfBoundsException e){
-                            GLOBAL.reportError("InterfaceCode", "ReadDataFile - e", e);
+                            LOG.log(Level.ERROR, "Failed to read data file", e);
                             break;
                         }
                         if (index % 100 == 0 && index != 0){
@@ -964,28 +952,28 @@ public class InterfaceCode {
                 }
                 if (index == length){
                     File image = new File("");
-                    image = new File(image.getAbsoluteFile() + "\\Data\\DATA " + DateTime.toString("MM-dd hh-mm") + ".CSV");
+                    image = new File(image.getAbsoluteFile() + "\\Data\\DATA " + GLOBAL.dateTime.toString("MM-dd hh-mm") + ".CSV");
                     FileOutputStream fos = new FileOutputStream(image);
                     fos.write(bytes);
                     receivedFiles = Augment(receivedFiles, image.getAbsolutePath());
                     fos.close();
-                    writeToLog("Interface", "Recieved Data File.  Stored in: " + image.getAbsolutePath());
+                    LOG.log(Level.INFO, "Received data file, stored in: {}", image.getAbsoluteFile());
                     receivingFile = false;
                     GUI.SerialDisplayLbl.setText(text + "Done.\n");
                     GUI.MailBtn.setIcon(new ImageIcon(getClass().getResource("/icons/Mail_Message.png")));
                 }
                 else {
                     GUI.SerialDisplayLbl.setText(text + "Data File transfer failed, incomplete size requirement.\n");
-                    writeToLog("Interface", "Data File transfer failed due to incomplete size requirement.");
+                    LOG.log(Level.WARN, "Failed to copy data file due to size req.");
                 }
 			}	
 			catch(Exception exe) {
-				GLOBAL.reportError("InterfaceCode", "ReadDataFile - exe", exe);
+                LOG.log(Level.ERROR, "Failed to read data file", exe);
 			}
 		}
 	}
 	
-	public void OpenRecievedFiles(){
+	public void OpenReceivedFiles(){
 		if (receivedFiles.length > 0){
 			new SynchronousThread(0, new Runnable(){
 				public void run(){
@@ -1016,12 +1004,12 @@ public class InterfaceCode {
 												try {
 													ImageIO.write(img, "jpg", imageOut);
 												} catch (Exception e1) {
-													GLOBAL.reportError("InterfaceCode", "OpenRecievedFiles - e1", e1);
-													opane.showConfirmDialog("Something went worng and the file failed to save.", "IO Error", PopUp.DEFAULT_OPTIONS);
+                                                    LOG.log(Level.ERROR, "Failed to open image file", e1);
+													opane.showConfirmDialog("Something went wrong and the file failed to save.", "IO Error", PopUp.DEFAULT_OPTIONS);
 												}
 
 											} catch (Exception e2) {
-												GLOBAL.reportError("InterfaceCode", "OpenRecievedFiles - e2", e2);
+                                                LOG.log(Level.ERROR, "Failed to open image file", e2);
 											}
 										}
 									}
@@ -1031,7 +1019,7 @@ public class InterfaceCode {
 									GUI.MailBtn.setIcon(new ImageIcon(getClass().getResource("/icons/Mail.png")));
 								}
 							} catch (Exception e3) {
-								GLOBAL.reportError("InterfaceCode", "OpenRecievedFiles - e3", e3);
+                                LOG.log(Level.ERROR, "Failed to open image file", e3);
 							}
 						}
 						if (getFileType(receivedFiles[choice]).equals("CSV")) {
@@ -1048,21 +1036,21 @@ public class InterfaceCode {
 											try {
 												String data = "";
 												FileReader input = new FileReader(file);
-												@SuppressWarnings("resource")
 												Scanner dataIn = new Scanner(input);
 												while (dataIn.hasNextLine()) {
 													data += dataIn.nextLine() + "\n";
 												}
+                                                dataIn.close();
 												input.close();
 												PrintWriter dataOut = new PrintWriter(filepath);
 												dataOut.print(data);
 												dataOut.close();
 											} catch (Exception e4) {
-												GLOBAL.reportError("InterfaceCode", "OpenRecievedFiles - e4", e4);
-												new PopUp().showConfirmDialog("Something went worng and the file failed to save.", "IO Error", PopUp.DEFAULT_OPTIONS);
+                                                LOG.log(Level.ERROR, "Failed to open data file", e4);
+												new PopUp().showConfirmDialog("Something went wrong and the file failed to save.", "IO Error", PopUp.DEFAULT_OPTIONS);
 											}
 										} catch (Exception e5) {
-											GLOBAL.reportError("InterfaceCode", "OpenReviecedFiles - e5", e5);
+                                            LOG.log(Level.ERROR, "Failed to open data file", e5);
 										}
 									}
 								}
@@ -1388,16 +1376,10 @@ public class InterfaceCode {
 	
 	private void SaveProgrammer(){
 		String filename = "CommandString.dll";
-		try {
-			File file = new File("");
-			file = new File(file.getAbsolutePath() + "\\CommandString.dll");
-			if (!file.delete()){
-				GLOBAL.reportError("Interface Object", "Failed to delete commandString.dll", null);
-			}
-		}
-		catch (Exception e) {
-			GLOBAL.reportError("InterfaceCode", "SaveProgrammer - e", e);
-		}
+        File file = new File("CommandString.dll");
+        if (!file.delete()){
+            LOG.log(Level.WARN, "Failed to delete commandString.dll");
+        }
 		try {
             FileOutputStream fos = new FileOutputStream(filename);
             ObjectOutputStream out = new ObjectOutputStream(fos);
@@ -1406,29 +1388,8 @@ public class InterfaceCode {
             fos.close();
 		}
 		catch (Exception ex) {
-			GLOBAL.reportError("InterfaceCode", "SaveProgrammer - ex", ex);
+            LOG.log(Level.ERROR, "Failed to write out new commandString.dll", ex);
 		}
-	}
-	
-	public void writeToLog(String from, String what){
-		try {
-			BufferedWriter write = new BufferedWriter(new FileWriter(logFile, true));
-			if (from.equals("Timing")){
-				write.write(what + "\n");
-			}
-			else {
-				write.write(from + "\t\t" + what + "\t\t" + DateTime.toString("[MM/dd/yyyy hh:mm:ss.") + (GLOBAL.timeMillis %1000) + "]\r\n");
-			}
-			write.flush();
-			write.close();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public File getLogFile(){
-		return logFile;
 	}
 	
 	// SUPPORTING METHODS
@@ -1439,15 +1400,8 @@ public class InterfaceCode {
 	
 	private String buildString(char[] array, int start, int end){
 		String out = "";
-		while (start <= end){
-			try {
-				out += array[start] + "";
-			}
-			catch (Exception e){
-				GLOBAL.reportError("InterfaceCode", "buildString", e);
-				return "";
-			}
-			start++;
+        for (int i = start; i <= end && i < array.length; i++){
+			out += array[i] + "";
 		}
 		return out;
 	}

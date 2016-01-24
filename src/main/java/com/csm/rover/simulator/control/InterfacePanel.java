@@ -6,6 +6,9 @@ import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.visual.ZList;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 //TODO pop out option
 //TODO more adaptable 'plug in' interface like communication style
 public class InterfacePanel extends Panel{
+	private static final Logger LOG = LogManager.getLogger(InterfacePanel.class);
 
 	private static final long serialVersionUID = -2554090286918354434L;
 
@@ -177,7 +181,7 @@ public class InterfacePanel extends Panel{
 		MailBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				InterfaceAccess.CODE.OpenRecievedFiles();
+				InterfaceAccess.CODE.OpenReceivedFiles();
 			}
 		});
 		ProgramBtnsPnl.add(MailBtn);
@@ -203,7 +207,7 @@ public class InterfacePanel extends Panel{
 		CommentBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				InterfaceAccess.addNoteToLog("User", JOptionPane.showInputDialog(getParent().getParent(), "Note for log:", "Data Log Edit", JOptionPane.PLAIN_MESSAGE));
+				LOG.log(Level.INFO, "Manual note: {}", JOptionPane.showInputDialog(getParent().getParent(), "Note for log:", "Data Log Edit", JOptionPane.PLAIN_MESSAGE));
 			}
 		});
 		ProgramBtnsPnl.add(CommentBtn);
@@ -230,7 +234,7 @@ public class InterfacePanel extends Panel{
 				try {
 					Desktop.getDesktop().open(new File("").getAbsoluteFile());
 				} catch (IOException e) {
-					Globals.getInstance().reportError("InterfacePanel", "folderBtn_Clicked", e);
+					LOG.log(Level.ERROR, "could not open documents folder", e);
 				}
 			}
 		});
@@ -620,6 +624,18 @@ public class InterfacePanel extends Panel{
 		SatelliteCommandList.setFont(new Font("Iskoola Pota", Font.PLAIN, 15));
 		SatelliteCommandList.setBackground(SystemColor.menu);
 		InstructionsPnl.add(SatelliteCommandList);
+
+		ParameterList = new ZList();
+		ParameterList.setSize(137, 69);
+		ParameterList.setLocation(304, 47);
+		ParameterList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				InterfaceAccess.ParametersListChanged();
+			}
+		});
+		ParameterList.setFont(new Font("Iskoola Pota", Font.PLAIN, 15));
+		ParameterList.setBackground(SystemColor.menu);
+		InstructionsPnl.add(ParameterList);
 		
 		ParameterTxt = new JTextField();
 		ParameterTxt.addComponentListener(new ComponentAdapter() {
@@ -637,18 +653,6 @@ public class InterfacePanel extends Panel{
 		ParameterTxt.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
 		ParameterTxt.setBounds(304, 127, 137, 25);
 		InstructionsPnl.add(ParameterTxt);
-		
-		ParameterList = new ZList();
-		ParameterList.setSize(137, 69);
-		ParameterList.setLocation(304, 47);
-		ParameterList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				InterfaceAccess.ParametersListChanged();
-			}
-		});
-		ParameterList.setFont(new Font("Iskoola Pota", Font.PLAIN, 15));
-		ParameterList.setBackground(SystemColor.menu);
-		InstructionsPnl.add(ParameterList);
 		
 		InstructionsList = new ZList();
 		InstructionsList.setSize(117, 113);
