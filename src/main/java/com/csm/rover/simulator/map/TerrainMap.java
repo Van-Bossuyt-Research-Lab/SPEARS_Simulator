@@ -156,7 +156,7 @@ public class TerrainMap {
         try {
             return getIntermediateValue(values.get(x, y), values.get(x + 1, y), values.get(x, y + 1), values.get(x + 1, y + 1), locx, locy);
         }
-        catch (NullPointerException e){
+        catch (ArrayIndexOutOfBoundsException e){
             LOG.log(Level.FATAL, "Rover fell of the map", e);
             System.exit(1);
             return 0;
