@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.wrapper;
 
 import com.csm.rover.simulator.control.PopUp;
+import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.map.io.TerrainMapReader;
 import com.csm.rover.simulator.map.modifiers.NormalizeMapMod;
@@ -9,6 +10,7 @@ import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
 import com.csm.rover.simulator.objects.RunConfiguration;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.satellite.SatelliteObject;
+import com.csm.rover.simulator.sub.SubObject;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +29,9 @@ public class Admin {
 
     //Runtime Variables
     private TerrainMap terrainMap;
+	private SubMap subMap;
     private ArrayList<RoverObject> rovers;
+	private ArrayList<SubObject> subs;
     private ArrayList<SatelliteObject> satellites;
     private SerialBuffers serialBuffers;
 
@@ -83,6 +87,7 @@ public class Admin {
 	private Admin(){
 		GLOBAL = Globals.getInstance();
         terrainMap = new TerrainMap();
+		subMap = new SubMap();
 	}
 
     private static Optional<Admin> singleton_instance = Optional.empty();
@@ -105,6 +110,7 @@ public class Admin {
         else {
             this.rovers = config.rovers;
             this.satellites = config.satellites;
+			this.subs = config.subs;
         }
 
         serialBuffers = new SerialBuffers(config.namesAndTags.getTags(), HI);

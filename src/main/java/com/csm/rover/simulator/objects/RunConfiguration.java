@@ -2,6 +2,7 @@ package com.csm.rover.simulator.objects;
 
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.satellite.SatelliteObject;
+import com.csm.rover.simulator.sub.SubObject;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 
 import java.io.*;
@@ -16,6 +17,7 @@ public class RunConfiguration implements Serializable {
 	public boolean mapFromFile;
 	public NamesAndTags namesAndTags;
 	public ArrayList<RoverObject> rovers;
+	public ArrayList<SubObject> subs;
 	public ArrayList<SatelliteObject> satellites;
 	public File mapFile;
 	public double mapRough;

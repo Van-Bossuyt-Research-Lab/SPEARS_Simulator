@@ -291,12 +291,12 @@ public class SubDisplayWindow extends JPanel {
         doUpdate(whichSub);
     }
 
-    private void doUpdate(int whichRover){
+    private void doUpdate(int whichSub){
         PageLeftBtn.setEnabled(subLock == -1);
-        PageRightBtn.setEnabled(whichRover != subs.size()-1 && subLock == -1);
+        PageRightBtn.setEnabled(whichSub != subs.size()-1 && subLock == -1);
         tabbedPane.setVisible(true);
 
-        SubObject sub = subs.get(whichRover);
+        SubObject sub = subs.get(whichSub);
         SubNameLbl.setText(sub.getName());
         SerialHistoryLbl.setText(sub.getSerialHistory());
         MovementStatsLbl.setText(String.format(movementPattern,
@@ -345,7 +345,7 @@ public class SubDisplayWindow extends JPanel {
         AutonomousLED.setSelected(false);
     }
 
-    public void setRoverList(ArrayList<SubObject> rovers){
+    public void setSubList(ArrayList<SubObject> subs){
         this.subs = subs;
     }
 
@@ -359,9 +359,9 @@ public class SubDisplayWindow extends JPanel {
     }
 
     public void unlock(){
-        int rover = subLock;
+        int sub = subLock;
         subLock = -1;
-        update(rover);
+        update(sub);
     }
 
     public void addPageForwardAction(ActionListener listener){

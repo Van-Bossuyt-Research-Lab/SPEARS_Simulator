@@ -8,6 +8,9 @@ import com.csm.rover.simulator.sub.subAuto.SubAutonomousCode;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
 import com.csm.rover.simulator.rover.MotorState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.awt.Point;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -19,6 +22,7 @@ import java.util.TreeMap;
 //TODO actually debug instructions
 //TODO make for modular for OCP, SRP
 public class SubObject implements Serializable {
+    private static final Logger LOG = LogManager.getLogger(SubObject.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -581,11 +585,11 @@ public class SubObject implements Serializable {
             } catch (Exception e) {
                 // something went wrong
                 System.out.println("Error in Sub Run Code");
-                Globals.getInstance().reportError("SubCode", "runCode - code", e);
+
             }
         } catch (Exception f){
             System.out.println("Something's bad");
-            Globals.getInstance().reportError("SubCode", "runCode - code", f);
+
         }
     }
 
@@ -609,7 +613,7 @@ public class SubObject implements Serializable {
             }
         }
         catch (Exception e){
-            Globals.getInstance().reportError("RoverCode", "takePicture", e);
+
         }
     }
 
@@ -708,12 +712,12 @@ public class SubObject implements Serializable {
                 x++;
             }
             addToSerialHistory(mess);
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+
             return true;
         }
         else {
             addToSerialHistory("Surpressed: " + mess);
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Surpressed: \'" + mess + "\'");
+
             return false;
         }
     }
@@ -726,11 +730,11 @@ public class SubObject implements Serializable {
         if (!mute) {
             serialBuffers.writeToSerial(mess, IDcode);
             addToSerialHistory(mess + "");
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+
             return true;
         } else {
             addToSerialHistory("Supressed: " + mess);
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+
             return false;
         }
     }
@@ -757,7 +761,7 @@ public class SubObject implements Serializable {
                 return 0;
             }
         } catch (Exception e) {
-            Globals.getInstance().reportError("RoverCode", "strcmp", e);
+
         }
         return 1;
     }
