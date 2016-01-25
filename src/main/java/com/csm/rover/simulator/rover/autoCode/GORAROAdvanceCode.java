@@ -103,7 +103,7 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 		int[] sciences = new int[sampleDirections];
 		int[] hazards = new int[sampleDirections];
 		switch (state){
-		case 1:
+		case 1: //identifying target
 			for (int i = 1; i < histories; i++){
 				for (int j = 0; j < sampleDirections; j++){
 					potentials[i-1][j] = potentials[i][j];
@@ -145,10 +145,7 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 				}
 				
 				//if there is a hazard at the point get less excited
-				int hazard = 0;
-				if (MAP.isPointInHazard(examine)){
-					hazard = MAP.getHazardValueAt(location.offset(sampleRadius * Math.cos(theta), sampleRadius * Math.sin(theta)));
-				}
+				int hazard = MAP.isPointInHazard(examine) ?  MAP.getHazardValueAt(examine) : 0;
 				
 				//Calculate the density of science targets in a wedge away from the rover 
 				double scienceArea = 0;
@@ -213,14 +210,8 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 		
 			targetDirection = maxDirection;
 			state++;
-			if (Globals.getInstance().subtractAngles(direction, targetDirection) < 0){
-				return "spin_cw";
-			}
-			else {
-				return "spin_ccw";
-			}
-		case 2:
-			//System.out.println(direction + " - " + targetDirection);
+		case 2: //Rotating to target
+//			System.out.println(direction + " - " + targetDirection);
 			if (Math.abs(direction-targetDirection) < ANGLE_ERROR){
 				state++;
 				return "move"; 
@@ -233,7 +224,7 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 					return "spin_ccw";
 				}
 			}
-		case 3:
+		case 3: //Moving, waiting to recalc
 			if (milliTime-lastOptTime > RECALC_TIME){
 				state = 1;
 			}
