@@ -48,11 +48,11 @@ public class TerrainMap {
     }
 
     public boolean isPointAtTarget(DecimalPoint pnt){
-        return targets.isPointMarked(getMapSquare(pnt));
+        return targets.isPointMarked(getGridSquare(pnt));
     }
 
     public int getTargetValueAt(DecimalPoint pnt){
-        return targets.getValueAt(getMapSquare(pnt));
+        return targets.getValueAt(getGridSquare(pnt));
     }
 
     public MapTargetField getTargets(){
@@ -64,11 +64,11 @@ public class TerrainMap {
     }
 
     public boolean isPointInHazard(DecimalPoint pnt){
-        return hazards.isPointMarked(getMapSquare(pnt));
+        return hazards.isPointMarked(getGridSquare(pnt));
     }
 
     public int getHazardValueAt(DecimalPoint pnt){
-        return hazards.getValueAt(getMapSquare(pnt));
+        return hazards.getValueAt(getGridSquare(pnt));
     }
 
     public MapHazardField getHazards(){
@@ -126,7 +126,7 @@ public class TerrainMap {
 	public int getDetail(){
 		return detail;
 	}
-	
+
 	public Point getMapSquare(DecimalPoint loc){ // says which display square a given coordinate falls in
 		int shift = values.getWidth() / (detail * 2);
 		double x = loc.getX() + shift;
@@ -135,6 +135,11 @@ public class TerrainMap {
 		int outy = (int)(y*detail);
 		return new Point(outx, outy);
 	}
+
+    public Point getGridSquare(DecimalPoint loc){
+        Point square = getMapSquare(loc);
+        return new Point(square.x/3, square.y/3);
+    }
 	
 	public double getValueAtLocation(int x, int y){
 		return values.get(x, y);
