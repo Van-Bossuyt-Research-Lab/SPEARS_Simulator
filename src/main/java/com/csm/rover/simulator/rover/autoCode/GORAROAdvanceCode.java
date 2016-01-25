@@ -36,9 +36,9 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 	private long timeAtPoint = 0;
 	private boolean begun = false;
 	private static final double STALL_RADIUS = 5;
-	private static final int STALL_TIME = 60000;
+	private static final int STALL_TIME = 90000;
 	private static final double RUN_ROTATION = 5*Math.PI/16.0;
-	private static final int RUN_TIME = 15000;
+	private static final int RUN_TIME = 25000;
 	
 	private Set<Point> visitedScience = new HashSet<Point>();
 	
