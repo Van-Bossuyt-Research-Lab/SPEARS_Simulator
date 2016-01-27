@@ -1,11 +1,10 @@
 package com.csm.rover.simulator.control;
 
-import com.csm.rover.simulator.objects.FreeThread;
+import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
-import jdk.nashorn.internal.objects.Global;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

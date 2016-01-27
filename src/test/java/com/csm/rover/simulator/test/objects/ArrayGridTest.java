@@ -1,7 +1,7 @@
 package com.csm.rover.simulator.test.objects;
 
-import com.csm.rover.simulator.objects.ArrayGrid;
-import com.csm.rover.simulator.objects.GenericArrayGrid;
+import com.csm.rover.simulator.objects.util.ArrayGrid;
+import com.csm.rover.simulator.objects.util.GenericArrayGrid;
 import org.junit.Before;
 import org.junit.Test;
 

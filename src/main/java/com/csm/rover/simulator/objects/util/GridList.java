@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.objects;
+package com.csm.rover.simulator.objects.util;
 
 import java.io.Serializable;
 import java.util.ArrayList;

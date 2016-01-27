@@ -2,10 +2,9 @@ package com.csm.rover.simulator.visual;
 
 import com.csm.rover.simulator.control.InterfacePanel;
 import com.csm.rover.simulator.map.display.LandMapPanel;
-import com.csm.rover.simulator.objects.FreeThread;
+import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.rover.RoverHub;
 import com.csm.rover.simulator.satellite.SatelliteHub;
-import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.MainWrapper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;

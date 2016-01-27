@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
 
 public class RoverIcon extends JPanel{
 	

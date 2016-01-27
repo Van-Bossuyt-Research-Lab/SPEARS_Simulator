@@ -1,8 +1,8 @@
 package com.csm.rover.simulator.visual;
 
 import com.csm.rover.simulator.control.PopUp;
-import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.objects.FreeThread;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.objects.io.MapFileFilter;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.rover.RoverObject;

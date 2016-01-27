@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.rover.autoCode;
 
-import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
 
 import java.util.Map;
 

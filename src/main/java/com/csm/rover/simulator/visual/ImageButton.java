@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.border.LineBorder;
-import com.csm.rover.simulator.objects.FreeThread;
+import com.csm.rover.simulator.objects.util.FreeThread;
 
 public class ImageButton extends ImageDisplay {
 
