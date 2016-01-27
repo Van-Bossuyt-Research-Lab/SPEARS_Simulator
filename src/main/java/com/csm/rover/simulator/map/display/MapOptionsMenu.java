@@ -1,8 +1,8 @@
 package com.csm.rover.simulator.map.display;
 
 import com.csm.rover.simulator.map.io.TerrainMapWriter;
-import com.csm.rover.simulator.objects.ImageFileFilter;
-import com.csm.rover.simulator.objects.MapFileFilter;
+import com.csm.rover.simulator.objects.io.ImageFileFilter;
+import com.csm.rover.simulator.objects.io.MapFileFilter;
 
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;

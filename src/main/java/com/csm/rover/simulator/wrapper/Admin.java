@@ -6,7 +6,7 @@ import com.csm.rover.simulator.map.io.TerrainMapReader;
 import com.csm.rover.simulator.map.modifiers.NormalizeMapMod;
 import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
 import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
-import com.csm.rover.simulator.objects.RunConfiguration;
+import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.satellite.SatelliteObject;
 import org.apache.logging.log4j.Level;
