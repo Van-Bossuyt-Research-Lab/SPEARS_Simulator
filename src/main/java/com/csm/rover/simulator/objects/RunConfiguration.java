@@ -8,6 +8,7 @@ import com.csm.rover.simulator.wrapper.NamesAndTags;
 import java.io.*;
 import java.util.ArrayList;
 
+
 public class RunConfiguration implements Serializable {
 	
 	private static final long serialVersionUID = 1L;

@@ -11,6 +11,8 @@ import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.satellite.SatelliteAutonomusCode;
 import com.csm.rover.simulator.satellite.SatelliteObject;
 import com.csm.rover.simulator.satellite.SatelliteParametersList;
+import com.csm.rover.simulator.sub.physicsModels.subPhysicsModel;
+import com.csm.rover.simulator.sub.subAuto.SubAutonomousCode;
 import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
@@ -41,6 +43,8 @@ public class StartupPanel extends Panel {
 
     private Map<String, RoverPhysicsModel> roverParameters = new TreeMap<String, RoverPhysicsModel>();
     private Map<String, RoverAutonomousCode> roverLogics = new TreeMap<String, RoverAutonomousCode>();
+    private Map<String, subPhysicsModel> SubParameters = new TreeMap<String, subPhysicsModel>();
+    private Map<String, SubAutonomousCode> SubLogics = new TreeMap<String, SubAutonomousCode>();
     private Map<String, SatelliteParametersList> satelliteParameters = new TreeMap<String, SatelliteParametersList>();
     private Map<String, SatelliteAutonomusCode> satelliteLogics = new TreeMap<String, SatelliteAutonomusCode>();
     private Map<String, RoverObject> roversToAdd = new TreeMap<String, RoverObject>();
@@ -609,6 +613,10 @@ public class StartupPanel extends Panel {
         RovDriveModelList.addValue(name);
     }
 
+    public void addItemToSelectionList(String name, subPhysicsModel item){
+        SubParameters.put(name, item);
+        RovDriveModelList.addValue(name);
+    }
     public void addItemToSelectionList(String name, RoverAutonomousCode item){
         roverLogics.put(name, item);
         RovAutonomusCodeList.addValue(name);
