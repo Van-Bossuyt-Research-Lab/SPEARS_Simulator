@@ -6,8 +6,12 @@ import com.csm.rover.simulator.map.io.TerrainMapReader;
 import com.csm.rover.simulator.map.modifiers.NormalizeMapMod;
 import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
 import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
+import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.rover.RoverObject;
+import com.csm.rover.simulator.rover.autoCode.BlankRoverAuto;
+import com.csm.rover.simulator.rover.autoCode.RAIRcode;
+import com.csm.rover.simulator.rover.autoCode.RoverAutonomousCode;
 import com.csm.rover.simulator.satellite.SatelliteObject;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -27,8 +31,8 @@ public class Admin {
 
     //Runtime Variables
     private TerrainMap terrainMap;
-    private ArrayList<RoverObject> rovers;
-    private ArrayList<SatelliteObject> satellites;
+    private ArrayList<PlatformConfig> roverCfgs;
+    private ArrayList<PlatformConfig> satCfgs;
     private SerialBuffers serialBuffers;
 
 	public static void main(String[] args) {
@@ -98,13 +102,13 @@ public class Admin {
     }
 
 	public void beginSimulation(RunConfiguration config){
-		if (config.rovers.size() == 0 ||config.satellites.size() == 0){
-			System.err.println("Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
+		this.roverCfgs = config.getPlatforms("Rover");
+		this.satCfgs = config.getPlatforms("Satellite");
+		if (roverCfgs.size() == 0 || satCfgs.size() == 0){
+			LOG.log(Level.WARN, "Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;
 		}
         else {
-            this.rovers = config.rovers;
-            this.satellites = config.satellites;
         }
 
         serialBuffers = new SerialBuffers(config.namesAndTags.getTags(), HI);
@@ -135,6 +139,9 @@ public class Admin {
 		}
         RoverObject.setTerrainMap(terrainMap);
 
+		ArrayList<RoverObject> rovers = buildRoversFromConfig(roverCfgs);
+		ArrayList<SatelliteObject> satellites = buildSatellitesFromConfig(satCfgs);
+
         HI.initialize(config.namesAndTags, serialBuffers, rovers, satellites, terrainMap);
 
 		if (config.accelerated){
@@ -152,6 +159,31 @@ public class Admin {
 		GLOBAL.startTime(config.accelerated);
 
 		HI.updateSerialBuffers();
+	}
+
+	private ArrayList<RoverObject> buildRoversFromConfig(ArrayList<PlatformConfig> configs){
+		ArrayList<RoverObject> out = new ArrayList<RoverObject>();
+		for (PlatformConfig config : configs){
+			if (!config.getType().equals("Rover")){
+				LOG.log(Level.DEBUG, "Elements in roverCfgs are not rovers");
+				continue;
+			}
+			RoverAutonomousCode auto;
+			switch (config.getAutonomousModelName()){
+				case "RAIR":
+					auto = new RAIRcode();
+					break;
+				default:
+					auto = new BlankRoverAuto();
+					break;
+			}
+			auto.constructParameters(config.getAutonomousModelParameters());
+
+		}
+	}
+
+	private ArrayList<SatelliteObject> buildSatellitesFromConfig(ArrayList<PlatformConfig> configs){
+
 	}
 
 }

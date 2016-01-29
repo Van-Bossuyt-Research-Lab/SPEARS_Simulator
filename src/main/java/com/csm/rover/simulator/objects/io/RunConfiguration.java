@@ -15,8 +15,7 @@ public class RunConfiguration implements Serializable {
 	
 	public boolean mapFromFile;
 	public NamesAndTags namesAndTags;
-	public ArrayList<RoverObject> rovers;
-	public ArrayList<SatelliteObject> satellites;
+	public ArrayList<PlatformConfig> platforms;
 	public File mapFile;
 	public double mapRough;
 	public int mapSize;
@@ -29,22 +28,19 @@ public class RunConfiguration implements Serializable {
 	public int runtime;
 	
 	public RunConfiguration(NamesAndTags namesAndTags,
-							ArrayList<RoverObject> rovers,
-							ArrayList<SatelliteObject> satellites,
+							ArrayList<PlatformConfig> platforms,
 							File mapFile,
 			boolean accelerated, int runtime) {
 		mapFromFile = true;
 		this.namesAndTags = namesAndTags;
-		this.rovers = rovers;
-		this.satellites = satellites;
+		this.platforms = platforms;
 		this.mapFile = mapFile;
 		this.accelerated = accelerated;
 		this.runtime = runtime;
 	}
 
 	public RunConfiguration(NamesAndTags namesAndTags,
-                            ArrayList<RoverObject> rovers,
-							ArrayList<SatelliteObject> satellites,
+                            ArrayList<PlatformConfig> platforms,
                             double mapRough,
 							int mapSize,
 							int mapDetail,
@@ -56,8 +52,7 @@ public class RunConfiguration implements Serializable {
 							int runtime) {
 		mapFromFile = false;
 		this.namesAndTags = namesAndTags;
-		this.rovers = rovers;
-		this.satellites = satellites;
+		this.platforms = platforms;
 		this.mapRough = mapRough;
 		this.mapSize = mapSize;
 		this.mapDetail = mapDetail;
@@ -78,8 +73,7 @@ public class RunConfiguration implements Serializable {
 		}
 		this.mapFromFile = input.mapFromFile;
 		this.namesAndTags = input.namesAndTags;
-		this.rovers = input.rovers;
-		this.satellites = input.satellites;
+		this.platforms = input.platforms;
 		this.mapFile = input.mapFile;
 		this.mapRough = input.mapRough;
 		this.mapSize = input.mapSize;
@@ -97,6 +91,16 @@ public class RunConfiguration implements Serializable {
 		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file.getAbsolutePath()));
 		out.writeObject(this);
 		out.close();
+	}
+
+	public ArrayList<PlatformConfig> getPlatforms(String type){
+		ArrayList<PlatformConfig> out = new ArrayList<PlatformConfig>();
+		for (PlatformConfig cnfg : this.platforms){
+			if (cnfg.getType().equals(type)){
+				out.add(cnfg);
+			}
+		}
+		return out;
 	}
 	
 }

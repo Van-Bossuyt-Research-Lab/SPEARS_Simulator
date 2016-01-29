@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.util.Map;
 
 //TODO add implementation with better time stepping
 public class RoverPhysicsModel implements Serializable, Cloneable {
@@ -122,6 +123,8 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		slip_acceleration = origin.slip_acceleration;
 		slip_velocity = origin.slip_velocity;
 	}
+
+	public void constructParameters(Map<String, Double> params) {}
 	
 	public void initalizeConditions(String name, double bat_charge, double temp){
 		roverName = name;

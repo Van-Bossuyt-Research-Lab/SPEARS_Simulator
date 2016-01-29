@@ -38,6 +38,8 @@ public abstract class RoverAutonomousCode implements Serializable, Cloneable {
 		this.name = rac.name;
 		this.roverName = rac.roverName;
 	}
+
+	public void constructParameters(Map<String, Double> params) {}
 	
 	abstract public String nextCommand(
 			long milliTime,

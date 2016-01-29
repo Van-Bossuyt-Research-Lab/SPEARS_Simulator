@@ -1,9 +1,10 @@
 package com.csm.rover.simulator.objects.io;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class PlatformConfig {
+public class PlatformConfig implements Serializable {
 
     String type;
     String screenName;
