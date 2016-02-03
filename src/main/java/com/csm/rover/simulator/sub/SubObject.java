@@ -8,6 +8,15 @@ import com.csm.rover.simulator.sub.subAuto.SubAutonomousCode;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
 import com.csm.rover.simulator.rover.MotorState;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.cfg.MapperConfig;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
+
 import java.awt.Point;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -90,6 +99,7 @@ public class SubObject implements Serializable {
         LEDs.put("Mute", false);
         LEDs.put("Instructions", false);
         LEDs.put("Autonomus", false);
+
     }
 
     public static void setSubMap(SubMap map){
@@ -112,6 +122,7 @@ public class SubObject implements Serializable {
         physics.start();
         timeOfLastCmd = Globals.getInstance().timeMillis;
     }
+
 
     private void excecuteCode() {
         try {
@@ -581,11 +592,11 @@ public class SubObject implements Serializable {
             } catch (Exception e) {
                 // something went wrong
                 System.out.println("Error in Sub Run Code");
-                Globals.getInstance().reportError("SubCode", "runCode - code", e);
+               // Globals.getInstance().reportError("SubCode", "runCode - code", e);
             }
         } catch (Exception f){
             System.out.println("Something's bad");
-            Globals.getInstance().reportError("SubCode", "runCode - code", f);
+           // Globals.getInstance().reportError("SubCode", "runCode - code", f);
         }
     }
 
@@ -609,7 +620,7 @@ public class SubObject implements Serializable {
             }
         }
         catch (Exception e){
-            Globals.getInstance().reportError("RoverCode", "takePicture", e);
+            // Globals.getInstance().reportError("RoverCode", "takePicture", e);
         }
     }
 
@@ -708,12 +719,12 @@ public class SubObject implements Serializable {
                 x++;
             }
             addToSerialHistory(mess);
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+            // Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
             return true;
         }
         else {
             addToSerialHistory("Surpressed: " + mess);
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Surpressed: \'" + mess + "\'");
+            // Globals.getInstance().writeToLogFile(name + " Serial", "Message Surpressed: \'" + mess + "\'");
             return false;
         }
     }
@@ -726,11 +737,11 @@ public class SubObject implements Serializable {
         if (!mute) {
             serialBuffers.writeToSerial(mess, IDcode);
             addToSerialHistory(mess + "");
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+            // Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
             return true;
         } else {
             addToSerialHistory("Supressed: " + mess);
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+            // Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
             return false;
         }
     }
@@ -757,7 +768,7 @@ public class SubObject implements Serializable {
                 return 0;
             }
         } catch (Exception e) {
-            Globals.getInstance().reportError("RoverCode", "strcmp", e);
+             // Globals.getInstance().reportError("RoverCode", "strcmp", e);
         }
         return 1;
     }
@@ -878,5 +889,6 @@ public class SubObject implements Serializable {
     public double getMotorTemp(subProp which){
         return physics.getMotorTemp(which);
     }
+
 
 }

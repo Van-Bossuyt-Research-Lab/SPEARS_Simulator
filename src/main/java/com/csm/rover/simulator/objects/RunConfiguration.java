@@ -2,10 +2,19 @@ package com.csm.rover.simulator.objects;
 
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.satellite.SatelliteObject;
+import com.csm.rover.simulator.sub.SubObject;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.cfg.MapperConfig;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 
 public class RunConfiguration implements Serializable {
 	
@@ -27,6 +36,7 @@ public class RunConfiguration implements Serializable {
 	public boolean monoHazards;
 	public boolean accelerated;
 	public int runtime;
+	public ObjectMapper mapper;
 	
 	public RunConfiguration(NamesAndTags namesAndTags,
 							ArrayList<RoverObject> rovers,
@@ -40,6 +50,14 @@ public class RunConfiguration implements Serializable {
 		this.mapFile = mapFile;
 		this.accelerated = accelerated;
 		this.runtime = runtime;
+		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+		SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy");
+		mapper.setDateFormat(outputFormat);
+
+		mapper.setSerializationInclusion(Include.NON_EMPTY);
+		mapper.writeValue(System.out,this.rovers);
+
 	}
 
 	public RunConfiguration(NamesAndTags namesAndTags,
@@ -94,9 +112,18 @@ public class RunConfiguration implements Serializable {
 	}
 
 	public void Save(File file) throws Exception {
+		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+		SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy");
+		mapper.setDateFormat(outputFormat);
+
+		mapper.setSerializationInclusion(Include.NON_EMPTY);
+		mapper.writeValue(System.out, this);
+		mapper.writeValue(new FileOutputStream(file.getAbsolutePath()), this);
 		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file.getAbsolutePath()));
 		out.writeObject(this);
 		out.close();
+
 	}
 	
 }

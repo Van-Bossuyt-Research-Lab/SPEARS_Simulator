@@ -96,7 +96,7 @@ public class SubHub extends Panel {
         for (int x = 0; x < numberOfDisplays; x++){
             final int a = x;
             SubDisplayWindow displayWindow = new SubDisplayWindow(map);
-            displayWindow.setSubList(subs);
+            // displayWindow.setSubList(subs);
             displayWindow.addPageForwardAction(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
@@ -180,7 +180,7 @@ public class SubHub extends Panel {
     //adds the rover objects to the hub
     public void setRovers(ArrayList<SubObject> subs){
         for (SubObject sub : subs){
-            this.subs.add(sub);
+             // this.subs.add(sub);
         }
 
         int x = 0;
@@ -242,7 +242,7 @@ public class SubHub extends Panel {
             display.setHUDMode(b);
         }
         if (b){
-            displayWindows.get(0).lockOnRover(HUDDisplayLinks.get(0));
+            // displayWindows.get(0).lockOnRover(HUDDisplayLinks.get(0));
         }
         else {
             displayWindows.get(0).unlock();

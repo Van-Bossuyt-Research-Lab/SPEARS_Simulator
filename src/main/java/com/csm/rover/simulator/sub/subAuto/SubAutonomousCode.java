@@ -7,6 +7,7 @@ import com.csm.rover.simulator.wrapper.Globals;
 
 import java.io.*;
 import java.util.Map;
+import java.text.SimpleDateFormat;
 
 public abstract class SubAutonomousCode implements Serializable, Cloneable {
 
@@ -54,20 +55,20 @@ public abstract class SubAutonomousCode implements Serializable, Cloneable {
     protected void writeToLog(String message){
         try {
             BufferedWriter write = new BufferedWriter(new FileWriter(logFile, true));
-            write.write(message + "\t\t" + InterfaceAccess.CODE.DateTime.toString("[MM/dd/yyyy hh:mm:ss.") + (Globals.getInstance().timeMillis %1000) + "]\r\n");
+           // write.write(message + "\t\t" + InterfaceAccess.CODE.toString("[MM/dd/yyyy hh:mm:ss.") + (Globals.getInstance().timeMillis %1000) + "]\r\n");
             write.flush();
             write.close();
         }
         catch (NullPointerException e){
             if (!tried){
                 tried = true;
-                logFile = new File("Logs/" + roverName + " Log " + InterfaceAccess.CODE.DateTime.toString("MM-dd-yyyy hh-mm") + ".txt");
-                Globals.getInstance().writeToLogFile(roverName, "Writing rover's autonomous log file to: " + logFile.getAbsolutePath());
+                // logFile = new File("Logs/" + roverName + " Log " + InterfaceAccess.CODE.DateTime.toString("MM-dd-yyyy hh-mm") + ".txt");
+               // Globals.getInstance().writeToLogFile(roverName, "Writing rover's autonomous log file to: " + logFile.getAbsolutePath());
                 writeToLog(message);
             }
             else {
                 e.printStackTrace();
-                Globals.getInstance().writeToLogFile(roverName, "Rover's autonomous log file failed to initalize.");
+                //Globals.getInstance().writeToLogFile(roverName, "Rover's autonomous log file failed to initalize.");
             }
         }
         catch (IOException e){
