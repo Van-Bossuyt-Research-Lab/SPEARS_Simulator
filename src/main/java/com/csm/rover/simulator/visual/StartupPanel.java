@@ -27,6 +27,7 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
@@ -90,7 +91,7 @@ public class StartupPanel extends Panel {
         align();
     }
 
-    private void initialize(){
+    private void initialize()  {
         this.setLayout(null);
 
         RovAddTtl = new JLabel("Adding Rovers");
@@ -212,7 +213,8 @@ public class StartupPanel extends Panel {
         StartBtn = new JButton("Start Simulation");
         StartBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                Admin.getInstance().beginSimulation(getConfigurationFromForm());
+                    Admin.getInstance().beginSimulation(getConfigurationFromForm());
+
             }
         });
         StartBtn.setFont(new Font("Tahoma", Font.PLAIN, 16));
@@ -353,7 +355,7 @@ public class StartupPanel extends Panel {
         SaveConfigLbl = new JLabel("<HTML><U>Save Run Configuration</U></HTML>");
         SaveConfigLbl.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(MouseEvent e)  {
                 saveCurrentConfiguration();
             }
         });

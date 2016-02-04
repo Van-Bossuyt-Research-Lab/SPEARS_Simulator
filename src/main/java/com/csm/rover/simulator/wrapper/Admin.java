@@ -97,7 +97,7 @@ public class Admin {
         return HI;
     }
 
-	public void beginSimulation(RunConfiguration config){
+	public void beginSimulation(RunConfiguration config) {
 		if (config.rovers.size() == 0 ||config.satellites.size() == 0){
 			System.err.println("Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;

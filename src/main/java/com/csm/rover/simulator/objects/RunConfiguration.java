@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
@@ -56,7 +57,12 @@ public class RunConfiguration implements Serializable {
 		mapper.setDateFormat(outputFormat);
 
 		mapper.setSerializationInclusion(Include.NON_EMPTY);
-		mapper.writeValue(System.out,this.rovers);
+		try {
+			mapper.writeValue(System.out, this.rovers);
+		}
+		catch (IOException e) {
+			System.out.println("IOexception");
+		}
 
 	}
 
@@ -85,6 +91,18 @@ public class RunConfiguration implements Serializable {
 		this.monoHazards = monoHazards;
 		this.accelerated = accelerated;
 		this.runtime = runtime;
+
+		try {
+			RoverObject rvr=this.rovers.get(1);
+
+			System.out.println(mapper.writeValueAsString(rvr));
+		}
+		catch (IOException e){
+			System.out.println("IOexception");
+		}
+		catch(NullPointerException f){
+			System.out.println("Null");
+		}
 	}
 	
 	public RunConfiguration(File save) throws Exception {
@@ -109,6 +127,13 @@ public class RunConfiguration implements Serializable {
 		this.accelerated = input.accelerated;
 		this.runtime = input.runtime;
 		in.close();
+
+		try {
+			mapper.writeValue(System.out, this.rovers);
+		}
+		catch (IOException e) {
+			System.out.println("IOexception");
+		}
 	}
 
 	public void Save(File file) throws Exception {
