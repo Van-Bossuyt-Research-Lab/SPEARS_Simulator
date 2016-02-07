@@ -22,8 +22,7 @@ import com.csm.rover.simulator.visual.Form;
 import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.visual.StartupPanel;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.util.ArrayList;
 
 public class HiForm implements HumanInterfaceAbstraction {
@@ -149,6 +148,11 @@ public class HiForm implements HumanInterfaceAbstraction {
         //wrapperPnl.addItemToSelectionList(		"PIDAA 2",		new PIDAAcode2());
         startupPnl.addItemToSelectionList("[null]", (SatelliteAutonomusCode) null);
         startupPnl.addItemToSelectionList("[null]", (SatelliteParametersList) null);
+        startupPnl.addItemToSelectionList("GORADRO-G", new GORADROGuided(new Point[]{
+                new Point(20, 20),
+                new Point(10, -15),
+                new Point(0, 0)
+        }, -2));
     }
 
     @Override

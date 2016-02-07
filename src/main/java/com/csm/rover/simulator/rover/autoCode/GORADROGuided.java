@@ -13,15 +13,16 @@ import java.util.Map;
 import java.util.Set;
 
 public class GORADROGuided extends RoverAutonomousCode {
-    private static final Logger LOG = LogManager.getLogger(GORADRO2code.class);
+    private static final Logger LOG = LogManager.getLogger(GORADROGuided.class);
 
     private static final long serialVersionUID = -8434875463993541766L;
 
     private static final double ANGLE_ERROR = Math.PI/16.0;
+    private static final double WAYPOINT_ERROR = 1.5;
     private static final double RECALC_TIME = 2000; //ms
     enum States {
-        CALCULATING, TURNING, TRAVELING, COLLECTING, STUCK, ESCAPING;
-    };
+        CALCULATING, TURNING, TRAVELING, COLLECTING, STUCK, ESCAPING, DONE
+    }
 
     private static final double STALL_RADIUS = 5;
     private static final int STALL_TIME = 240000;
@@ -53,15 +54,17 @@ public class GORADROGuided extends RoverAutonomousCode {
     private long timeAtPoint = 0;
 
     private Point[] waypoints;
-    private static final double[] attitudes = { 1000, 25, 23.333, 0.666, 20 };
+    private int current_waypoint = 0;
+    private static final double[] attitudes = { 1000, 25, 23.333, 0.666, 15 };
     private double dev_tolerance;
 
     public GORADROGuided(Point[] waypoints, double dev_tolerance) {
         super("GORADRO-G", "GORADRO-G");
         this.waypoints = waypoints;
         this.dev_tolerance = dev_tolerance;
-        if (dev_tolerance == 0){
-            throw new IllegalArgumentException("dev_tolerance cannot by 0");
+        potentials = new double[HISTORIES][SAMPLE_DIRECTIONS];
+        if (dev_tolerance < 1 && dev_tolerance > -1){
+            throw new IllegalArgumentException("dev_tolerance must be > 1 or < -1");
         }
     }
 
@@ -74,6 +77,7 @@ public class GORADROGuided extends RoverAutonomousCode {
         this.lastCalcTime = orig.lastCalcTime;
         this.score = orig.score;
         this.waypoints = orig.waypoints.clone();
+        this.current_waypoint = orig.current_waypoint;
         this.dev_tolerance = orig.dev_tolerance;
         this.lastLoc = orig.lastLoc;
         this.timeAtPoint = orig.timeAtPoint;
@@ -108,12 +112,18 @@ public class GORADROGuided extends RoverAutonomousCode {
                 }
 
             case TRAVELING:
-                if (MAP.isPointAtTarget(location)){
+                if (hasUnvisitedScience(location)){
                     state = States.COLLECTING;
                     return "stop";
                 }
+                else if (distanceBetween(location, waypoints[current_waypoint]) < WAYPOINT_ERROR){
+                    current_waypoint++;
+                    if (current_waypoint == waypoints.length){
+                        state = States.DONE;
+                    }
+                }
                 else if (milliTime-timeAtPoint > STALL_TIME){
-                    if (Math.sqrt(Math.pow(lastLoc.getX()-location.getX(),2) + Math.pow(lastLoc.getY()-location.getY(), 2)) > STALL_RADIUS){
+                    if (distanceBetween(location, lastLoc) > STALL_RADIUS){
                         travelDirection += RUN_ROTATION;
                         state = States.STUCK;
                     }
@@ -129,8 +139,10 @@ public class GORADROGuided extends RoverAutonomousCode {
 
             case COLLECTING:
                 score += MAP.getTargetValueAt(location);
+                Point mapLoc = MAP.getMapSquare(location);
+                visitedScience.add(new Point(mapLoc.x/3, mapLoc.y/3));
                 state = States.CALCULATING;
-                LOG.log(Level.INFO, "Reached a target.  Score at "+score);
+                LOG.log(Level.INFO, "Reached a target at {}.  Score at "+score, location.toString());
                 return "";
 
             case STUCK:
@@ -154,6 +166,9 @@ public class GORADROGuided extends RoverAutonomousCode {
                     state = States.CALCULATING;
                 }
                 return "";
+
+            case DONE:
+                return "stop";
 
             default:
                 state = States.CALCULATING;
@@ -211,7 +226,12 @@ public class GORADROGuided extends RoverAutonomousCode {
             hazardArea /= AVERAGING_RADIUS * AVERAGING_ANGLE;
 
             //calculate the potential of the point
-            potentials[HISTORIES -1][i] = attitudes[0]*science - attitudes[1]*hazard + attitudes[2]*scienceArea - attitudes[3]*hazardArea - attitudes[4]*getDirectionPenalty(direction);
+            potentials[HISTORIES -1][i] =
+                    attitudes[0]*science
+                    - attitudes[1]*hazard
+                    + attitudes[2]*scienceArea
+                    - attitudes[3]*hazardArea
+                    - attitudes[4]*getDirectionPenalty(location,theta);
             double average = 0;
             for (int j = 0; j < HISTORIES; j++){
                 average += potentials[j][i];
@@ -221,7 +241,9 @@ public class GORADROGuided extends RoverAutonomousCode {
                 maxPotential = average;
                 maxDirection = theta;
             }
+            System.out.println(theta+": "+average);
         }
+        System.out.println("\n\n\n");
         travelDirection = maxDirection;
     }
 
@@ -233,9 +255,21 @@ public class GORADROGuided extends RoverAutonomousCode {
         return false;
     }
 
-    private double getDirectionPenalty(double direction){
+    private double getDirectionPenalty(DecimalPoint location, double direction){
         double functional_tolerance = -dev_tolerance < 0 ? 1/dev_tolerance : dev_tolerance;
-        return Math.pow(functional_tolerance*direction, 4);
+        double waypoint_direction =
+                Math.atan2(waypoints[current_waypoint].getY()-location.getY(),
+                        waypoints[current_waypoint].getX()-location.getX());
+        waypoint_direction = (waypoint_direction + 2*Math.PI) % (2*Math.PI);
+        return Math.pow(functional_tolerance*(direction-waypoint_direction), 4);
+    }
+
+    private double distanceBetween(DecimalPoint a, Point b){
+        return distanceBetween(a, new DecimalPoint(b.getX(), b.getY()));
+    }
+
+    private double distanceBetween(DecimalPoint a, DecimalPoint b){
+        return Math.sqrt(Math.pow(a.getX()-b.getX(),2) + Math.pow(a.getY()-b.getY(), 2));
     }
 
     @Override
