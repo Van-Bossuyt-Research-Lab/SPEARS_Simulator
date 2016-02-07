@@ -9,6 +9,9 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationConfig;
@@ -38,6 +41,7 @@ public class RunConfiguration implements Serializable {
 	public boolean accelerated;
 	public int runtime;
 	public ObjectMapper mapper;
+
 	
 	public RunConfiguration(NamesAndTags namesAndTags,
 							ArrayList<RoverObject> rovers,
@@ -51,18 +55,7 @@ public class RunConfiguration implements Serializable {
 		this.mapFile = mapFile;
 		this.accelerated = accelerated;
 		this.runtime = runtime;
-		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-		mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-		SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy");
-		mapper.setDateFormat(outputFormat);
-
-		mapper.setSerializationInclusion(Include.NON_EMPTY);
-		try {
-			mapper.writeValue(System.out, this.rovers);
-		}
-		catch (IOException e) {
-			System.out.println("IOexception");
-		}
+		
 
 	}
 
@@ -92,17 +85,6 @@ public class RunConfiguration implements Serializable {
 		this.accelerated = accelerated;
 		this.runtime = runtime;
 
-		try {
-			RoverObject rvr=this.rovers.get(1);
-
-			System.out.println(mapper.writeValueAsString(rvr));
-		}
-		catch (IOException e){
-			System.out.println("IOexception");
-		}
-		catch(NullPointerException f){
-			System.out.println("Null");
-		}
 	}
 	
 	public RunConfiguration(File save) throws Exception {
@@ -137,14 +119,67 @@ public class RunConfiguration implements Serializable {
 	}
 
 	public void Save(File file) throws Exception {
-		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-		mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-		SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy");
-		mapper.setDateFormat(outputFormat);
+		try {
 
-		mapper.setSerializationInclusion(Include.NON_EMPTY);
-		mapper.writeValue(System.out, this);
-		mapper.writeValue(new FileOutputStream(file.getAbsolutePath()), this);
+			JsonFactory f = new JsonFactory();
+			JsonGenerator g = f.createGenerator(new File("jtest.json"), JsonEncoding.UTF8);
+			g.writeStartObject();
+			g.writeObjectFieldStart("namesAndTags");
+			g.writeFieldName("GroundNames");
+			g.writeStartArray();
+			for(int j=0; j<namesAndTags.getGroundNames().size(); j++){
+				g.writeString(namesAndTags.getNames().get(j));}
+			g.writeEndArray();
+			g.writeFieldName("RoverNames");
+			g.writeStartArray();
+			for(int j=0; j<namesAndTags.getRoverNames().size(); j++){
+				g.writeString(namesAndTags.getRoverNames().get(j));
+			}
+			g.writeEndArray();
+			g.writeFieldName("SatelliteNames");
+			g.writeStartArray();
+			for(int j=0; j<namesAndTags.getSatelliteNames().size(); j++){
+				g.writeString(namesAndTags.getSatelliteNames().get(j));
+			}
+			g.writeEndArray();
+			g.writeFieldName("GroundTags");
+			g.writeStartArray();
+			for(int j=0; j<namesAndTags.getGroundTags().size(); j++){
+				g.writeString(namesAndTags.getGroundTags().get(j));
+			}
+			g.writeEndArray();
+			g.writeFieldName("RoverTags");
+			g.writeStartArray();
+			for(int j=0; j<namesAndTags.getRoverTags().size(); j++){
+				g.writeString(namesAndTags.getRoverTags().get(j));
+			}
+			g.writeEndArray();
+			g.writeFieldName("SatelliteTags");
+			g.writeStartArray();
+			for(int j=0; j<namesAndTags.getSatelliteTags().size(); j++){
+				g.writeString(namesAndTags.getSatelliteTags().get(j));
+			}
+			g.writeEndArray();
+			g.writeEndObject();
+			g.writeStartObject();;
+			g.writeObjectFieldStart("Runtime");
+			g.writeNumberField("Runtime",runtime);
+			g.writeBooleanField("acclelerated", accelerated);
+			g.writeEndObject();
+			g.writeStartObject();
+			g.writeObjectFieldStart("Map");
+			g.writeBooleanField("RunFromFile",false);
+			g.writeNumberField("mapRough", mapRough);
+			g.writeNumberField("mapDetail", mapDetail);
+			g.close();
+
+		}
+		catch (IOException e){
+			System.out.println("IOexception");
+		}
+		catch(NullPointerException f){
+			System.out.println("Null");
+		}
 		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file.getAbsolutePath()));
 		out.writeObject(this);
 		out.close();
