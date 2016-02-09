@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class NamesAndTags implements Serializable {
 
-    private ArrayList<String> groundNames, groundTags, roverNames, roverTags, satelliteNames, satelliteTags;
+    private ArrayList<String> groundNames, groundTags, roverNames, roverTags, satelliteNames, satelliteTags, subTags, subNames;
 
     public NamesAndTags(ArrayList<String> roverNames,
                         ArrayList<String> roverTags,
@@ -19,6 +19,16 @@ public class NamesAndTags implements Serializable {
         this.roverTags = roverTags;
         this.satelliteNames = satelliteNames;
         this.satelliteTags = satelliteTags;
+    }
+    public NamesAndTags(ArrayList<String> subNames, ArrayList<String> subTags){
+        this.subNames = subNames;
+        this.subTags = subTags;
+        this.roverNames.clear();
+        this.roverTags.clear();
+        this.satelliteNames.clear();
+        this.satelliteTags.clear();
+        this.groundNames.clear();
+        this.groundTags.clear();
     }
 
     public String getNameByTag(String tag){
@@ -35,6 +45,11 @@ public class NamesAndTags implements Serializable {
         for (int i = 0; i < satelliteTags.size(); i++){
             if (satelliteTags.get(i).equals(tag)){
                 return satelliteNames.get(i);
+            }
+        }
+        for (int i = 0; i < subTags.size(); i++){
+            if (subTags.get(i).equals(tag)){
+                return subNames.get(i);
             }
         }
         return null;
@@ -54,6 +69,11 @@ public class NamesAndTags implements Serializable {
         for (int i = 0; i < satelliteNames.size(); i++){
             if (satelliteNames.get(i).equals(name)){
                 return satelliteTags.get(i);
+            }
+        }
+        for (int i = 0; i < subNames.size(); i++){
+            if (subNames.get(i).equals(name)){
+                return subTags.get(i);
             }
         }
         return null;
@@ -109,5 +129,13 @@ public class NamesAndTags implements Serializable {
 
     public ArrayList<String> getSatelliteTags() {
         return satelliteTags;
+    }
+
+    public ArrayList<String> getSubTags() {
+        return subTags;
+    }
+
+    public ArrayList<String> getSubNames() {
+        return subNames;
     }
 }

@@ -29,6 +29,7 @@ public class RunConfiguration implements Serializable {
 	public boolean mapFromFile;
 	public NamesAndTags namesAndTags;
 	public ArrayList<RoverObject> rovers;
+	public ArrayList<SubObject> subs;
 	public ArrayList<SatelliteObject> satellites;
 	public File mapFile;
 	public double mapRough;
@@ -40,7 +41,9 @@ public class RunConfiguration implements Serializable {
 	public boolean monoHazards;
 	public boolean accelerated;
 	public int runtime;
-	public ObjectMapper mapper;
+	public boolean subrun;
+	ObjectMapper mapper = new ObjectMapper();
+
 
 	
 	public RunConfiguration(NamesAndTags namesAndTags,
@@ -55,7 +58,8 @@ public class RunConfiguration implements Serializable {
 		this.mapFile = mapFile;
 		this.accelerated = accelerated;
 		this.runtime = runtime;
-		
+		this.subrun = false;
+
 
 	}
 
@@ -84,18 +88,21 @@ public class RunConfiguration implements Serializable {
 		this.monoHazards = monoHazards;
 		this.accelerated = accelerated;
 		this.runtime = runtime;
+		this.subrun = false;
 
 	}
 	
 	public RunConfiguration(File save) throws Exception {
+		/*
 		ObjectInputStream in = new ObjectInputStream(new FileInputStream(save.getAbsolutePath()));
 		RunConfiguration input = (RunConfiguration) in.readObject();
 		if (!this.fileCode.equals(input.fileCode)){
 			in.close();
 			throw new Exception("Invalid File Version");
 		}
-		this.mapFromFile = input.mapFromFile;
-		this.namesAndTags = input.namesAndTags;
+		*/
+		this.mapFromFile = false
+		this.namesAndTags = mapper.readValue(save, NamesAndTags.class);
 		this.rovers = input.rovers;
 		this.satellites = input.satellites;
 		this.mapFile = input.mapFile;
@@ -108,14 +115,9 @@ public class RunConfiguration implements Serializable {
 		this.hazardDensity = input.hazardDensity;
 		this.accelerated = input.accelerated;
 		this.runtime = input.runtime;
+		this.subrun = false;
 		in.close();
 
-		try {
-			mapper.writeValue(System.out, this.rovers);
-		}
-		catch (IOException e) {
-			System.out.println("IOexception");
-		}
 	}
 
 	public void Save(File file) throws Exception {
@@ -142,6 +144,12 @@ public class RunConfiguration implements Serializable {
 				g.writeString(namesAndTags.getSatelliteNames().get(j));
 			}
 			g.writeEndArray();
+			g.writeFieldName("SubNames");
+			g.writeStartArray();
+			for(int j=0; j<namesAndTags.getSubNames().size(); j++){
+				g.writeString(namesAndTags.getSubNames().get(j));
+			}
+			g.writeEndArray();
 			g.writeFieldName("GroundTags");
 			g.writeStartArray();
 			for(int j=0; j<namesAndTags.getGroundTags().size(); j++){
@@ -160,6 +168,12 @@ public class RunConfiguration implements Serializable {
 				g.writeString(namesAndTags.getSatelliteTags().get(j));
 			}
 			g.writeEndArray();
+			g.writeFieldName("SubTags");
+			g.writeStartArray();
+			for(int j=0; j<namesAndTags.getSubTags().size(); j++){
+				g.writeString(namesAndTags.getSubTags().get(j));
+			}
+			g.writeEndArray();
 			g.writeEndObject();
 			g.writeStartObject();;
 			g.writeObjectFieldStart("Runtime");
@@ -168,9 +182,10 @@ public class RunConfiguration implements Serializable {
 			g.writeEndObject();
 			g.writeStartObject();
 			g.writeObjectFieldStart("Map");
-			g.writeBooleanField("RunFromFile",false);
+			g.writeBooleanField("RunFromFile",mapFromFile);
 			g.writeNumberField("mapRough", mapRough);
 			g.writeNumberField("mapDetail", mapDetail);
+
 			g.close();
 
 		}
