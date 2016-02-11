@@ -55,7 +55,7 @@ public class GORADROGuided extends RoverAutonomousCode {
 
     private Point[] waypoints;
     private int current_waypoint = 0;
-    private static final double[] attitudes = { 1000, 25, 23.333, 0.666, 15 };
+    private static final double[] attitudes = { 1000, 25, 23.333, 0.666, 20 };
     private double dev_tolerance;
 
     public GORADROGuided(Point[] waypoints, double dev_tolerance) {
@@ -63,9 +63,6 @@ public class GORADROGuided extends RoverAutonomousCode {
         this.waypoints = waypoints;
         this.dev_tolerance = dev_tolerance;
         potentials = new double[HISTORIES][SAMPLE_DIRECTIONS];
-        if (dev_tolerance < 1 && dev_tolerance > -1){
-            throw new IllegalArgumentException("dev_tolerance must be > 1 or < -1");
-        }
     }
 
     public GORADROGuided(GORADROGuided orig){
@@ -241,9 +238,7 @@ public class GORADROGuided extends RoverAutonomousCode {
                 maxPotential = average;
                 maxDirection = theta;
             }
-            System.out.println(theta+": "+average);
         }
-        System.out.println("\n\n\n");
         travelDirection = maxDirection;
     }
 
@@ -256,12 +251,11 @@ public class GORADROGuided extends RoverAutonomousCode {
     }
 
     private double getDirectionPenalty(DecimalPoint location, double direction){
-        double functional_tolerance = -dev_tolerance < 0 ? 1/dev_tolerance : dev_tolerance;
         double waypoint_direction =
                 Math.atan2(waypoints[current_waypoint].getY()-location.getY(),
                         waypoints[current_waypoint].getX()-location.getX());
         waypoint_direction = (waypoint_direction + 2*Math.PI) % (2*Math.PI);
-        return Math.pow(functional_tolerance*(direction-waypoint_direction), 4);
+        return 1-Math.exp(-(Math.pow(direction-waypoint_direction, 2))/(2*Math.pow(dev_tolerance, 2)));
     }
 
     private double distanceBetween(DecimalPoint a, Point b){

@@ -80,8 +80,8 @@ public class HiForm implements HumanInterfaceAbstraction {
         startupPnl.addItemToSelectionList("PIDAA", new PIDAAcode3());
         startupPnl.addItemToSelectionList("PIDAA CONTROL", new PIDAAcontrol());
         startupPnl.addItemToSelectionList("GORARO Simp", new GORAROcode1());
-        startupPnl.addItemToSelectionList("GORARO Adv A", new GORAROAdvanceCode(new double[]{
-                10000, 84.2892, 567.513, 7.37412, 0
+        startupPnl.addItemToSelectionList("GORADRO Adv", new GORAROAdvanceCode(new double[]{
+                10000, 19, 82, 0.266, 0
         }));
         /*wrapperPnl.addItemToSelectionList("GORARO Adv B", new GORAROAdvanceCode(new double[]{
                 10000, 80.44, 972.8, 25.84, 0
@@ -152,7 +152,7 @@ public class HiForm implements HumanInterfaceAbstraction {
                 new Point(20, 20),
                 new Point(10, -15),
                 new Point(0, 0)
-        }, -2));
+        }, Math.PI/6.));
     }
 
     @Override
