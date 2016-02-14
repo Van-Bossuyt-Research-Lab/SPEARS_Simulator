@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class NamesAndTags implements Serializable {
 
-    private ArrayList<String> groundNames, groundTags, roverNames, roverTags, satelliteNames, satelliteTags, subTags, subNames;
+    public ArrayList<String> groundNames, groundTags, roverNames, roverTags, satelliteNames, satelliteTags, subTags, subNames;
 
     public NamesAndTags(ArrayList<String> roverNames,
                         ArrayList<String> roverTags,
@@ -29,6 +29,16 @@ public class NamesAndTags implements Serializable {
         this.satelliteTags.clear();
         this.groundNames.clear();
         this.groundTags.clear();
+    }
+    public NamesAndTags(){
+        groundNames = new ArrayList<String>();
+        groundTags = new ArrayList<String>();
+        roverNames = new ArrayList<String>();
+        roverTags = new ArrayList<String>();
+        satelliteNames = new ArrayList<String>();
+        satelliteTags = new ArrayList<String>();
+        subNames = new ArrayList<String>();
+        subTags = new ArrayList<String>();
     }
 
     public String getNameByTag(String tag){

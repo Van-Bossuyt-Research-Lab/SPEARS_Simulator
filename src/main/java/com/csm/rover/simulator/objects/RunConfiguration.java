@@ -9,9 +9,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationConfig;
@@ -101,22 +99,39 @@ public class RunConfiguration implements Serializable {
 			throw new Exception("Invalid File Version");
 		}
 		*/
-		this.mapFromFile = false
-		this.namesAndTags = mapper.readValue(save, NamesAndTags.class);
-		this.rovers = input.rovers;
-		this.satellites = input.satellites;
-		this.mapFile = input.mapFile;
-		this.mapRough = input.mapRough;
-		this.mapSize = input.mapSize;
-		this.mapDetail = input.mapDetail;
-		this.monoTargets = input.monoTargets;
-		this.monoHazards = input.monoHazards;
-		this.targetDensity = input.targetDensity;
-		this.hazardDensity = input.hazardDensity;
-		this.accelerated = input.accelerated;
-		this.runtime = input.runtime;
-		this.subrun = false;
-		in.close();
+		JsonFactory f = new JsonFactory();
+		JsonParser jp = f.createParser(save);
+		jp.nextToken();
+		while (jp.nextToken() != JsonToken.END_OBJECT) {
+			String fieldname = jp.getCurrentName();
+			jp.nextToken();
+			if("namesAndTags".equals(fieldname)){
+				NamesAndTags NT = new NamesAndTags();
+				while(jp.nextToken() != JsonToken.END_OBJECT){
+					String namefield = jp.getCurrentName();
+					jp.nextToken();
+					if("GroundNames".equals(namefield)){
+						NT.groundNames = 
+					}
+				}
+			}
+			this.mapFromFile = false;
+
+			this.rovers = input.rovers;
+			this.satellites = input.satellites;
+			this.mapFile = input.mapFile;
+			this.mapRough = input.mapRough;
+			this.mapSize = input.mapSize;
+			this.mapDetail = input.mapDetail;
+			this.monoTargets = input.monoTargets;
+			this.monoHazards = input.monoHazards;
+			this.targetDensity = input.targetDensity;
+			this.hazardDensity = input.hazardDensity;
+			this.accelerated = input.accelerated;
+			this.runtime = input.runtime;
+			this.subrun = false;
+		}
+		 // in.close();
 
 	}
 
