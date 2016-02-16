@@ -111,7 +111,28 @@ public class RunConfiguration implements Serializable {
 					String namefield = jp.getCurrentName();
 					jp.nextToken();
 					if("GroundNames".equals(namefield)){
-						NT.groundNames = 
+						NT.groundNames =  jp.readValueAs(ArrayList.class);
+				}
+					if("RoverNames".equals(namefield)){
+						NT.roverNames =  jp.readValueAs(ArrayList.class);
+					}
+					if("SatelliteNames".equals(namefield)){
+						NT.satelliteNames =  jp.readValueAs(ArrayList.class);
+					}
+					if("GroundTags".equals(namefield)){
+						NT.groundTags =  jp.readValueAs(ArrayList.class);
+					}
+					if("RoverTags".equals(namefield)){
+						NT.roverTags =  jp.readValueAs(ArrayList.class);
+					}
+					if("SatelliteTags".equals(namefield)){
+						NT.satelliteTags =  jp.readValueAs(ArrayList.class);
+					}
+					if("SubNames".equals(namefield)){
+						NT.subNames =  jp.readValueAs(ArrayList.class);
+					}
+					if("SubTags".equals(namefield)){
+						NT.subTags =  jp.readValueAs(ArrayList.class);
 					}
 				}
 			}
