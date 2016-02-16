@@ -469,6 +469,7 @@ public class StartupPanel extends Panel {
     }
 
     public void saveCurrentConfiguration(){
+        setupAuto();
         new FreeThread(0, new Runnable(){
             public void run(){
                 File config = new File("default.cfg");
@@ -495,6 +496,26 @@ public class StartupPanel extends Panel {
                 }
             }
         }, 1, "config-save");
+        System.exit(0);
+    }
+
+    private void setupAuto(){
+        AccelChk.setSelected(true);
+        RuntimeSpnr.setEnabled(true);
+        RuntimeSpnr.setValue(1);
+
+        TypeSelector.setSelectedIndex(1);
+        FileLocTxt.setText("C:\\Users\\PHM-Lab4_2\\Google Drive\\IDETC Global to Local\\Maps\\Map 2.map");
+
+        SatDriveModelList.setSelection(0);
+        SatAutonomusCodeList.setSelection(0);
+        addSatelliteToList();
+
+        RovDriveModelList.setSelection(0);
+        for (int i = 0; i < RovAutonomusCodeList.getItems().size(); i++){
+            RovAutonomusCodeList.setSelection(i);
+            addRoverToList();
+        }
     }
 
     public RunConfiguration getConfigurationFromForm(){

@@ -1,5 +1,4 @@
 package com.csm.rover.simulator.wrapper;
-
 import com.csm.rover.simulator.control.InterfaceAccess;
 import com.csm.rover.simulator.control.InterfacePanel;
 import com.csm.rover.simulator.map.PlanetParametersList;
@@ -9,9 +8,7 @@ import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.rover.RoverHub;
 import com.csm.rover.simulator.rover.RoverObject;
-import com.csm.rover.simulator.rover.autoCode.*;
-import com.csm.rover.simulator.rover.phsicsModels.FailOnHazard;
-import com.csm.rover.simulator.rover.phsicsModels.RiskOnHazard;
+import com.csm.rover.simulator.rover.autoCode.GORADROGuided;
 import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.satellite.SatelliteAutonomusCode;
 import com.csm.rover.simulator.satellite.SatelliteHub;
@@ -21,195 +18,1054 @@ import com.csm.rover.simulator.visual.AccelPopUp;
 import com.csm.rover.simulator.visual.Form;
 import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.visual.StartupPanel;
-
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.util.ArrayList;
-
 public class HiForm implements HumanInterfaceAbstraction {
+private boolean init;
+private Form GUI;
+private StartupPanel startupPnl;
+private MainWrapper wrapperPnl;
+private Panel orbitalPnl;
+private LandMapPanel terrainPnl;
+private InterfacePanel interfacePnl;
+private RoverHub roverHubPnl;
+private SatelliteHub satelliteHubPnl;
+private AccelPopUp informer;
+public HiForm(){
+init = false;
+Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+startupPnl = new StartupPanel(screenSize);
+GUI = new Form(screenSize,
+startupPnl);
+setUpSelectionLists();
+GUI.setVisible(true);
+startupPnl.saveCurrentConfiguration();
+}
+@Override
+public void initialize(NamesAndTags namesAndTags,
+SerialBuffers buffers,
+ArrayList<RoverObject> rovers,
+ArrayList<SatelliteObject> satellites,
+TerrainMap map) {
+Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+wrapperPnl = new MainWrapper(screenSize,
+buffers,
+namesAndTags);
+orbitalPnl = new Panel(screenSize,
+"Orbital View");
+roverHubPnl = new RoverHub(screenSize,
+buffers,
+rovers,
+map);
+terrainPnl = new LandMapPanel(screenSize,
+new PlanetParametersList(),
+roverHubPnl,
+rovers,
+map);
+interfacePnl = new InterfacePanel(screenSize,
+buffers);
+satelliteHubPnl = new SatelliteHub(screenSize,
+satellites);
+GUI.setRunTimePanels(wrapperPnl,
+orbitalPnl,
+terrainPnl,
+interfacePnl,
+roverHubPnl,
+satelliteHubPnl);
+init = true;
+InterfaceAccess.CODE.setCallTags(namesAndTags);
+roverHubPnl.setIdentifiers(namesAndTags.getRoverTags(),
+namesAndTags.getSatelliteTags());
+}
+private void setUpSelectionLists(){
+startupPnl.addItemToSelectionList("Default",
+new RoverPhysicsModel());
+startupPnl.addItemToSelectionList("[null]",
+(SatelliteAutonomusCode) null);
+startupPnl.addItemToSelectionList("[null]",
+(SatelliteParametersList) null);
+//**&&^^%%^^&&**
+startupPnl.addItemToSelectionList("GORADRO-G 2 1.320-1", new GORADROGuided(new Point[]{
+new Point(5,0),
+new Point(15,-15),
+new Point(25,-30),
+new Point(35,-45),
+new Point(50,-55),
+new Point(65,-65),
+new Point(80,-75),
+new Point(80,-90),
+new Point(75,-110),
+new Point(70,-130),
+new Point(55,-140),
+new Point(45,-155),
+new Point(30,-165),
+new Point(20,-180),
+new Point(10,-175),
+new Point(-10,-170),
+new Point(-35,-170),
+new Point(-45,-155),
+new Point(-60,-145),
+new Point(-70,-130),
+new Point(-80,-115),
+new Point(-70,-110),
+new Point(-60,-95),
+new Point(-45,-85),
+new Point(-45,-60),
+new Point(-40,-40),
+new Point(-35,-20),
+new Point(-20,-10),
+new Point(-10,5),
+new Point(5,15),
+new Point(20,25),
+new Point(35,35),
+new Point(50,45),
+new Point(60,60),
+new Point(75,70),
+new Point(85,85),
+new Point(80,105),
+new Point(80,130),
+new Point(60,135),
+new Point(50,150),
+new Point(40,165),
+new Point(25,175),
+new Point(15,180),
+new Point(-10,180),
+new Point(-25,170),
+new Point(-40,160),
+new Point(-55,150),
+new Point(-65,135),
+new Point(-80,125),
+new Point(-85,105),
+new Point(-85,80),
+new Point(-70,70),
+new Point(-60,55),
+new Point(-45,45),
+new Point(-30,35),
+new Point(-20,20),
+new Point(0,15),
+new Point(10,0),
+new Point(20,-15),
+new Point(30,-30),
+new Point(40,-45),
+new Point(55,-55),
+new Point(65,-70),
+new Point(80,-80),
+new Point(95,-80),
+new Point(120,-80),
+new Point(130,-65),
+new Point(150,-60),
+new Point(155,-40),
+new Point(170,-30),
+new Point(180,-15),
+new Point(175,-5),
+new Point(175,20),
+new Point(165,35),
+new Point(150,45),
+new Point(140,60),
+new Point(125,70),
+new Point(115,85),
+new Point(100,75),
+new Point(95,55),
+new Point(75,50),
+new Point(50,50),
+new Point(40,35),
+new Point(25,25),
+new Point(10,15),
+new Point(0,0),
+new Point(-10,-15),
+new Point(-25,-25),
+new Point(-40,-35),
+new Point(-45,-55),
+new Point(-65,-60),
+new Point(-75,-75),
+new Point(-90,-85),
+new Point(-115,-85),
+new Point(-125,-70),
+new Point(-145,-65),
+new Point(-150,-45),
+new Point(-165,-35),
+new Point(-180,-25),
+new Point(-185,-5),
+new Point(-175,10),
+new Point(-170,30),
+new Point(-160,45),
+new Point(-145,55),
+new Point(-130,65),
+new Point(-120,80),
+new Point(-100,85),
+new Point(-80,80),
+new Point(-65,70),
+new Point(-55,55),
+new Point(-40,45),
+new Point(-30,30),
+new Point(-20,15)
+}, 1.320));
+startupPnl.addItemToSelectionList("GORADRO-G 2 1.320-2", new GORADROGuided(new Point[]{
+new Point(5,0),
+new Point(15,-15),
+new Point(25,-30),
+new Point(35,-45),
+new Point(50,-55),
+new Point(65,-65),
+new Point(80,-75),
+new Point(80,-90),
+new Point(75,-110),
+new Point(70,-130),
+new Point(55,-140),
+new Point(45,-155),
+new Point(30,-165),
+new Point(20,-180),
+new Point(10,-175),
+new Point(-10,-170),
+new Point(-35,-170),
+new Point(-45,-155),
+new Point(-60,-145),
+new Point(-70,-130),
+new Point(-80,-115),
+new Point(-70,-110),
+new Point(-60,-95),
+new Point(-45,-85),
+new Point(-45,-60),
+new Point(-40,-40),
+new Point(-35,-20),
+new Point(-20,-10),
+new Point(-10,5),
+new Point(5,15),
+new Point(20,25),
+new Point(35,35),
+new Point(50,45),
+new Point(60,60),
+new Point(75,70),
+new Point(85,85),
+new Point(80,105),
+new Point(80,130),
+new Point(60,135),
+new Point(50,150),
+new Point(40,165),
+new Point(25,175),
+new Point(15,180),
+new Point(-10,180),
+new Point(-25,170),
+new Point(-40,160),
+new Point(-55,150),
+new Point(-65,135),
+new Point(-80,125),
+new Point(-85,105),
+new Point(-85,80),
+new Point(-70,70),
+new Point(-60,55),
+new Point(-45,45),
+new Point(-30,35),
+new Point(-20,20),
+new Point(0,15),
+new Point(10,0),
+new Point(20,-15),
+new Point(30,-30),
+new Point(40,-45),
+new Point(55,-55),
+new Point(65,-70),
+new Point(80,-80),
+new Point(95,-80),
+new Point(120,-80),
+new Point(130,-65),
+new Point(150,-60),
+new Point(155,-40),
+new Point(170,-30),
+new Point(180,-15),
+new Point(175,-5),
+new Point(175,20),
+new Point(165,35),
+new Point(150,45),
+new Point(140,60),
+new Point(125,70),
+new Point(115,85),
+new Point(100,75),
+new Point(95,55),
+new Point(75,50),
+new Point(50,50),
+new Point(40,35),
+new Point(25,25),
+new Point(10,15),
+new Point(0,0),
+new Point(-10,-15),
+new Point(-25,-25),
+new Point(-40,-35),
+new Point(-45,-55),
+new Point(-65,-60),
+new Point(-75,-75),
+new Point(-90,-85),
+new Point(-115,-85),
+new Point(-125,-70),
+new Point(-145,-65),
+new Point(-150,-45),
+new Point(-165,-35),
+new Point(-180,-25),
+new Point(-185,-5),
+new Point(-175,10),
+new Point(-170,30),
+new Point(-160,45),
+new Point(-145,55),
+new Point(-130,65),
+new Point(-120,80),
+new Point(-100,85),
+new Point(-80,80),
+new Point(-65,70),
+new Point(-55,55),
+new Point(-40,45),
+new Point(-30,30),
+new Point(-20,15)
+}, 1.320));
+startupPnl.addItemToSelectionList("GORADRO-G 2 1.320-3", new GORADROGuided(new Point[]{
+new Point(5,0),
+new Point(15,-15),
+new Point(25,-30),
+new Point(35,-45),
+new Point(50,-55),
+new Point(65,-65),
+new Point(80,-75),
+new Point(80,-90),
+new Point(75,-110),
+new Point(70,-130),
+new Point(55,-140),
+new Point(45,-155),
+new Point(30,-165),
+new Point(20,-180),
+new Point(10,-175),
+new Point(-10,-170),
+new Point(-35,-170),
+new Point(-45,-155),
+new Point(-60,-145),
+new Point(-70,-130),
+new Point(-80,-115),
+new Point(-70,-110),
+new Point(-60,-95),
+new Point(-45,-85),
+new Point(-45,-60),
+new Point(-40,-40),
+new Point(-35,-20),
+new Point(-20,-10),
+new Point(-10,5),
+new Point(5,15),
+new Point(20,25),
+new Point(35,35),
+new Point(50,45),
+new Point(60,60),
+new Point(75,70),
+new Point(85,85),
+new Point(80,105),
+new Point(80,130),
+new Point(60,135),
+new Point(50,150),
+new Point(40,165),
+new Point(25,175),
+new Point(15,180),
+new Point(-10,180),
+new Point(-25,170),
+new Point(-40,160),
+new Point(-55,150),
+new Point(-65,135),
+new Point(-80,125),
+new Point(-85,105),
+new Point(-85,80),
+new Point(-70,70),
+new Point(-60,55),
+new Point(-45,45),
+new Point(-30,35),
+new Point(-20,20),
+new Point(0,15),
+new Point(10,0),
+new Point(20,-15),
+new Point(30,-30),
+new Point(40,-45),
+new Point(55,-55),
+new Point(65,-70),
+new Point(80,-80),
+new Point(95,-80),
+new Point(120,-80),
+new Point(130,-65),
+new Point(150,-60),
+new Point(155,-40),
+new Point(170,-30),
+new Point(180,-15),
+new Point(175,-5),
+new Point(175,20),
+new Point(165,35),
+new Point(150,45),
+new Point(140,60),
+new Point(125,70),
+new Point(115,85),
+new Point(100,75),
+new Point(95,55),
+new Point(75,50),
+new Point(50,50),
+new Point(40,35),
+new Point(25,25),
+new Point(10,15),
+new Point(0,0),
+new Point(-10,-15),
+new Point(-25,-25),
+new Point(-40,-35),
+new Point(-45,-55),
+new Point(-65,-60),
+new Point(-75,-75),
+new Point(-90,-85),
+new Point(-115,-85),
+new Point(-125,-70),
+new Point(-145,-65),
+new Point(-150,-45),
+new Point(-165,-35),
+new Point(-180,-25),
+new Point(-185,-5),
+new Point(-175,10),
+new Point(-170,30),
+new Point(-160,45),
+new Point(-145,55),
+new Point(-130,65),
+new Point(-120,80),
+new Point(-100,85),
+new Point(-80,80),
+new Point(-65,70),
+new Point(-55,55),
+new Point(-40,45),
+new Point(-30,30),
+new Point(-20,15)
+}, 1.320));
+startupPnl.addItemToSelectionList("GORADRO-G 2 1.320-4", new GORADROGuided(new Point[]{
+new Point(5,0),
+new Point(15,-15),
+new Point(25,-30),
+new Point(35,-45),
+new Point(50,-55),
+new Point(65,-65),
+new Point(80,-75),
+new Point(80,-90),
+new Point(75,-110),
+new Point(70,-130),
+new Point(55,-140),
+new Point(45,-155),
+new Point(30,-165),
+new Point(20,-180),
+new Point(10,-175),
+new Point(-10,-170),
+new Point(-35,-170),
+new Point(-45,-155),
+new Point(-60,-145),
+new Point(-70,-130),
+new Point(-80,-115),
+new Point(-70,-110),
+new Point(-60,-95),
+new Point(-45,-85),
+new Point(-45,-60),
+new Point(-40,-40),
+new Point(-35,-20),
+new Point(-20,-10),
+new Point(-10,5),
+new Point(5,15),
+new Point(20,25),
+new Point(35,35),
+new Point(50,45),
+new Point(60,60),
+new Point(75,70),
+new Point(85,85),
+new Point(80,105),
+new Point(80,130),
+new Point(60,135),
+new Point(50,150),
+new Point(40,165),
+new Point(25,175),
+new Point(15,180),
+new Point(-10,180),
+new Point(-25,170),
+new Point(-40,160),
+new Point(-55,150),
+new Point(-65,135),
+new Point(-80,125),
+new Point(-85,105),
+new Point(-85,80),
+new Point(-70,70),
+new Point(-60,55),
+new Point(-45,45),
+new Point(-30,35),
+new Point(-20,20),
+new Point(0,15),
+new Point(10,0),
+new Point(20,-15),
+new Point(30,-30),
+new Point(40,-45),
+new Point(55,-55),
+new Point(65,-70),
+new Point(80,-80),
+new Point(95,-80),
+new Point(120,-80),
+new Point(130,-65),
+new Point(150,-60),
+new Point(155,-40),
+new Point(170,-30),
+new Point(180,-15),
+new Point(175,-5),
+new Point(175,20),
+new Point(165,35),
+new Point(150,45),
+new Point(140,60),
+new Point(125,70),
+new Point(115,85),
+new Point(100,75),
+new Point(95,55),
+new Point(75,50),
+new Point(50,50),
+new Point(40,35),
+new Point(25,25),
+new Point(10,15),
+new Point(0,0),
+new Point(-10,-15),
+new Point(-25,-25),
+new Point(-40,-35),
+new Point(-45,-55),
+new Point(-65,-60),
+new Point(-75,-75),
+new Point(-90,-85),
+new Point(-115,-85),
+new Point(-125,-70),
+new Point(-145,-65),
+new Point(-150,-45),
+new Point(-165,-35),
+new Point(-180,-25),
+new Point(-185,-5),
+new Point(-175,10),
+new Point(-170,30),
+new Point(-160,45),
+new Point(-145,55),
+new Point(-130,65),
+new Point(-120,80),
+new Point(-100,85),
+new Point(-80,80),
+new Point(-65,70),
+new Point(-55,55),
+new Point(-40,45),
+new Point(-30,30),
+new Point(-20,15)
+}, 1.320));
+startupPnl.addItemToSelectionList("GORADRO-G 2 1.320-5", new GORADROGuided(new Point[]{
+new Point(5,0),
+new Point(15,-15),
+new Point(25,-30),
+new Point(35,-45),
+new Point(50,-55),
+new Point(65,-65),
+new Point(80,-75),
+new Point(80,-90),
+new Point(75,-110),
+new Point(70,-130),
+new Point(55,-140),
+new Point(45,-155),
+new Point(30,-165),
+new Point(20,-180),
+new Point(10,-175),
+new Point(-10,-170),
+new Point(-35,-170),
+new Point(-45,-155),
+new Point(-60,-145),
+new Point(-70,-130),
+new Point(-80,-115),
+new Point(-70,-110),
+new Point(-60,-95),
+new Point(-45,-85),
+new Point(-45,-60),
+new Point(-40,-40),
+new Point(-35,-20),
+new Point(-20,-10),
+new Point(-10,5),
+new Point(5,15),
+new Point(20,25),
+new Point(35,35),
+new Point(50,45),
+new Point(60,60),
+new Point(75,70),
+new Point(85,85),
+new Point(80,105),
+new Point(80,130),
+new Point(60,135),
+new Point(50,150),
+new Point(40,165),
+new Point(25,175),
+new Point(15,180),
+new Point(-10,180),
+new Point(-25,170),
+new Point(-40,160),
+new Point(-55,150),
+new Point(-65,135),
+new Point(-80,125),
+new Point(-85,105),
+new Point(-85,80),
+new Point(-70,70),
+new Point(-60,55),
+new Point(-45,45),
+new Point(-30,35),
+new Point(-20,20),
+new Point(0,15),
+new Point(10,0),
+new Point(20,-15),
+new Point(30,-30),
+new Point(40,-45),
+new Point(55,-55),
+new Point(65,-70),
+new Point(80,-80),
+new Point(95,-80),
+new Point(120,-80),
+new Point(130,-65),
+new Point(150,-60),
+new Point(155,-40),
+new Point(170,-30),
+new Point(180,-15),
+new Point(175,-5),
+new Point(175,20),
+new Point(165,35),
+new Point(150,45),
+new Point(140,60),
+new Point(125,70),
+new Point(115,85),
+new Point(100,75),
+new Point(95,55),
+new Point(75,50),
+new Point(50,50),
+new Point(40,35),
+new Point(25,25),
+new Point(10,15),
+new Point(0,0),
+new Point(-10,-15),
+new Point(-25,-25),
+new Point(-40,-35),
+new Point(-45,-55),
+new Point(-65,-60),
+new Point(-75,-75),
+new Point(-90,-85),
+new Point(-115,-85),
+new Point(-125,-70),
+new Point(-145,-65),
+new Point(-150,-45),
+new Point(-165,-35),
+new Point(-180,-25),
+new Point(-185,-5),
+new Point(-175,10),
+new Point(-170,30),
+new Point(-160,45),
+new Point(-145,55),
+new Point(-130,65),
+new Point(-120,80),
+new Point(-100,85),
+new Point(-80,80),
+new Point(-65,70),
+new Point(-55,55),
+new Point(-40,45),
+new Point(-30,30),
+new Point(-20,15)
+}, 1.320));
+startupPnl.addItemToSelectionList("GORADRO-G 2 1.320-6", new GORADROGuided(new Point[]{
+new Point(5,0),
+new Point(15,-15),
+new Point(25,-30),
+new Point(35,-45),
+new Point(50,-55),
+new Point(65,-65),
+new Point(80,-75),
+new Point(80,-90),
+new Point(75,-110),
+new Point(70,-130),
+new Point(55,-140),
+new Point(45,-155),
+new Point(30,-165),
+new Point(20,-180),
+new Point(10,-175),
+new Point(-10,-170),
+new Point(-35,-170),
+new Point(-45,-155),
+new Point(-60,-145),
+new Point(-70,-130),
+new Point(-80,-115),
+new Point(-70,-110),
+new Point(-60,-95),
+new Point(-45,-85),
+new Point(-45,-60),
+new Point(-40,-40),
+new Point(-35,-20),
+new Point(-20,-10),
+new Point(-10,5),
+new Point(5,15),
+new Point(20,25),
+new Point(35,35),
+new Point(50,45),
+new Point(60,60),
+new Point(75,70),
+new Point(85,85),
+new Point(80,105),
+new Point(80,130),
+new Point(60,135),
+new Point(50,150),
+new Point(40,165),
+new Point(25,175),
+new Point(15,180),
+new Point(-10,180),
+new Point(-25,170),
+new Point(-40,160),
+new Point(-55,150),
+new Point(-65,135),
+new Point(-80,125),
+new Point(-85,105),
+new Point(-85,80),
+new Point(-70,70),
+new Point(-60,55),
+new Point(-45,45),
+new Point(-30,35),
+new Point(-20,20),
+new Point(0,15),
+new Point(10,0),
+new Point(20,-15),
+new Point(30,-30),
+new Point(40,-45),
+new Point(55,-55),
+new Point(65,-70),
+new Point(80,-80),
+new Point(95,-80),
+new Point(120,-80),
+new Point(130,-65),
+new Point(150,-60),
+new Point(155,-40),
+new Point(170,-30),
+new Point(180,-15),
+new Point(175,-5),
+new Point(175,20),
+new Point(165,35),
+new Point(150,45),
+new Point(140,60),
+new Point(125,70),
+new Point(115,85),
+new Point(100,75),
+new Point(95,55),
+new Point(75,50),
+new Point(50,50),
+new Point(40,35),
+new Point(25,25),
+new Point(10,15),
+new Point(0,0),
+new Point(-10,-15),
+new Point(-25,-25),
+new Point(-40,-35),
+new Point(-45,-55),
+new Point(-65,-60),
+new Point(-75,-75),
+new Point(-90,-85),
+new Point(-115,-85),
+new Point(-125,-70),
+new Point(-145,-65),
+new Point(-150,-45),
+new Point(-165,-35),
+new Point(-180,-25),
+new Point(-185,-5),
+new Point(-175,10),
+new Point(-170,30),
+new Point(-160,45),
+new Point(-145,55),
+new Point(-130,65),
+new Point(-120,80),
+new Point(-100,85),
+new Point(-80,80),
+new Point(-65,70),
+new Point(-55,55),
+new Point(-40,45),
+new Point(-30,30),
+new Point(-20,15)
+}, 1.320));
+startupPnl.addItemToSelectionList("GORADRO-G 2 1.320-7", new GORADROGuided(new Point[]{
+new Point(5,0),
+new Point(15,-15),
+new Point(25,-30),
+new Point(35,-45),
+new Point(50,-55),
+new Point(65,-65),
+new Point(80,-75),
+new Point(80,-90),
+new Point(75,-110),
+new Point(70,-130),
+new Point(55,-140),
+new Point(45,-155),
+new Point(30,-165),
+new Point(20,-180),
+new Point(10,-175),
+new Point(-10,-170),
+new Point(-35,-170),
+new Point(-45,-155),
+new Point(-60,-145),
+new Point(-70,-130),
+new Point(-80,-115),
+new Point(-70,-110),
+new Point(-60,-95),
+new Point(-45,-85),
+new Point(-45,-60),
+new Point(-40,-40),
+new Point(-35,-20),
+new Point(-20,-10),
+new Point(-10,5),
+new Point(5,15),
+new Point(20,25),
+new Point(35,35),
+new Point(50,45),
+new Point(60,60),
+new Point(75,70),
+new Point(85,85),
+new Point(80,105),
+new Point(80,130),
+new Point(60,135),
+new Point(50,150),
+new Point(40,165),
+new Point(25,175),
+new Point(15,180),
+new Point(-10,180),
+new Point(-25,170),
+new Point(-40,160),
+new Point(-55,150),
+new Point(-65,135),
+new Point(-80,125),
+new Point(-85,105),
+new Point(-85,80),
+new Point(-70,70),
+new Point(-60,55),
+new Point(-45,45),
+new Point(-30,35),
+new Point(-20,20),
+new Point(0,15),
+new Point(10,0),
+new Point(20,-15),
+new Point(30,-30),
+new Point(40,-45),
+new Point(55,-55),
+new Point(65,-70),
+new Point(80,-80),
+new Point(95,-80),
+new Point(120,-80),
+new Point(130,-65),
+new Point(150,-60),
+new Point(155,-40),
+new Point(170,-30),
+new Point(180,-15),
+new Point(175,-5),
+new Point(175,20),
+new Point(165,35),
+new Point(150,45),
+new Point(140,60),
+new Point(125,70),
+new Point(115,85),
+new Point(100,75),
+new Point(95,55),
+new Point(75,50),
+new Point(50,50),
+new Point(40,35),
+new Point(25,25),
+new Point(10,15),
+new Point(0,0),
+new Point(-10,-15),
+new Point(-25,-25),
+new Point(-40,-35),
+new Point(-45,-55),
+new Point(-65,-60),
+new Point(-75,-75),
+new Point(-90,-85),
+new Point(-115,-85),
+new Point(-125,-70),
+new Point(-145,-65),
+new Point(-150,-45),
+new Point(-165,-35),
+new Point(-180,-25),
+new Point(-185,-5),
+new Point(-175,10),
+new Point(-170,30),
+new Point(-160,45),
+new Point(-145,55),
+new Point(-130,65),
+new Point(-120,80),
+new Point(-100,85),
+new Point(-80,80),
+new Point(-65,70),
+new Point(-55,55),
+new Point(-40,45),
+new Point(-30,30),
+new Point(-20,15)
+}, 1.320));
+startupPnl.addItemToSelectionList("GORADRO-G 2 1.320-8", new GORADROGuided(new Point[]{
+new Point(5,0),
+new Point(15,-15),
+new Point(25,-30),
+new Point(35,-45),
+new Point(50,-55),
+new Point(65,-65),
+new Point(80,-75),
+new Point(80,-90),
+new Point(75,-110),
+new Point(70,-130),
+new Point(55,-140),
+new Point(45,-155),
+new Point(30,-165),
+new Point(20,-180),
+new Point(10,-175),
+new Point(-10,-170),
+new Point(-35,-170),
+new Point(-45,-155),
+new Point(-60,-145),
+new Point(-70,-130),
+new Point(-80,-115),
+new Point(-70,-110),
+new Point(-60,-95),
+new Point(-45,-85),
+new Point(-45,-60),
+new Point(-40,-40),
+new Point(-35,-20),
+new Point(-20,-10),
+new Point(-10,5),
+new Point(5,15),
+new Point(20,25),
+new Point(35,35),
+new Point(50,45),
+new Point(60,60),
+new Point(75,70),
+new Point(85,85),
+new Point(80,105),
+new Point(80,130),
+new Point(60,135),
+new Point(50,150),
+new Point(40,165),
+new Point(25,175),
+new Point(15,180),
+new Point(-10,180),
+new Point(-25,170),
+new Point(-40,160),
+new Point(-55,150),
+new Point(-65,135),
+new Point(-80,125),
+new Point(-85,105),
+new Point(-85,80),
+new Point(-70,70),
+new Point(-60,55),
+new Point(-45,45),
+new Point(-30,35),
+new Point(-20,20),
+new Point(0,15),
+new Point(10,0),
+new Point(20,-15),
+new Point(30,-30),
+new Point(40,-45),
+new Point(55,-55),
+new Point(65,-70),
+new Point(80,-80),
+new Point(95,-80),
+new Point(120,-80),
+new Point(130,-65),
+new Point(150,-60),
+new Point(155,-40),
+new Point(170,-30),
+new Point(180,-15),
+new Point(175,-5),
+new Point(175,20),
+new Point(165,35),
+new Point(150,45),
+new Point(140,60),
+new Point(125,70),
+new Point(115,85),
+new Point(100,75),
+new Point(95,55),
+new Point(75,50),
+new Point(50,50),
+new Point(40,35),
+new Point(25,25),
+new Point(10,15),
+new Point(0,0),
+new Point(-10,-15),
+new Point(-25,-25),
+new Point(-40,-35),
+new Point(-45,-55),
+new Point(-65,-60),
+new Point(-75,-75),
+new Point(-90,-85),
+new Point(-115,-85),
+new Point(-125,-70),
+new Point(-145,-65),
+new Point(-150,-45),
+new Point(-165,-35),
+new Point(-180,-25),
+new Point(-185,-5),
+new Point(-175,10),
+new Point(-170,30),
+new Point(-160,45),
+new Point(-145,55),
+new Point(-130,65),
+new Point(-120,80),
+new Point(-100,85),
+new Point(-80,80),
+new Point(-65,70),
+new Point(-55,55),
+new Point(-40,45),
+new Point(-30,30),
+new Point(-20,15)
+}, 1.320));
 
-    private boolean init;
-
-    private Form GUI;
-    private StartupPanel startupPnl;
-
-    private MainWrapper wrapperPnl;
-    private Panel orbitalPnl;
-    private LandMapPanel terrainPnl;
-    private InterfacePanel interfacePnl;
-    private RoverHub roverHubPnl;
-    private SatelliteHub satelliteHubPnl;
-
-    private AccelPopUp informer;
-
-    public HiForm(){
-        init = false;
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        startupPnl = new StartupPanel(screenSize);
-        GUI = new Form(screenSize, startupPnl);
-        setUpSelectionLists();
-        GUI.setVisible(true);
-    }
-
-    @Override
-    public void initialize(NamesAndTags namesAndTags, SerialBuffers buffers, ArrayList<RoverObject> rovers, ArrayList<SatelliteObject> satellites, TerrainMap map) {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        wrapperPnl = new MainWrapper(screenSize, buffers, namesAndTags);
-        orbitalPnl = new Panel(screenSize, "Orbital View");
-        roverHubPnl = new RoverHub(screenSize, buffers, rovers, map);
-        terrainPnl = new LandMapPanel(screenSize, new PlanetParametersList(), roverHubPnl, rovers, map);
-        interfacePnl = new InterfacePanel(screenSize, buffers);
-        satelliteHubPnl = new SatelliteHub(screenSize, satellites);
-        GUI.setRunTimePanels(wrapperPnl, orbitalPnl, terrainPnl, interfacePnl, roverHubPnl, satelliteHubPnl);
-        init = true;
-        InterfaceAccess.CODE.setCallTags(namesAndTags);
-        roverHubPnl.setIdentifiers(namesAndTags.getRoverTags(), namesAndTags.getSatelliteTags());
-    }
-
-    private void setUpSelectionLists(){
-        //addItemToSelectionList(	name_on_list ,	object_to_add	);
-        startupPnl.addItemToSelectionList("Default", new RoverPhysicsModel());
-        startupPnl.addItemToSelectionList("Fail On Hazard", new FailOnHazard());
-        startupPnl.addItemToSelectionList("Risk On Hazard", new RiskOnHazard());
-        startupPnl.addItemToSelectionList("[null]", new BlankRoverAuto());
-        startupPnl.addItemToSelectionList("Generic4", new GenericRover("Generic4", 4));
-        startupPnl.addItemToSelectionList("RAIR", new RAIRcode());
-        startupPnl.addItemToSelectionList("RAIR Control", new RAIRcodeControl());
-        startupPnl.addItemToSelectionList("RAIR Risk Averse", new RAIRcodeRA());
-        startupPnl.addItemToSelectionList("RAIR Risk Seeking", new RAIRcodeRS());
-        startupPnl.addItemToSelectionList("RAIR Risk Temper", new RAIRcodeRT());
-        startupPnl.addItemToSelectionList("PIDAA", new PIDAAcode3());
-        startupPnl.addItemToSelectionList("PIDAA CONTROL", new PIDAAcontrol());
-        startupPnl.addItemToSelectionList("GORARO Simp", new GORAROcode1());
-        startupPnl.addItemToSelectionList("GORADRO Adv", new GORAROAdvanceCode(new double[]{
-                10000, 19, 82, 0.266, 0
-        }));
-        /*wrapperPnl.addItemToSelectionList("GORARO Adv B", new GORAROAdvanceCode(new double[]{
-                10000, 80.44, 972.8, 25.84, 0
-        }));
-        wrapperPnl.addItemToSelectionList("GORARO Adv C", new GORAROAdvanceCode(new double[]{
-                10000, 100, 500, 2, 0
-        }));
-        wrapperPnl.addItemToSelectionList("GORARO Adv D", new GORAROAdvanceCode(new double[]{
-                10000, 40, 600, 2, 0
-        }));
-        wrapperPnl.addItemToSelectionList("GORARO Adv E", new GORAROAdvanceCode(new double[]{
-                10000, 70, 600, 2, 0
-        }));
-        wrapperPnl.addItemToSelectionList("GORARO Adv F", new GORAROAdvanceCode(new double[]{
-                10000, 100, 600, 2, 0
-        }));
-        wrapperPnl.addItemToSelectionList("GORARO Adv G", new GORAROAdvanceCode(new double[]{
-                10000, 40, 700, 2, 0
-        }));
-        wrapperPnl.addItemToSelectionList("GORARO Adv H", new GORAROAdvanceCode(new double[]{
-                10000, 70, 700, 2, 0
-        }));*/
-        startupPnl.addItemToSelectionList("MER", new MER(new DecimalPoint[]{
-                new DecimalPoint(-9.5, -9.5),
-                new DecimalPoint(-12.5, -5.5),
-                new DecimalPoint(-17.5, -9.5),
-                new DecimalPoint(-10.5, -16.5),
-                new DecimalPoint(-2.5, -38.5),
-                new DecimalPoint(8.5, -37.5),
-                new DecimalPoint(15.5, -36.5),
-                new DecimalPoint(21.5, -49.5),
-                new DecimalPoint(22.5, -60.5),
-                new DecimalPoint(23.5, -70.5),
-                new DecimalPoint(14.5, -65.5),
-                new DecimalPoint(13.5, -81.5),
-                new DecimalPoint(6.5, -81.5),
-                new DecimalPoint(2.5, -77.5),
-                new DecimalPoint(3.5, -83.5),
-                new DecimalPoint(0.5, -89.5),
-                new DecimalPoint(-30.5, -109.5),
-                new DecimalPoint(-26.5, -117.5),
-                new DecimalPoint(-43.5, -127.5),
-                new DecimalPoint(-54.5, -146.5),
-                new DecimalPoint(-54.5, -149.5),
-                new DecimalPoint(-57.5, -147.5),
-                new DecimalPoint(-56.5, -159.5),
-                new DecimalPoint(-59.5, -160.5),
-                new DecimalPoint(-64.5, -165.5),
-                new DecimalPoint(-61.5, -174.5),
-                new DecimalPoint(-55.5, -182.5),
-                new DecimalPoint(-57.5, -184.5),
-                new DecimalPoint(-59.5, -189.5),
-                new DecimalPoint(-43.5, -193.5),
-                new DecimalPoint(-39.5, -190.5),
-                new DecimalPoint(-38.5, -200.5),
-                new DecimalPoint(-24.5, -198.5),
-                new DecimalPoint(-25.5, -193.5),
-                new DecimalPoint(-38.5, -212.5),
-                new DecimalPoint(-21.5, -219.5),
-                new DecimalPoint(-8.5, -223.5),
-                new DecimalPoint(-4.5, -224.5),
-                new DecimalPoint(-5.5, -227.5)
-        }));
-        //wrapperPnl.addItemToSelectionList(		"PIDAA 2",		new PIDAAcode2());
-        startupPnl.addItemToSelectionList("[null]", (SatelliteAutonomusCode) null);
-        startupPnl.addItemToSelectionList("[null]", (SatelliteParametersList) null);
-        startupPnl.addItemToSelectionList("GORADRO-G", new GORADROGuided(new Point[]{
-                new Point(20, 20),
-                new Point(10, -15),
-                new Point(0, 0)
-        }, Math.PI/6.));
-    }
-
-    @Override
-    public void start(){
-        interfacePnl.CODE.start();
-        roverHubPnl.start();
-        satelliteHubPnl.start();
-    }
-
-    @Override
-    public void updateRovers() {
-        if (init){
-            roverHubPnl.updateDisplays();
-        }
-    }
-
-    @Override
-    public void updateSatellites() {
-        if (init){
-            satelliteHubPnl.updateDisplays();
-        }
-    }
-
-    @Override
-    public void updateRover(String name, DecimalPoint location, double direction) {
-        if (init){
-            terrainPnl.updateRover(name, location, direction);
-        }
-    }
-
-    @Override
-    public void updateSatellite(String name) {
-
-    }
-
-    @Override
-    public void updateSerialBuffers() {
-        if (init){
-            wrapperPnl.updateSerialDisplays();
-        }
-    }
-
-    @Override
-    public void viewAccelerated(int runtime, double accelerant) {
-        if (init){
-            GUI.setVisible(false);
-            informer = new AccelPopUp(runtime, (int) (runtime/accelerant/60000));
-            new FreeThread(1000, new Runnable(){
-                public void run(){
-                    informer.update((int) Globals.getInstance().timeMillis);
-                }
-            }, FreeThread.FOREVER, "accel-pop-up");
-        }
-    }
-
-    @Override
-    public void exit(){
-        GUI.exit();
-    }
+//))(({{}}]][[
+}
+@Override
+public void start(){
+interfacePnl.CODE.start();
+roverHubPnl.start();
+satelliteHubPnl.start();
+}
+@Override
+public void updateRovers() {
+if (init){
+roverHubPnl.updateDisplays();
+}
+}
+@Override
+public void updateSatellites() {
+if (init){
+satelliteHubPnl.updateDisplays();
+}
+}
+@Override
+public void updateRover(String name,
+DecimalPoint location,
+double direction) {
+if (init){
+terrainPnl.updateRover(name,
+location,
+direction);
+}
+}
+@Override
+public void updateSatellite(String name) {
+}
+@Override
+public void updateSerialBuffers() {
+if (init){
+wrapperPnl.updateSerialDisplays();
+}
+}
+@Override
+public void viewAccelerated(int runtime,
+double accelerant) {
+if (init){
+GUI.setVisible(false);
+informer = new AccelPopUp(runtime,
+(int) (runtime/accelerant/60000));
+new FreeThread(1000,
+new Runnable(){
+public void run(){
+informer.update((int) Globals.getInstance().timeMillis);
+}
+},
+FreeThread.FOREVER,
+"accel-pop-up");
+}
+}
+@Override
+public void exit(){
+GUI.exit();
+}
 }

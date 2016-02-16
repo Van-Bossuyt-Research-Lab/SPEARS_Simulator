@@ -3,11 +3,10 @@ package com.csm.rover.simulator.rover.autoCode;
 
 import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.wrapper.Globals;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +16,7 @@ public class GORADROGuided extends RoverAutonomousCode {
 
     private static final long serialVersionUID = -8434875463993541766L;
 
-    private static final double ANGLE_ERROR = Math.PI/16.0;
+    private static final double ANGLE_ERROR = Math.PI/13.0;
     private static final double WAYPOINT_ERROR = 1.5;
     private static final double RECALC_TIME = 2000; //ms
     enum States {
@@ -25,9 +24,8 @@ public class GORADROGuided extends RoverAutonomousCode {
     }
 
     private static final double STALL_RADIUS = 5;
-    private static final int STALL_TIME = 240000;
-    private static final double RUN_ROTATION = 5*Math.PI/16.0;
-    private static final int RUN_TIME = 15000;
+    private static final int STALL_TIME = 90000;
+    private static final int RUN_TIME = 25000;
 
     private static final int HISTORIES = 3;
     private static final int SAMPLE_DIRECTIONS = 16;
@@ -55,8 +53,10 @@ public class GORADROGuided extends RoverAutonomousCode {
 
     private Point[] waypoints;
     private int current_waypoint = 0;
-    private static final double[] attitudes = { 1000, 25, 23.333, 0.666, 20 };
+    private static final double[] attitudes = { 1000, 25, 23.333, 0.666, 200 };
     private double dev_tolerance;
+
+    private int stuck_turn = 0;
 
     public GORADROGuided(Point[] waypoints, double dev_tolerance) {
         super("GORADRO-G", "GORADRO-G");
@@ -85,9 +85,11 @@ public class GORADROGuided extends RoverAutonomousCode {
     @Override
     public String nextCommand(long milliTime, DecimalPoint location, double direction, Map<String, Double> parameters) {
         if (!started){
-
+            writeToLog("time\tX\tY\tZ\tscore\tcharge\tstate\thazard");
             started = true;
         }
+        writeToLog(milliTime + "\t" + formatDouble(location.getX()) + "\t" + formatDouble(location.getY()) + "\t" + formatDouble(MAP.getHeightAt(location)) + "\t" + score + "\t" + formatDouble(parameters.get("battery_charge")) + "\t" + state + "\t" + MAP.getHazardValueAt(location) + "\t" + current_waypoint);
+        direction = (direction + 2*Math.PI) % (2*Math.PI);
         switch (state){
             case CALCULATING:
                 calculateBasedDirection(location, direction);
@@ -121,7 +123,8 @@ public class GORADROGuided extends RoverAutonomousCode {
                 }
                 else if (milliTime-timeAtPoint > STALL_TIME){
                     if (distanceBetween(location, lastLoc) > STALL_RADIUS){
-                        travelDirection += RUN_ROTATION;
+                        travelDirection = Math.atan2(waypoints[current_waypoint].getY()-location.getY(),
+                                waypoints[current_waypoint].getX()-location.getX());
                         state = States.STUCK;
                     }
                     else {
@@ -139,30 +142,48 @@ public class GORADROGuided extends RoverAutonomousCode {
                 Point mapLoc = MAP.getMapSquare(location);
                 visitedScience.add(new Point(mapLoc.x/3, mapLoc.y/3));
                 state = States.CALCULATING;
-                LOG.log(Level.INFO, "Reached a target at {}.  Score at "+score, location.toString());
+                System.out.println("Collecting");
+//                LOG.log(Level.INFO, "Reached a target at {}.  Score at "+score, location.toString());
                 return "";
 
             case STUCK:
-                if (Math.abs(direction-travelDirection) < ANGLE_ERROR){
-                    state = States.ESCAPING;
-                    lastCalcTime = milliTime;
-                    return "move";
-                }
-                else {
-                    if (Globals.getInstance().subtractAngles(direction, travelDirection) < 0){
+                int stuck_this = Globals.getInstance().subtractAngles(direction, travelDirection) < 0 ? -1 : 1;
+                if (stuck_turn == 0){
+                    stuck_turn = stuck_this;
+                    if (stuck_turn == -1){
                         return "spin_cw";
                     }
                     else {
                         return "spin_ccw";
                     }
                 }
+                else if (Math.abs(direction-travelDirection) < ANGLE_ERROR || stuck_turn != stuck_this){
+                    stuck_turn = 0;
+                    state = States.ESCAPING;
+                    lastCalcTime = milliTime;
+                    return "move";
+                }
+                else {
+                    return "";
+                }
 
             case ESCAPING:
                 if (milliTime-lastCalcTime > RUN_TIME){
-                    lastCalcTime = (long)(milliTime - RECALC_TIME);
+                    lastLoc = location;
+                    timeAtPoint = milliTime;
                     state = States.CALCULATING;
                 }
-                return "";
+                else if (hasUnvisitedScience(location)){
+                    state = States.COLLECTING;
+                    return "stop";
+                }
+                else if (distanceBetween(location, waypoints[current_waypoint]) < WAYPOINT_ERROR){
+                    current_waypoint++;
+                    if (current_waypoint == waypoints.length){
+                        state = States.DONE;
+                    }
+                }
+                return "move";
 
             case DONE:
                 return "stop";
@@ -240,6 +261,8 @@ public class GORADROGuided extends RoverAutonomousCode {
             }
         }
         travelDirection = maxDirection;
+        System.out.println("At: " + location + "\t\tWaypoint: " + waypoints[current_waypoint]);
+        System.out.println("Traveling: " + travelDirection + "\t\tWaypoiny: " + getWaypointDirection(location));
     }
 
     private boolean hasUnvisitedScience(DecimalPoint loc){
@@ -251,11 +274,14 @@ public class GORADROGuided extends RoverAutonomousCode {
     }
 
     private double getDirectionPenalty(DecimalPoint location, double direction){
-        double waypoint_direction =
-                Math.atan2(waypoints[current_waypoint].getY()-location.getY(),
-                        waypoints[current_waypoint].getX()-location.getX());
+        double waypoint_direction = getWaypointDirection(location);
         waypoint_direction = (waypoint_direction + 2*Math.PI) % (2*Math.PI);
         return 1-Math.exp(-(Math.pow(direction-waypoint_direction, 2))/(2*Math.pow(dev_tolerance, 2)));
+    }
+
+    private double getWaypointDirection(DecimalPoint loc){
+        return  (Math.atan2(waypoints[current_waypoint].getY()-loc.getY(),
+                waypoints[current_waypoint].getX()-loc.getX())+2*Math.PI)%(2*Math.PI);
     }
 
     private double distanceBetween(DecimalPoint a, Point b){
@@ -264,6 +290,35 @@ public class GORADROGuided extends RoverAutonomousCode {
 
     private double distanceBetween(DecimalPoint a, DecimalPoint b){
         return Math.sqrt(Math.pow(a.getX()-b.getX(),2) + Math.pow(a.getY()-b.getY(), 2));
+    }
+
+    private String formatDouble(double in){
+        String out = "";
+        if (Math.abs(in) < Integer.MAX_VALUE/1000){
+            if (in < 0){
+                in *= -1;
+                out = "-";
+            }
+            int whole = (int)in;
+            out += whole;
+            int part = (int)((in * 1000) - whole*1000);
+            if (part == 0){
+                out += ".000";
+            }
+            else if (part < 10){
+                out += "." + part + "00";
+            }
+            else if (part < 100){
+                out += "." + part + "0";
+            }
+            else {
+                out += "." + part;
+            }
+        }
+        else {
+            out = (int)in + "";
+        }
+        return out;
     }
 
     @Override
