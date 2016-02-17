@@ -3,6 +3,7 @@ package com.csm.rover.simulator.satellite;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public abstract class SatelliteAutonomusCode implements Serializable {
 	
@@ -42,5 +43,9 @@ public abstract class SatelliteAutonomusCode implements Serializable {
 	public String getName(){
 		return name;
 	}
+
+    public void constructParameters(Map<String, Double> params){
+
+    }
 
 }
