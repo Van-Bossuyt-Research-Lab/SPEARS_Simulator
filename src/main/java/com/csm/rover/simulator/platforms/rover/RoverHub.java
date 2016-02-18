@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.rover;
+package com.csm.rover.simulator.platforms.rover;
 
 import com.csm.rover.simulator.control.InterfaceCode;
 import com.csm.rover.simulator.map.TerrainMap;

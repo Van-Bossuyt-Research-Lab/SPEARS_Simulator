@@ -1,14 +1,14 @@
-package com.csm.rover.simulator.rover.autoCode;
+package com.csm.rover.simulator.platforms.rover.autoCode;
 
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 
 import java.util.Map;
 
-public class RAIRcodeRT extends RoverAutonomousCode {
+public class RAIRcodeControl extends RoverAutonomousCode {
 
-	private static final long serialVersionUID = 2019138860969103442L;
+	private static final long serialVersionUID = -3155001114069176722L;
 
-	public RAIRcodeRT(RAIRcodeRT in) {
+	public RAIRcodeControl(RAIRcodeControl in) {
 		super(in);
 		this.phiBound = in.phiBound;
 		this.tphi = in.tphi;
@@ -27,7 +27,7 @@ public class RAIRcodeRT extends RoverAutonomousCode {
 		D11=in.D11;
 		D12=in.D12;
 		D13=in.D13;
-		D14=in.D14;
+		D14=in.D14;	
 		D15=in.D15;
 		D16=in.D16;
 		S1 = in.S1;
@@ -113,13 +113,14 @@ public class RAIRcodeRT extends RoverAutonomousCode {
 		int substate3=0;
 		
 		//Target location 
-		DecimalPoint Trgt=new DecimalPoint(5,5);
+		//DecimalPoint Trgt=new DecimalPoint(-100,-100);
+		DecimalPoint Trgt=new DecimalPoint(-100,-100);
 
 		private long lastActionTime = 0;
 		private int action = 0;
 		private int seconds = 1;
 		
-		public RAIRcodeRT(){
+		public RAIRcodeControl(){
 			super("RAIR", "RAIR");
 
 		}
@@ -132,13 +133,14 @@ public class RAIRcodeRT extends RoverAutonomousCode {
 			double direction,
 			Map<String, Double> parameters
 	) {
-
+		
 		//Write processing code here
 		//log
 		boolean hazard=MAP.isPointInHazard(location);
 		double elevation=MAP.getHeightAt(location);
+		
 		writeToLog("RA" +","+state+","+ milliTime +","+ location+","+ elevation+","+direction+","+parameters.get("motor_temp_FL")+","+parameters.get("motor_temp_FR")+","+parameters.get("motor_temp_BL")+","+parameters.get("motor_temp_BR")+","+parameters.get("battery_temp")+","+parameters.get("battery_charge")+","+hazard);
-				
+		
 			//determine variables: arc angle range theta, number of angle increments n, distance checked d, 
 				
 			//Begin loop
@@ -156,20 +158,24 @@ public class RAIRcodeRT extends RoverAutonomousCode {
 		double phi=Math.atan(delta_X/delta_Y);
 			//optimal climb angle
 		double theta=Math.atan(delta_Z/delta_L);
-
-if (milliTime-checkTime>=150000){
-	//if distance travelled is greater than 10 meters
-	if (pythagorean(location,checkPoint)>=10){
-		checkPoint=location;
-	} else {
-		//if distance travelled is less that 10 meters
-		//enter state 3
-		state=3;
-		substate3=1;
-		checkTime=milliTime;
-	}
-}
 		
+//code break state 3
+		if (milliTime-checkTime>=600000){
+			//if distance travelled is greater than 10 meters
+			checkTime=milliTime;
+			if (pythagorean(location,checkPoint)>=10){
+				checkPoint=location;
+			} else {
+				//if distance travelled is less that 10 meters
+				//enter state 3
+				state=3;
+				substate3=1;
+			}
+		}
+//Goal Reached State 4 Break
+		if (pythagorean(location,Trgt)<=1.5){
+			state=4;
+		}
 		
 		
 if (milliTime-rnTime>=500){
@@ -287,226 +293,123 @@ if (milliTime-rnTime>=500){
 				state=0;
 				return "stop";
 			}
-//State 3 is the hole escape state
+//State 3 Give up
 		} else if (state==3){
-			if (substate3==1){
-				//P1
-				DecimalPoint loc=location;
-				DecimalPoint P1;
-				P1=location.offset(D1);
-				S1=FastRoute(P1,loc);
-				
-				//P2
-				DecimalPoint P2;
-				P2=location.offset(D2);
-				S2=FastRoute(P2,loc);
-				
-				//P3
-				DecimalPoint P3;
-				P3=location.offset(D3);
-				S3=FastRoute(P3,loc);
-				
-				//P4
-				DecimalPoint P4;
-				P4=location.offset(D4);
-				S4=FastRoute(P4,loc);
-				
-				//P5
-				DecimalPoint P5;
-				P5=location.offset(D5);
-				S5=FastRoute(P5,loc);
-				
-				//P6
-				DecimalPoint P6;
-				P6=location.offset(D6);
-				S6=FastRoute(P6,loc);
-				
-				//P7
-				DecimalPoint P7;
-				P7=location.offset(D7);
-				S7=FastRoute(P7,loc);
-				
-				//P8
-				DecimalPoint P8;
-				P8=location.offset(D8);
-				S8=FastRoute(P8,loc);
-				
-				//P9
-				DecimalPoint P9;
-				P9=location.offset(D9);
-				S9=FastRoute(P9,loc);
-				
-				//P10
-				DecimalPoint P10;
-				P10=location.offset(D10);
-				S10=FastRoute(P10,loc);
-				
-				//P11
-				DecimalPoint P11;
-				P11=location.offset(D11);
-				S11=FastRoute(P11,loc);
-				
-				//P12
-				DecimalPoint P12;
-				P12=location.offset(D12);
-				S12=FastRoute(P12,loc);
-				
-				//P13
-				DecimalPoint P13;
-				P13=location.offset(D13);
-				S13=FastRoute(P13,loc);
-				
-				//P14
-				DecimalPoint P14;
-				P14=location.offset(D14);
-				S14=FastRoute(P14,loc);
-				
-				//P15
-				DecimalPoint P15;
-				P15=location.offset(D15);
-				S15=FastRoute(P15,loc);
-				
-				//P16
-				DecimalPoint P16;
-				P16=location.offset(D16);
-				S16=FastRoute(P16,loc);
-				
-				substate3=2;
-				tphi=minscore(S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16);
-			} else if (substate3==2){
-				//Determine if current angle is outside of desired range 
-				if (direction>=(tphi+phiBound)){
-					return "spin_cw";
-				} else if (direction<=(tphi-phiBound)){
-					return "spin_ccw";
-				} else {
-					substate3=3;
-					rnTimeb=milliTime;
-				}
-			} else if (substate3==3){
-				if ((milliTime-rnTimeb)<=30000){
-					return "move";
-				} else {
-					state=0;
-					return "stop";
-				}
-			}
-			//if checkPoint to location is less than 5m drive in direction towards point
-			//check is have travelled 5 m
-			//if have not travelled 5 m determine direction towards goal
-			//turn to face direction towards goal
-			//drive until has moved 5m 
-			//use some sort of substate maybe?
+			//System.exit(0);
+			return "stop";
+//State 4 Goal Reached
+		} else if (state==4){
+			checkTime=milliTime;
+			return "stop";
 		}
 }
-
 
 		return "delay100";
 		//end line of code
 	}
 		
 
-	//Method for selection of minimum option
-		@SuppressWarnings("unused")
-		private double minscore(double o1,double o2,double o3,double o4,double o5,double o6,double o7,double o8,double o9,double o10,double o11,double o12,double o13, double o14, double o15,double o16) {
-			double tested;
-			int Option;
-			double Oang;
-			if (o1<=o2){
-				Option=1;
-				tested=o1;
-				Oang=0;
-			}else{
-				Option=2;
-				tested=o2;
-				Oang=Math.PI/8;
-			}
-			if (tested<=o3){
-			}else{
-				Option=3;
-				tested=o3;
-				Oang=2*Math.PI/8;
-			}
-			if (tested<=o4){
-			}else{
-				Option=4;
-				tested=o4;
-				Oang=3*Math.PI/8;
-			}
-			if (tested<=o5){
-			}else{
-				Option=5;
-				tested=o5;
-				Oang=4*Math.PI/8;
-			}
-			if (tested<=o6){
-			}else{
-				Option=6;
-				tested=o6;
-				Oang=5*Math.PI/8;
-			}
-			if (tested<=o7){
-			}else{
-				Option=7;
-				tested=o7;
-				Oang=6*Math.PI/8;
-			}
-			if (tested<=o8){
-			}else{
-				Option=8;
-				tested=o8;
-				Oang=7*Math.PI/8;
-			}
-			if (tested<=o9){
-			}else{
-				Option=9;
-				tested=o9;
-				Oang=8*Math.PI/8;
-			}
-			if (tested<=o10){
-			}else{
-				Option=10;
-				tested=o10;
-				Oang=9*Math.PI/8;
-			}
-			if (tested<=o11){
-			}else{
-				Option=11;
-				tested=o11;
-				Oang=10*Math.PI/8;
-			}
-			if (tested<=o12){
-			}else{
-				Option=12;
-				tested=o12;
-				Oang=11*Math.PI/8;
-			}
-			if (tested<=o13){
-			}else{
-				Option=13;
-				tested=o13;
-				Oang=12*Math.PI/8;
-			}
-			if (tested<=o14){
-			}else{
-				Option=14;
-				tested=o14;
-				Oang=13*Math.PI/8;
-			}
-			if (tested<=o15){
-			}else{
-				Option=15;
-				tested=o15;
-				Oang=14*Math.PI/8;
-			}
-			if (tested<=o16){
-			}else{
-				Option=16;
-				tested=o16;
-				Oang=15*Math.PI/8;
-			}
-			return Oang;
+//Method for selection of minimum option
+	@SuppressWarnings("unused")
+	private double minscore(double o1,double o2,double o3,double o4,double o5,double o6,double o7,double o8,double o9,double o10,double o11,double o12,double o13, double o14, double o15,double o16) {
+		double tested;
+		int Option;
+		double Oang;
+		if (o1<=o2){
+			Option=1;
+			tested=o1;
+			Oang=0;
+		}else{
+			Option=2;
+			tested=o2;
+			Oang=Math.PI/8;
 		}
+		if (tested<=o3){
+		}else{
+			Option=3;
+			tested=o3;
+			Oang=2*Math.PI/8;
+		}
+		if (tested<=o4){
+		}else{
+			Option=4;
+			tested=o4;
+			Oang=3*Math.PI/8;
+		}
+		if (tested<=o5){
+		}else{
+			Option=5;
+			tested=o5;
+			Oang=4*Math.PI/8;
+		}
+		if (tested<=o6){
+		}else{
+			Option=6;
+			tested=o6;
+			Oang=5*Math.PI/8;
+		}
+		if (tested<=o7){
+		}else{
+			Option=7;
+			tested=o7;
+			Oang=6*Math.PI/8;
+		}
+		if (tested<=o8){
+		}else{
+			Option=8;
+			tested=o8;
+			Oang=7*Math.PI/8;
+		}
+		if (tested<=o9){
+		}else{
+			Option=9;
+			tested=o9;
+			Oang=8*Math.PI/8;
+		}
+		if (tested<=o10){
+		}else{
+			Option=10;
+			tested=o10;
+			Oang=9*Math.PI/8;
+		}
+		if (tested<=o11){
+		}else{
+			Option=11;
+			tested=o11;
+			Oang=10*Math.PI/8;
+		}
+		if (tested<=o12){
+		}else{
+			Option=12;
+			tested=o12;
+			Oang=11*Math.PI/8;
+		}
+		if (tested<=o13){
+		}else{
+			Option=13;
+			tested=o13;
+			Oang=12*Math.PI/8;
+		}
+		if (tested<=o14){
+		}else{
+			Option=14;
+			tested=o14;
+			Oang=13*Math.PI/8;
+		}
+		if (tested<=o15){
+		}else{
+			Option=15;
+			tested=o15;
+			Oang=14*Math.PI/8;
+		}
+		if (tested<=o16){
+		}else{
+			Option=16;
+			tested=o16;
+			Oang=15*Math.PI/8;
+		}
+		return Oang;
+	}
 	
 //Method for finding linear distance between two points
 	private double pythagorean(DecimalPoint A,DecimalPoint B){
@@ -520,6 +423,7 @@ if (milliTime-rnTime>=500){
 		return C;
 	}
 //Method for determining Point Optimization Score
+	@SuppressWarnings("unused")
 	private double RouteChoice(DecimalPoint pnt,DecimalPoint loc){
 		double score;
 		double hzrds;
@@ -561,8 +465,8 @@ if (milliTime-rnTime>=500){
 		//intermediate point
 			//average of pnt and loc
 		DecimalPoint intpnt;
-		intpnt=loc.offset(Pt_X/2,Pt_Y/2);
-		double intPt_L=Math.sqrt(Math.pow(Pt_X/2, 2)+Math.pow(Pt_Y/2, 2));
+		intpnt=loc.offset(Pt_X/10,Pt_Y/10);
+		double intPt_L=Math.sqrt(Math.pow(Pt_X/10, 2)+Math.pow(Pt_Y/10, 2));
 		double intPt_Z=MAP.getHeightAt(intpnt)-MAP.getHeightAt(loc);
 		double intTheta=Math.atan(intPt_Z/intPt_L);
 		if (intTheta>=0.15){
@@ -572,48 +476,12 @@ if (milliTime-rnTime>=500){
 		}
 		
 		//score point for optimality
-		score=Math.abs((theta-thetaP)/((theta+thetaP)/2))+5*Math.abs((delta_L-Pd_L-1)/((delta_L-Pd_L+3)/2))+hzrds+slopehzrd+intslopehzrd;
+		score=Math.abs((delta_L-Pd_L-1)/((delta_L-Pd_L+3)/2));
 		return score;
 	}
-
-		//Method for determining Point that is best at escaping a hole
-		@SuppressWarnings("unused")
-		private double FastRoute(DecimalPoint pnt,DecimalPoint loc){
-			double score;
-
-			double delta_X=Trgt.getX()-loc.getX();
-			double delta_Y=Trgt.getY()-loc.getY();
-			double delta_L=Math.sqrt(Math.pow(delta_X, 2)+Math.pow(delta_Y, 2));
-			double delta_Z=MAP.getHeightAt(Trgt)-MAP.getHeightAt(loc);
-			
-			//target drive direction
-			double phi=Math.atan(delta_Y/delta_X);
-			//target climb angle
-			double theta=Math.atan(delta_Z/delta_L);
-			
-			double Pd_X=Trgt.getX()-pnt.getX();
-			double Pd_Y=Trgt.getY()-pnt.getY();
-			double Pt_X=pnt.getX()-loc.getX();
-			double Pt_Y=pnt.getY()-loc.getY();
-			double Pd_L=Math.sqrt(Math.pow(Pd_X, 2)+Math.pow(Pd_Y, 2));
-			double Pd_Z=MAP.getHeightAt(Trgt)-MAP.getHeightAt(pnt);
-			double Pt_L=Math.sqrt(Math.pow(Pt_X, 2)+Math.pow(Pt_Y, 2));
-			double Pt_Z=MAP.getHeightAt(pnt)-MAP.getHeightAt(loc);
-			double phiP=Math.atan(Pd_Y/Pd_X);
-			double thetaP=Math.atan(Pt_Z/Pt_L);
-			
-			
-			//score point for optimality
-			//score=(Math.abs((theta-thetaP)/((theta+thetaP)/2)))*(Math.pow(10,(Pd_L-delta_L+1))/100);
-			//score=(Math.pow(10,(Pd_L-delta_L+1))h/100);
-			//score=Math.abs((delta_L-Pd_L-1)/((delta_L-Pd_L+3)/2));
-			//score=Math.abs((theta-thetaP)/((theta+thetaP)/2))*Math.abs((delta_L-Pd_L-1)/((delta_L-Pd_L+3)/2));
-			score=Math.abs((theta-thetaP)/((theta+thetaP)/2))+Math.abs((delta_L-Pd_L-1)/((delta_L-Pd_L+3)/2));
-			return score;
-		}
 		
-		public RAIRcodeRT clone(){
-			return new RAIRcodeRT(this);
+		public RAIRcodeControl clone(){
+			return new RAIRcodeControl(this);
 		}
 
 }

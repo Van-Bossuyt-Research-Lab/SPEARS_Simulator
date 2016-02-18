@@ -1,14 +1,14 @@
-package com.csm.rover.simulator.rover.autoCode;
+package com.csm.rover.simulator.platforms.rover.autoCode;
 
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 
 import java.util.Map;
 
-public class RAIRcodeRA extends RoverAutonomousCode {
+public class RAIRcodeRS extends RoverAutonomousCode {
 
-	private static final long serialVersionUID = -5906418187403643078L;
+	private static final long serialVersionUID = -8559687637329165760L;
 
-	public RAIRcodeRA(RAIRcodeRA in) {
+	public RAIRcodeRS(RAIRcodeRS in) {
 		super(in);
 		this.phiBound = in.phiBound;
 		this.tphi = in.tphi;
@@ -27,7 +27,7 @@ public class RAIRcodeRA extends RoverAutonomousCode {
 		D11=in.D11;
 		D12=in.D12;
 		D13=in.D13;
-		D14=in.D14;
+		D14=in.D14;	
 		D15=in.D15;
 		D16=in.D16;
 		S1 = in.S1;
@@ -113,14 +113,15 @@ public class RAIRcodeRA extends RoverAutonomousCode {
 		int substate3=0;
 		
 		//Target location 
-		DecimalPoint Trgt=new DecimalPoint(-30,-30);
+		//DecimalPoint Trgt=new DecimalPoint(-100,-100);
+		DecimalPoint Trgt=new DecimalPoint(-100,-100);
 
 		private long lastActionTime = 0;
 		private int action = 0;
 		private int seconds = 1;
 		
-		public RAIRcodeRA(){
-			super("RAIR", "RAIR");
+		public RAIRcodeRS(){
+			super("RAIR RS", "RAIR");
 
 		}
 	
@@ -137,8 +138,9 @@ public class RAIRcodeRA extends RoverAutonomousCode {
 		//log
 		boolean hazard=MAP.isPointInHazard(location);
 		double elevation=MAP.getHeightAt(location);
+		
 		writeToLog("RA" +","+state+","+ milliTime +","+ location+","+ elevation+","+direction+","+parameters.get("motor_temp_FL")+","+parameters.get("motor_temp_FR")+","+parameters.get("motor_temp_BL")+","+parameters.get("motor_temp_BR")+","+parameters.get("battery_temp")+","+parameters.get("battery_charge")+","+hazard);
-				
+		
 			//determine variables: arc angle range theta, number of angle increments n, distance checked d, 
 				
 			//Begin loop
@@ -157,6 +159,23 @@ public class RAIRcodeRA extends RoverAutonomousCode {
 			//optimal climb angle
 		double theta=Math.atan(delta_Z/delta_L);
 		
+//code break state 3
+		if (milliTime-checkTime>=600000){
+			//if distance travelled is greater than 10 meters
+			checkTime=milliTime;
+			if (pythagorean(location,checkPoint)>=10){
+				checkPoint=location;
+			} else {
+				//if distance travelled is less that 10 meters
+				//enter state 3
+				state=3;
+				substate3=1;
+			}
+		}
+//Goal Reached State 4 Break
+		if (pythagorean(location,Trgt)<=1.5){
+			state=4;
+		}
 		
 		
 if (milliTime-rnTime>=500){
@@ -274,7 +293,14 @@ if (milliTime-rnTime>=500){
 				state=0;
 				return "stop";
 			}
-
+//State 3 Give up
+		} else if (state==3){
+			//System.exit(0);
+			return "stop";
+//State 4 Goal Reached
+		} else if (state==4){
+			checkTime=milliTime;
+			return "stop";
 		}
 }
 
@@ -386,7 +412,6 @@ if (milliTime-rnTime>=500){
 	}
 	
 //Method for finding linear distance between two points
-	@SuppressWarnings("unused")
 	private double pythagorean(DecimalPoint A,DecimalPoint B){
 		double C;
 		
@@ -439,8 +464,8 @@ if (milliTime-rnTime>=500){
 		//intermediate point
 			//average of pnt and loc
 		DecimalPoint intpnt;
-		intpnt=loc.offset(Pt_X/2,Pt_Y/2);
-		double intPt_L=Math.sqrt(Math.pow(Pt_X/2, 2)+Math.pow(Pt_Y/2, 2));
+		intpnt=loc.offset(Pt_X/10,Pt_Y/10);
+		double intPt_L=Math.sqrt(Math.pow(Pt_X/10, 2)+Math.pow(Pt_Y/10, 2));
 		double intPt_Z=MAP.getHeightAt(intpnt)-MAP.getHeightAt(loc);
 		double intTheta=Math.atan(intPt_Z/intPt_L);
 		if (intTheta>=0.15){
@@ -482,16 +507,12 @@ if (milliTime-rnTime>=500){
 			
 			
 			//score point for optimality
-			//score=(Math.abs((theta-thetaP)/((theta+thetaP)/2)))*(Math.pow(10,(Pd_L-delta_L+1))/100);
-			//score=(Math.pow(10,(Pd_L-delta_L+1))h/100);
-			//score=Math.abs((delta_L-Pd_L-1)/((delta_L-Pd_L+3)/2));
-			//score=Math.abs((theta-thetaP)/((theta+thetaP)/2))*Math.abs((delta_L-Pd_L-1)/((delta_L-Pd_L+3)/2));
 			score=Math.abs((theta-thetaP)/((theta+thetaP)/2))+Math.abs((delta_L-Pd_L-1)/((delta_L-Pd_L+3)/2));
 			return score;
 		}
 		
-		public RAIRcodeRA clone(){
-			return new RAIRcodeRA(this);
+		public RAIRcodeRS clone(){
+			return new RAIRcodeRS(this);
 		}
 
 }

@@ -1,10 +1,10 @@
-package com.csm.rover.simulator.rover;
+package com.csm.rover.simulator.platforms.rover;
 
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.rover.autoCode.RoverAutonomousCode;
-import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
+import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
+import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
 import org.apache.logging.log4j.Level;

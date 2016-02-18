@@ -2,8 +2,8 @@ package com.csm.rover.simulator.wrapper;
 
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
-import com.csm.rover.simulator.rover.RoverObject;
-import com.csm.rover.simulator.satellite.SatelliteObject;
+import com.csm.rover.simulator.platforms.rover.RoverObject;
+import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

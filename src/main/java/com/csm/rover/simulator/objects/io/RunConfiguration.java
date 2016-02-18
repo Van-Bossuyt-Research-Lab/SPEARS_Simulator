@@ -1,7 +1,5 @@
 package com.csm.rover.simulator.objects.io;
 
-import com.csm.rover.simulator.rover.RoverObject;
-import com.csm.rover.simulator.satellite.SatelliteObject;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 
 import java.io.*;

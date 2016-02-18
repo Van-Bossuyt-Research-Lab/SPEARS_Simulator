@@ -9,14 +9,14 @@ import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
-import com.csm.rover.simulator.rover.RoverObject;
-import com.csm.rover.simulator.rover.autoCode.BlankRoverAuto;
-import com.csm.rover.simulator.rover.autoCode.RAIRcode;
-import com.csm.rover.simulator.rover.autoCode.RoverAutonomousCode;
-import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
-import com.csm.rover.simulator.satellite.SatelliteAutonomusCode;
-import com.csm.rover.simulator.satellite.SatelliteObject;
-import com.csm.rover.simulator.satellite.SatelliteParametersList;
+import com.csm.rover.simulator.platforms.rover.RoverObject;
+import com.csm.rover.simulator.platforms.rover.autoCode.BlankRoverAuto;
+import com.csm.rover.simulator.platforms.rover.autoCode.RAIRcode;
+import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
+import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
+import com.csm.rover.simulator.platforms.satellite.SatelliteAutonomusCode;
+import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
+import com.csm.rover.simulator.platforms.satellite.SatelliteParametersList;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -216,7 +216,7 @@ public class Admin {
                     break;
             }
 //            params.constructParameters(config.getPhysicsModelParameters());
-            out.add(new SatelliteObject(config.getScreenName()+" "+x, "s"+x, params, auto, 0, 0, 0));
+            out.add(new SatelliteObject(config.getScreenName() + " " + x, "s" + x, params, auto, 0, 0, 0));
             x++;
         }
         return out;

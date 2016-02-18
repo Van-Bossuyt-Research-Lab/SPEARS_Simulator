@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.satellite;
+package com.csm.rover.simulator.platforms.satellite;
 
 import java.io.Serializable;
 import java.util.Map;

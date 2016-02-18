@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.rover.phsicsModels;
+package com.csm.rover.simulator.platforms.rover.phsicsModels;
 
 public class FailOnHazard extends RoverPhysicsModel {
 

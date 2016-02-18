@@ -1,6 +1,4 @@
-package com.csm.rover.simulator.rover.phsicsModels;
-
-import com.csm.rover.simulator.wrapper.Globals;
+package com.csm.rover.simulator.platforms.rover.phsicsModels;
 
 import java.util.Random;
 

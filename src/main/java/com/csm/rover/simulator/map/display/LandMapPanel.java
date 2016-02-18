@@ -3,8 +3,8 @@ package com.csm.rover.simulator.map.display;
 import com.csm.rover.simulator.map.PlanetParametersList;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
-import com.csm.rover.simulator.rover.RoverHub;
-import com.csm.rover.simulator.rover.RoverObject;
+import com.csm.rover.simulator.platforms.rover.RoverHub;
+import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.visual.Panel;
 
 import java.awt.Color;

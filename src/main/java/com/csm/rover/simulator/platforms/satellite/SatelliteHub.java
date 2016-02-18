@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.satellite;
+package com.csm.rover.simulator.platforms.satellite;
 
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.LEDIndicator;

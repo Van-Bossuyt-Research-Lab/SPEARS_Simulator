@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.satellite;
+package com.csm.rover.simulator.platforms.satellite;
 
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 
