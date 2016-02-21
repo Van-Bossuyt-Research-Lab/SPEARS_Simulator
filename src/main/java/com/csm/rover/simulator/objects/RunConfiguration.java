@@ -1,13 +1,19 @@
 package com.csm.rover.simulator.objects;
 
 import com.csm.rover.simulator.rover.RoverObject;
+import com.csm.rover.simulator.rover.autoCode.RoverAutonomousCode;
+import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
+import com.csm.rover.simulator.satellite.SatelliteAutonomusCode;
 import com.csm.rover.simulator.satellite.SatelliteObject;
+import com.csm.rover.simulator.satellite.SatelliteParametersList;
 import com.csm.rover.simulator.sub.SubObject;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -101,12 +107,12 @@ public class RunConfiguration implements Serializable {
 		*/
 		JsonFactory f = new JsonFactory();
 		JsonParser jp = f.createParser(save);
+		NamesAndTags NT = new NamesAndTags();
 		jp.nextToken();
 		while (jp.nextToken() != JsonToken.END_OBJECT) {
 			String fieldname = jp.getCurrentName();
 			jp.nextToken();
 			if("namesAndTags".equals(fieldname)){
-				NamesAndTags NT = new NamesAndTags();
 				while(jp.nextToken() != JsonToken.END_OBJECT){
 					String namefield = jp.getCurrentName();
 					jp.nextToken();
@@ -137,9 +143,35 @@ public class RunConfiguration implements Serializable {
 				}
 			}
 			this.mapFromFile = false;
+			for(int rn=0; rn<NT.roverNames.size(); rn++){
+				RoverPhysicsModel ph = new RoverPhysicsModel();
+				RoverAutonomousCode ac = new RoverAutonomousCode(NT.getRoverNames().get(rn),NT.getRoverTags().get(rn)) {
+					@Override
+					public String nextCommand(long milliTime, DecimalPoint location, double direction, Map<String, Double> parameters) {
+						return null;
+					}
 
-			this.rovers = input.rovers;
-			this.satellites = input.satellites;
+					@Override
+					public RoverAutonomousCode clone() {
+						return null;
+					}
+				};
+				DecimalPoint dp = new DecimalPoint();
+					RoverObject n = new RoverObject(NT.getRoverNames().get(rn), NT.getRoverTags().get(rn), ph, ac, dp, 0,0);
+				this.rovers.add(n);
+			}
+			for(int rn=0; rn<NT.getSatelliteNames().size(); rn++){
+				SatelliteParametersList spl = new SatelliteParametersList();
+				SatelliteAutonomusCode sac = new SatelliteAutonomusCode(NT.getSatelliteNames().get(rn),NT.getSatelliteTags().get(rn)) {
+					@Override
+					public String nextCommand(long milliTime, DecimalPoint location, double direction, double acceleration, double angular_acceleration, double wheel_speed_FL, double wheel_speed_FR, double wheel_speed_BL, double wheel_speed_BR, double motor_current_FL, double motor_current_FR, double motor_current_BL, double motor_current_BR, double motor_temp_FL, double motor_temp_FR, double motor_temp_BL, double motor_temp_BR, double battery_voltage, double battery_current, double battery_temp) {
+						return null;
+					}
+				};
+
+				SatelliteObject so = new SatelliteObject(NT.getSatelliteNames().get(rn),NT.getSatelliteTags().get(rn), spl,sac, 1000,0,0 );
+				this.satellites.add(so);
+			}
 			this.mapFile = input.mapFile;
 			this.mapRough = input.mapRough;
 			this.mapSize = input.mapSize;
