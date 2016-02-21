@@ -1,8 +1,9 @@
 package com.csm.rover.simulator.platforms.rover;
 
 import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
 import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.wrapper.Globals;
@@ -21,7 +22,7 @@ import java.util.TreeMap;
 
 //TODO actually debug instructions
 //TODO make for modular for OCP, SRP
-public class RoverObject implements Serializable {
+public class RoverObject extends Platform implements Serializable {
 	private static final Logger LOG = LogManager.getLogger(RoverObject.class);
 	
 	private static final long serialVersionUID = 1L;
@@ -84,7 +85,8 @@ public class RoverObject implements Serializable {
 	private Map<String, Boolean> LEDs = new TreeMap<String, Boolean>();
 	
 	public RoverObject(String name, String ID, RoverPhysicsModel param, RoverAutonomousCode code, DecimalPoint loc, double dir, double temp){
-		this.name = name;
+		super("Rover");
+        this.name = name;
 		IDcode = ID;
 		physics = param;
 		autoCode = code;
@@ -144,7 +146,7 @@ public class RoverObject implements Serializable {
 															// to prevent starting a message not intended for the rover 
 															// from within the body of another message
 					serialBuffers.ReadSerial(IDcode); // white space
-					tag = (char) serialBuffers.ReadSerial(IDcode); // get type tag
+					tag = (char) serialBuffers.ReadSerial(IDcode); // get platform_type tag
 					if (serialBuffers.RFAvailable(IDcode) > 0) { // if there is more to the message
 						run_auto = false; // stop running autonomously
 						data[0] = tag; // tag is not actually import, just read the entire body of the message

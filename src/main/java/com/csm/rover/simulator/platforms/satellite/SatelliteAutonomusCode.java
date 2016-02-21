@@ -1,11 +1,12 @@
 package com.csm.rover.simulator.platforms.satellite;
 
 import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 
 import java.io.Serializable;
 import java.util.Map;
 
-public abstract class SatelliteAutonomusCode implements Serializable {
+public abstract class SatelliteAutonomusCode extends PlatformAutonomousCodeModel implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -13,6 +14,7 @@ public abstract class SatelliteAutonomusCode implements Serializable {
 	private String satelliteName;
 	
 	public SatelliteAutonomusCode(String name, String satellite){
+        super("Satellite");
 		this.name = name;
 		satelliteName = satellite;
 	}

@@ -4,6 +4,7 @@ import com.csm.rover.simulator.map.PlanetParametersList;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
 import com.csm.rover.simulator.platforms.rover.MotorState;
 import com.csm.rover.simulator.platforms.rover.RoverWheels;
 import com.csm.rover.simulator.wrapper.Admin;
@@ -15,7 +16,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 //TODO add implementation with better time stepping
-public class RoverPhysicsModel implements Serializable, Cloneable {
+public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializable, Cloneable {
 	private static final Logger LOG = LogManager.getLogger(RoverPhysicsModel.class);
 
 	private static final long serialVersionUID = 1L;
@@ -91,13 +92,16 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	protected double slip_acceleration = 0; //m/s^2
 	protected double slip_velocity = 0; //m/s
 	
-	public RoverPhysicsModel() {}
+	public RoverPhysicsModel() {
+        super("Rover");
+    }
 
     public static void setTerrainMap(TerrainMap map){
         MAP = map;
     }
 	
 	protected RoverPhysicsModel(RoverPhysicsModel origin){
+        super("Rover");
 		roverName = origin.roverName;
 		battery_max_charge = origin.battery_max_charge;
 		fric_gr_all = origin.fric_gr_all;

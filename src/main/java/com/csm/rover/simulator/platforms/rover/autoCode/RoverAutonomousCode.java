@@ -3,6 +3,7 @@ package com.csm.rover.simulator.platforms.rover.autoCode;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -13,7 +14,7 @@ import org.joda.time.format.DateTimeFormat;
 import java.io.*;
 import java.util.Map;
 
-public abstract class RoverAutonomousCode implements Serializable, Cloneable {
+public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel implements Serializable, Cloneable {
 	private static final Logger LOG = LogManager.getLogger(RoverAutonomousCode.class);
 
 	private static final long serialVersionUID = 1L;
@@ -26,6 +27,7 @@ public abstract class RoverAutonomousCode implements Serializable, Cloneable {
 	private File logFile;
 	
 	public RoverAutonomousCode(String name, String rover){
+        super("Rover");
 		this.name = name;
 		roverName = rover;
 	}
@@ -35,6 +37,7 @@ public abstract class RoverAutonomousCode implements Serializable, Cloneable {
     }
 	
 	public RoverAutonomousCode(RoverAutonomousCode rac){
+        super(rac.platform_type);
 		this.name = rac.name;
 		this.roverName = rac.roverName;
 	}

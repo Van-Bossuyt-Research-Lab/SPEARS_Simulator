@@ -77,7 +77,7 @@ class Builder {
     public PlatformConfig build(){
         String missing = "";
         if (config.type == null){
-            missing += " type";
+            missing += " platform_type";
         }
         if (config.screenName == null){
             missing += " screenName";

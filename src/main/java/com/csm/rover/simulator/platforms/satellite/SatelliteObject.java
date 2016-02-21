@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.platforms.satellite;
 
 import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
 import org.apache.logging.log4j.Level;
@@ -15,7 +16,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 @SuppressWarnings("unused")
-public class SatelliteObject implements Serializable {
+public class SatelliteObject extends Platform implements Serializable {
 	private static final Logger LOG = LogManager.getLogger(SatelliteObject.class);
 
 	private static final long serialVersionUID = 1L;
@@ -48,7 +49,8 @@ public class SatelliteObject implements Serializable {
 	private Map<String, Boolean> LEDs = new TreeMap<String, Boolean>();
 	
 	public SatelliteObject(String name, String id, SatelliteParametersList params, SatelliteAutonomusCode code, double altitue, double orbitIncline, double theta){
-		this.name = name;
+		super("Satellite");
+        this.name = name;
 		IDcode = id;
 		this.params = params;
 		autoCode = code;
@@ -90,7 +92,7 @@ public class SatelliteObject implements Serializable {
 				if (strcmp(id, IDcode) == 0) { // if the message is for us and are we allowed to read it
 					delay(500);
 					serialBuffers.ReadSerial(IDcode); // white space
-					tag[0] = (char) serialBuffers.ReadSerial(IDcode); // message type tag
+					tag[0] = (char) serialBuffers.ReadSerial(IDcode); // message platform_type tag
 					if (tag[0] == 'r'){
 						tag[1] = (char) serialBuffers.ReadSerial(IDcode); //number of rover
 						index = 3;

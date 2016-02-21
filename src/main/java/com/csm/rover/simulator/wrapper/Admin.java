@@ -9,6 +9,7 @@ import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.rover.autoCode.BlankRoverAuto;
 import com.csm.rover.simulator.platforms.rover.autoCode.RAIRcode;
@@ -40,6 +41,7 @@ public class Admin {
     private SerialBuffers serialBuffers;
 
 	public static void main(String[] args) {
+        PlatformRegistry.fillRegistry();
 		Admin admin = getInstance();
 		LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
 		if (args.length == 0) {

@@ -1,10 +1,10 @@
 package com.csm.rover.simulator.visual;
 
 import com.csm.rover.simulator.control.PopUp;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
-import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.objects.io.MapFileFilter;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
 import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
@@ -13,7 +13,6 @@ import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteParametersList;
 import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
-import com.csm.rover.simulator.wrapper.NamesAndTags;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +26,6 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
@@ -498,47 +496,48 @@ public class StartupPanel extends Panel {
     }
 
     public RunConfiguration getConfigurationFromForm(){
-        ArrayList<String> roverNames = new ArrayList<String>();
-        ArrayList<String> roverTags = new ArrayList<String>();
-        ArrayList<RoverObject> rovers = new ArrayList<RoverObject>(roversToAdd.size());
-        ArrayList<String> satelliteNames = new ArrayList<String>();
-        ArrayList<String> satelliteTags = new ArrayList<String>();
-        ArrayList<SatelliteObject> satellites = new ArrayList<SatelliteObject>(satsToAdd.size());
-        int x = 0;
-        while (x < SatelliteList.getItems().size()){
-            String key = (String)SatelliteList.getItemAt(x);
-            satellites.add(x, satsToAdd.get(key));
-            satelliteNames.add(key);
-            satelliteTags.add(satellites.get(x).getIDCode());
-            x++;
-        }
-        x = 0;
-        while (x < RoverList.getItems().size()){
-            String key = (String)RoverList.getItemAt(x);
-            rovers.add(roversToAdd.get(key));
-            roverNames.add(key);
-            roverTags.add(rovers.get(x).getIDTag());
-            x++;
-        }
-        NamesAndTags namesAndTags = new NamesAndTags(roverNames, roverTags, satelliteNames, satelliteTags);
-        if (TypeSelector.getSelectedIndex() == 1){
-            File mapFile = new File(FileLocTxt.getText());
-            return new RunConfiguration(namesAndTags, rovers, satellites, mapFile, AccelChk.isSelected(),
-                    (Integer)RuntimeSpnr.getValue());
-        }
-        else {
-            double mapRough = MapRoughSlider.getValue()/50000.0;
-            int mapSize = (Integer) MapSizeSpnr.getValue();
-            int mapDetail = (Integer) MapDetailSpnr.getValue();
-            double targetDensity = (Double) TargetDensitySpnr.getValue()/1000.;
-            double hazardDensity = (Double) HazardDensitySpnr.getValue()/1000.;
-            boolean monoTargets = !ValuedTargetsChk.isSelected(); //cause the form says use and the computer reads not using
-            boolean monoHazards = !ValuedHazardsChk.isSelected();
-            return new RunConfiguration(namesAndTags, rovers, satellites, mapRough,
-                    mapSize, mapDetail, targetDensity, hazardDensity, monoTargets,
-                    monoHazards, AccelChk.isSelected(),
-                    (Integer)RuntimeSpnr.getValue());
-        }
+        return null;
+//        ArrayList<String> roverNames = new ArrayList<String>();
+//        ArrayList<String> roverTags = new ArrayList<String>();
+//        ArrayList<RoverObject> rovers = new ArrayList<RoverObject>(roversToAdd.size());
+//        ArrayList<String> satelliteNames = new ArrayList<String>();
+//        ArrayList<String> satelliteTags = new ArrayList<String>();
+//        ArrayList<SatelliteObject> satellites = new ArrayList<SatelliteObject>(satsToAdd.size());
+//        int x = 0;
+//        while (x < SatelliteList.getItems().size()){
+//            String key = (String)SatelliteList.getItemAt(x);
+//            satellites.add(x, satsToAdd.get(key));
+//            satelliteNames.add(key);
+//            satelliteTags.add(satellites.get(x).getIDCode());
+//            x++;
+//        }
+//        x = 0;
+//        while (x < RoverList.getItems().size()){
+//            String key = (String)RoverList.getItemAt(x);
+//            rovers.add(roversToAdd.get(key));
+//            roverNames.add(key);
+//            roverTags.add(rovers.get(x).getIDTag());
+//            x++;
+//        }
+//        NamesAndTags namesAndTags = new NamesAndTags(roverNames, roverTags, satelliteNames, satelliteTags);
+//        if (TypeSelector.getSelectedIndex() == 1){
+//            File mapFile = new File(FileLocTxt.getText());
+//            return new RunConfiguration(namesAndTags, rovers, satellites, mapFile, AccelChk.isSelected(),
+//                    (Integer)RuntimeSpnr.getValue());
+//        }
+//        else {
+//            double mapRough = MapRoughSlider.getValue()/50000.0;
+//            int mapSize = (Integer) MapSizeSpnr.getValue();
+//            int mapDetail = (Integer) MapDetailSpnr.getValue();
+//            double targetDensity = (Double) TargetDensitySpnr.getValue()/1000.;
+//            double hazardDensity = (Double) HazardDensitySpnr.getValue()/1000.;
+//            boolean monoTargets = !ValuedTargetsChk.isSelected(); //cause the form says use and the computer reads not using
+//            boolean monoHazards = !ValuedHazardsChk.isSelected();
+//            return new RunConfiguration(namesAndTags, rovers, satellites, mapRough,
+//                    mapSize, mapDetail, targetDensity, hazardDensity, monoTargets,
+//                    monoHazards, AccelChk.isSelected(),
+//                    (Integer)RuntimeSpnr.getValue());
+//        }
     }
 
     public void addRoverToList(){
