@@ -41,9 +41,9 @@ public class Admin {
     private SerialBuffers serialBuffers;
 
 	public static void main(String[] args) {
+        LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
         PlatformRegistry.fillRegistry();
 		Admin admin = getInstance();
-		LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");
             HI = new HiForm();

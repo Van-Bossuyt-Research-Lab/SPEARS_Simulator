@@ -32,6 +32,7 @@ public class PlatformRegistry {
     }
 
     private void doFillRegistry(){
+        LOG.log(Level.INFO, "Initializing Platform Registry");
         Reflections reflect = new Reflections("com.csm.rover.simulator");
 
         fillPlatforms(reflect);
@@ -44,6 +45,7 @@ public class PlatformRegistry {
         for (Class<? extends Platform> platform : platforms){
             this.platforms.add(getClassPath(platform));
         }
+        LOG.log(Level.INFO, "Identified Platforms: {}", platforms.toString());
     }
 
     private void fillAutoModels(Reflections reflect){
@@ -53,6 +55,7 @@ public class PlatformRegistry {
                 this.autoModels.put(getClassPath(auto), new ArrayList<String>());
             }
         }
+        LOG.log(Level.INFO, "Identified AutonomousModel Types: {}", autoModels.keySet().toString());
         for (String platformModel : autoModels.keySet()){
             try {
                 Set<?> models = reflect.getSubTypesOf(Class.forName(platformModel));
@@ -68,6 +71,7 @@ public class PlatformRegistry {
             catch (Exception e){
                 LOG.log(Level.ERROR, "Platform of class " + platformModel + " was found but could not be accessed", e);
             }
+            LOG.log(Level.INFO, "For AutonomousModel Type \"{}\" found Models: {}", platformModel, autoModels.get(platformModel).toString());
         }
     }
 
@@ -78,6 +82,7 @@ public class PlatformRegistry {
                 this.physicsModels.put(getClassPath(physics), new ArrayList<String>());
             }
         }
+        LOG.log(Level.INFO, "Identified PhysicsModel Types: {}", physicsModels.keySet().toString());
         for (String platformModel : physicsModels.keySet()) {
             try {
                 Set<?> models = reflect.getSubTypesOf(Class.forName(platformModel));
@@ -91,6 +96,7 @@ public class PlatformRegistry {
             } catch (Exception e) {
                 LOG.log(Level.ERROR, "Platform of class " + platformModel + " was found but could not be accessed", e);
             }
+            LOG.log(Level.INFO, "For PhysicsModel Type \"{}\" found Models: {}", platformModel, physicsModels.get(platformModel).toString());
         }
     }
 
