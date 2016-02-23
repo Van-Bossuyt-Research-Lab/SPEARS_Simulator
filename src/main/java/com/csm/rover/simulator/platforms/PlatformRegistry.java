@@ -1,5 +1,7 @@
 package com.csm.rover.simulator.platforms;
 
+import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
+import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,14 +18,14 @@ public class PlatformRegistry {
 
     private static Optional<PlatformRegistry> instance;
     private PlatformRegistry(){
-        platforms = new ArrayList<>();
+        platforms = new TreeMap<>();
         autoModels = new TreeMap<>();
         physicsModels = new TreeMap<>();
     }
 
-    private ArrayList<String> platforms;
-    private Map<String, ArrayList<String>> autoModels;
-    private Map<String, ArrayList<String>> physicsModels;
+    private Map<String, String> platforms;
+    private Map<String, Map<String, String>> autoModels;
+    private Map<String, Map<String, String>> physicsModels;
 
     public static void fillRegistry(){
         PlatformRegistry reg = new PlatformRegistry();
@@ -41,67 +43,147 @@ public class PlatformRegistry {
     }
 
     private void fillPlatforms(Reflections reflect){
-        Set<Class<? extends Platform>> platforms = reflect.getSubTypesOf(Platform.class);
-        for (Class<? extends Platform> platform : platforms){
-            this.platforms.add(getClassPath(platform));
+        Set<Class<? extends Platform>> classplatforms = reflect.getSubTypesOf(Platform.class);
+        Set<Class<?>> labelplatforms = reflect.getTypesAnnotatedWith(com.csm.rover.simulator.platforms.annotations.Platform.class);
+        List<Set<?>> sortedSets = sortSets(classplatforms, labelplatforms);
+        @SuppressWarnings("unchecked")
+        Set<Class<?>> warnset1 = (Set<Class<?>>)sortedSets.get(0);
+        for (Class<?> clazz : warnset1){
+            LOG.log(Level.WARN, "{} extends Platform but is not registered as a Platform", clazz.toString());
         }
-        LOG.log(Level.INFO, "Identified Platforms: {}", platforms.toString());
+        @SuppressWarnings("unchecked")
+        Set<Class<?>> warnset2 = (Set<Class<?>>)sortedSets.get(2);
+        for (Class<?> clazz : warnset2){
+            LOG.log(Level.WARN, "{} is a registered Platform but does not extend Platform", clazz.toString());
+        }
+
+        @SuppressWarnings("unchecked")
+        Set<Class<? extends Platform>> realplatforms = (Set<Class<? extends Platform>>)sortedSets.get(1);
+        for (Class<? extends Platform> platform : realplatforms){
+            String type = platform.getAnnotation(com.csm.rover.simulator.platforms.annotations.Platform.class).type();
+            this.platforms.put(type, getClassPath(platform));
+        }
+        LOG.log(Level.INFO, "Identified Platforms: {}", this.platforms.toString());
     }
 
     private void fillAutoModels(Reflections reflect){
-        Set<Class<? extends PlatformAutonomousCodeModel>> allautos = reflect.getSubTypesOf(PlatformAutonomousCodeModel.class);
-        for (Class<? extends PlatformAutonomousCodeModel> auto : allautos){
+        for (String type : platforms.keySet()){
+            autoModels.put(type, new TreeMap<String, String>());
+        }
+
+        Set<Class<? extends PlatformAutonomousCodeModel>> classautos = reflect.getSubTypesOf(PlatformAutonomousCodeModel.class);
+        Set<Class<?>> labelautos = reflect.getTypesAnnotatedWith(com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel.class);
+        List<Set<?>> sortedSets = sortSets(classautos, labelautos);
+        @SuppressWarnings("unchecked")
+        Set<Class<?>> warnset1 = (Set<Class<?>>)sortedSets.get(0);
+        for (Class<?> clazz : warnset1){
+            LOG.log(Level.WARN, "{} extends PlatformAutonomousCodeModel but is not registered as an AutonomousCodeModel", clazz.toString());
+        }
+        @SuppressWarnings("unchecked")
+        Set<Class<?>> warnset2 = (Set<Class<?>>)sortedSets.get(2);
+        for (Class<?> clazz : warnset2){
+            LOG.log(Level.WARN, "{} is a registered AutonomousCodeModel but does not extend PlatformAutonomousCodeModel", clazz.toString());
+        }
+
+        @SuppressWarnings("unchecked")
+        Set<Class<? extends PlatformAutonomousCodeModel>> realautos = (Set<Class<? extends PlatformAutonomousCodeModel>>)sortedSets.get(1);
+        for (Class<? extends PlatformAutonomousCodeModel> auto : realautos){
             if (reflect.getSubTypesOf(auto).size() > 0){
-                this.autoModels.put(getClassPath(auto), new ArrayList<String>());
+                //Model is a Platform Master
+                continue;
+            }
+            String type = auto.getAnnotation(AutonomousCodeModel.class).type();
+            String name = auto.getAnnotation(AutonomousCodeModel.class).name();
+            String clazz = getClassPath(auto);
+            if (autoModels.keySet().contains(type)){
+                autoModels.get(type).put(name, clazz);
+            }
+            else {
+                LOG.log(Level.WARN, "AutonomousCodeModel {} has type {} which is not a recognized platform", clazz, type);
             }
         }
-        LOG.log(Level.INFO, "Identified AutonomousModel Types: {}", autoModels.keySet().toString());
-        for (String platformModel : autoModels.keySet()){
-            try {
-                Set<?> models = reflect.getSubTypesOf(Class.forName(platformModel));
-                for (Object model : models){
-                    try {
-                        autoModels.get(platformModel).add(getClassPath((Class<?>)model));
-                    }
-                    catch (ClassCastException e){
-                        LOG.log(Level.ERROR, model+" could not be parsed to a Class<?> object", e);
-                    }
-                }
-            }
-            catch (Exception e){
-                LOG.log(Level.ERROR, "Platform of class " + platformModel + " was found but could not be accessed", e);
-            }
-            LOG.log(Level.INFO, "For AutonomousModel Type \"{}\" found Models: {}", platformModel, autoModels.get(platformModel).toString());
+        for (String type : autoModels.keySet()){
+            LOG.log(Level.INFO, "For platform type {} found AutonomousCodeModels: {}", type, autoModels.get(type).toString());
         }
     }
 
     private void fillPhysicsModels(Reflections reflect){
-        Set<Class<? extends PlatformPhysicsModel>> allphysics = reflect.getSubTypesOf(PlatformPhysicsModel.class);
-        for (Class<? extends PlatformPhysicsModel> physics : allphysics){
-            if (reflect.getSubTypesOf(physics).size() > 0){
-                this.physicsModels.put(getClassPath(physics), new ArrayList<String>());
+        for (String type : platforms.keySet()){
+            physicsModels.put(type, new TreeMap<String, String>());
+        }
+
+        Set<Class<? extends PlatformPhysicsModel>> classphysics = reflect.getSubTypesOf(PlatformPhysicsModel.class);
+        Set<Class<?>> labelphysics = reflect.getTypesAnnotatedWith(com.csm.rover.simulator.platforms.annotations.PhysicsModel.class);
+        List<Set<?>> sortedSets = sortSets(classphysics, labelphysics);
+        @SuppressWarnings("unchecked")
+        Set<Class<?>> warnset1 = (Set<Class<?>>)sortedSets.get(0);
+        for (Class<?> clazz : warnset1){
+            LOG.log(Level.WARN, "{} extends PlatformPhysicsModel but is not registered as a PhysicsModel", clazz.toString());
+        }
+        @SuppressWarnings("unchecked")
+        Set<Class<?>> warnset2 = (Set<Class<?>>)sortedSets.get(2);
+        for (Class<?> clazz : warnset2){
+            LOG.log(Level.WARN, "{} is a registered PhysicsModel but does not extend PlatformPhysicsModel", clazz.toString());
+        }
+
+        @SuppressWarnings("unchecked")
+        Set<Class<? extends PlatformPhysicsModel>> realphysics = (Set<Class<? extends PlatformPhysicsModel>>)sortedSets.get(1);
+        for (Class<? extends PlatformPhysicsModel> physic : realphysics){
+            if (reflect.getSubTypesOf(physic).size() > 0){
+                //Model is a Platform Master
+                continue;
+            }
+            String type = physic.getAnnotation(PhysicsModel.class).type();
+            String name = physic.getAnnotation(PhysicsModel.class).name();
+            String clazz = getClassPath(physic);
+            if (physicsModels.keySet().contains(type)){
+                physicsModels.get(type).put(name, clazz);
+            }
+            else {
+                LOG.log(Level.WARN, "PhysicsModel {} has type {} which is not a recognized platform", clazz, type);
             }
         }
-        LOG.log(Level.INFO, "Identified PhysicsModel Types: {}", physicsModels.keySet().toString());
-        for (String platformModel : physicsModels.keySet()) {
-            try {
-                Set<?> models = reflect.getSubTypesOf(Class.forName(platformModel));
-                for (Object model : models) {
-                    try {
-                        physicsModels.get(platformModel).add(getClassPath((Class<?>) model));
-                    } catch (ClassCastException e) {
-                        LOG.log(Level.ERROR, model + " could not be parsed to a Class<?> object", e);
-                    }
-                }
-            } catch (Exception e) {
-                LOG.log(Level.ERROR, "Platform of class " + platformModel + " was found but could not be accessed", e);
-            }
-            LOG.log(Level.INFO, "For PhysicsModel Type \"{}\" found Models: {}", platformModel, physicsModels.get(platformModel).toString());
+        for (String type : autoModels.keySet()){
+            LOG.log(Level.INFO, "For platform type {} found PhysicsModels: {}", type, physicsModels.get(type).toString());
         }
     }
 
     private static String getClassPath(Class<?> clazz){
         return clazz.toString().substring(clazz.toString().indexOf(' ')+1);
+    }
+
+    private <T,V> List<Set<?>> sortSets(Set<T> set1, Set<V> set2){
+        Map<String,T> strs1 = new HashMap<>();
+        for (T t : set1){
+            strs1.put(t.toString(), t);
+        }
+        Map<String, V> strs2 = new HashMap<>();
+        for (V v : set2){
+            strs2.put(v.toString(), v);
+        }
+        Set<T> just1 = new HashSet<>();
+        Set<V> just2 = new HashSet<>();
+        Map<String, T> both = new HashMap<>();
+        for (String s1 : strs1.keySet()){
+            for (String s2 : strs2.keySet()){
+                if (s1.equals(s2)){
+                    both.put(s1, strs1.get(s1));
+                }
+            }
+            if (!both.keySet().contains(s1)){
+                just1.add(strs1.get(s1));
+            }
+        }
+        for (String s2 : strs2.keySet()){
+            if (!both.keySet().contains(s2)){
+                just2.add(strs2.get(s2));
+            }
+        }
+        List<Set<?>> out = new ArrayList<>();
+        out.add(just1);
+        out.add(new HashSet<T>(both.values()));
+        out.add(just2);
+        return out;
     }
 
 }
