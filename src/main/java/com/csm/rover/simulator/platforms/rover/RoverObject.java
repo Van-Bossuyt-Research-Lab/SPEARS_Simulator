@@ -22,6 +22,7 @@ import java.util.TreeMap;
 
 //TODO actually debug instructions
 //TODO make for modular for OCP, SRP
+@com.csm.rover.simulator.platforms.annotations.Platform(type="Rover")
 public class RoverObject extends Platform implements Serializable {
 	private static final Logger LOG = LogManager.getLogger(RoverObject.class);
 	

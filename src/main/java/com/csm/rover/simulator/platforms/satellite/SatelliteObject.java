@@ -16,6 +16,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 @SuppressWarnings("unused")
+@com.csm.rover.simulator.platforms.annotations.Platform(type="Satellite")
 public class SatelliteObject extends Platform implements Serializable {
 	private static final Logger LOG = LogManager.getLogger(SatelliteObject.class);
 
