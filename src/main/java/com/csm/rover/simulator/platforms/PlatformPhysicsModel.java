@@ -12,4 +12,7 @@ public abstract class PlatformPhysicsModel {
         return platform_type;
     }
 
+//    public abstract void constructParameters(Map<String, Double> params);
+//    public abstract Map<String, Double> getParameters();
+
 }
