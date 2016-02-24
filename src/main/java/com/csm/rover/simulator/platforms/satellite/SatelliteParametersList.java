@@ -1,10 +1,12 @@
 package com.csm.rover.simulator.platforms.satellite;
 
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
+import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 
 import java.io.Serializable;
 import java.util.Map;
 
+@PhysicsModel(type="Satellite", name="Default")
 public class SatelliteParametersList extends PlatformPhysicsModel implements Serializable {
 
     public SatelliteParametersList(){
@@ -13,7 +15,18 @@ public class SatelliteParametersList extends PlatformPhysicsModel implements Ser
 
 	private static final long serialVersionUID = 1L;
 
+    @Override
     public void constructParameters(Map<String, Double> params){
+
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void updatePhysics() {
 
     }
 

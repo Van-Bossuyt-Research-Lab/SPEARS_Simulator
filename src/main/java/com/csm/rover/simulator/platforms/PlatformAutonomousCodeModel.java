@@ -1,5 +1,9 @@
 package com.csm.rover.simulator.platforms;
 
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+
+import java.util.Map;
+
 public abstract class PlatformAutonomousCodeModel {
 
     protected final String platform_type;
@@ -12,9 +16,9 @@ public abstract class PlatformAutonomousCodeModel {
         return platform_type;
     }
 
-//    public abstract void constructParameters(Map<String, Double> params);
-//    public abstract Map<String, Double> getParameters();
+    public abstract void constructParameters(Map<String, Double> params);
 
-
+    public abstract String nextCommand(long milliTime, DecimalPoint location,
+                                       double direction, Map<String, Double> parameters);
 
 }

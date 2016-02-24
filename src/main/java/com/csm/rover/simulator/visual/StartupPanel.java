@@ -555,9 +555,9 @@ public class StartupPanel extends Panel {
             //TODO change temp to map temp
             RoverList.addValue(newName);
             //if you're getting errors with rovers 'sharing' data it's the pass reference value here
-            RoverAutonomousCode autoCode = roverLogics.get((String)RovAutonomusCodeList.getSelectedItem()).clone();
+            RoverAutonomousCode autoCode = roverLogics.get((String)RovAutonomusCodeList.getSelectedItem());
             autoCode.setRoverName(newName);
-            RoverPhysicsModel params = roverParameters.get((String)RovDriveModelList.getSelectedItem()).clone();
+            RoverPhysicsModel params = roverParameters.get((String)RovDriveModelList.getSelectedItem());
             // for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
             DecimalPoint location = new DecimalPoint(0, 0);
             roversToAdd.put(newName, new RoverObject(newName, "r"+RoverList.getItems().size(), params, autoCode, location, Math.PI/2, -30));

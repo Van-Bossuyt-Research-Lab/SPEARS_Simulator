@@ -12,7 +12,6 @@ import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.rover.autoCode.BlankRoverAuto;
-import com.csm.rover.simulator.platforms.rover.autoCode.RAIRcode;
 import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
 import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.platforms.satellite.SatelliteAutonomusCode;
@@ -175,9 +174,6 @@ public class Admin {
 			}
 			RoverAutonomousCode auto;
 			switch (config.getAutonomousModelName()){
-				case "RAIR":
-					auto = new RAIRcode();
-					break;
 				default:
 					auto = new BlankRoverAuto();
 					break;

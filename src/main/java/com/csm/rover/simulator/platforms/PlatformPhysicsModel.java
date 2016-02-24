@@ -1,5 +1,7 @@
 package com.csm.rover.simulator.platforms;
 
+import java.util.Map;
+
 public abstract class PlatformPhysicsModel {
 
     protected final String platform_type;
@@ -12,7 +14,9 @@ public abstract class PlatformPhysicsModel {
         return platform_type;
     }
 
-//    public abstract void constructParameters(Map<String, Double> params);
-//    public abstract Map<String, Double> getParameters();
+    public abstract void constructParameters(Map<String, Double> params);
+
+    public abstract void start();
+    public abstract void updatePhysics();
 
 }

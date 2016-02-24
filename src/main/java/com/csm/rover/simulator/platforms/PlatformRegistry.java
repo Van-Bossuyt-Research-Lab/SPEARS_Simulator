@@ -63,7 +63,12 @@ public class PlatformRegistry {
             String type = platform.getAnnotation(com.csm.rover.simulator.platforms.annotations.Platform.class).type();
             this.platforms.put(type, getClassPath(platform));
         }
-        LOG.log(Level.INFO, "Identified Platforms: {}", this.platforms.toString());
+        if (this.platforms.size() == 0){
+            LOG.log(Level.WARN, "No platforms were found to load");
+        }
+        else {
+            LOG.log(Level.INFO, "Identified Platforms: {}", this.platforms.toString());
+        }
     }
 
     private void fillAutoModels(Reflections reflect){
@@ -96,14 +101,25 @@ public class PlatformRegistry {
             String name = auto.getAnnotation(AutonomousCodeModel.class).name();
             String clazz = getClassPath(auto);
             if (autoModels.keySet().contains(type)){
-                autoModels.get(type).put(name, clazz);
+                try {
+                    auto.newInstance();
+                    autoModels.get(type).put(name, clazz);
+                }
+                catch (InstantiationException | IllegalAccessException e) {
+                    LOG.log(Level.WARN, "{} does not have a default constructor. Parameters should be set using constructParameters()", auto.toString());
+                }
             }
             else {
                 LOG.log(Level.WARN, "AutonomousCodeModel {} has type {} which is not a recognized platform", clazz, type);
             }
         }
         for (String type : autoModels.keySet()){
-            LOG.log(Level.INFO, "For platform type {} found AutonomousCodeModels: {}", type, autoModels.get(type).toString());
+            if (autoModels.get(type).size() == 0){
+                LOG.log(Level.WARN, "Found no AutonomousCodeModels for platform type {}", type);
+            }
+            else {
+                LOG.log(Level.INFO, "For platform type {} found AutonomousCodeModels: {}", type, autoModels.get(type).toString());
+            }
         }
     }
 
@@ -137,14 +153,25 @@ public class PlatformRegistry {
             String name = physic.getAnnotation(PhysicsModel.class).name();
             String clazz = getClassPath(physic);
             if (physicsModels.keySet().contains(type)){
-                physicsModels.get(type).put(name, clazz);
+                try {
+                    physic.newInstance();
+                    physicsModels.get(type).put(name, clazz);
+                }
+                catch (InstantiationException | IllegalAccessException e) {
+                    LOG.log(Level.WARN, "{} does not have a default constructor. Parameters should be set using constructParameters()", physic.toString());
+                }
             }
             else {
                 LOG.log(Level.WARN, "PhysicsModel {} has type {} which is not a recognized platform", clazz, type);
             }
         }
         for (String type : autoModels.keySet()){
-            LOG.log(Level.INFO, "For platform type {} found PhysicsModels: {}", type, physicsModels.get(type).toString());
+            if (physicsModels.get(type).size() == 0){
+                LOG.log(Level.WARN, "Found no PhysicsModels for platform type {}", type);
+            }
+            else {
+                LOG.log(Level.INFO, "For platform type {} found PhysicsModels: {}", type, physicsModels.get(type).toString());
+            }
         }
     }
 

@@ -2,8 +2,8 @@ package com.csm.rover.simulator.platforms.rover.autoCode;
 
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
+import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -12,9 +12,9 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 import java.io.*;
-import java.util.Map;
 
-public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel implements Serializable, Cloneable {
+@AutonomousCodeModel(type="Rover", name="parent")
+public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel implements Serializable {
 	private static final Logger LOG = LogManager.getLogger(RoverAutonomousCode.class);
 
 	private static final long serialVersionUID = 1L;
@@ -35,21 +35,6 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel im
     public static void setTerrainMap(TerrainMap map){
         MAP = map;
     }
-	
-	public RoverAutonomousCode(RoverAutonomousCode rac){
-        super(rac.platform_type);
-		this.name = rac.name;
-		this.roverName = rac.roverName;
-	}
-
-	public void constructParameters(Map<String, Double> params) {}
-	
-	abstract public String nextCommand(
-			long milliTime,
-			DecimalPoint location,
-			double direction,
-			Map<String, Double> parameters
-	);
 	
 	public void setRoverName(String name){
 		roverName = name;
@@ -88,7 +73,5 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel im
 		DateTime date = new DateTime();
 		return String.format("%s/%s_%s.log", DatedFileAppenderImpl.Log_File_Name, roverName, date.toString(DateTimeFormat.forPattern("MM-dd-yyyy_HH.mm")));
 	}
-	
-	public abstract RoverAutonomousCode clone();
-	
+
 }
