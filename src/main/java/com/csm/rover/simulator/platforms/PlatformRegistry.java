@@ -175,6 +175,92 @@ public class PlatformRegistry {
         }
     }
 
+    public static Class<? extends Platform> getPlatform(String type){
+        checkInitialized();
+        return instance.get().doGetPlatform(type);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<? extends Platform> doGetPlatform(String type){
+        if (platforms.keySet().contains(type)){
+            try {
+                return (Class<? extends Platform>)Class.forName(platforms.get(type));
+            }
+            catch (ClassNotFoundException | ClassCastException e){
+                LOG.log(Level.ERROR, "Registry failed to properly load class " + platforms.get(type) + " for Platform " + type, e);
+                return null;
+            }
+        }
+        else {
+            LOG.log(Level.ERROR, "The Platform \"{}\" is not registered and cannot be returned", type);
+            return null;
+        }
+    }
+
+    public static Class<? extends PlatformAutonomousCodeModel> getAutonomousCodeModel(String type, String name){
+        checkInitialized();
+        return instance.get().doGetAutonomousCodeModel(type, name);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<? extends PlatformAutonomousCodeModel> doGetAutonomousCodeModel(String type, String name){
+        if (platforms.keySet().contains(type)){
+            Map<String, String> models = autoModels.get(type);
+            if (models.keySet().contains(name)) {
+                try {
+                    return (Class<? extends PlatformAutonomousCodeModel>) Class.forName(models.get(name));
+                }
+                catch (ClassNotFoundException | ClassCastException e) {
+                    LOG.log(Level.ERROR, "Registry failed to properly load class " + autoModels.get(type) + " for AutonomousCodeModel " + type + "." + name, e);
+                    return null;
+                }
+            }
+            else {
+                LOG.log(Level.ERROR, "The AutonomousCodeModel \"{}\" for platform \"{}\" is not registered and cannot be returned", name, type);
+                return null;
+            }
+        }
+        else {
+            LOG.log(Level.ERROR, "The Platform \"{}\" is not registered and cannot be requested", type);
+            return null;
+        }
+    }
+
+    public static Class<? extends PlatformPhysicsModel> getPhysicsModel(String type, String name){
+        checkInitialized();
+        return instance.get().doGetPhysicsModel(type, name);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<? extends PlatformPhysicsModel> doGetPhysicsModel(String type, String name){
+        if (platforms.keySet().contains(type)){
+            Map<String, String> models = physicsModels.get(type);
+            if (models.keySet().contains(name)) {
+                try {
+                    return (Class<? extends PlatformPhysicsModel>) Class.forName(models.get(name));
+                }
+                catch (ClassNotFoundException | ClassCastException e) {
+                    LOG.log(Level.ERROR, "Registry failed to properly load class " + autoModels.get(type) + " for PhysicsModel " + type + "." + name, e);
+                    return null;
+                }
+            }
+            else {
+                LOG.log(Level.ERROR, "The PhysicsModel \"{}\" for platform \"{}\" is not registered and cannot be returned", name, type);
+                return null;
+            }
+        }
+        else {
+            LOG.log(Level.ERROR, "The Platform \"{}\" is not registered and cannot be requested", type);
+            return null;
+        }
+    }
+
+    private static void checkInitialized(){
+        if (!instance.isPresent()){
+            throw new IllegalStateException("The registry has not been filled initialized");
+        }
+    }
+
     private static String getClassPath(Class<?> clazz){
         return clazz.toString().substring(clazz.toString().indexOf(' ')+1);
     }
