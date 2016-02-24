@@ -45,7 +45,7 @@ public class RunConfiguration implements Serializable {
 	public boolean monoHazards;
 	public boolean accelerated;
 	public int runtime;
-	public boolean subrun;
+	public boolean subRun;
 	ObjectMapper mapper = new ObjectMapper();
 
 
@@ -62,7 +62,7 @@ public class RunConfiguration implements Serializable {
 		this.mapFile = mapFile;
 		this.accelerated = accelerated;
 		this.runtime = runtime;
-		this.subrun = false;
+		this.subRun = false;
 
 
 	}
@@ -92,7 +92,7 @@ public class RunConfiguration implements Serializable {
 		this.monoHazards = monoHazards;
 		this.accelerated = accelerated;
 		this.runtime = runtime;
-		this.subrun = false;
+		this.subRun = false;
 
 	}
 	
@@ -140,6 +140,23 @@ public class RunConfiguration implements Serializable {
 					if("SubTags".equals(namefield)){
 						NT.subTags =  jp.readValueAs(ArrayList.class);
 					}
+					if("Runtime".equals(namefield)){
+						this.runtime = jp.readValueAs(int.class);
+						this.accelerated = jp.readValueAs(boolean.class);
+					}
+					if("Map".equals(namefield)){
+						mapRough = jp.readValueAs(double.class);
+						mapDetail = jp.readValueAs(int.class);
+						mapSize = jp.readValueAs(int.class);
+
+
+					}
+					if("TargetHazard".equals(namefield)){
+						monoTargets = jp.readValueAs(boolean.class);
+						monoHazards = jp.readValueAs(boolean.class);
+						targetDensity = jp.readValueAs(double.class);
+						hazardDensity = jp.readValueAs(double.class);
+					}
 				}
 			}
 			this.mapFromFile = false;
@@ -172,18 +189,9 @@ public class RunConfiguration implements Serializable {
 				SatelliteObject so = new SatelliteObject(NT.getSatelliteNames().get(rn),NT.getSatelliteTags().get(rn), spl,sac, 1000,0,0 );
 				this.satellites.add(so);
 			}
-			this.mapFile = input.mapFile;
-			this.mapRough = input.mapRough;
-			this.mapSize = input.mapSize;
-			this.mapDetail = input.mapDetail;
-			this.monoTargets = input.monoTargets;
-			this.monoHazards = input.monoHazards;
-			this.targetDensity = input.targetDensity;
-			this.hazardDensity = input.hazardDensity;
-			this.accelerated = input.accelerated;
-			this.runtime = input.runtime;
-			this.subrun = false;
+			this.subRun = false;
 		}
+		jp.close();
 		 // in.close();
 
 	}
@@ -253,6 +261,16 @@ public class RunConfiguration implements Serializable {
 			g.writeBooleanField("RunFromFile",mapFromFile);
 			g.writeNumberField("mapRough", mapRough);
 			g.writeNumberField("mapDetail", mapDetail);
+			g.writeNumberField("mapSize", mapSize);
+			g.writeEndObject();
+			g.writeStartObject();
+			g.writeObjectFieldStart("TargetHazard");
+			g.writeBooleanField("monoTargets",monoTargets);
+			g.writeBooleanField("(monoHazards", monoHazards);
+			g.writeNumberField("targetDensity", targetDensity);
+			g.writeNumberField("hazardDensity", hazardDensity);
+
+			g.writeEndObject();
 
 			g.close();
 
