@@ -1,17 +1,20 @@
 package com.csm.rover.simulator.visual;
 
-import java.awt.*;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.EventListenerList;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.Adjustable;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-
-import javax.swing.*;
-import javax.swing.border.EtchedBorder;
-import javax.swing.event.EventListenerList;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import static java.util.Arrays.asList;
 
@@ -27,13 +30,13 @@ public class ZList <T> extends JPanel implements Cloneable{
 	private EventListenerList ListSelectionListeners = new EventListenerList();
 	
 	public ZList(){
-        values = new ArrayList<T>();
-		items = new ArrayList<JLabel>();
+        values = new ArrayList<>();
+		items = new ArrayList<>();
         initialize();
 	}
 	
 	public ZList(T[] values){
-		this.values = new ArrayList<T>();
+		this.values = new ArrayList<>();
         this.values.addAll(asList(values));    
         setLabels();
         initialize();
@@ -62,7 +65,7 @@ public class ZList <T> extends JPanel implements Cloneable{
     }
 	
     private void setLabels(){
-        items = new ArrayList<JLabel>();
+        items = new ArrayList<>();
         int x = 0;
         while (x < items.size()){
             items.add(new JLabel("  " + values.get(x).toString()));
@@ -210,7 +213,7 @@ public class ZList <T> extends JPanel implements Cloneable{
 		return selected;
 	}
 	
-	public Object getSelectedItem(){
+	public T getSelectedItem(){
 		return getItemAt(selected);
 	}
 	
@@ -228,7 +231,7 @@ public class ZList <T> extends JPanel implements Cloneable{
 		return out;
 	}
 	
-	public void removeValue(Object val){
+	public void removeValue(T val){
 		int hold = getLocationOfValue(val);
 		if (hold != -1){
 			removeValue(hold);
@@ -261,7 +264,7 @@ public class ZList <T> extends JPanel implements Cloneable{
 		}
 	}
 	
-	public Object getItemAt(int loc){
+	public T getItemAt(int loc){
 		try {
 			try {
 				return values.get(loc);
@@ -275,7 +278,7 @@ public class ZList <T> extends JPanel implements Cloneable{
 		}
 	}
 	
-	public int getLocationOfValue(Object val){
+	public int getLocationOfValue(T val){
 		int x = 0;
 		while (x < values.size()){
 			if (values.get(x).equals(val)){
@@ -285,62 +288,5 @@ public class ZList <T> extends JPanel implements Cloneable{
 		}
 		return -1;
 	}
-	
-	private Object[] Augment(Object[] array, Object val, int loc){
-		Object[] out = new Object[array.length + 1];
-		int x = 0;
-		while (x < loc){
-			out[x] = array[x];
-			x++;
-		}
-		out[x] = val;
-		while (x < array.length){
-			out[x + 1] = array[x];
-			x++;
-		}
-		return out;
-	}
-	
-	private JLabel[] Augment(JLabel[] array, JLabel val, int loc){
-		JLabel[] out = new JLabel[array.length + 1];
-		int x = 0;
-		while (x < loc){
-			out[x] = array[x];
-			x++;
-		}
-		out[x] = val;
-		while (x < array.length){
-			out[x + 1] = array[x];
-			x++;
-		}
-		return out;
-	}
-	
-	private Object[] Remove(Object[] array, int which){
-		Object[] out = new Object[array.length - 1];
-		int x = 0;
-		while (x < which){
-			out[x] = array[x];
-			x++;
-		}
-		while (x < out.length){
-			out[x] = array[x + 1];
-			x++;
-		}
-		return out;
-	}
-	
-	private JLabel[] Remove(JLabel[] array, int which){
-		JLabel[] out = new JLabel[array.length - 1];
-		int x = 0;
-		while (x < which){
-			out[x] = array[x];
-			x++;
-		}
-		while (x < out.length){
-			out[x] = array[x + 1];
-			x++;
-		}
-		return out;
-	}
+
 }

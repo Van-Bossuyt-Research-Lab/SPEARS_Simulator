@@ -7,14 +7,11 @@ import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.map.display.LandMapPanel;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.platforms.rover.RoverHub;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
-import com.csm.rover.simulator.platforms.rover.autoCode.*;
-import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
-import com.csm.rover.simulator.platforms.satellite.SatelliteAutonomousCode;
 import com.csm.rover.simulator.platforms.satellite.SatelliteHub;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
-import com.csm.rover.simulator.platforms.satellite.SatelliteParametersList;
 import com.csm.rover.simulator.visual.AccelPopUp;
 import com.csm.rover.simulator.visual.Form;
 import com.csm.rover.simulator.visual.Panel;
@@ -65,14 +62,18 @@ public class HiForm implements HumanInterfaceAbstraction {
     }
 
     private void setUpSelectionLists(){
-        //addItemToSelectionList(	name_on_list ,	object_to_add	);
-        startupPnl.addItemToSelectionList("Default", new RoverPhysicsModel());
-        startupPnl.addItemToSelectionList("[null]", new BlankRoverAuto());
-        startupPnl.addItemToSelectionList("Generic4", new GenericRover());
-        startupPnl.addItemToSelectionList("GORARO Simp", new GORAROcode1());
-        startupPnl.addItemToSelectionList("GORARO Adv A", new GORAROAdvanceCode());
-        startupPnl.addItemToSelectionList("[null]", new SatelliteAutonomousCode());
-        startupPnl.addItemToSelectionList("[null]", new SatelliteParametersList());
+        for (String name : PlatformRegistry.listAutonomousCodeModels("Rover")){
+            startupPnl.addItemToRoverAutoList(name);
+        }
+        for (String name : PlatformRegistry.listPhysicsModels("Rover")){
+            startupPnl.addItemToRoverPhysicsList(name);
+        }
+        for (String name : PlatformRegistry.listAutonomousCodeModels("Satellite")){
+            startupPnl.addItemToSatelliteAutoList(name);
+        }
+        for (String name : PlatformRegistry.listPhysicsModels("Satellite")){
+            startupPnl.addItemToSatellitePhysicsList(name);
+        }
     }
 
     @Override

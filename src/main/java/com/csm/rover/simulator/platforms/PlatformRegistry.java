@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class PlatformRegistry {
@@ -40,6 +41,8 @@ public class PlatformRegistry {
         fillPlatforms(reflect);
         fillAutoModels(reflect);
         fillPhysicsModels(reflect);
+
+        LOG.log(Level.INFO, "Platform Registration Complete");
     }
 
     private void fillPlatforms(Reflections reflect){
@@ -99,13 +102,13 @@ public class PlatformRegistry {
         @SuppressWarnings("unchecked")
         Set<Class<? extends PlatformAutonomousCodeModel>> realautos = (Set<Class<? extends PlatformAutonomousCodeModel>>)sortedSets.get(1);
         for (Class<? extends PlatformAutonomousCodeModel> auto : realautos){
-            if (reflect.getSubTypesOf(auto).size() > 0){
-                //Model is a Platform Master
-                continue;
-            }
             String type = auto.getAnnotation(AutonomousCodeModel.class).type();
             String name = auto.getAnnotation(AutonomousCodeModel.class).name();
             String clazz = getClassPath(auto);
+            if (Modifier.isAbstract(auto.getModifiers())){
+                LOG.log(Level.DEBUG, "Abstract parent model {} is ignored", auto.toString());
+                continue;
+            }
             if (autoModels.keySet().contains(type)){
                 try {
                     auto.newInstance();
@@ -151,13 +154,13 @@ public class PlatformRegistry {
         @SuppressWarnings("unchecked")
         Set<Class<? extends PlatformPhysicsModel>> realphysics = (Set<Class<? extends PlatformPhysicsModel>>)sortedSets.get(1);
         for (Class<? extends PlatformPhysicsModel> physic : realphysics){
-            if (reflect.getSubTypesOf(physic).size() > 0){
-                //Model is a Platform Master
-                continue;
-            }
             String type = physic.getAnnotation(PhysicsModel.class).type();
             String name = physic.getAnnotation(PhysicsModel.class).name();
             String clazz = getClassPath(physic);
+            if (Modifier.isAbstract(physic.getModifiers())){
+                LOG.log(Level.DEBUG, "Abstract parent model {} is ignored", physic.toString());
+                continue;
+            }
             if (physicsModels.keySet().contains(type)){
                 try {
                     physic.newInstance();
@@ -257,6 +260,36 @@ public class PlatformRegistry {
         }
         else {
             LOG.log(Level.ERROR, "The Platform \"{}\" is not registered and cannot be requested", type);
+            return null;
+        }
+    }
+
+    public static List<String> listPhysicsModels(String type){
+        checkInitialized();
+        return instance.get().doListPhysicsModels(type);
+    }
+
+    private List<String> doListPhysicsModels(String type){
+        if (physicsModels.keySet().contains(type)){
+            return new ArrayList<>(physicsModels.get(type).keySet());
+        }
+        else {
+            LOG.log(Level.ERROR, "Requested type \"{}\" is not registered");
+            return null;
+        }
+    }
+
+    public static List<String> listAutonomousCodeModels(String type){
+        checkInitialized();
+        return instance.get().doListAutonomousCodeModels(type);
+    }
+
+    private List<String> doListAutonomousCodeModels(String type){
+        if (autoModels.keySet().contains(type)){
+            return new ArrayList<>(autoModels.get(type).keySet());
+        }
+        else {
+            LOG.log(Level.ERROR, "Requested type \"{}\" is not registered");
             return null;
         }
     }
