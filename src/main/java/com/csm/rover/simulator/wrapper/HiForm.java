@@ -11,7 +11,7 @@ import com.csm.rover.simulator.platforms.rover.RoverHub;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.rover.autoCode.*;
 import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
-import com.csm.rover.simulator.platforms.satellite.SatelliteAutonomusCode;
+import com.csm.rover.simulator.platforms.satellite.SatelliteAutonomousCode;
 import com.csm.rover.simulator.platforms.satellite.SatelliteHub;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteParametersList;
@@ -71,8 +71,8 @@ public class HiForm implements HumanInterfaceAbstraction {
         startupPnl.addItemToSelectionList("Generic4", new GenericRover());
         startupPnl.addItemToSelectionList("GORARO Simp", new GORAROcode1());
         startupPnl.addItemToSelectionList("GORARO Adv A", new GORAROAdvanceCode());
-        startupPnl.addItemToSelectionList("[null]", (SatelliteAutonomusCode) null);
-        startupPnl.addItemToSelectionList("[null]", (SatelliteParametersList) null);
+        startupPnl.addItemToSelectionList("[null]", new SatelliteAutonomousCode());
+        startupPnl.addItemToSelectionList("[null]", new SatelliteParametersList());
     }
 
     @Override

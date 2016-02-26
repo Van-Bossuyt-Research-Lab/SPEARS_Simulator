@@ -8,15 +8,12 @@ import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
 import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
-import com.csm.rover.simulator.platforms.rover.autoCode.BlankRoverAuto;
-import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
-import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
-import com.csm.rover.simulator.platforms.satellite.SatelliteAutonomusCode;
+import com.csm.rover.simulator.platforms.rover.RoverState;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
-import com.csm.rover.simulator.platforms.satellite.SatelliteParametersList;
+import com.csm.rover.simulator.platforms.satellite.SatelliteState;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -165,57 +162,17 @@ public class Admin {
 	}
 
 	private ArrayList<RoverObject> buildRoversFromConfig(ArrayList<PlatformConfig> configs){
-		ArrayList<RoverObject> out = new ArrayList<RoverObject>();
-        int x = 1;
+		ArrayList<RoverObject> out = new ArrayList<>();
 		for (PlatformConfig config : configs){
-			if (!config.getType().equals("Rover")){
-				LOG.log(Level.DEBUG, "Elements in roverCfgs are not rovers");
-				continue;
-			}
-			RoverAutonomousCode auto;
-			switch (config.getAutonomousModelName()){
-				default:
-					auto = new BlankRoverAuto();
-					break;
-			}
-			auto.constructParameters(config.getAutonomousModelParameters());
-            RoverPhysicsModel physics;
-            switch (config.getPhysicsModelName()){
-                default:
-                    physics = new RoverPhysicsModel();
-                    break;
-            }
-            physics.constructParameters(config.getPhysicsModelParameters());
-            out.add(new RoverObject(config.getScreenName() + " " + x, "r" + x, physics, auto, new DecimalPoint(0, 0), Math.PI/2., -30));
-            x++;
+            out.add(Platform.<RoverObject>buildFromConfiguration(config, RoverState.defaultState()));
 		}
         return out;
 	}
 
 	private ArrayList<SatelliteObject> buildSatellitesFromConfig(ArrayList<PlatformConfig> configs){
         ArrayList<SatelliteObject> out = new ArrayList<>();
-        int x = 1;
         for (PlatformConfig config : configs){
-            if (!config.getType().equals("Satellite")){
-                LOG.log(Level.DEBUG, "Elements in satConfigs are not satellites");
-                continue;
-            }
-            SatelliteAutonomusCode auto;
-            switch (config.getAutonomousModelName()){
-                default:
-                    auto = null;
-                    break;
-            }
-//            auto.constructParameters(config.getAutonomousModelParameters());
-            SatelliteParametersList params;
-            switch (config.getPhysicsModelName()){
-                default:
-                    params = null;
-                    break;
-            }
-//            params.constructParameters(config.getPhysicsModelParameters());
-            out.add(new SatelliteObject(config.getScreenName() + " " + x, "s" + x, params, auto, 0, 0, 0));
-            x++;
+            out.add(Platform.<SatelliteObject>buildFromConfiguration(config, SatelliteState.defaultState()));
         }
         return out;
 	}

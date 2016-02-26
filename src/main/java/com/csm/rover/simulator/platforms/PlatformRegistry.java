@@ -61,7 +61,13 @@ public class PlatformRegistry {
         Set<Class<? extends Platform>> realplatforms = (Set<Class<? extends Platform>>)sortedSets.get(1);
         for (Class<? extends Platform> platform : realplatforms){
             String type = platform.getAnnotation(com.csm.rover.simulator.platforms.annotations.Platform.class).type();
-            this.platforms.put(type, getClassPath(platform));
+            try {
+                platform.newInstance();
+                this.platforms.put(type, getClassPath(platform));
+            }
+            catch (InstantiationException | IllegalAccessException e) {
+                LOG.log(Level.WARN, "{} does not have a default constructor", platform.toString());
+            }
         }
         if (this.platforms.size() == 0){
             LOG.log(Level.WARN, "No platforms were found to load");

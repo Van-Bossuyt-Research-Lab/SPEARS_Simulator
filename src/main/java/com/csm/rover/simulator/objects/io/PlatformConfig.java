@@ -7,6 +7,7 @@ import java.util.TreeMap;
 public class PlatformConfig implements Serializable {
 
     String type;
+    String ID;
     String screenName;
 
     PhysicsConfig physics;
@@ -24,6 +25,10 @@ public class PlatformConfig implements Serializable {
 
     public String getScreenName(){
         return screenName;
+    }
+
+    public String getID(){
+        return ID;
     }
 
     public String getPhysicsModelName(){
@@ -66,6 +71,9 @@ public class PlatformConfig implements Serializable {
             if (config.screenName == null){
                 missing += " screenName";
             }
+            if (config.ID == null){
+                missing += " ID";
+            }
             if (config.physics == null){
                 missing += " PhysicsModel";
             }
@@ -85,6 +93,11 @@ public class PlatformConfig implements Serializable {
 
         public Builder setScreenName(String name){
             config.screenName = name;
+            return this;
+        }
+
+        public Builder setID(String ID){
+            config.ID = ID;
             return this;
         }
 

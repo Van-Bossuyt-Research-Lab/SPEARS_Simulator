@@ -4,6 +4,7 @@ import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
 import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.wrapper.Globals;
@@ -31,11 +32,6 @@ public class RoverObject extends Platform implements Serializable {
 	private static TerrainMap MAP;
     private static SerialBuffers serialBuffers;
 
-	private String name;
-	private String IDcode;
-	private RoverPhysicsModel physics;
-	private RoverAutonomousCode autoCode;
-	
 	@SuppressWarnings("unused")
 	private boolean connected = false; // Can the ground station hear/talk to us
 	private boolean mute = false; // Can we talk at all
@@ -85,19 +81,25 @@ public class RoverObject extends Platform implements Serializable {
 	private String serialHistory = "";
 	private Map<String, Boolean> LEDs = new TreeMap<String, Boolean>();
 	
-	public RoverObject(String name, String ID, RoverPhysicsModel param, RoverAutonomousCode code, DecimalPoint loc, double dir, double temp){
+	public RoverObject(){
 		super("Rover");
-        this.name = name;
-		IDcode = ID;
-		physics = param;
-		autoCode = code;
-		physics.initalizeConditions(name, physics.getbattery_max_charge(), temp);
-		physics.setLocation(loc);
-		physics.setDirection(dir);
 		LEDs.put("Mute", false);
 		LEDs.put("Instructions", false);
-		LEDs.put("Autonomus", false);
+		LEDs.put("Autonomous", false);
 	}
+
+    @Override
+    protected void initializeState(PlatformState s1) {
+        if (s1.getType().equals(this.platform_type)){
+            RoverState state = (RoverState)s1;
+            ((RoverPhysicsModel)physicsModel).initalizeConditions(name, ((RoverPhysicsModel)physicsModel).getbattery_max_charge(), state.temperature);
+            ((RoverPhysicsModel)physicsModel).setLocation(state.location);
+            ((RoverPhysicsModel)physicsModel).setDirection(state.direction);
+        }
+        else {
+            LOG.log(Level.ERROR, "The given state is not a RoverState");
+        }
+    }
 
     public static void setTerrainMap(TerrainMap map){
         MAP = map;
@@ -117,13 +119,13 @@ public class RoverObject extends Platform implements Serializable {
 			}
 		},
 		SynchronousThread.FOREVER, name+"-code");
-		physics.start();
+		physicsModel.start();
 		timeOfLastCmd = Globals.getInstance().timeMillis;
 	}
 	
 	private void excecuteCode(){
 		try {
-			//Globals.getInstance().writeToLogFile(this.name, Globals.getInstance().timeMillis + "\t" + physics.getLocation().getX() + "\t" + physics.getLocation().getY() + "\t" + Access.getMapHeightatPoint(physics.getLocation()) + "\t" + visitedScience.size()*10 + "\t" + physics.getBatteryCharge());
+			//Globals.getInstance().writeToLogFile(this.name, Globals.getInstance().timeMillis + "\t" + physicsModel.getLocation().getX() + "\t" + physicsModel.getLocation().getY() + "\t" + Access.getMapHeightatPoint(physicsModel.getLocation()) + "\t" + visitedScience.size()*10 + "\t" + physicsModel.getBatteryCharge());
 			try {
 				motorVoltage = (float) getBatteryVoltage(); // check battery voltage
 				if (motorVoltage < 0.0001){
@@ -139,21 +141,21 @@ public class RoverObject extends Platform implements Serializable {
 				LOG.log(Level.ERROR, "{}: Error in voltage check", name);
 			}
 			
-			if (serialBuffers.RFAvailable(IDcode) > 1) { // if there is a message
+			if (serialBuffers.RFAvailable(ID) > 1) { // if there is a message
 				delay(500);
-				char[] id = strcat((char)serialBuffers.ReadSerial(IDcode), (char)serialBuffers.ReadSerial(IDcode));
-				if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
-															// go is set to false if the first read is not IDcode 
+				char[] id = strcat((char)serialBuffers.ReadSerial(ID), (char)serialBuffers.ReadSerial(ID));
+				if (strcmp(id, ID) == 0 && go) { // if the message is for us and are we allowed to read it
+															// go is set to false if the first read is not ID 
 															// to prevent starting a message not intended for the rover 
 															// from within the body of another message
-					serialBuffers.ReadSerial(IDcode); // white space
-					tag = (char) serialBuffers.ReadSerial(IDcode); // get platform_type tag
-					if (serialBuffers.RFAvailable(IDcode) > 0) { // if there is more to the message
+					serialBuffers.ReadSerial(ID); // white space
+					tag = (char) serialBuffers.ReadSerial(ID); // get platform_type tag
+					if (serialBuffers.RFAvailable(ID) > 0) { // if there is more to the message
 						run_auto = false; // stop running autonomously
 						data[0] = tag; // tag is not actually import, just read the entire body of the message
 						index++;
-						while (serialBuffers.RFAvailable(IDcode) > 0 && index < data.length-1) { //read in message body
-							data[index] = (char) serialBuffers.ReadSerial(IDcode);
+						while (serialBuffers.RFAvailable(ID) > 0 && index < data.length-1) { //read in message body
+							data[index] = (char) serialBuffers.ReadSerial(ID);
 							index++;
 						}
 						data[index] = '\0'; // end of string
@@ -225,13 +227,13 @@ public class RoverObject extends Platform implements Serializable {
 						} 
 						else if (strcmp(data, "instructions") == 0) { // if we are recieving instructions
 							instructions = ""; // clear existing "file"
-							while (serialBuffers.RFAvailable(IDcode) == 0) { // wait for transmission to start
+							while (serialBuffers.RFAvailable(ID) == 0) { // wait for transmission to start
 								delay(5);
 							}
 							delay(1000); // begin syncopation of read/write
-							while (serialBuffers.RFAvailable(IDcode) > 0) { 
-								while (serialBuffers.RFAvailable(IDcode) > 0) {
-									instructions += (char) serialBuffers.ReadSerial(IDcode); // read in character, add to list
+							while (serialBuffers.RFAvailable(ID) > 0) { 
+								while (serialBuffers.RFAvailable(ID) > 0) {
+									instructions += (char) serialBuffers.ReadSerial(ID); // read in character, add to list
 								}
 								delay(2000); // continue syncopation, we want to avoid the incoming message running out of room in the buffer
 							}
@@ -297,9 +299,9 @@ public class RoverObject extends Platform implements Serializable {
 				} 
 				else { // the message wasn't for us
 					go = false; // ignore it
-					int waiting = serialBuffers.RFAvailable(IDcode);
+					int waiting = serialBuffers.RFAvailable(ID);
 					while (waiting > 0) { // delete it
-						serialBuffers.ReadSerial(IDcode);
+						serialBuffers.ReadSerial(ID);
 						waiting--;
 					}
 				}
@@ -344,7 +346,7 @@ public class RoverObject extends Platform implements Serializable {
 							count++;
 						}
 						System.out.println(cmd); // TODO: more debugging
-						if (strcmp(cmd.substring(0, 2), IDcode) == 0) { // if the instruction is for us
+						if (strcmp(cmd.substring(0, 2), ID) == 0) { // if the instruction is for us
 							String temp = cmd; //drop the first 2 characters cause they're not important
 							cmd = "";
 							x = 2;
@@ -486,10 +488,10 @@ public class RoverObject extends Platform implements Serializable {
 				LEDs.put("Autonomus", true);
 				LEDs.put("Instructions", false);
 				
-				String cmd = autoCode.nextCommand(
+				String cmd = autonomousCodeModel.nextCommand(
 						Globals.getInstance().timeMillis,
-						physics.getLocation(),
-						physics.getDirection(),
+						((RoverPhysicsModel)physicsModel).getLocation(),
+						((RoverPhysicsModel)physicsModel).getDirection(),
 						getAutonomousParameters()
 				);
 				//TODO switch all known commands
@@ -594,7 +596,7 @@ public class RoverObject extends Platform implements Serializable {
 			    			wheel = RoverWheels.BR;
 			    			break;
 			    		}
-			    		physics.setMotorPower(wheel, power);
+			    		((RoverPhysicsModel)physicsModel).setMotorPower(wheel, power);
 			    	}
 			    }
 				
@@ -672,7 +674,7 @@ public class RoverObject extends Platform implements Serializable {
 			while (hold != -1) { // send the file in 60 byte chunks
 				index = 0;
 				while (index < 60 && hold != -1) {
-					serialBuffers.writeToSerial((byte) hold, IDcode);
+					serialBuffers.writeToSerial((byte) hold, ID);
 					hold = data.read();
 					index++;
 				}
@@ -696,66 +698,66 @@ public class RoverObject extends Platform implements Serializable {
 	
 	// how to move the motors for driving
 	private void driveForward(){
-		physics.setMotorState(RoverWheels.FL, MotorState.FORWARD);
-		physics.setMotorState(RoverWheels.BL, MotorState.FORWARD);
-		physics.setMotorState(RoverWheels.BR, MotorState.FORWARD);
-		physics.setMotorState(RoverWheels.FR, MotorState.FORWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.FORWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.FORWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.FORWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.FORWARD);
 	}
 	
 	private void driveBackward(){
-		physics.setMotorState(RoverWheels.FL, MotorState.BACKWARD);
-		physics.setMotorState(RoverWheels.BL, MotorState.BACKWARD);
-		physics.setMotorState(RoverWheels.BR, MotorState.BACKWARD);
-		physics.setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.BACKWARD);
 	}
 	
 	private void driveSpinCW(){
-		physics.setMotorState(RoverWheels.FL, MotorState.FORWARD);
-		physics.setMotorState(RoverWheels.BL, MotorState.FORWARD);
-		physics.setMotorState(RoverWheels.BR, MotorState.BACKWARD);
-		physics.setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.FORWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.FORWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.BACKWARD);
 	}
 	
 	private void driveSpinCCW(){
-		physics.setMotorState(RoverWheels.FL, MotorState.BACKWARD);
-		physics.setMotorState(RoverWheels.BL, MotorState.BACKWARD);
-		physics.setMotorState(RoverWheels.BR, MotorState.FORWARD);
-		physics.setMotorState(RoverWheels.FR, MotorState.FORWARD);
+        ((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.FORWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.FORWARD);
 	}
 	
 	private void driveStop(){
-		physics.setMotorState(RoverWheels.FL, MotorState.RELEASE);
-		physics.setMotorState(RoverWheels.BL, MotorState.RELEASE);
-		physics.setMotorState(RoverWheels.BR, MotorState.RELEASE);
-		physics.setMotorState(RoverWheels.FR, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.RELEASE);
 	}
 	
 	private void driveTurnFL(){
-		physics.setMotorState(RoverWheels.FL, MotorState.RELEASE);
-		physics.setMotorState(RoverWheels.BL, MotorState.RELEASE);
-		physics.setMotorState(RoverWheels.BR, MotorState.FORWARD);
-		physics.setMotorState(RoverWheels.FR, MotorState.FORWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.FORWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.FORWARD);
 	}
 	
 	private void driveTurnFR(){
-		physics.setMotorState(RoverWheels.FL, MotorState.FORWARD);
-		physics.setMotorState(RoverWheels.BL, MotorState.FORWARD);
-		physics.setMotorState(RoverWheels.BR, MotorState.RELEASE);
-		physics.setMotorState(RoverWheels.FR, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.FORWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.FORWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.RELEASE);
 	}
 	
 	private void driveTurnBL(){
-		physics.setMotorState(RoverWheels.FL, MotorState.RELEASE);
-		physics.setMotorState(RoverWheels.BL, MotorState.RELEASE);
-		physics.setMotorState(RoverWheels.BR, MotorState.BACKWARD);
-		physics.setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.BACKWARD);
 	}
 	
 	private void driveTurnBR(){
-		physics.setMotorState(RoverWheels.FL, MotorState.BACKWARD);
-		physics.setMotorState(RoverWheels.BL, MotorState.BACKWARD);
-		physics.setMotorState(RoverWheels.BR, MotorState.RELEASE);
-		physics.setMotorState(RoverWheels.FR, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.RELEASE);
+		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.RELEASE);
 	}
 	
 	// set up waiting for a response
@@ -774,7 +776,7 @@ public class RoverObject extends Platform implements Serializable {
 				if (message[x] == '\0') { // while not the end of string
 					break;
 				}
-				serialBuffers.writeToSerial(message[x], IDcode); // Write to Serial one char at a time
+				serialBuffers.writeToSerial(message[x], ID); // Write to Serial one char at a time
 				delay(1);
 				x++;
 			}
@@ -795,7 +797,7 @@ public class RoverObject extends Platform implements Serializable {
 
 	private boolean sendSerial(char mess) {
 		if (!mute) {
-			serialBuffers.writeToSerial(mess, IDcode);
+			serialBuffers.writeToSerial(mess, ID);
 			addToSerialHistory(mess + "");
 			LOG.log(Level.INFO, "{}: Sent serial message \'{}\'", name, mess);
 			return true;
@@ -848,24 +850,24 @@ public class RoverObject extends Platform implements Serializable {
 
 	private Map<String, Double> getAutonomousParameters(){
 		Map<String, Double> params = new TreeMap<String, Double>();
-		params.put("acceleration", physics.getAcceleration());
-		params.put("angular_acceleration", physics.getAngularAcceleration());
-		params.put("wheel_speed_FL", physics.getWheelSpeed(RoverWheels.FL));
-		params.put("wheel_speed_FR", physics.getWheelSpeed(RoverWheels.FR));
-		params.put("wheel_speed_BL", physics.getWheelSpeed(RoverWheels.BL));
-		params.put("wheel_speed_BR", physics.getWheelSpeed(RoverWheels.BR));
-		params.put("motor_current_FL", physics.getMotorCurrent(RoverWheels.FL));
-		params.put("motor_current_FR", physics.getMotorCurrent(RoverWheels.FR));
-		params.put("motor_current_BL", physics.getMotorCurrent(RoverWheels.BL));
-		params.put("motor_current_BR", physics.getMotorCurrent(RoverWheels.BR));
-		params.put("motor_temp_FL", physics.getMotorTemp(RoverWheels.FL));
-		params.put("motor_temp_FR", physics.getMotorTemp(RoverWheels.FR));
-		params.put("motor_temp_BL", physics.getMotorTemp(RoverWheels.BL));
-		params.put("motor_temp_BR", physics.getMotorTemp(RoverWheels.BR));
-		params.put("battery_voltage", physics.getBatteryVoltage());
-		params.put("battery_current", physics.getBatteryCurrent());
-		params.put("battery_temp", physics.getBatteryTemperature());
-		params.put("battery_charge", physics.getBatteryCharge());
+		params.put("acceleration", ((RoverPhysicsModel)physicsModel).getAcceleration());
+		params.put("angular_acceleration", ((RoverPhysicsModel)physicsModel).getAngularAcceleration());
+		params.put("wheel_speed_FL", ((RoverPhysicsModel)physicsModel).getWheelSpeed(RoverWheels.FL));
+		params.put("wheel_speed_FR", ((RoverPhysicsModel)physicsModel).getWheelSpeed(RoverWheels.FR));
+		params.put("wheel_speed_BL", ((RoverPhysicsModel)physicsModel).getWheelSpeed(RoverWheels.BL));
+		params.put("wheel_speed_BR", ((RoverPhysicsModel)physicsModel).getWheelSpeed(RoverWheels.BR));
+		params.put("motor_current_FL", ((RoverPhysicsModel)physicsModel).getMotorCurrent(RoverWheels.FL));
+		params.put("motor_current_FR", ((RoverPhysicsModel)physicsModel).getMotorCurrent(RoverWheels.FR));
+		params.put("motor_current_BL", ((RoverPhysicsModel)physicsModel).getMotorCurrent(RoverWheels.BL));
+		params.put("motor_current_BR", ((RoverPhysicsModel)physicsModel).getMotorCurrent(RoverWheels.BR));
+		params.put("motor_temp_FL", ((RoverPhysicsModel)physicsModel).getMotorTemp(RoverWheels.FL));
+		params.put("motor_temp_FR", ((RoverPhysicsModel)physicsModel).getMotorTemp(RoverWheels.FR));
+		params.put("motor_temp_BL", ((RoverPhysicsModel)physicsModel).getMotorTemp(RoverWheels.BL));
+		params.put("motor_temp_BR", ((RoverPhysicsModel)physicsModel).getMotorTemp(RoverWheels.BR));
+		params.put("battery_voltage", ((RoverPhysicsModel)physicsModel).getBatteryVoltage());
+		params.put("battery_current", ((RoverPhysicsModel)physicsModel).getBatteryCurrent());
+		params.put("battery_temp", ((RoverPhysicsModel)physicsModel).getBatteryTemperature());
+		params.put("battery_charge", ((RoverPhysicsModel)physicsModel).getBatteryCharge());
 		return params;
 	}
 
@@ -880,7 +882,7 @@ public class RoverObject extends Platform implements Serializable {
 	}
 	
 	public String getIDTag(){
-		return IDcode;
+		return ID;
 	}
 	
 	public String getSerialHistory(){
@@ -892,79 +894,78 @@ public class RoverObject extends Platform implements Serializable {
 	}
 	
 	public RoverPhysicsModel getParameters(){
-		return physics;
+		return ((RoverPhysicsModel)physicsModel);
 	}
 	
 	public DecimalPoint getLocation(){
-		return physics.getLocation();
+		return ((RoverPhysicsModel)physicsModel).getLocation();
 	}
 	
 	public double getDirection(){
-		return physics.getDirection();
+		return ((RoverPhysicsModel)physicsModel).getDirection();
 	}
 	
 	public double getBatteryVoltage(){
-		return physics.getBatteryVoltage();
+		return ((RoverPhysicsModel)physicsModel).getBatteryVoltage();
 	}
 
 	public double getBatteryCharge(){
-		return physics.getBatteryCharge();
+		return ((RoverPhysicsModel)physicsModel).getBatteryCharge();
 	}
 	
 	public double getBatterCPCharge(){
-		return physics.getBattery_cp_charge();
+		return ((RoverPhysicsModel)physicsModel).getBattery_cp_charge();
 	}
 	
 	public double getSOC(){
-		return physics.getSOC();
+		return ((RoverPhysicsModel)physicsModel).getSOC();
 	}
 	
 	public double getBatteryCurrent(){
-		return physics.getBatteryCurrent();
+		return ((RoverPhysicsModel)physicsModel).getBatteryCurrent();
 	}
 
 	public double getSpeed(){
-		return physics.getSpeed();
+		return ((RoverPhysicsModel)physicsModel).getSpeed();
 	}
 
 	public double getAngularVelocity(){
-		return physics.getAngularVelocity();
+		return ((RoverPhysicsModel)physicsModel).getAngularVelocity();
 	}
 	
 	public double getSlipVelocity(){
-		return physics.getSlipVelocity();
+		return ((RoverPhysicsModel)physicsModel).getSlipVelocity();
 	}
 
 	public double getAcceleration(){
-		return physics.getAcceleration();
+		return ((RoverPhysicsModel)physicsModel).getAcceleration();
 	}
 
 	public double getAngularAcceleration(){
-		return physics.getAngularAcceleration();
+		return ((RoverPhysicsModel)physicsModel).getAngularAcceleration();
 	}
 	
 	public double getSlipAcceleration(){
-		return physics.getSlip_acceleration();
+		return ((RoverPhysicsModel)physicsModel).getSlip_acceleration();
 	}
 
 	public double getWheelSpeed(RoverWheels which){
-		return physics.getWheelSpeed()[which.getValue()];
+		return ((RoverPhysicsModel)physicsModel).getWheelSpeed()[which.getValue()];
 	}
 	
 	public double getMotorCurrent(RoverWheels which){
-		return physics.getMotor_current()[which.getValue()];
+		return ((RoverPhysicsModel)physicsModel).getMotor_current()[which.getValue()];
 	}
 	
 	public double getMotorVoltage(RoverWheels which){
-		return (physics.getMotor_power()[which.getValue()]/255.0)*physics.getBatteryVoltage()*physics.getMotorStates()[which.getValue()];
+		return (((RoverPhysicsModel)physicsModel).getMotor_power()[which.getValue()]/255.0)*((RoverPhysicsModel)physicsModel).getBatteryVoltage()*((RoverPhysicsModel)physicsModel).getMotorStates()[which.getValue()];
 	}
 	
 	public double getBatteryTemperature(){
-		return physics.getBatteryTemperature();
+		return ((RoverPhysicsModel)physicsModel).getBatteryTemperature();
 	}
 	
 	public double getMotorTemp(RoverWheels which){
-		return physics.getMotorTemp(which);
+		return ((RoverPhysicsModel)physicsModel).getMotorTemp(which);
 	}
-	
 }
