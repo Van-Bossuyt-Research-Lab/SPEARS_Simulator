@@ -60,7 +60,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
     }
 
     @Override
-	public String nextCommand(long milliTime, DecimalPoint location,
+	public String doNextCommand(long milliTime, DecimalPoint location,
 			double direction, Map<String, Double> parameters)
 	{
 		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + MAP.getHeightAt(location) + "\t" + score + "\t" + parameters.get("battery_charge") + "\t" + state);

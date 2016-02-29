@@ -20,7 +20,7 @@ public class BlankRoverAuto extends RoverAutonomousCode {
     }
 
     @Override
-	public String nextCommand(long milliTime, DecimalPoint location,
+	public String doNextCommand(long milliTime, DecimalPoint location,
 			double direction, Map<String, Double> parameters) {
 		// TODO Auto-generated method stub
 		return "";

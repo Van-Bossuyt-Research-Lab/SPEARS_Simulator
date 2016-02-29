@@ -64,7 +64,7 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
     }
 
     @Override
-	public String nextCommand(long milliTime, DecimalPoint location,
+	public String doNextCommand(long milliTime, DecimalPoint location,
 			double direction, Map<String, Double> parameters)
 	{
 		if (!runyet){

@@ -490,9 +490,7 @@ public class RoverObject extends Platform implements Serializable {
 				
 				String cmd = autonomousCodeModel.nextCommand(
 						Globals.getInstance().timeMillis,
-						((RoverPhysicsModel)physicsModel).getLocation(),
-						((RoverPhysicsModel)physicsModel).getDirection(),
-						getAutonomousParameters()
+                        physicsModel.getState()
 				);
 				//TODO switch all known commands
 				if (strcmp(cmd, "") == 0){ /*Do Nothing*/ }
@@ -846,29 +844,6 @@ public class RoverObject extends Platform implements Serializable {
 		else {
 			return 1;
 		}
-	}
-
-	private Map<String, Double> getAutonomousParameters(){
-		Map<String, Double> params = new TreeMap<String, Double>();
-		params.put("acceleration", ((RoverPhysicsModel)physicsModel).getAcceleration());
-		params.put("angular_acceleration", ((RoverPhysicsModel)physicsModel).getAngularAcceleration());
-		params.put("wheel_speed_FL", ((RoverPhysicsModel)physicsModel).getWheelSpeed(RoverWheels.FL));
-		params.put("wheel_speed_FR", ((RoverPhysicsModel)physicsModel).getWheelSpeed(RoverWheels.FR));
-		params.put("wheel_speed_BL", ((RoverPhysicsModel)physicsModel).getWheelSpeed(RoverWheels.BL));
-		params.put("wheel_speed_BR", ((RoverPhysicsModel)physicsModel).getWheelSpeed(RoverWheels.BR));
-		params.put("motor_current_FL", ((RoverPhysicsModel)physicsModel).getMotorCurrent(RoverWheels.FL));
-		params.put("motor_current_FR", ((RoverPhysicsModel)physicsModel).getMotorCurrent(RoverWheels.FR));
-		params.put("motor_current_BL", ((RoverPhysicsModel)physicsModel).getMotorCurrent(RoverWheels.BL));
-		params.put("motor_current_BR", ((RoverPhysicsModel)physicsModel).getMotorCurrent(RoverWheels.BR));
-		params.put("motor_temp_FL", ((RoverPhysicsModel)physicsModel).getMotorTemp(RoverWheels.FL));
-		params.put("motor_temp_FR", ((RoverPhysicsModel)physicsModel).getMotorTemp(RoverWheels.FR));
-		params.put("motor_temp_BL", ((RoverPhysicsModel)physicsModel).getMotorTemp(RoverWheels.BL));
-		params.put("motor_temp_BR", ((RoverPhysicsModel)physicsModel).getMotorTemp(RoverWheels.BR));
-		params.put("battery_voltage", ((RoverPhysicsModel)physicsModel).getBatteryVoltage());
-		params.put("battery_current", ((RoverPhysicsModel)physicsModel).getBatteryCurrent());
-		params.put("battery_temp", ((RoverPhysicsModel)physicsModel).getBatteryTemperature());
-		params.put("battery_charge", ((RoverPhysicsModel)physicsModel).getBatteryCharge());
-		return params;
 	}
 
 //PHYSCIS Related Stuff *****************************************************************************************************************************************************************************************************

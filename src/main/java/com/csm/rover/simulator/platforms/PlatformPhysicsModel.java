@@ -19,4 +19,6 @@ public abstract class PlatformPhysicsModel {
     public abstract void start();
     public abstract void updatePhysics();
 
+    public abstract PlatformState getState();
+
 }

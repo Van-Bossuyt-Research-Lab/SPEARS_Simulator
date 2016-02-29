@@ -24,7 +24,7 @@ public class GenericRover extends RoverAutonomousCode {
         seconds = 4;//(int)params.get("sec").doubleValue();
     }
 
-    public String nextCommand(
+    public String doNextCommand(
 			long milliTime,
 			DecimalPoint location,
 			double direction,
