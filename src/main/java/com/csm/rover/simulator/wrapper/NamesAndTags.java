@@ -3,9 +3,10 @@ package com.csm.rover.simulator.wrapper;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+
 public class NamesAndTags implements Serializable {
 
-    private ArrayList<String> groundNames, groundTags, roverNames, roverTags, satelliteNames, satelliteTags;
+    public ArrayList<String> groundNames, groundTags, roverNames, roverTags, satelliteNames, satelliteTags;
 
     public NamesAndTags(ArrayList<String> roverNames,
                         ArrayList<String> roverTags,
@@ -19,6 +20,10 @@ public class NamesAndTags implements Serializable {
         this.roverTags = roverTags;
         this.satelliteNames = satelliteNames;
         this.satelliteTags = satelliteTags;
+    }
+
+    public NamesAndTags(){
+
     }
 
     public String getNameByTag(String tag){
