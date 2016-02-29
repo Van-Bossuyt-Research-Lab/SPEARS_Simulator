@@ -8,5 +8,6 @@ public @interface AutonomousCodeModel {
 
     String type();
     String name();
+    String[] parameters();
 
 }

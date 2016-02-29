@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@AutonomousCodeModel(name="GORADRO Adv", type="Rover")
+@AutonomousCodeModel(name="GORADRO Adv", type="Rover", parameters={"mentality1", "mentality2", "mentality3", "mentality4", "mentality5"})
 public class GORAROAdvanceCode extends RoverAutonomousCode {
 
 	private static final long serialVersionUID = -5817385172013297956L;

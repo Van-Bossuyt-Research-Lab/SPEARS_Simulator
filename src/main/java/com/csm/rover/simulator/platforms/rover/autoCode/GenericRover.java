@@ -5,7 +5,7 @@ import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 
 import java.util.Map;
 
-@AutonomousCodeModel(type="Rover", name="Generic")
+@AutonomousCodeModel(type="Rover", name="Generic", parameters={"sec"})
 public class GenericRover extends RoverAutonomousCode {
 
 	private static final long serialVersionUID = -5883548370057346938L;

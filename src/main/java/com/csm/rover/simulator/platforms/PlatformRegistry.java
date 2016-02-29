@@ -22,11 +22,16 @@ public class PlatformRegistry {
         platforms = new TreeMap<>();
         autoModels = new TreeMap<>();
         physicsModels = new TreeMap<>();
+        autoModelParameters = new TreeMap<>();
+        physicsModelParameters = new TreeMap<>();
     }
 
     private Map<String, String> platforms;
     private Map<String, Map<String, String>> autoModels;
     private Map<String, Map<String, String>> physicsModels;
+
+    private Map<String, Map<String, String[]>> autoModelParameters;
+    private Map<String, Map<String, String[]>> physicsModelParameters;
 
     public static void fillRegistry(){
         PlatformRegistry reg = new PlatformRegistry();
@@ -83,6 +88,7 @@ public class PlatformRegistry {
     private void fillAutoModels(Reflections reflect){
         for (String type : platforms.keySet()){
             autoModels.put(type, new TreeMap<String, String>());
+            autoModelParameters.put(type, new TreeMap<String, String[]>());
         }
 
         Set<Class<? extends PlatformAutonomousCodeModel>> classautos = reflect.getSubTypesOf(PlatformAutonomousCodeModel.class);
@@ -102,8 +108,10 @@ public class PlatformRegistry {
         @SuppressWarnings("unchecked")
         Set<Class<? extends PlatformAutonomousCodeModel>> realautos = (Set<Class<? extends PlatformAutonomousCodeModel>>)sortedSets.get(1);
         for (Class<? extends PlatformAutonomousCodeModel> auto : realautos){
-            String type = auto.getAnnotation(AutonomousCodeModel.class).type();
-            String name = auto.getAnnotation(AutonomousCodeModel.class).name();
+            AutonomousCodeModel annotation = auto.getAnnotation(AutonomousCodeModel.class);
+            String type = annotation.type();
+            String name = annotation.name();
+            String[] params = annotation.parameters();
             String clazz = getClassPath(auto);
             if (Modifier.isAbstract(auto.getModifiers())){
                 LOG.log(Level.DEBUG, "Abstract parent model {} is ignored", auto.toString());
@@ -113,6 +121,7 @@ public class PlatformRegistry {
                 try {
                     auto.newInstance();
                     autoModels.get(type).put(name, clazz);
+                    autoModelParameters.get(type).put(name, params);
                 }
                 catch (InstantiationException | IllegalAccessException e) {
                     LOG.log(Level.WARN, "{} does not have a default constructor. Parameters should be set using constructParameters()", auto.toString());
@@ -135,6 +144,7 @@ public class PlatformRegistry {
     private void fillPhysicsModels(Reflections reflect){
         for (String type : platforms.keySet()){
             physicsModels.put(type, new TreeMap<String, String>());
+            physicsModelParameters.put(type, new TreeMap<String, String[]>());
         }
 
         Set<Class<? extends PlatformPhysicsModel>> classphysics = reflect.getSubTypesOf(PlatformPhysicsModel.class);
@@ -154,8 +164,10 @@ public class PlatformRegistry {
         @SuppressWarnings("unchecked")
         Set<Class<? extends PlatformPhysicsModel>> realphysics = (Set<Class<? extends PlatformPhysicsModel>>)sortedSets.get(1);
         for (Class<? extends PlatformPhysicsModel> physic : realphysics){
-            String type = physic.getAnnotation(PhysicsModel.class).type();
-            String name = physic.getAnnotation(PhysicsModel.class).name();
+            PhysicsModel annotation = physic.getAnnotation(PhysicsModel.class);
+            String type = annotation.type();
+            String name = annotation.name();
+            String[] params = annotation.parameters();
             String clazz = getClassPath(physic);
             if (Modifier.isAbstract(physic.getModifiers())){
                 LOG.log(Level.DEBUG, "Abstract parent model {} is ignored", physic.toString());
@@ -165,6 +177,7 @@ public class PlatformRegistry {
                 try {
                     physic.newInstance();
                     physicsModels.get(type).put(name, clazz);
+                    physicsModelParameters.get(type).put(name, params);
                 }
                 catch (InstantiationException | IllegalAccessException e) {
                     LOG.log(Level.WARN, "{} does not have a default constructor. Parameters should be set using constructParameters()", physic.toString());
@@ -274,7 +287,7 @@ public class PlatformRegistry {
             return new ArrayList<>(physicsModels.get(type).keySet());
         }
         else {
-            LOG.log(Level.ERROR, "Requested type \"{}\" is not registered");
+            LOG.log(Level.ERROR, "Requested type \"{}\" is not registered", type);
             return null;
         }
     }
@@ -289,7 +302,49 @@ public class PlatformRegistry {
             return new ArrayList<>(autoModels.get(type).keySet());
         }
         else {
-            LOG.log(Level.ERROR, "Requested type \"{}\" is not registered");
+            LOG.log(Level.ERROR, "Requested type \"{}\" is not registered", type);
+            return null;
+        }
+    }
+
+    public static List<String> getParametersForAutonomousCodeModel(String type, String name){
+        checkInitialized();
+        return instance.get().doGetParametersForAutonomousCodeModel(type, name);
+    }
+
+    private List<String> doGetParametersForAutonomousCodeModel(String type, String name){
+        if (autoModelParameters.keySet().contains(type)){
+            if (autoModelParameters.get(type).keySet().contains(name)){
+                return Arrays.asList(autoModelParameters.get(type).get(name));
+            }
+            else {
+                LOG.log(Level.ERROR, "Requested type autonomous code model \"{}\" of type {} is not registered", name, type);
+                return null;
+            }
+        }
+        else {
+            LOG.log(Level.ERROR, "Requested type \"{}\" is not registered", type);
+            return null;
+        }
+    }
+
+    public static List<String> getParametersForPhysicsModel(String type, String name){
+        checkInitialized();
+        return instance.get().doGetParametersForPhysicsModel(type, name);
+    }
+
+    private List<String> doGetParametersForPhysicsModel(String type, String name){
+        if (physicsModelParameters.keySet().contains(type)){
+            if (physicsModelParameters.get(type).keySet().contains(name)){
+                return Arrays.asList(physicsModelParameters.get(type).get(name));
+            }
+            else {
+                LOG.log(Level.ERROR, "Requested type physics model \"{}\" of type {} is not registered", name, type);
+                return null;
+            }
+        }
+        else {
+            LOG.log(Level.ERROR, "Requested type \"{}\" is not registered", type);
             return null;
         }
     }

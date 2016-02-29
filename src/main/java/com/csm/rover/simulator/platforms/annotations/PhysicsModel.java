@@ -8,5 +8,6 @@ public @interface PhysicsModel {
 
     String type();
     String name();
+    String[] parameters();
 
 }

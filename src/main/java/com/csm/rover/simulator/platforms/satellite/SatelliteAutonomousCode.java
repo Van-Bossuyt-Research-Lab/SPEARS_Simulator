@@ -7,7 +7,7 @@ import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import java.io.Serializable;
 import java.util.Map;
 
-@AutonomousCodeModel(type="Satellite", name="Default")
+@AutonomousCodeModel(type="Satellite", name="Default", parameters={})
 public class SatelliteAutonomousCode extends PlatformAutonomousCodeModel implements Serializable {
 	
 	private static final long serialVersionUID = 1L;

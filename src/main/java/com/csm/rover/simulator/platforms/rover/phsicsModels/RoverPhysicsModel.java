@@ -5,6 +5,7 @@ import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
+import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import com.csm.rover.simulator.platforms.rover.MotorState;
 import com.csm.rover.simulator.platforms.rover.RoverWheels;
@@ -17,7 +18,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 //TODO add implementation with better time stepping
-@PhysicsModel(type="Rover", name="Default")
+@PhysicsModel(type="Rover", name="Default", parameters={})
 public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializable {
 	private static final Logger LOG = LogManager.getLogger(RoverPhysicsModel.class);
 
@@ -222,8 +223,8 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 		motor_temp[BL] += ((winding_heat_transfer*(winding_temp[BL] - motor_temp[BL]) - motor_surface_heat_transfer*(motor_temp[BL] - temperature)) / motor_thermal_cap) * time_step;
 		motor_temp[BR] += ((winding_heat_transfer*(winding_temp[BR] - motor_temp[BR]) - motor_surface_heat_transfer*(motor_temp[BR] - temperature)) / motor_thermal_cap) * time_step;
 	}
-	
-	private double resistance_cp(){ // get the resistance of the CP resistor as a function of SOC
+
+    private double resistance_cp(){ // get the resistance of the CP resistor as a function of SOC
 		return R_cp0+R_cp1*Math.exp(R_cp2*(1-SOC));
 	}
 	

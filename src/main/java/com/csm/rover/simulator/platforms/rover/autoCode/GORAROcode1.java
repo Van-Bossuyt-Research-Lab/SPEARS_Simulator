@@ -7,7 +7,7 @@ import com.csm.rover.simulator.wrapper.Globals;
 import java.util.ArrayList;
 import java.util.Map;
 
-@AutonomousCodeModel(name="GORADRO", type="Rover")
+@AutonomousCodeModel(name="GORADRO", type="Rover", parameters={ "sampleDirections", "sampleRadius", "averagingRadius", "averagingAngle", "averagingPStep","averagingRStep", "mentality1", "mentality2", "mentality3", "mentality4", "mentality5" })
 public class GORAROcode1 extends RoverAutonomousCode {
 	
 	private static final long serialVersionUID = -7214933982888683962L;

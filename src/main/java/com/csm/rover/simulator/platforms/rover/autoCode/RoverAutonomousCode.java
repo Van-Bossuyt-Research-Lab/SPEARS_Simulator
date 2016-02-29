@@ -17,7 +17,7 @@ import java.io.*;
 import java.util.Map;
 import java.util.TreeMap;
 
-@AutonomousCodeModel(type="Rover", name="parent")
+@AutonomousCodeModel(type="Rover", name="parent", parameters = {})
 public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel implements Serializable {
 	private static final Logger LOG = LogManager.getLogger(RoverAutonomousCode.class);
 
