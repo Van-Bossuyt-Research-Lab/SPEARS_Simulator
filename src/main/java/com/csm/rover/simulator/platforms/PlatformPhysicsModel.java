@@ -19,6 +19,8 @@ public abstract class PlatformPhysicsModel {
     public abstract void start();
     public abstract void updatePhysics();
 
+    public abstract void setPlatformName(String name);
+    public abstract void initializeState(PlatformState state);
     public abstract PlatformState getState();
 
 }

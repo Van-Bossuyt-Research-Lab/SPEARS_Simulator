@@ -4,18 +4,15 @@ import com.csm.rover.simulator.platforms.PlatformState;
 
 public class SatelliteState extends PlatformState {
 
-    public double altitude, orbitIncline, theta;
-
     public SatelliteState(){
-        super("Satellite");
-    }
-
-    public static SatelliteState defaultState(){
-        SatelliteState state = new SatelliteState();
-        state.altitude = 0;
-        state.orbitIncline = 0;
-        state.theta = 0;
-        return state;
+        super("Satellite", new String[] {
+                "altitude",
+                "orbitIncline",
+                "theta"
+        });
+        super.setDefaultValue("altitude", 0);
+        super.setDefaultValue("orbitIncline", 0);
+        super.setDefaultValue("theta", 0);
     }
 
 }

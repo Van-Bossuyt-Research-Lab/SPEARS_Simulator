@@ -59,7 +59,7 @@ public class PlatformConfig implements Serializable {
 
         private PlatformConfig config;
 
-        public Builder(){
+        private Builder(){
             config = new PlatformConfig();
         }
 

@@ -2,12 +2,13 @@ package com.csm.rover.simulator.platforms.rover.phsicsModels;
 
 import com.csm.rover.simulator.map.PlanetParametersList;
 import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import com.csm.rover.simulator.platforms.rover.MotorState;
+import com.csm.rover.simulator.platforms.rover.RoverState;
 import com.csm.rover.simulator.platforms.rover.RoverWheels;
 import com.csm.rover.simulator.wrapper.Admin;
 import org.apache.logging.log4j.Level;
@@ -26,13 +27,15 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	
 	private final int FL = 0, FR = 1, BL = 2, BR = 3;
 
+    private RoverState rov_state;
+
     //TODO variable planet params
 	private PlanetParametersList planetParams = new PlanetParametersList();
 	protected static TerrainMap MAP;
 
 	protected String roverName;
 	public final double time_step = 0.01; // time step of physics, in seconds
-	
+
 	protected final double wheel_radius = 0.0476; //m
 	protected final double wheel_mass = 0.064; //kg
 	protected final double rover_width = 0.438; //m
@@ -41,7 +44,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	protected final double rover_mass = 2.266; //kg
 	protected final double rover_inertia = 0.1025; //kg*m^2
 	protected final double wheel_inertia = 0.5 * wheel_mass * Math.pow(wheel_radius, 2); //kg*m^2
-	
+
 	protected final double motor_energy_transform = 0.035;
 	protected final double motor_voltage_transform = 0.571;
 	protected final double motor_resistance = 3; //Ohm
@@ -50,7 +53,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	protected final double friction_gr = .65;
 	protected final double friction_s = 1.2;
 	protected final double gamma = Math.atan(1/rover_width);
-	
+
 	protected final double R_cp0 = 0.07; //Ohm
 	protected final double R_cp1 = 0.01; //Ohm
 	protected final double R_cp2 = 3;
@@ -59,33 +62,33 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	protected final double resistance_s = 0.01; //Ohm
 	protected final double resistance_parasite = 100000000; //Ohm
 	protected double battery_max_charge = 140000; //C
-	
+
 	protected final double battery_heat_transfer = 10; //J/s/*c
 	protected final double battery_thermal_cap = 170; //J/K
-	
+
 	protected final double winding_heat_transfer = 2; //J/s/*c
 	protected final double winding_thermal_cap = 1.7; //J/*c
 	protected final double motor_surface_heat_transfer = 0.9; //J/s/*c
-	protected final double motor_thermal_cap = 0.8; //J/*c	
-	
+	protected final double motor_thermal_cap = 0.8; //J/*c
+
 	protected double fric_gr_all = 0;
-	protected double[] slip = { 0, 0, 0, 0 };		
-	
+	protected double[] slip = { 0, 0, 0, 0 };
+
 	protected int[] motor_power = new int[] {  250, 250, 250, 250 }; // assigned motor powers
 	protected int[] motor_states = new int[] { 0, 0, 0, 0 }; // assigned motor states
-	protected double[] wheel_speed = { 0, 0, 0, 0 }; //rad/s	
+	protected double[] wheel_speed = { 0, 0, 0, 0 }; //rad/s
 	protected double[] motor_current = { 0, 0, 0, 0 }; //A
-	
+
 	protected double battery_charge = 0; //C
 	protected double battery_cp_charge = 0; //C
 	protected double battery_voltage = 12; //V
 	protected double battery_current = 0; //A
 	protected double SOC = 1;
-	
+
 	protected double battery_temperature = 30; //*c
 	protected double[] winding_temp = { 30, 30, 30, 30 }; //*c
 	protected double[] motor_temp = { 30, 30, 30, 30 }; //*c
-	
+
 	protected DecimalPoint location = new DecimalPoint(); //m x m from center of map
 	protected double direction = 0; //rad off of positive X
 	protected double speed = 0; //m/s
@@ -94,7 +97,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	protected double angular_acceleration = 0; //rad/s^2
 	protected double slip_acceleration = 0; //m/s^2
 	protected double slip_velocity = 0; //m/s
-	
+
 	public RoverPhysicsModel() {
         super("Rover");
     }
@@ -104,16 +107,12 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
     }
 
     @Override
+    public void setPlatformName(String name) {
+        this.roverName = name;
+    }
+
+    @Override
 	public void constructParameters(Map<String, Double> params) {}
-	
-	public void initalizeConditions(String name, double bat_charge, double temp){
-		roverName = name;
-		battery_charge = bat_charge;
-		battery_max_charge = bat_charge;
-		battery_temperature = temp;
-		winding_temp = new double[] { temp, temp, temp, temp };
-		motor_temp = new double[] { temp, temp, temp, temp };
-	}
 
     @Override
 	public void start(){
@@ -131,6 +130,32 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 		},
 		SynchronousThread.FOREVER, roverName+"-physics");
 	}
+
+    @Override
+    public void initializeState(PlatformState state) {
+        if (state.getType().equals("Rover")){
+            try {
+                this.rov_state = (RoverState)state;
+                this.location = new DecimalPoint(state.get("x"), state.get("y"));
+                this.direction = state.get("dir");
+                double temp = -30; //TODO temp
+                battery_charge = battery_max_charge;
+                battery_temperature = temp;
+                winding_temp = new double[] { temp, temp, temp, temp };
+                motor_temp = new double[] { temp, temp, temp, temp };
+                return;
+            }
+            catch (ClassCastException e){
+                //Let the error throw
+            }
+        }
+        throw new IllegalArgumentException("The given state is not a RoverState");
+    }
+
+    @Override
+    public PlatformState getState() {
+        return rov_state.immutableCopy();
+    }
 
     @Override
 	public void updatePhysics() {
@@ -182,7 +207,11 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 		//TODO													  + here??
 		location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
 		direction = (direction + angular_velocity*time_step + 2*Math.PI) % (2*Math.PI);
-		// report new location to map
+
+        rov_state.set("x", location.getX());
+        rov_state.set("y", location.getY());
+        rov_state.set("dir", direction);
+        // report new location to map
         Admin.getCurrentInterface().updateRover(roverName, location, direction);
 		
 		//Determining the current of the battery and the change in the stored charge
@@ -351,7 +380,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	public int[] getMotor_power() {
 		return motor_power;
 	}
-	
+
 	public int getMotor_power(int motor) {
 		return motor_power[motor];
 	}
@@ -377,7 +406,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	public double[] getMotor_current() {
 		return motor_current;
 	}
-	
+
 	public double getMotorCurrent(RoverWheels wheel) {
 		return motor_current[wheel.getValue()];
 	}

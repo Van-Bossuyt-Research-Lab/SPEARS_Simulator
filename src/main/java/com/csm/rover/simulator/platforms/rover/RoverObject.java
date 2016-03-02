@@ -4,7 +4,6 @@ import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.Platform;
-import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
 import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.wrapper.Globals;
@@ -87,19 +86,6 @@ public class RoverObject extends Platform implements Serializable {
 		LEDs.put("Instructions", false);
 		LEDs.put("Autonomous", false);
 	}
-
-    @Override
-    protected void initializeState(PlatformState s1) {
-        if (s1.getType().equals(this.platform_type)){
-            RoverState state = (RoverState)s1;
-            ((RoverPhysicsModel)physicsModel).initalizeConditions(name, ((RoverPhysicsModel)physicsModel).getbattery_max_charge(), state.temperature);
-            ((RoverPhysicsModel)physicsModel).setLocation(state.location);
-            ((RoverPhysicsModel)physicsModel).setDirection(state.direction);
-        }
-        else {
-            LOG.log(Level.ERROR, "The given state is not a RoverState");
-        }
-    }
 
     public static void setTerrainMap(TerrainMap map){
         MAP = map;

@@ -164,7 +164,7 @@ public class Admin {
 	private ArrayList<RoverObject> buildRoversFromConfig(ArrayList<PlatformConfig> configs){
 		ArrayList<RoverObject> out = new ArrayList<>();
 		for (PlatformConfig config : configs){
-            out.add(Platform.<RoverObject>buildFromConfiguration(config, RoverState.defaultState()));
+            out.add(Platform.<RoverObject>buildFromConfiguration(config, new RoverState()));
 		}
         return out;
 	}
@@ -172,7 +172,7 @@ public class Admin {
 	private ArrayList<SatelliteObject> buildSatellitesFromConfig(ArrayList<PlatformConfig> configs){
         ArrayList<SatelliteObject> out = new ArrayList<>();
         for (PlatformConfig config : configs){
-            out.add(Platform.<SatelliteObject>buildFromConfiguration(config, SatelliteState.defaultState()));
+            out.add(Platform.<SatelliteObject>buildFromConfiguration(config, new SatelliteState()));
         }
         return out;
 	}

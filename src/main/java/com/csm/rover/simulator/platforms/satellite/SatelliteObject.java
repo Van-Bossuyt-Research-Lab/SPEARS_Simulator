@@ -2,7 +2,6 @@ package com.csm.rover.simulator.platforms.satellite;
 
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.platforms.Platform;
-import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
 import org.apache.logging.log4j.Level;
@@ -68,16 +67,6 @@ public class SatelliteObject extends Platform implements Serializable {
 		//},
 		//SynchronousThread.FOREVER, name+"-physics");
 	}
-
-    @Override
-    protected void initializeState(PlatformState s1) {
-        if (s1.getType().equals(this.platform_type)){
-            SatelliteState state = (SatelliteState)s1;
-        }
-        else {
-            LOG.log(Level.ERROR, "The given state is not a SatelliteState");
-        }
-    }
 	
 	public String getName(){
 		return name;

@@ -24,20 +24,19 @@ public abstract class Platform {
         return platform_type;
     }
 
-    protected abstract void initializeState(PlatformState state);
-
     @SuppressWarnings("unchecked")
     public static <T extends Platform> T buildFromConfiguration(PlatformConfig cfg, PlatformState initState){
         Class<? extends Platform> type = PlatformRegistry.getPlatform(cfg.getType());
         try {
             Platform platform = type.newInstance();
+            platform.name = cfg.getScreenName();
+            platform.ID = cfg.getID();
             platform.autonomousCodeModel = PlatformRegistry.getAutonomousCodeModel(cfg.getType(), cfg.getAutonomousModelName()).newInstance();
             platform.autonomousCodeModel.constructParameters(cfg.getAutonomousModelParameters());
             platform.physicsModel = PlatformRegistry.getPhysicsModel(cfg.getType(), cfg.getPhysicsModelName()).newInstance();
             platform.physicsModel.constructParameters(cfg.getPhysicsModelParameters());
-            platform.name = cfg.getScreenName();
-            platform.ID = cfg.getID();
-            platform.initializeState(initState);
+            platform.physicsModel.initializeState(initState);
+            platform.physicsModel.setPlatformName(cfg.getScreenName());
             return (T)platform;
         }
         catch (InstantiationException | IllegalAccessException e) {

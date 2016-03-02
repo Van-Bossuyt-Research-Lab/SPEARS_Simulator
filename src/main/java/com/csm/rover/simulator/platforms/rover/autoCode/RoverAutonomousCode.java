@@ -14,8 +14,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 import java.io.*;
-import java.util.Map;
-import java.util.TreeMap;
 
 @AutonomousCodeModel(type="Rover", name="parent", parameters = {})
 public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel implements Serializable {
@@ -41,12 +39,11 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel im
         if (!state.getType().equals("Rover")){
             throw new IllegalArgumentException("The provided state is not a RoverState");
         }
-        return doNextCommand(millitime, new DecimalPoint(state.get("x"), state.get("y")), state.get("direction"),
-                getAutonomousParameters(state));
+        return doNextCommand(millitime, new DecimalPoint(state.get("x"), state.get("y")), state.get("dir"));
     }
 
     protected abstract String doNextCommand(long milliTime, DecimalPoint location,
-                                          double direction, Map<String, Double> parameters);
+                                          double direction);
 
     public static void setTerrainMap(TerrainMap map){
         MAP = map;
@@ -84,18 +81,6 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel im
 			e.printStackTrace();
 		}
 	}
-
-    private Map<String, Double> getAutonomousParameters(PlatformState state){
-        String[] required = new String[] { "acceleration", "angular_acceleration", "wheel_speed_FL", "wheel_speed_FR",
-                "wheel_speed_BL", "wheel_speed_BR", "motor_current_FL", "motor_current_FR", "motor_current_BL",
-                "motor_current_BR", "motor_temp_FL", "motor_temp_FR", "motor_temp_BL", "motor_temp_BR",
-                "battery_voltage", "battery_current", "battery_temp", "battery_charge" };
-        Map<String, Double> params = new TreeMap<>();
-        for (String param : required){
-            params.put(param, state.get(param));
-        }
-        return params;
-    }
 
 	private String generateFilepath(){
 		DateTime date = new DateTime();

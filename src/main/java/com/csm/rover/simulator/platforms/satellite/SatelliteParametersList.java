@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.platforms.satellite;
 
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
+import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 
 import java.io.Serializable;
@@ -28,6 +29,21 @@ public class SatelliteParametersList extends PlatformPhysicsModel implements Ser
     @Override
     public void updatePhysics() {
 
+    }
+
+    @Override
+    public void setPlatformName(String name) {
+
+    }
+
+    @Override
+    public void initializeState(PlatformState state) {
+
+    }
+
+    @Override
+    public PlatformState getState() {
+        return null;
     }
 
 }
