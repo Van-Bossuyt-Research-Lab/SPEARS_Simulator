@@ -1,6 +1,8 @@
-package com.csm.rover.simulator.satellite;
+package com.csm.rover.simulator.platforms.satellite;
 
 import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
 import org.apache.logging.log4j.Level;
@@ -15,18 +17,14 @@ import java.util.Random;
 import java.util.TreeMap;
 
 @SuppressWarnings("unused")
-public class SatelliteObject implements Serializable {
+@com.csm.rover.simulator.platforms.annotations.Platform(type="Satellite")
+public class SatelliteObject extends Platform implements Serializable {
 	private static final Logger LOG = LogManager.getLogger(SatelliteObject.class);
 
 	private static final long serialVersionUID = 1L;
 	
     private static SerialBuffers serialBuffers;
-    
-	private String name;
-	private String IDcode;
-	private SatelliteParametersList params;
-	private SatelliteAutonomusCode autoCode;
-	
+    	
 	private double time_step = 0.01; // time step of physics, in seconds
 	
 	private String instructions = ""; // the "file" of instructions
@@ -47,11 +45,8 @@ public class SatelliteObject implements Serializable {
 	private String serialHistory = "";
 	private Map<String, Boolean> LEDs = new TreeMap<String, Boolean>();
 	
-	public SatelliteObject(String name, String id, SatelliteParametersList params, SatelliteAutonomusCode code, double altitue, double orbitIncline, double theta){
-		this.name = name;
-		IDcode = id;
-		this.params = params;
-		autoCode = code;
+	public SatelliteObject(){
+		super("Satellite");
 	}
 
     public static void setSerialBuffers(SerialBuffers buffers){
@@ -73,36 +68,46 @@ public class SatelliteObject implements Serializable {
 		//},
 		//SynchronousThread.FOREVER, name+"-physics");
 	}
+
+    @Override
+    protected void initializeState(PlatformState s1) {
+        if (s1.getType().equals(this.platform_type)){
+            SatelliteState state = (SatelliteState)s1;
+        }
+        else {
+            LOG.log(Level.ERROR, "The given state is not a SatelliteState");
+        }
+    }
 	
 	public String getName(){
 		return name;
 	}
 	
 	public String getIDCode(){
-		return IDcode;
+		return ID;
 	}
 	
 	public void excecuteCode(){
 		try {
-			if (serialBuffers.RFAvailable(IDcode) > 1) { // if there is a message
+			if (serialBuffers.RFAvailable(ID) > 1) { // if there is a message
 				delay(500);
-				char[] id = strcat((char)serialBuffers.ReadSerial(IDcode), (char)serialBuffers.ReadSerial(IDcode));
-				if (strcmp(id, IDcode) == 0) { // if the message is for us and are we allowed to read it
+				char[] id = strcat((char)serialBuffers.ReadSerial(ID), (char)serialBuffers.ReadSerial(ID));
+				if (strcmp(id, ID) == 0) { // if the message is for us and are we allowed to read it
 					delay(500);
-					serialBuffers.ReadSerial(IDcode); // white space
-					tag[0] = (char) serialBuffers.ReadSerial(IDcode); // message type tag
+					serialBuffers.ReadSerial(ID); // white space
+					tag[0] = (char) serialBuffers.ReadSerial(ID); // message platform_type tag
 					if (tag[0] == 'r'){
-						tag[1] = (char) serialBuffers.ReadSerial(IDcode); //number of rover
+						tag[1] = (char) serialBuffers.ReadSerial(ID); //number of rover
 						index = 3;
 					}
 					else {
 						tag[1] = '\0';
 						index = 2;
 					}
-					serialBuffers.ReadSerial(IDcode); // white space
+					serialBuffers.ReadSerial(ID); // white space
 					data[index-1] = ' '; // fills in for message forward
-					while (serialBuffers.RFAvailable(IDcode) > 0){
-						data[index] = (char) serialBuffers.ReadSerial(IDcode); // read message body
+					while (serialBuffers.RFAvailable(ID) > 0){
+						data[index] = (char) serialBuffers.ReadSerial(ID); // read message body
 						index++;
 					}
 					data[index] = '\0'; // end string
@@ -137,14 +142,14 @@ public class SatelliteObject implements Serializable {
 						}
 						else if (strcmp(data, "[o]") == 0){ // receive and forward image
 							byte[] data = new byte[0]; // output data
-							while (serialBuffers.RFAvailable(IDcode) == 0) { // wait for transmission to start
+							while (serialBuffers.RFAvailable(ID) == 0) { // wait for transmission to start
 								delay(5);
 							}
 							delay(1000); // syncopate
 							int index = 0;
-							while (serialBuffers.RFAvailable(IDcode) > 0) { // read data in 60 byte chunks
-								while (serialBuffers.RFAvailable(IDcode) > 0) {
-									data = Augment(data, serialBuffers.ReadSerial(IDcode));
+							while (serialBuffers.RFAvailable(ID) > 0) { // read data in 60 byte chunks
+								while (serialBuffers.RFAvailable(ID) > 0) {
+									data = Augment(data, serialBuffers.ReadSerial(ID));
 									index++;
 								}
 								delay(2000); // continue syncapation for smooth data transmission
@@ -160,7 +165,7 @@ public class SatelliteObject implements Serializable {
 							while (x < data.length) {
 								index = 0;
 								while ((index < 60) && x < data.length) { // send data in 60 byte chunks
-									serialBuffers.writeToSerial(data[x], IDcode);
+									serialBuffers.writeToSerial(data[x], ID);
 									index++;
 									x++;
 								}
@@ -172,11 +177,11 @@ public class SatelliteObject implements Serializable {
 							String data = "";
 							index = 0;
 						    char buffer;
-						    while (serialBuffers.RFAvailable(IDcode) == 0) {}
+						    while (serialBuffers.RFAvailable(ID) == 0) {}
 							delay(1000);
-							while (serialBuffers.RFAvailable(IDcode) > 0){
-								while (serialBuffers.RFAvailable(IDcode) > 0){
-								    buffer = (char)serialBuffers.ReadSerial(IDcode);
+							while (serialBuffers.RFAvailable(ID) > 0){
+								while (serialBuffers.RFAvailable(ID) > 0){
+								    buffer = (char)serialBuffers.ReadSerial(ID);
 								    data += buffer;
 								    index++;
 							    }
@@ -205,13 +210,13 @@ public class SatelliteObject implements Serializable {
 					    }
 						else if (strcmp(data, "instructions") == 0){ // is recieving instructions
 							instructions = ""; // create new "file"
-							while (serialBuffers.RFAvailable(IDcode) == 0) { // wait for transmission to start
+							while (serialBuffers.RFAvailable(ID) == 0) { // wait for transmission to start
 								delay(5);
 							}
 							delay(1000); // syncopate
-							while (serialBuffers.RFAvailable(IDcode) > 0){
-								while (serialBuffers.RFAvailable(IDcode) > 0){
-									instructions += (char)serialBuffers.ReadSerial(IDcode); // read in byte at a time, add to file
+							while (serialBuffers.RFAvailable(ID) > 0){
+								while (serialBuffers.RFAvailable(ID) > 0){
+									instructions += (char)serialBuffers.ReadSerial(ID); // read in byte at a time, add to file
 									try {
 										Thread.sleep(1);
 									} catch (Exception e) {
@@ -232,7 +237,7 @@ public class SatelliteObject implements Serializable {
 							while (x < instructions.length()) {
 								index = 0;
 								while ((index < 60) && (x < instructions.length())){
-									serialBuffers.writeToSerial(instructions.charAt(x), IDcode); // send instructions to rover 60 byte chunks
+									serialBuffers.writeToSerial(instructions.charAt(x), ID); // send instructions to rover 60 byte chunks
 									index++;
 									x++;
 								}
@@ -311,7 +316,7 @@ public class SatelliteObject implements Serializable {
 		  while (hold != -1) { // while there still is data
 			  index = 0;
 			  while (index < 60 && hold != -1) {
-				  serialBuffers.writeToSerial((byte) hold, IDcode); // send data in 60 byte chunks
+				  serialBuffers.writeToSerial((byte) hold, ID); // send data in 60 byte chunks
 				  hold = data.read();
 				  index++;
 			  }  
@@ -347,7 +352,7 @@ public class SatelliteObject implements Serializable {
 			if (message[x] == '\0'){ // while not end of string
 				break;
 			}
-			serialBuffers.writeToSerial(message[x], IDcode); // Write to Serial one char at a time
+			serialBuffers.writeToSerial(message[x], ID); // Write to Serial one char at a time
 			print += message[x];
 			delay(1);
 			x++;
@@ -358,7 +363,7 @@ public class SatelliteObject implements Serializable {
 	}
 
 	boolean sendSerial(char mess){
-		serialBuffers.writeToSerial(mess, IDcode);
+		serialBuffers.writeToSerial(mess, ID);
 		addToSerialHistory(mess + "");
 		LOG.log(Level.INFO, "Satellite {} sent serial message \'{}\'", name, mess);
 		return true;

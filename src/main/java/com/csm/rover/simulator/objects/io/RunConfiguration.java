@@ -1,12 +1,14 @@
 package com.csm.rover.simulator.objects.io;
 
 import com.csm.rover.simulator.objects.util.DecimalPoint;
-import com.csm.rover.simulator.rover.RoverObject;
-import com.csm.rover.simulator.rover.autoCode.RoverAutonomousCode;
-import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
-import com.csm.rover.simulator.satellite.SatelliteAutonomusCode;
-import com.csm.rover.simulator.satellite.SatelliteObject;
-import com.csm.rover.simulator.satellite.SatelliteParametersList;
+import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.rover.RoverObject;
+import com.csm.rover.simulator.platforms.rover.RoverState;
+import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
+import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
+import com.csm.rover.simulator.platforms.satellite.SatelliteAutonomousCode;
+import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
+import com.csm.rover.simulator.platforms.satellite.SatelliteParametersList;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 
 import java.io.*;
@@ -155,6 +157,7 @@ public class RunConfiguration implements Serializable {
 				RoverObject n = new RoverObject(NT.getRoverNames().get(rn), NT.getRoverTags().get(rn), ph, ac, dp, 0,0);
 				this.rovers.add(n);
 			}
+			Platform.buildFromConfiguration(RoverState.defaultState())
 			for(int rn=0; rn<NT.getSatelliteNames().size(); rn++){
 				SatelliteParametersList spl = new SatelliteParametersList();
 				SatelliteAutonomusCode sac = new SatelliteAutonomusCode(NT.getSatelliteNames().get(rn),NT.getSatelliteTags().get(rn)) {

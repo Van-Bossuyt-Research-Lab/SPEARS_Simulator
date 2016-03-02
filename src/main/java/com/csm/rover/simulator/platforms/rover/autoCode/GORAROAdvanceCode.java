@@ -1,6 +1,7 @@
-package com.csm.rover.simulator.rover.autoCode;
+package com.csm.rover.simulator.platforms.rover.autoCode;
 
 import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import com.csm.rover.simulator.wrapper.Globals;
 
 import java.awt.Point;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@AutonomousCodeModel(name="GORADRO Adv", type="Rover", parameters={"mentality1", "mentality2", "mentality3", "mentality4", "mentality5"})
 public class GORAROAdvanceCode extends RoverAutonomousCode {
 
 	private static final long serialVersionUID = -5817385172013297956L;
@@ -46,40 +48,23 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 	private String mentalityStr;
 	private boolean runyet = false;
 	
-	public GORAROAdvanceCode(double[] attitudes){
+	public GORAROAdvanceCode(){
 		super("GORARO Adv.", "GORARO");
 		potentials = new double[histories][sampleDirections];
-		String print = "";
-		for (int i = 0; i < mentality.length; i++){
-			print += attitudes[i] + "; ";
-			mentality[i] = attitudes[i];
-		}
-		mentalityStr = "Using Mentality: {" + print + "}";
-	}
-	
-	public GORAROAdvanceCode(GORAROAdvanceCode org) {
-		super(org);
-		score = org.score;
-		state = org.state;
-		this.sampleDirections = org.sampleDirections;
-		this.sampleRadius = org.sampleRadius;
-		this.averagingRadius = org.averagingRadius;
-		this.averagingAngle = org.averagingAngle;
-		this.mentality = org.mentality;
-		this.targetDirection = org.targetDirection;
-		this.lastOptTime = org.lastOptTime;
-		this.mentalityStr = org.mentalityStr;
-		this.runyet = org.runyet;
-		potentials = new double[histories][sampleDirections];
-		this.targetDirection = org.targetDirection;
-		this.lastOptTime = org.lastOptTime;		
-		this.lastLoc = org.lastLoc;
-		this.timeAtPoint = org.timeAtPoint;
-		this.begun = org.begun;
 	}
 
-	@Override
-	public String nextCommand(long milliTime, DecimalPoint location,
+    @Override
+    public void constructParameters(Map<String, Double> params) {
+        this.mentality = new double[] { params.get("mentality1"), params.get("mentality2"), params.get("mentality3"), params.get("mentality4"), params.get("mentality5") };
+        String print = "";
+        for (int i = 0; i < mentality.length; i++){
+            print +=  + mentality[i] + "; ";
+        }
+        mentalityStr = "Using Mentality: {" + print + "}";
+    }
+
+    @Override
+	public String doNextCommand(long milliTime, DecimalPoint location,
 			double direction, Map<String, Double> parameters)
 	{
 		if (!runyet){
@@ -265,11 +250,6 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 			return !visitedScience.contains(new Point(mapLoc.x/3, mapLoc.y/3));
 		}
 		return false;
-	}
-	
-	@Override
-	public GORAROAdvanceCode clone(){
-		return new GORAROAdvanceCode(this);
 	}
 	
 	private String formatDouble(double in){ 

@@ -8,11 +8,12 @@ import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
 import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
-import com.csm.rover.simulator.rover.RoverObject;
-import com.csm.rover.simulator.rover.autoCode.BlankRoverAuto;
-import com.csm.rover.simulator.rover.autoCode.RAIRcode;
-import com.csm.rover.simulator.rover.autoCode.RoverAutonomousCode;
-import com.csm.rover.simulator.satellite.SatelliteObject;
+import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.PlatformRegistry;
+import com.csm.rover.simulator.platforms.rover.RoverObject;
+import com.csm.rover.simulator.platforms.rover.RoverState;
+import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
+import com.csm.rover.simulator.platforms.satellite.SatelliteState;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,8 +37,9 @@ public class Admin {
     private SerialBuffers serialBuffers;
 
 	public static void main(String[] args) {
+        LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
+        PlatformRegistry.fillRegistry();
 		Admin admin = getInstance();
-		LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");
             HI = new HiForm();
@@ -108,8 +110,6 @@ public class Admin {
 			LOG.log(Level.WARN, "Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;
 		}
-        else {
-        }
 
         serialBuffers = new SerialBuffers(config.namesAndTags.getTags(), HI);
         RoverObject.setSerialBuffers(serialBuffers);
@@ -162,28 +162,19 @@ public class Admin {
 	}
 
 	private ArrayList<RoverObject> buildRoversFromConfig(ArrayList<PlatformConfig> configs){
-		ArrayList<RoverObject> out = new ArrayList<RoverObject>();
+		ArrayList<RoverObject> out = new ArrayList<>();
 		for (PlatformConfig config : configs){
-			if (!config.getType().equals("Rover")){
-				LOG.log(Level.DEBUG, "Elements in roverCfgs are not rovers");
-				continue;
-			}
-			RoverAutonomousCode auto;
-			switch (config.getAutonomousModelName()){
-				case "RAIR":
-					auto = new RAIRcode();
-					break;
-				default:
-					auto = new BlankRoverAuto();
-					break;
-			}
-			auto.constructParameters(config.getAutonomousModelParameters());
-
+            out.add(Platform.<RoverObject>buildFromConfiguration(config, RoverState.defaultState()));
 		}
+        return out;
 	}
 
 	private ArrayList<SatelliteObject> buildSatellitesFromConfig(ArrayList<PlatformConfig> configs){
-
+        ArrayList<SatelliteObject> out = new ArrayList<>();
+        for (PlatformConfig config : configs){
+            out.add(Platform.<SatelliteObject>buildFromConfiguration(config, SatelliteState.defaultState()));
+        }
+        return out;
 	}
 
 }

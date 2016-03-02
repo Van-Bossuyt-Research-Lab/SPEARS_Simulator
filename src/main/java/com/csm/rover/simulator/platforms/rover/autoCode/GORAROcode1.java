@@ -1,11 +1,13 @@
-package com.csm.rover.simulator.rover.autoCode;
+package com.csm.rover.simulator.platforms.rover.autoCode;
 
 import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import com.csm.rover.simulator.wrapper.Globals;
 
 import java.util.ArrayList;
 import java.util.Map;
 
+@AutonomousCodeModel(name="GORADRO", type="Rover", parameters={ "sampleDirections", "sampleRadius", "averagingRadius", "averagingAngle", "averagingPStep","averagingRStep", "mentality1", "mentality2", "mentality3", "mentality4", "mentality5" })
 public class GORAROcode1 extends RoverAutonomousCode {
 	
 	private static final long serialVersionUID = -7214933982888683962L;
@@ -44,39 +46,21 @@ public class GORAROcode1 extends RoverAutonomousCode {
 	public GORAROcode1(){
 		super("GORARO Simple", "GORARO");
 		potentials = new double[histories][sampleDirections];
-	}	
-	
-	public GORAROcode1(int sampleDirections, double sampleRadius, double averagingRadius,
-			double averagingAngle, double averagingPStep, double averagingRStep, double mentality1, double mentality2, double mentality3, 
-			double mentality4, double mentality5) {
-		super("GORARO Simple", "GORARO");
-		this.sampleDirections = sampleDirections;
-		this.sampleRadius = sampleRadius;
-		this.averagingRadius = averagingRadius;
-		this.averagingAngle = averagingAngle;
-		this.averagingPStep = averagingPStep;
-		this.averagingRStep = averagingRStep;
-		this.mentality = new double[] { mentality1, mentality2, mentality3, mentality4, mentality5 };
-		potentials = new double[histories][sampleDirections];
-		
 	}
 
-	public GORAROcode1(GORAROcode1 org){
-		super(org);
-		score = org.score;
-		state = org.state;
-		this.sampleDirections = org.sampleDirections;
-		this.sampleRadius = org.sampleRadius;
-		this.averagingRadius = org.averagingRadius;
-		this.averagingAngle = org.averagingAngle;
-		this.mentality = org.mentality;
-		this.targetDirection = org.targetDirection;
-		this.lastOptTime = org.lastOptTime;
-		potentials = new double[histories][sampleDirections];
-	}	
+    @Override
+    public void constructParameters(Map<String, Double> params) {
+        this.sampleDirections = (int)params.get("sampleDirections").doubleValue();
+        this.sampleRadius = params.get("sampleRadius");
+        this.averagingRadius = params.get("averagingRadius");
+        this.averagingAngle = params.get("averagingAngle");
+        this.averagingPStep = params.get("averagingPStep");
+        this.averagingRStep = params.get("averagingRStep");
+        this.mentality = new double[] { params.get("mentality1"), params.get("mentality2"), params.get("mentality3"), params.get("mentality4"), params.get("mentality5") };
+    }
 
-	@Override
-	public String nextCommand(long milliTime, DecimalPoint location,
+    @Override
+	public String doNextCommand(long milliTime, DecimalPoint location,
 			double direction, Map<String, Double> parameters)
 	{
 		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + MAP.getHeightAt(location) + "\t" + score + "\t" + parameters.get("battery_charge") + "\t" + state);
@@ -228,11 +212,6 @@ public class GORAROcode1 extends RoverAutonomousCode {
 			return true;
 		}
 		return false;
-	}
-	
-	@Override
-	public RoverAutonomousCode clone() {
-		return new GORAROcode1(this);
 	}
 
 }

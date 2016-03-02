@@ -1,11 +1,14 @@
-package com.csm.rover.simulator.rover.phsicsModels;
+package com.csm.rover.simulator.platforms.rover.phsicsModels;
 
 import com.csm.rover.simulator.map.PlanetParametersList;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.rover.MotorState;
-import com.csm.rover.simulator.rover.RoverWheels;
+import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
+import com.csm.rover.simulator.platforms.PlatformState;
+import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
+import com.csm.rover.simulator.platforms.rover.MotorState;
+import com.csm.rover.simulator.platforms.rover.RoverWheels;
 import com.csm.rover.simulator.wrapper.Admin;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +18,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 //TODO add implementation with better time stepping
-public class RoverPhysicsModel implements Serializable, Cloneable {
+@PhysicsModel(type="Rover", name="Default", parameters={})
+public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializable {
 	private static final Logger LOG = LogManager.getLogger(RoverPhysicsModel.class);
 
 	private static final long serialVersionUID = 1L;
@@ -91,39 +95,15 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 	protected double slip_acceleration = 0; //m/s^2
 	protected double slip_velocity = 0; //m/s
 	
-	public RoverPhysicsModel() {}
+	public RoverPhysicsModel() {
+        super("Rover");
+    }
 
     public static void setTerrainMap(TerrainMap map){
         MAP = map;
     }
-	
-	protected RoverPhysicsModel(RoverPhysicsModel origin){
-		roverName = origin.roverName;
-		battery_max_charge = origin.battery_max_charge;
-		fric_gr_all = origin.fric_gr_all;
-		slip = origin.slip.clone();
-		motor_power = origin.motor_power.clone();
-		motor_states = origin.motor_states.clone();
-		wheel_speed = origin.wheel_speed.clone();
-		motor_current = origin.motor_current.clone();
-		battery_charge = origin.battery_charge;
-		battery_cp_charge = origin.battery_cp_charge;
-		battery_voltage = origin.battery_voltage;
-		battery_current = origin.battery_current;
-		SOC = origin.SOC;
-		battery_temperature = origin.battery_temperature;
-		winding_temp = origin.winding_temp.clone();
-		motor_temp = origin.motor_temp.clone();
-		location = origin.location.clone();
-		direction = origin.direction;
-		speed = origin.speed;
-		angular_velocity = origin.angular_velocity;
-		acceleration = origin.acceleration;
-		angular_acceleration = origin.angular_acceleration;
-		slip_acceleration = origin.slip_acceleration;
-		slip_velocity = origin.slip_velocity;
-	}
 
+    @Override
 	public void constructParameters(Map<String, Double> params) {}
 	
 	public void initalizeConditions(String name, double bat_charge, double temp){
@@ -134,12 +114,13 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		winding_temp = new double[] { temp, temp, temp, temp };
 		motor_temp = new double[] { temp, temp, temp, temp };
 	}
-	
+
+    @Override
 	public void start(){
 		new SynchronousThread((int) (time_step*1000), new Runnable(){
 			public void run(){
 				try {
-					excecute();
+					updatePhysics();
 					//System.out.println(roverName + "-physics\t" + Globals.getInstance.timeMillis);
 					//RoverEvents.updateStats();
 				}
@@ -150,8 +131,9 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		},
 		SynchronousThread.FOREVER, roverName+"-physics");
 	}
-	
-	public void excecute() throws Exception {
+
+    @Override
+	public void updatePhysics() {
 		// Motor Currents, based on voltage
 		motor_current[FL] += ( motor_power[FL]*motor_states[FL]/255.0*battery_voltage - motor_voltage_transform*wheel_speed[FL] - motor_current[FL]*motor_resistance) / motor_inductance * time_step;
 		motor_current[FR] += ( motor_power[FR]*motor_states[FR]/255.0*battery_voltage - motor_voltage_transform*wheel_speed[FR] - motor_current[FR]*motor_resistance) / motor_inductance * time_step;
@@ -241,13 +223,8 @@ public class RoverPhysicsModel implements Serializable, Cloneable {
 		motor_temp[BL] += ((winding_heat_transfer*(winding_temp[BL] - motor_temp[BL]) - motor_surface_heat_transfer*(motor_temp[BL] - temperature)) / motor_thermal_cap) * time_step;
 		motor_temp[BR] += ((winding_heat_transfer*(winding_temp[BR] - motor_temp[BR]) - motor_surface_heat_transfer*(motor_temp[BR] - temperature)) / motor_thermal_cap) * time_step;
 	}
-	
-	@Override
-	public RoverPhysicsModel clone(){
-		return new RoverPhysicsModel(this);
-	}
-	
-	private double resistance_cp(){ // get the resistance of the CP resistor as a function of SOC
+
+    private double resistance_cp(){ // get the resistance of the CP resistor as a function of SOC
 		return R_cp0+R_cp1*Math.exp(R_cp2*(1-SOC));
 	}
 	

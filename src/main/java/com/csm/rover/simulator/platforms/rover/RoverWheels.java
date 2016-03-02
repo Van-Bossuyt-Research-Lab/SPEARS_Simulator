@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.rover;
+package com.csm.rover.simulator.platforms.rover;
 
 public enum RoverWheels {
 	
