@@ -28,7 +28,8 @@ public class GenericRover extends RoverAutonomousCode {
     public String doNextCommand(
 			long milliTime,
 			DecimalPoint location,
-			double direction
+			double direction,
+            Map<String, Double> params
 	){
 		if (milliTime-lastActionTime > 1000*seconds){
 			lastActionTime = milliTime;

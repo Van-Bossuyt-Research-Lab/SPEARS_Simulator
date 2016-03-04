@@ -11,9 +11,7 @@ import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
-import com.csm.rover.simulator.platforms.rover.RoverState;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
-import com.csm.rover.simulator.platforms.satellite.SatelliteState;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -164,7 +162,7 @@ public class Admin {
 	private ArrayList<RoverObject> buildRoversFromConfig(ArrayList<PlatformConfig> configs){
 		ArrayList<RoverObject> out = new ArrayList<>();
 		for (PlatformConfig config : configs){
-            out.add(Platform.<RoverObject>buildFromConfiguration(config, new RoverState()));
+            out.add(Platform.<RoverObject>buildFromConfiguration(config));
 		}
         return out;
 	}
@@ -172,7 +170,7 @@ public class Admin {
 	private ArrayList<SatelliteObject> buildSatellitesFromConfig(ArrayList<PlatformConfig> configs){
         ArrayList<SatelliteObject> out = new ArrayList<>();
         for (PlatformConfig config : configs){
-            out.add(Platform.<SatelliteObject>buildFromConfiguration(config, new SatelliteState()));
+            out.add(Platform.<SatelliteObject>buildFromConfiguration(config));
         }
         return out;
 	}

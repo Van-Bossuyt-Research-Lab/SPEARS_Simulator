@@ -5,6 +5,8 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Map;
+
 public abstract class Platform {
     private static final Logger LOG = LogManager.getLogger(Platform.class);
 
@@ -25,7 +27,7 @@ public abstract class Platform {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Platform> T buildFromConfiguration(PlatformConfig cfg, PlatformState initState){
+    public static <T extends Platform> T buildFromConfiguration(PlatformConfig cfg){
         Class<? extends Platform> type = PlatformRegistry.getPlatform(cfg.getType());
         try {
             Platform platform = type.newInstance();
@@ -35,7 +37,7 @@ public abstract class Platform {
             platform.autonomousCodeModel.constructParameters(cfg.getAutonomousModelParameters());
             platform.physicsModel = PlatformRegistry.getPhysicsModel(cfg.getType(), cfg.getPhysicsModelName()).newInstance();
             platform.physicsModel.constructParameters(cfg.getPhysicsModelParameters());
-            platform.physicsModel.initializeState(initState);
+            platform.physicsModel.initializeState(PlatformRegistry.getPlatformState(cfg.getType()).newInstance().overrideValues(cfg.getStateParameters()));
             platform.physicsModel.setPlatformName(cfg.getScreenName());
             return (T)platform;
         }

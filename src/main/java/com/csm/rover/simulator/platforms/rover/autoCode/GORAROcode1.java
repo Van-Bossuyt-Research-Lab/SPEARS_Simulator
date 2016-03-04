@@ -60,7 +60,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
     }
 
     @Override
-	public String doNextCommand(long milliTime, DecimalPoint location, double direction)
+	public String doNextCommand(long milliTime, DecimalPoint location, double direction, Map<String, Double> params)
 	{
 		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + MAP.getHeightAt(location) + "\t" + score + "\t" + state);
 		direction = (direction + 2*Math.PI) % (2*Math.PI);

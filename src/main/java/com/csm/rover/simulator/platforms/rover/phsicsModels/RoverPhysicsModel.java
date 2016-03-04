@@ -74,19 +74,21 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	protected double fric_gr_all = 0;
 	protected double[] slip = { 0, 0, 0, 0 };
 
+    protected double battery_cp_charge = 0; //C
+    protected double SOC = 1;
+
+    protected double[] winding_temp = { 30, 30, 30, 30 }; //*c
+
 	protected int[] motor_power = new int[] {  250, 250, 250, 250 }; // assigned motor powers
 	protected int[] motor_states = new int[] { 0, 0, 0, 0 }; // assigned motor states
 	protected double[] wheel_speed = { 0, 0, 0, 0 }; //rad/s
 	protected double[] motor_current = { 0, 0, 0, 0 }; //A
 
 	protected double battery_charge = 0; //C
-	protected double battery_cp_charge = 0; //C
 	protected double battery_voltage = 12; //V
 	protected double battery_current = 0; //A
-	protected double SOC = 1;
 
 	protected double battery_temperature = 30; //*c
-	protected double[] winding_temp = { 30, 30, 30, 30 }; //*c
 	protected double[] motor_temp = { 30, 30, 30, 30 }; //*c
 
 	protected DecimalPoint location = new DecimalPoint(); //m x m from center of map
@@ -136,7 +138,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
         if (state.getType().equals("Rover")){
             try {
                 this.rov_state = (RoverState)state;
-                this.location = new DecimalPoint(state.get("x"), state.get("y"));
+                this.location = new DecimalPoint(state.<Double>get("x"), state.<Double>get("y"));
                 this.direction = state.get("dir");
                 double temp = -30; //TODO temp
                 battery_charge = battery_max_charge;
