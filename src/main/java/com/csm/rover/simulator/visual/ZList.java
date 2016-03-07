@@ -4,7 +4,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.border.EtchedBorder;
-import javax.swing.event.EventListenerList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.Adjustable;
@@ -15,6 +14,7 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 
@@ -27,16 +27,16 @@ public class ZList <T> extends JPanel implements Cloneable{
 	private ArrayList<T> values;
 	private int selected = -1;
 	
-	private EventListenerList ListSelectionListeners = new EventListenerList();
+	private List<ListSelectionListener> ListSelectionListeners = new ArrayList<ListSelectionListener>();
 	
 	public ZList(){
-        values = new ArrayList<>();
-		items = new ArrayList<>();
+        values = new ArrayList<T>();
+		items = new ArrayList<JLabel>();
         initialize();
 	}
 	
 	public ZList(T[] values){
-		this.values = new ArrayList<>();
+		this.values = new ArrayList<T>();
         this.values.addAll(asList(values));    
         setLabels();
         initialize();
@@ -65,7 +65,7 @@ public class ZList <T> extends JPanel implements Cloneable{
     }
 	
     private void setLabels(){
-        items = new ArrayList<>();
+        items = new ArrayList<JLabel>();
         int x = 0;
         while (x < items.size()){
             items.add(new JLabel("  " + values.get(x).toString()));
@@ -239,19 +239,16 @@ public class ZList <T> extends JPanel implements Cloneable{
 	}
 	
 	public void addListSelectionListener(ListSelectionListener listener){
-		ListSelectionListeners.add(ListSelectionListener.class, listener);
+		ListSelectionListeners.add(listener);
 	}
 	
 	public void removeListSelectionListener(ListSelectionListener listener){
-		ListSelectionListeners.remove(ListSelectionListener.class, listener);
+		ListSelectionListeners.remove(listener);
 	}
 	
 	protected void fireListSelectionEvent(ListSelectionEvent event){
-		Object[] listeners = ListSelectionListeners.getListenerList();
-		for (Object listener : listeners){
-			try {
-				((ListSelectionListener) listener).valueChanged(event);
-			} catch (Exception e) { e.printStackTrace(); }
+		for (ListSelectionListener listener : ListSelectionListeners){
+			listener.valueChanged(event);
 		}
 	}
 	

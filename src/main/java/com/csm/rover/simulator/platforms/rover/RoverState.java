@@ -16,7 +16,7 @@ public class RoverState extends PlatformState {
                         .addParameter("battery_charge", Double.class, 0.)
                         .addParameter("battery_voltage", Double.class, 12.)
                         .addParameter("battery_current", Double.class, 0.)
-                        .addParameter("battery_temperature", Double.class, -30.)
+                        .addParameter("battery_temp", Double.class, -30.)
                         .addParameter("motor_temp", Double[].class, new Double[]{-30., -30., -30., -30.})
                         .addParameter("x", Double.class, 0.)
                         .addParameter("y", Double.class, 0.)
