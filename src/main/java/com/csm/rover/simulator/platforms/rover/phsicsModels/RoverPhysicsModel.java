@@ -139,7 +139,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
             try {
                 this.rov_state = (RoverState)state;
                 this.location = new DecimalPoint(state.<Double>get("x"), state.<Double>get("y"));
-                this.direction = state.get("dir");
+                this.direction = state.get("direction");
                 double temp = -30; //TODO temp
                 battery_charge = battery_max_charge;
                 battery_temperature = temp;
@@ -212,7 +212,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 
         rov_state.set("x", location.getX());
         rov_state.set("y", location.getY());
-        rov_state.set("dir", direction);
+        rov_state.set("direction", direction);
         // report new location to map
         Admin.getCurrentInterface().updateRover(roverName, location, direction);
 		

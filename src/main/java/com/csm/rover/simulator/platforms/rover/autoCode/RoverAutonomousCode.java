@@ -43,7 +43,7 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel im
             throw new IllegalArgumentException("The provided state is not a RoverState");
         }
         return doNextCommand(millitime, new DecimalPoint(state.<Double>get("x"), state.<Double>get("y")),
-                state.<Double>get("dir"), getAutonomousParameters(state));
+                state.<Double>get("direction"), getAutonomousParameters(state));
     }
 
     protected abstract String doNextCommand(long milliTime, DecimalPoint location,
