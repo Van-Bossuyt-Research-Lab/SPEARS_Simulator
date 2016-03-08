@@ -1,0 +1,22 @@
+{
+	"Map": {
+		"mapFromFile": false,
+		"mapFile": "",
+		"mapRough": 1.3,
+		"mapDetail": 3,
+		"mapSize": 25
+		}
+	"TargetHazard" : {
+		"monoTargets": false,
+		"MonoHazards": false,
+		"targetDensity": 2.1,
+		"hazardDensity": 1.8
+		}
+	"PlatformConfig": {
+		"ID": {"r1" : "r2"},
+		"names": {"rover1" : "rover2"},
+		"types": {"Rover" : "Rover"},
+		"physics": {"Generic" : "Generic"},
+		"autos": {"Generic": "Generic"}
+		}
+}

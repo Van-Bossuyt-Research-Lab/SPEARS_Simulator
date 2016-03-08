@@ -42,7 +42,7 @@ public class Admin {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");
             HI = new HiForm();
 			boolean go = false;
-			File config = new File("default.cfg");
+			File config = new File("jtest.json");
 			if (config.exists()) {
 				if ((new PopUp()).showConfirmDialog("A quick run configuration file has been found.  Would you like to run the simulator from the file?", "Quick Run", PopUp.YES_NO_OPTIONS) == PopUp.YES_OPTION) {
 					go = true;

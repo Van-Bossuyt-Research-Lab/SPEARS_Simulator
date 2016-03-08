@@ -118,7 +118,6 @@ public class RunConfiguration implements Serializable {
 						hazardDensity = jp.readValueAs(double.class);
 					}
 					if("PlatformConfig".equals(namefield)){
-						PlatformConfig pc = new PlatformConfig();
 						Iterator<String> ID = new Iterator<String>() {
 							@Override
 							public boolean hasNext() {
@@ -180,7 +179,7 @@ public class RunConfiguration implements Serializable {
 						physics = jp.readValuesAs(String.class);
 						autos = jp.readValuesAs(String.class);
 						while (names.hasNext()){
-							pc = PlatformConfig.builder().setID(ID.next())
+							PlatformConfig pc = PlatformConfig.builder().setID(ID.next())
 									.setScreenName(names.next())
 									.setType(types.next())
 									.setPhysicsModel(physics.next())
