@@ -186,7 +186,7 @@ public class PlatformState {
     private void checkParam(String param, Class<?> type){
         checkParam(param);
         if (parameters.get(param) != type){
-            throw new IllegalArgumentException(String.format("The parameter %s of of type %s not %s", param, parameters.get(param).toString(), type.toString()));
+            throw new IllegalArgumentException(String.format("The parameter %s of type %s not %s", param, parameters.get(param).toString(), type.toString()));
         }
     }
 

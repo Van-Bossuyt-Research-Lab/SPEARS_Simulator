@@ -21,7 +21,7 @@ public class GenericRover extends RoverAutonomousCode {
 
     @Override
     public void constructParameters(Map<String, Double> params) {
-        seconds = 4;//(int)params.get("sec").doubleValue();
+        seconds = (int)params.get("sec").doubleValue();
     }
 
     @Override

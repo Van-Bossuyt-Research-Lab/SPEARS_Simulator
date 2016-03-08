@@ -5,8 +5,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Map;
-
 public abstract class Platform {
     private static final Logger LOG = LogManager.getLogger(Platform.class);
 
@@ -48,6 +46,10 @@ public abstract class Platform {
             LOG.log(Level.ERROR, "Incorrect type request, the final cast failed", e);
         }
         return null;
+    }
+
+    public final PlatformState getState(){
+        return physicsModel.getState();
     }
 
 }
