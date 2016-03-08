@@ -175,7 +175,7 @@ public class LandMapPanel extends Panel{
 		roverIcons = new ArrayList<RoverIcon>();
 		int x = 0;
 		while (x < rovers.size()){
-			roverIcons.add(new RoverIcon(rovers.get(x).getName(), rovers.get(x).getLocation(), rovers.get(x).getDirection()));
+			roverIcons.add(new RoverIcon(rovers.get(x).getName(), new DecimalPoint(rovers.get(x).getState().<Double>get("x"), rovers.get(x).getState().<Double>get("y")), rovers.get(x).getState().<Double>get("direction")));
 			this.add(roverIcons.get(x));
 			this.setComponentZOrder(roverIcons.get(x), 0);
 			x++;

@@ -21,14 +21,15 @@ public class GenericRover extends RoverAutonomousCode {
 
     @Override
     public void constructParameters(Map<String, Double> params) {
-        seconds = 4;//(int)params.get("sec").doubleValue();
+        seconds = (int)params.get("sec").doubleValue();
     }
 
+    @Override
     public String doNextCommand(
 			long milliTime,
 			DecimalPoint location,
 			double direction,
-			Map<String, Double> parameters
+            Map<String, Double> params
 	){
 		if (milliTime-lastActionTime > 1000*seconds){
 			lastActionTime = milliTime;

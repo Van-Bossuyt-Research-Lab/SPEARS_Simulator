@@ -2,12 +2,14 @@ package com.csm.rover.simulator.platforms.rover.phsicsModels;
 
 import com.csm.rover.simulator.map.PlanetParametersList;
 import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.DriveCommandHandler;
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import com.csm.rover.simulator.platforms.rover.MotorState;
+import com.csm.rover.simulator.platforms.rover.RoverState;
 import com.csm.rover.simulator.platforms.rover.RoverWheels;
 import com.csm.rover.simulator.wrapper.Admin;
 import org.apache.logging.log4j.Level;
@@ -26,13 +28,15 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	
 	private final int FL = 0, FR = 1, BL = 2, BR = 3;
 
+    private RoverState rov_state;
+
     //TODO variable planet params
 	private PlanetParametersList planetParams = new PlanetParametersList();
 	protected static TerrainMap MAP;
 
 	protected String roverName;
 	public final double time_step = 0.01; // time step of physics, in seconds
-	
+
 	protected final double wheel_radius = 0.0476; //m
 	protected final double wheel_mass = 0.064; //kg
 	protected final double rover_width = 0.438; //m
@@ -41,7 +45,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	protected final double rover_mass = 2.266; //kg
 	protected final double rover_inertia = 0.1025; //kg*m^2
 	protected final double wheel_inertia = 0.5 * wheel_mass * Math.pow(wheel_radius, 2); //kg*m^2
-	
+
 	protected final double motor_energy_transform = 0.035;
 	protected final double motor_voltage_transform = 0.571;
 	protected final double motor_resistance = 3; //Ohm
@@ -50,7 +54,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	protected final double friction_gr = .65;
 	protected final double friction_s = 1.2;
 	protected final double gamma = Math.atan(1/rover_width);
-	
+
 	protected final double R_cp0 = 0.07; //Ohm
 	protected final double R_cp1 = 0.01; //Ohm
 	protected final double R_cp2 = 3;
@@ -59,33 +63,35 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	protected final double resistance_s = 0.01; //Ohm
 	protected final double resistance_parasite = 100000000; //Ohm
 	protected double battery_max_charge = 140000; //C
-	
+
 	protected final double battery_heat_transfer = 10; //J/s/*c
 	protected final double battery_thermal_cap = 170; //J/K
-	
+
 	protected final double winding_heat_transfer = 2; //J/s/*c
 	protected final double winding_thermal_cap = 1.7; //J/*c
 	protected final double motor_surface_heat_transfer = 0.9; //J/s/*c
-	protected final double motor_thermal_cap = 0.8; //J/*c	
-	
+	protected final double motor_thermal_cap = 0.8; //J/*c
+
 	protected double fric_gr_all = 0;
-	protected double[] slip = { 0, 0, 0, 0 };		
-	
+	protected double[] slip = { 0, 0, 0, 0 };
+
+    protected double battery_cp_charge = 0; //C
+    protected double SOC = 1;
+
+    protected double[] winding_temp = { 30, 30, 30, 30 }; //*c
+
 	protected int[] motor_power = new int[] {  250, 250, 250, 250 }; // assigned motor powers
 	protected int[] motor_states = new int[] { 0, 0, 0, 0 }; // assigned motor states
-	protected double[] wheel_speed = { 0, 0, 0, 0 }; //rad/s	
+	protected double[] wheel_speed = { 0, 0, 0, 0 }; //rad/s
 	protected double[] motor_current = { 0, 0, 0, 0 }; //A
-	
+
 	protected double battery_charge = 0; //C
-	protected double battery_cp_charge = 0; //C
 	protected double battery_voltage = 12; //V
 	protected double battery_current = 0; //A
-	protected double SOC = 1;
-	
+
 	protected double battery_temperature = 30; //*c
-	protected double[] winding_temp = { 30, 30, 30, 30 }; //*c
 	protected double[] motor_temp = { 30, 30, 30, 30 }; //*c
-	
+
 	protected DecimalPoint location = new DecimalPoint(); //m x m from center of map
 	protected double direction = 0; //rad off of positive X
 	protected double speed = 0; //m/s
@@ -94,9 +100,100 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 	protected double angular_acceleration = 0; //rad/s^2
 	protected double slip_acceleration = 0; //m/s^2
 	protected double slip_velocity = 0; //m/s
-	
+
 	public RoverPhysicsModel() {
         super("Rover");
+        establishDriveResponses();
+    }
+
+    private void establishDriveResponses() {
+        super.addCommandHandler(RoverDriveCommands.DRIVE_FORWARD.getCmd(), new DriveCommandHandler() {
+            @Override
+            public void processCommand(double[] params) {
+                setMotorState(RoverWheels.FL, MotorState.FORWARD);
+                setMotorState(RoverWheels.BL, MotorState.FORWARD);
+                setMotorState(RoverWheels.BR, MotorState.FORWARD);
+                setMotorState(RoverWheels.FR, MotorState.FORWARD);
+            }
+        });
+        super.addCommandHandler(RoverDriveCommands.DRIVE_BACKWARD.getCmd(), new DriveCommandHandler() {
+            @Override
+            public void processCommand(double[] params) {
+                setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+                setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+                setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+                setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+            }
+        });
+        super.addCommandHandler(RoverDriveCommands.SPIN_CW.getCmd(), new DriveCommandHandler() {
+            @Override
+            public void processCommand(double[] params) {
+                setMotorState(RoverWheels.FL, MotorState.FORWARD);
+                setMotorState(RoverWheels.BL, MotorState.FORWARD);
+                setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+                setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+            }
+        });
+        super.addCommandHandler(RoverDriveCommands.SPIN_CCW.getCmd(), new DriveCommandHandler() {
+            @Override
+            public void processCommand(double[] params) {
+                setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+                setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+                setMotorState(RoverWheels.BR, MotorState.FORWARD);
+                setMotorState(RoverWheels.FR, MotorState.FORWARD);
+            }
+        });
+        super.addCommandHandler(RoverDriveCommands.STOP.getCmd(), new DriveCommandHandler() {
+            @Override
+            public void processCommand(double[] params) {
+                setMotorState(RoverWheels.FL, MotorState.RELEASE);
+                setMotorState(RoverWheels.BL, MotorState.RELEASE);
+                setMotorState(RoverWheels.BR, MotorState.RELEASE);
+                setMotorState(RoverWheels.FR, MotorState.RELEASE);
+            }
+        });
+        super.addCommandHandler(RoverDriveCommands.TURN_FRONT_LEFT.getCmd(), new DriveCommandHandler() {
+            @Override
+            public void processCommand(double[] params) {
+                setMotorState(RoverWheels.FL, MotorState.RELEASE);
+                setMotorState(RoverWheels.BL, MotorState.RELEASE);
+                setMotorState(RoverWheels.BR, MotorState.FORWARD);
+                setMotorState(RoverWheels.FR, MotorState.FORWARD);
+            }
+        });
+        super.addCommandHandler(RoverDriveCommands.TURN_FRONT_RIGHT.getCmd(), new DriveCommandHandler() {
+            @Override
+            public void processCommand(double[] params) {
+                setMotorState(RoverWheels.FL, MotorState.FORWARD);
+                setMotorState(RoverWheels.BL, MotorState.FORWARD);
+                setMotorState(RoverWheels.BR, MotorState.RELEASE);
+                setMotorState(RoverWheels.FR, MotorState.RELEASE);
+            }
+        });
+        super.addCommandHandler(RoverDriveCommands.TURN_BACK_LEFT.getCmd(), new DriveCommandHandler() {
+            @Override
+            public void processCommand(double[] params) {
+                setMotorState(RoverWheels.FL, MotorState.RELEASE);
+                setMotorState(RoverWheels.BL, MotorState.RELEASE);
+                setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+                setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+            }
+        });
+        super.addCommandHandler(RoverDriveCommands.TURN_BACK_RIGHT.getCmd(), new DriveCommandHandler() {
+            @Override
+            public void processCommand(double[] params) {
+                setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+                setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+                setMotorState(RoverWheels.BR, MotorState.RELEASE);
+                setMotorState(RoverWheels.FR, MotorState.RELEASE);
+            }
+        });
+        super.addCommandHandler(RoverDriveCommands.CHANGE_MOTOR_PWR.getCmd(), new DriveCommandHandler() {
+            @Override
+            public void processCommand(double[] params) {
+                setMotorPower((int) params[0], (int) params[1]);
+            }
+        });
     }
 
     public static void setTerrainMap(TerrainMap map){
@@ -104,16 +201,12 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
     }
 
     @Override
+    public void setPlatformName(String name) {
+        this.roverName = name;
+    }
+
+    @Override
 	public void constructParameters(Map<String, Double> params) {}
-	
-	public void initalizeConditions(String name, double bat_charge, double temp){
-		roverName = name;
-		battery_charge = bat_charge;
-		battery_max_charge = bat_charge;
-		battery_temperature = temp;
-		winding_temp = new double[] { temp, temp, temp, temp };
-		motor_temp = new double[] { temp, temp, temp, temp };
-	}
 
     @Override
 	public void start(){
@@ -131,6 +224,32 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 		},
 		SynchronousThread.FOREVER, roverName+"-physics");
 	}
+
+    @Override
+    public void initializeState(PlatformState state) {
+        if (state.getType().equals("Rover")){
+            try {
+                this.rov_state = (RoverState)state;
+                this.location = new DecimalPoint(state.<Double>get("x"), state.<Double>get("y"));
+                this.direction = state.get("direction");
+                double temp = -30; //TODO temp
+                battery_charge = battery_max_charge;
+                battery_temperature = temp;
+                winding_temp = new double[] { temp, temp, temp, temp };
+                motor_temp = new double[] { temp, temp, temp, temp };
+                return;
+            }
+            catch (ClassCastException e){
+                //Let the error throw
+            }
+        }
+        throw new IllegalArgumentException("The given state is not a RoverState");
+    }
+
+    @Override
+    public PlatformState getState() {
+        return rov_state.immutableCopy();
+    }
 
     @Override
 	public void updatePhysics() {
@@ -182,7 +301,29 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 		//TODO													  + here??
 		location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
 		direction = (direction + angular_velocity*time_step + 2*Math.PI) % (2*Math.PI);
-		// report new location to map
+
+        // update state
+        rov_state.set("x", location.getX());
+        rov_state.set("y", location.getY());
+        rov_state.set("direction", direction);
+        rov_state.set("motor_power", convertToDoubleArray(motor_power));
+        rov_state.set("motor_state", convertToDoubleArray(motor_states));
+        rov_state.set("motor_current", convertToDoubleArray(motor_current));
+        rov_state.set("motor_voltage", getMotorVoltage());
+        rov_state.set("motor_temp", convertToDoubleArray(motor_temp));
+        rov_state.set("wheel_speed", convertToDoubleArray(wheel_speed));
+        rov_state.set("battery_charge", battery_charge);
+        rov_state.set("battery_voltage", battery_voltage);
+        rov_state.set("battery_current", battery_current);
+        rov_state.set("battery_temp", battery_temperature);
+        rov_state.set("speed", speed);
+        rov_state.set("angular_velocity", angular_velocity);
+        rov_state.set("acceleration", acceleration);
+        rov_state.set("angular_acceleration", angular_acceleration);
+        rov_state.set("slip_acceleration", slip_acceleration);
+        rov_state.set("slip_velocity", slip_velocity);
+
+        // report new location to map
         Admin.getCurrentInterface().updateRover(roverName, location, direction);
 		
 		//Determining the current of the battery and the change in the stored charge
@@ -211,7 +352,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 		double temperature = -30;
 
 		//Determining the temperature of the battery
-		battery_temperature += ((resistance_parasite*Math.pow(battery_change-battery_current, 2) + resistance_s*Math.pow(battery_current, 2) + getcapacitance_cp()*Math.pow(battery_current-cp_change, 2)) - battery_heat_transfer*(battery_temperature - temperature) / battery_thermal_cap) * time_step;
+		battery_temperature += ((resistance_parasite*Math.pow(battery_change-battery_current, 2) + resistance_s*Math.pow(battery_current, 2) + capacitance_cp*Math.pow(battery_current-cp_change, 2)) - battery_heat_transfer*(battery_temperature - temperature) / battery_thermal_cap) * time_step;
 		//Determining the temperature of the motor coils
 		winding_temp[FL] += ((motor_resistance*Math.pow(motor_current[FL], 2) - winding_heat_transfer*(winding_temp[FL] - motor_temp[FL])) / winding_thermal_cap) * time_step;
 		winding_temp[FR] += ((motor_resistance*Math.pow(motor_current[FR], 2) - winding_heat_transfer*(winding_temp[FR] - motor_temp[FR])) / winding_thermal_cap) * time_step;
@@ -227,159 +368,47 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
     private double resistance_cp(){ // get the resistance of the CP resistor as a function of SOC
 		return R_cp0+R_cp1*Math.exp(R_cp2*(1-SOC));
 	}
-	
-	public double getwheel_radius(){
-		return wheel_radius;
-	}
 
-	public double getwheel_mass(){
-		return wheel_mass;
-	}
+    private Double[] convertToDoubleArray(double[] array){
+        Double[] out = new Double[array.length];
+        for (int i = 0; i < out.length; i++){
+            out[i] = array[i];
+        }
+        return out;
+    }
 
-	public double getrover_width(){
-		return rover_width;
-	}
+    private Double[] convertToDoubleArray(int[] array){
+        Double[] out = new Double[array.length];
+        for (int i = 0; i < out.length; i++){
+            out[i] = (double)array[i];
+        }
+        return out;
+    }
 
-	public double getrover_length(){
-		return rover_length;
-	}
+    private Double[] getMotorVoltage(){
+        Double[] out = new Double[4];
+        for (int i = 0; i < out.length; i++){
+            out[i] = motor_power[i]*motor_states[i]/255.0*battery_voltage;
+        }
+        return out;
+    }
 
-	public double getmotor_arm(){
-		return motor_arm;
-	}
-
-	public double getrover_mass(){
-		return rover_mass;
-	}
-
-	public double getrover_inertia(){
-		return rover_inertia;
-	}
-
-	public double getwheel_inertia(){
-		return wheel_inertia;
-	}
-
-	public double getmotor_energy_transform(){
-		return motor_energy_transform;
-	}
-
-	public double getmotor_voltage_transform(){
-		return motor_voltage_transform;
-	}
-
-	public double getmotor_resistance(){
-		return motor_resistance;
-	}
-
-	public double getmotor_inductance(){
-		return motor_inductance;
-	}
-
-	public double getfriction_axle(){
-		return friction_axle;
-	}
-
-	public double getfriction_gr(){
-		return friction_gr;
-	}
-
-	public double getfriction_s(){
-		return friction_s;
-	}
-
-	public double getgamma(){
-		return gamma;
-	}
-
-	public double getR_cp0(){
-		return R_cp0;
-	}
-
-	public double getR_cp1(){
-		return R_cp1;
-	}
-
-	public double getR_cp2(){
-		return R_cp2;
-	}
-
-	public double getcapacitance_battery(){
-		return capacitance_battery;
-	}
-
-	public double getcapacitance_cp(){
-		return capacitance_cp;
-	}
-
-	public double getresistance_s(){
-		return resistance_s;
-	}
-
-	public double getresistance_parasite(){
-		return resistance_parasite;
-	}
-
-	public double getbattery_max_charge(){
-		return battery_max_charge;
-	}
-
-	public double getbattery_heat_transfer(){
-		return battery_heat_transfer;
-	}
-
-	public double getbattery_thermal_cap(){
-		return battery_thermal_cap;
-	}
-
-	public double getwinding_heat_transfer(){
-		return  winding_heat_transfer;
-	}
-
-	public double getwinding_thermal_cap(){
-		return winding_thermal_cap;
-	}
-
-	public double getmotor_surface_heat_transfer(){
-		return motor_surface_heat_transfer;
-	}
-
-	public double getmotor_thermal_cap(){
-		return motor_thermal_cap;
-	}
-
-	public int[] getMotor_power() {
-		return motor_power;
-	}
-	
-	public int getMotor_power(int motor) {
+    private int getMotor_power(int motor) {
 		return motor_power[motor];
 	}
 
-	public void setMotorPower(RoverWheels motor, int motor_power) {
+    private void setMotorPower(int motor, int motor_power) {
 		if (motor_power < 0){
 			motor_power = 0;
 		}
 		else if (motor_power > 255){
 			motor_power = 255;
 		}
-		this.motor_power[motor.getValue()] = motor_power;
+		this.motor_power[motor] = motor_power;
 	}
 
-	public int[] getMotorStates() {
-		return motor_states;
-	}
-
-	public void setMotorState(RoverWheels wheel, MotorState state) {
+    private void setMotorState(RoverWheels wheel, MotorState state) {
 		this.motor_states[wheel.getValue()] = state.getValue();
-	}
-
-	public double[] getMotor_current() {
-		return motor_current;
-	}
-	
-	public double getMotorCurrent(RoverWheels wheel) {
-		return motor_current[wheel.getValue()];
 	}
 
 	public DecimalPoint getLocation() {
@@ -398,92 +427,4 @@ public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializa
 		this.direction = direction;
 	}
 
-	public double getFrictionAxle() {
-		return friction_axle;
-	}
-
-	public double getFriction_gr() {
-		return friction_gr;
-	}
-
-	public double getFriction_s() {
-		return friction_s;
-	}
-
-	public double[] getWheelSpeed() {
-		return wheel_speed;
-	}
-	
-	public double getWheelSpeed(RoverWheels wheel) {
-		return wheel_speed[wheel.getValue()];
-	}
-
-	public double getSOC() {
-		return SOC;
-	}
-
-	public double getSpeed() {
-		return speed;
-	}
-
-	public double getSlip_acceleration() {
-		return slip_acceleration;
-	}
-
-	public double getSlipVelocity() {
-		return slip_velocity;
-	}
-
-	public void setBatteryCharge(double battery_charge) {
-		this.battery_charge = battery_charge;
-	}
-	
-	public double getMotorTemp(RoverWheels motor){
-		return this.motor_temp[motor.getValue()];
-	}
-
-	public double getBatteryVoltage() {
-		return battery_voltage;
-	}
-
-	public double[] getWindingTemp() {
-		return winding_temp;
-	}
-
-	public double[] getMotorTemp() {
-		return motor_temp;
-	}
-
-	public double getBatteryCharge() {
-		return battery_charge;
-	}
-
-	public double getBatteryCurrent() {
-		return battery_current;
-	}
-
-	public double getAngularVelocity() {
-		return angular_velocity;
-	}
-
-	public double getAcceleration() {
-		return acceleration;
-	}
-
-	public double getAngularAcceleration() {
-		return angular_acceleration;
-	}
-
-	public void setMotorPower(int[] motor_power) {
-		this.motor_power = motor_power;
-	}
-
-	public double getBatteryTemperature() {
-		return battery_temperature;
-	}
-
-	public double getBattery_cp_charge() {
-		return battery_cp_charge;
-	}
-	
 }

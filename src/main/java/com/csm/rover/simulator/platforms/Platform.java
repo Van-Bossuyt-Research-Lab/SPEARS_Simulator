@@ -24,20 +24,19 @@ public abstract class Platform {
         return platform_type;
     }
 
-    protected abstract void initializeState(PlatformState state);
-
     @SuppressWarnings("unchecked")
-    public static <T extends Platform> T buildFromConfiguration(PlatformConfig cfg, PlatformState initState){
+    public static <T extends Platform> T buildFromConfiguration(PlatformConfig cfg){
         Class<? extends Platform> type = PlatformRegistry.getPlatform(cfg.getType());
         try {
             Platform platform = type.newInstance();
+            platform.name = cfg.getScreenName();
+            platform.ID = cfg.getID();
             platform.autonomousCodeModel = PlatformRegistry.getAutonomousCodeModel(cfg.getType(), cfg.getAutonomousModelName()).newInstance();
             platform.autonomousCodeModel.constructParameters(cfg.getAutonomousModelParameters());
             platform.physicsModel = PlatformRegistry.getPhysicsModel(cfg.getType(), cfg.getPhysicsModelName()).newInstance();
             platform.physicsModel.constructParameters(cfg.getPhysicsModelParameters());
-            platform.name = cfg.getScreenName();
-            platform.ID = cfg.getID();
-            platform.initializeState(initState);
+            platform.physicsModel.initializeState(PlatformRegistry.getPlatformState(cfg.getType()).newInstance().overrideValues(cfg.getStateParameters()));
+            platform.physicsModel.setPlatformName(cfg.getScreenName());
             return (T)platform;
         }
         catch (InstantiationException | IllegalAccessException e) {
@@ -47,6 +46,10 @@ public abstract class Platform {
             LOG.log(Level.ERROR, "Incorrect type request, the final cast failed", e);
         }
         return null;
+    }
+
+    public final PlatformState getState(){
+        return physicsModel.getState();
     }
 
 }

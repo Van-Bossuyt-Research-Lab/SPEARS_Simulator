@@ -1,6 +1,8 @@
 package com.csm.rover.simulator.platforms.rover;
 
 import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.visual.LEDIndicator;
 
 import javax.swing.*;
@@ -15,7 +17,7 @@ public class RoverDisplayWindow extends JPanel {
 
     private TerrainMap map;
 
-    private ArrayList<RoverObject> rovers = new ArrayList<RoverObject>();
+    private ArrayList<RoverObject> rovers = new ArrayList<>();
     private int roverLock = -1;
 
     private boolean inHUD = false;
@@ -60,9 +62,7 @@ public class RoverDisplayWindow extends JPanel {
             "\n\nAcceleration: %s m/s\u00B2" +
             "\nAngular Acceleration: %s \u00B0/s\u00B2" +
             "\nSlip Acceleration: %s m/s\u00B2";
-    private String electricalPattern = "SOC: %s" +
-            "\nBattery Charge: %s C" +
-            "\nBattery CP Charge: %s C" +
+    private String electricalPattern = "Battery Charge: %s C" +
             "\nBattery Voltage: %s V" +
             "\nBattery Current: %s A" +
             "\n\nMotor Current FL: %s A" +
@@ -296,47 +296,49 @@ public class RoverDisplayWindow extends JPanel {
         tabbedPane.setVisible(true);
 
         RoverObject rover = rovers.get(whichRover);
+        PlatformState state = rover.getState();
         RoverNameLbl.setText(rover.getName());
         SerialHistoryLbl.setText(rover.getSerialHistory());
         MovementStatsLbl.setText(String.format(movementPattern,
-                formatDouble(rover.getLocation().getX()),
-                formatDouble(Math.toDegrees(rover.getWheelSpeed(RoverWheels.FL))),
-                formatDouble(rover.getLocation().getY()),
-                formatDouble(Math.toDegrees(rover.getWheelSpeed(RoverWheels.FR))),
-                formatDouble(Math.toDegrees(rover.getDirection())),
-                formatDouble(Math.toDegrees(rover.getWheelSpeed(RoverWheels.BL))),
-                formatDouble(Math.toDegrees(rover.getWheelSpeed(RoverWheels.BR))),
-                formatDouble(rover.getSpeed()),
-                formatDouble(Math.cos(rover.getDirection()) * rover.getSpeed()),
-                formatDouble(Math.toDegrees(map.getIncline(rover.getLocation(), rover.getDirection()))),
-                formatDouble(Math.sin(rover.getDirection()) * rover.getSpeed()),
-                formatDouble(Math.toDegrees(map.getCrossSlope(rover.getLocation(), rover.getDirection()))),
-                formatDouble(Math.toDegrees(rover.getAngularVelocity())),
-                formatDouble(rover.getSlipVelocity()),
-                formatDouble(rover.getAcceleration()),
-                formatDouble(Math.toDegrees(rover.getAngularAcceleration())),
-                formatDouble(rover.getSlipAcceleration())));
+                formatDouble(state.<Double>get("x")),
+                formatDouble(Math.toDegrees(state.<Double[]>get("wheel_speed")[RoverWheels.FL.getValue()])),
+                formatDouble(state.<Double>get("y")),
+                formatDouble(Math.toDegrees(state.<Double[]>get("wheel_speed")[RoverWheels.FR.getValue()])),
+                formatDouble(Math.toDegrees(state.<Double>get("direction"))),
+                formatDouble(Math.toDegrees(state.<Double[]>get("wheel_speed")[RoverWheels.BL.getValue()])),
+                formatDouble(Math.toDegrees(state.<Double[]>get("wheel_speed")[RoverWheels.BR.getValue()])),
+                formatDouble(state.<Double>get("speed")),
+                formatDouble(Math.cos(state.<Double>get("direction") * state.<Double>get("speed"))),
+                formatDouble(Math.toDegrees(map.getIncline(new DecimalPoint(state.<Double>get("x"), state.<Double>get("y")), state.<Double>get("direction")))),
+                formatDouble(Math.sin(state.<Double>get("direction") * state.<Double>get("speed"))),
+                formatDouble(Math.toDegrees(map.getCrossSlope(new DecimalPoint(state.<Double>get("x"), state.<Double>get("y")), state.<Double>get("direction")))),
+                formatDouble(Math.toDegrees(state.<Double>get("angular_velocity"))),
+                formatDouble(state.<Double>get("slip_velocity")),
+                formatDouble(state.<Double>get("acceleration")),
+                formatDouble(Math.toDegrees(state.<Double>get("angular_acceleration"))),
+                formatDouble(state.<Double>get("slip_acceleration"))
+        ));
         ElectricalStatsLbl.setText(String.format(electricalPattern,
-                formatDouble(rover.getSOC()),
-                formatDouble(rover.getBatteryCharge()),
-                formatDouble(rover.getBatterCPCharge()),
-                formatDouble(rover.getBatteryVoltage()),
-                formatDouble(rover.getBatteryCurrent()),
-                formatDouble(Math.abs(rover.getMotorCurrent(RoverWheels.FL))),
-                formatDouble(Math.abs(rover.getMotorCurrent(RoverWheels.FR))),
-                formatDouble(Math.abs(rover.getMotorCurrent(RoverWheels.BL))),
-                formatDouble(Math.abs(rover.getMotorCurrent(RoverWheels.BR))),
-                formatDouble(rover.getMotorVoltage(RoverWheels.FL)),
-                formatDouble(rover.getMotorVoltage(RoverWheels.FR)),
-                formatDouble(rover.getMotorVoltage(RoverWheels.BL)),
-                formatDouble(rover.getMotorVoltage(RoverWheels.BR))));
+                formatDouble(state.<Double>get("battery_charge")),
+                formatDouble(state.<Double>get("battery_voltage")),
+                formatDouble(state.<Double>get("battery_current")),
+                formatDouble(Math.abs(state.<Double[]>get("motor_current")[RoverWheels.FL.getValue()])),
+                formatDouble(Math.abs(state.<Double[]>get("motor_current")[RoverWheels.FR.getValue()])),
+                formatDouble(Math.abs(state.<Double[]>get("motor_current")[RoverWheels.BL.getValue()])),
+                formatDouble(Math.abs(state.<Double[]>get("motor_current")[RoverWheels.BR.getValue()])),
+                formatDouble(state.<Double[]>get("motor_voltage")[RoverWheels.FL.getValue()]),
+                formatDouble(state.<Double[]>get("motor_voltage")[RoverWheels.FR.getValue()]),
+                formatDouble(state.<Double[]>get("motor_voltage")[RoverWheels.BL.getValue()]),
+                formatDouble(state.<Double[]>get("motor_voltage")[RoverWheels.BR.getValue()])
+        ));
         TemperatureStatsLbl.setText(String.format(temperaturePattern,
-                formatDouble(rover.getMotorTemp(RoverWheels.FL)),
-                formatDouble(rover.getMotorTemp(RoverWheels.FR)),
-                formatDouble(rover.getMotorTemp(RoverWheels.BL)),
-                formatDouble(rover.getMotorTemp(RoverWheels.BR)),
-                formatDouble(rover.getBatteryTemperature()),
-                formatDouble(-30))); //TODO add temp map
+                formatDouble(state.<Double[]>get("motor_temp")[RoverWheels.FL.getValue()]),
+                formatDouble(state.<Double[]>get("motor_temp")[RoverWheels.FR.getValue()]),
+                formatDouble(state.<Double[]>get("motor_temp")[RoverWheels.BL.getValue()]),
+                formatDouble(state.<Double[]>get("motor_temp")[RoverWheels.BR.getValue()]),
+                formatDouble(state.<Double>get("battery_temp")),
+                formatDouble(-30) //TODO add temp map
+        ));
         MuteLED.setSelected(rover.getLEDisLit("Mute"));
         InstructionsLED.setSelected(rover.getLEDisLit("Instructions"));
         AutonomousLED.setSelected(rover.getLEDisLit("Autonomus"));

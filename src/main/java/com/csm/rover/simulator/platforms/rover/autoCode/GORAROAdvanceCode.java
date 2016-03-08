@@ -64,15 +64,14 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
     }
 
     @Override
-	public String doNextCommand(long milliTime, DecimalPoint location,
-			double direction, Map<String, Double> parameters)
+	public String doNextCommand(long milliTime, DecimalPoint location, double direction, Map<String, Double> params)
 	{
 		if (!runyet){
 			writeToLog(mentalityStr);
-			writeToLog("time\tX\tY\tZ\tscore\tcharge\tstate\thazard");
+			writeToLog("time\tX\tY\tZ\tscore\tstate\thazard");
 			runyet = true;
 		}
-		writeToLog(milliTime + "\t" + formatDouble(location.getX()) + "\t" + formatDouble(location.getY()) + "\t" + formatDouble(MAP.getHeightAt(location)) + "\t" + score + "\t" + formatDouble(parameters.get("battery_charge")) + "\t" + state + "\t" + MAP.getHazardValueAt(location));
+		writeToLog(milliTime + "\t" + formatDouble(location.getX()) + "\t" + formatDouble(location.getY()) + "\t" + formatDouble(MAP.getHeightAt(location)) + "\t" + score + "\t" + state + "\t" + MAP.getHazardValueAt(location));
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
 			score += MAP.getTargetValueAt(location);

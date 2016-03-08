@@ -6,6 +6,7 @@ import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
+import com.csm.rover.simulator.platforms.rover.RoverWheels;
 import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -41,12 +42,12 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel im
         if (!state.getType().equals("Rover")){
             throw new IllegalArgumentException("The provided state is not a RoverState");
         }
-        return doNextCommand(millitime, new DecimalPoint(state.get("x"), state.get("y")), state.get("direction"),
-                getAutonomousParameters(state));
+        return doNextCommand(millitime, new DecimalPoint(state.<Double>get("x"), state.<Double>get("y")),
+                state.<Double>get("direction"), getAutonomousParameters(state));
     }
 
     protected abstract String doNextCommand(long milliTime, DecimalPoint location,
-                                          double direction, Map<String, Double> parameters);
+                                          double direction, Map<String, Double> params);
 
     public static void setTerrainMap(TerrainMap map){
         MAP = map;
@@ -86,13 +87,23 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel im
 	}
 
     private Map<String, Double> getAutonomousParameters(PlatformState state){
-        String[] required = new String[] { "acceleration", "angular_acceleration", "wheel_speed_FL", "wheel_speed_FR",
-                "wheel_speed_BL", "wheel_speed_BR", "motor_current_FL", "motor_current_FR", "motor_current_BL",
-                "motor_current_BR", "motor_temp_FL", "motor_temp_FR", "motor_temp_BL", "motor_temp_BR",
-                "battery_voltage", "battery_current", "battery_temp", "battery_charge" };
+        String[] required = new String[] { "acceleration", "angular_acceleration", "battery_voltage", "battery_current",
+                "battery_temp", "battery_charge" };
+        String[] fromLists = new String[] { "wheel_speed", "motor_current", "motor_temp" };
         Map<String, Double> params = new TreeMap<>();
         for (String param : required){
-            params.put(param, state.get(param));
+            params.put(param, state.<Double>get(param));
+        }
+        for (String param : fromLists){
+            Double[] list = state.get(param);
+            for (int i = 0; i < list.length; i++){
+                for (RoverWheels wheel : RoverWheels.values()){
+                    if (wheel.getValue() == i && wheel.name().length() < 4){
+                        params.put(param+"_"+wheel.name(), list[i]);
+                        break;
+                    }
+                }
+            }
         }
         return params;
     }
