@@ -1,26 +1,14 @@
 package com.csm.rover.simulator.objects.io;
 
-import com.csm.rover.simulator.objects.util.DecimalPoint;
-import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
-import com.csm.rover.simulator.platforms.rover.RoverState;
-import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
-import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
-import com.csm.rover.simulator.platforms.satellite.SatelliteAutonomousCode;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
-import com.csm.rover.simulator.platforms.satellite.SatelliteParametersList;
-import com.csm.rover.simulator.platforms.satellite.SatelliteState;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
+import com.fasterxml.jackson.core.*;
 
-import java.io.*;
-import java.lang.reflect.Array;
+import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
-
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 
 public class RunConfiguration implements Serializable {
 	
@@ -94,9 +82,6 @@ public class RunConfiguration implements Serializable {
 		JsonParser jp = f.createParser(save);
 		NamesAndTags NT = new NamesAndTags();
 		jp.nextToken();
-		while (jp.nextToken() != JsonToken.END_OBJECT) {
-			String fieldname = jp.getCurrentName();
-			jp.nextToken();
 				while(jp.nextToken() != JsonToken.END_OBJECT){
 					String namefield = jp.getCurrentName();
 					jp.nextToken();
@@ -194,7 +179,6 @@ public class RunConfiguration implements Serializable {
 						}
 					}
 				}
-			}
 		jp.close();
 		/*
 		this.mapFromFile = input.mapFromFile;
@@ -224,26 +208,23 @@ public class RunConfiguration implements Serializable {
 		JsonGenerator g = f.createGenerator(new File("jtest.json"), JsonEncoding.UTF8);
 		g.writeStartObject();
 		g.writeObjectFieldStart("Runtime");
-		g.writeNumberField("Runtime",runtime);
+		g.writeNumberField("runtime", runtime);
 		g.writeBooleanField("acclelerated", accelerated);
-		g.writeEndObject();
-		g.writeStartObject();
+        g.writeEndObject();
 		g.writeObjectFieldStart("Map");
-		g.writeBooleanField("RunFromFile",mapFromFile);
+		g.writeBooleanField("runFromFile", mapFromFile);
 		g.writeFieldName("mapFile");
-		g.writeString(mapFile.toString());
+		g.writeString("test");
 		g.writeNumberField("mapRough", mapRough);
 		g.writeNumberField("mapDetail", mapDetail);
 		g.writeNumberField("mapSize", mapSize);
-		g.writeEndObject();
-		g.writeStartObject();
+        g.writeEndObject();
 		g.writeObjectFieldStart("TargetHazard");
-		g.writeBooleanField("monoTargets",monoTargets);
-		g.writeBooleanField("(monoHazards", monoHazards);
+		g.writeBooleanField("monoTargets", monoTargets);
+		g.writeBooleanField("monoHazards", monoHazards);
 		g.writeNumberField("targetDensity", targetDensity);
 		g.writeNumberField("hazardDensity", hazardDensity);
-		g.writeEndObject();
-		g.writeStartObject();;
+        g.writeEndObject();
 		g.writeObjectFieldStart("PlatformConfig");
 		g.writeFieldName("ID");
 		g.writeStartArray();
@@ -257,24 +238,36 @@ public class RunConfiguration implements Serializable {
 			g.writeString(platforms.get(j).getScreenName());
 		}
 		g.writeEndArray();
-		g.writeFieldName("Type");
+		g.writeFieldName("type");
 		g.writeStartArray();
 		for(int j=0; j<platforms.size(); j++){
 			g.writeString(platforms.get(j).getType());
 		}
 		g.writeEndArray();
-		g.writeFieldName("PhysicsConfig");
+		g.writeFieldName("physicsConfig");
 		g.writeStartArray();
 		for(int j=0; j<platforms.size(); j++){
 			g.writeString(platforms.get(j).getPhysicsModelName());
 		}
 		g.writeEndArray();
-		g.writeFieldName("AutonomousConfig");
+        g.writeFieldName("physicsConfigParams");
+        g.writeStartArray();
+        for(int j=0; j<platforms.size(); j++){
+            g.writeString(platforms.get(j).getPhysicsModelParameters().toString());
+        }
+        g.writeEndArray();
+		g.writeFieldName("autonomousConfig");
 		g.writeStartArray();
 		for(int j=0; j<platforms.size(); j++){
 			g.writeString(platforms.get(j).getAutonomousModelName());
 		}
 		g.writeEndArray();
+        g.writeFieldName("autonomousConfigParams");
+        g.writeStartArray();
+        for(int j=0; j<platforms.size(); j++){
+            g.writeString(platforms.get(j).getAutonomousModelParameters().toString());
+        }
+        g.writeEndArray();
 		g.writeEndObject();
 
 		g.close();
