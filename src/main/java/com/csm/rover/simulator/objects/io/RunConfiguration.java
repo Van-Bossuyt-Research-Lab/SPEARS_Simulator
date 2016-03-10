@@ -206,6 +206,7 @@ public class RunConfiguration implements Serializable {
 		*/
 		JsonFactory f = new JsonFactory();
 		JsonGenerator g = f.createGenerator(new File("jtest.json"), JsonEncoding.UTF8);
+		g.useDefaultPrettyPrinter();
 		g.writeStartObject();
 		g.writeObjectFieldStart("Runtime");
 		g.writeNumberField("runtime", runtime);
@@ -225,51 +226,39 @@ public class RunConfiguration implements Serializable {
 		g.writeNumberField("targetDensity", targetDensity);
 		g.writeNumberField("hazardDensity", hazardDensity);
         g.writeEndObject();
-		g.writeObjectFieldStart("PlatformConfig");
-		g.writeFieldName("ID");
-		g.writeStartArray();
-		for(int j=0; j<platforms.size(); j++){
-			g.writeString(platforms.get(j).getID());
+		for(int j=0; j<platforms.size(); j++) {
+			g.writeObjectFieldStart("PlatformConfig");
+			g.writeStringField("ID", platforms.get(j).getID());
+			g.writeStringField("screenName", platforms.get(j).getScreenName());
+			g.writeStringField("type", platforms.get(j).getType());
+			g.writeStringField("physicsConfig", platforms.get(j).getPhysicsModelName());
+			g.writeFieldName("physicsConfigParams");
+			g.writeStartArray();
+			for (String s : platforms.get(j).getPhysicsModelParameters().keySet()) {
+				g.writeString(s);
+				g.writeNumber(platforms.get(j).getPhysicsModelParameters().get(s));
+			}
+			g.writeEndArray();
+			g.writeStringField("autonomousConfig", platforms.get(j).getAutonomousModelName());
+			g.writeFieldName("autonomousConfigParams");
+			g.writeStartArray();
+			for (String s : platforms.get(j).getAutonomousModelParameters().keySet()) {
+				g.writeString(s);
+				g.writeNumber(platforms.get(j).getAutonomousModelParameters().get(s));
+			}
+			g.writeEndArray();
+			g.writeFieldName("stateParams");
+			g.writeStartArray();
+			for (String s : platforms.get(j).getStateParameters().keySet()) {
+				g.writeStartArray();
+				g.writeString(s);
+				g.writeNumber(platforms.get(j).getStateParameters().get(s));
+				g.writeEndArray();
+			}
+			g.writeEndArray();
+			g.writeEndObject();
 		}
-		g.writeEndArray();
-		g.writeFieldName("screenName");
-		g.writeStartArray();
-		for(int j=0; j<platforms.size(); j++){
-			g.writeString(platforms.get(j).getScreenName());
-		}
-		g.writeEndArray();
-		g.writeFieldName("type");
-		g.writeStartArray();
-		for(int j=0; j<platforms.size(); j++){
-			g.writeString(platforms.get(j).getType());
-		}
-		g.writeEndArray();
-		g.writeFieldName("physicsConfig");
-		g.writeStartArray();
-		for(int j=0; j<platforms.size(); j++){
-			g.writeString(platforms.get(j).getPhysicsModelName());
-		}
-		g.writeEndArray();
-        g.writeFieldName("physicsConfigParams");
-        g.writeStartArray();
-        for(int j=0; j<platforms.size(); j++){
-            g.writeString(platforms.get(j).getPhysicsModelParameters().toString());
-        }
-        g.writeEndArray();
-		g.writeFieldName("autonomousConfig");
-		g.writeStartArray();
-		for(int j=0; j<platforms.size(); j++){
-			g.writeString(platforms.get(j).getAutonomousModelName());
-		}
-		g.writeEndArray();
-        g.writeFieldName("autonomousConfigParams");
-        g.writeStartArray();
-        for(int j=0; j<platforms.size(); j++){
-            g.writeString(platforms.get(j).getAutonomousModelParameters().toString());
-        }
-        g.writeEndArray();
 		g.writeEndObject();
-
 		g.close();
 	}
 
