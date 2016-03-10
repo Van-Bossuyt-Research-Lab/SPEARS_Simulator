@@ -1,21 +1,26 @@
 package com.csm.rover.simulator.objects.io;
 
+import com.csm.rover.simulator.control.InterfaceCode;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 public class RunConfiguration implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private String fileCode = "ent";
-	
+
+	private static final Logger LOG = LogManager.getLogger(InterfaceCode.class);
 	public boolean mapFromFile;
 	public NamesAndTags namesAndTags;
 	public ArrayList<PlatformConfig> platforms;
@@ -80,105 +85,149 @@ public class RunConfiguration implements Serializable {
 		*/
 		JsonFactory f = new JsonFactory();
 		JsonParser jp = f.createParser(save);
-		NamesAndTags NT = new NamesAndTags();
+		ObjectMapper m = new ObjectMapper();
 		jp.nextToken();
-				while(jp.nextToken() != JsonToken.END_OBJECT){
-					String namefield = jp.getCurrentName();
-					jp.nextToken();
-
-					if("Map".equals(namefield)){
-						mapFromFile = jp.readValueAs(boolean.class);
-						File fle = new File(jp.getValueAsString());
-						mapFile = fle;
-						mapRough = jp.readValueAs(double.class);
-						mapDetail = jp.readValueAs(int.class);
-						mapSize = jp.readValueAs(int.class);
-
-
-					}
-					if("TargetHazard".equals(namefield)){
-						monoTargets = jp.readValueAs(boolean.class);
-						monoHazards = jp.readValueAs(boolean.class);
-						targetDensity = jp.readValueAs(double.class);
-						hazardDensity = jp.readValueAs(double.class);
-					}
-					if("PlatformConfig".equals(namefield)){
-						Iterator<String> ID = new Iterator<String>() {
-							@Override
-							public boolean hasNext() {
-								return false;
-							}
-
-							@Override
-							public String next() {
-								return null;
-							}
-						};
-						Iterator<String> names = new Iterator<String>() {
-							@Override
-							public boolean hasNext() {
-								return false;
-							}
-
-							@Override
-							public String next() {
-								return null;
-							}
-						};
-						Iterator<String> types = new Iterator<String>() {
-							@Override
-							public boolean hasNext() {
-								return false;
-							}
-
-							@Override
-							public String next() {
-								return null;
-							}
-						};
-						Iterator<String> physics = new Iterator<String>() {
-							@Override
-							public boolean hasNext() {
-								return false;
-							}
-
-							@Override
-							public String next() {
-								return null;
-							}
-						};
-						Iterator<String> autos = new Iterator<String>() {
-							@Override
-							public boolean hasNext() {
-								return false;
-							}
-
-							@Override
-							public String next() {
-								return null;
-							}
-						};
-						ID = jp.readValuesAs(String.class);
-						names = jp.readValuesAs(String.class);
-						types = jp.readValuesAs(String.class);
-						physics = jp.readValuesAs(String.class);
-						autos = jp.readValuesAs(String.class);
-						while (names.hasNext()){
-							PlatformConfig pc = PlatformConfig.builder().setID(ID.next())
-									.setScreenName(names.next())
-									.setType(types.next())
-									.setPhysicsModel(physics.next())
-									.setAutonomousModel(autos.next())
-									.build();
-							platforms.add(pc);
-							ID.remove();
-							names.remove();
-							types.remove();
-							physics.remove();
-							autos.remove();
+		while(jp.nextToken() != JsonToken.END_OBJECT){
+			String namefield = jp.getCurrentName();
+			System.out.println("start");
+			jp.nextToken();
+			switch(namefield) {
+				case("Runtime"):
+					while (jp.nextToken() != JsonToken.END_OBJECT) {
+						String fieldname = jp.getCurrentName();
+						jp.nextToken();
+						switch (fieldname){
+							case("runtime"):
+								this.runtime = jp.getNumberValue().intValue();
+								break;
+							case ("accelerated"):
+								accelerated = jp.getBooleanValue();
+								break;
 						}
 					}
-				}
+					break;
+				case ("Map"):
+					while (jp.nextToken() != JsonToken.END_OBJECT) {
+						String fieldname = jp.getCurrentName();
+						jp.nextToken();
+						switch (fieldname) {
+							case ("mapFromFile"):
+								mapFromFile = jp.getBooleanValue();
+								break;
+							case ("mapFile"):
+								mapFile = new File(jp.getValueAsString());
+								break;
+							case ("mapRough"):
+								mapRough = jp.getNumberValue().doubleValue();
+								break;
+							case ("mapDetail"):
+								mapDetail = jp.getNumberValue().intValue();
+								break;
+							case ("mapSize"):
+								mapSize = jp.getNumberValue().intValue();
+								break;
+							case ("monoTargets"):
+								monoTargets = jp.getBooleanValue();
+								break;
+							case ("monoHazards"):
+								monoHazards = jp.getBooleanValue();
+								break;
+							case ("targetdensity"):
+								targetDensity = jp.getNumberValue().doubleValue();
+								break;
+							case ("hazardDensity"):
+								hazardDensity = jp.getNumberValue().doubleValue();
+								break;
+						}
+					}
+					System.out.println("builtMap");
+					break;
+				case ("PlatformConfig"):
+					Map<String, Double> physicsMap = Collections.emptyMap();
+					Map<String, Double> autoMap = Collections.emptyMap();
+					String physics = "";
+					String autos = "";
+					PlatformConfig.Builder pc = PlatformConfig.builder();
+					while (jp.nextToken() != JsonToken.END_OBJECT) {
+						String fieldname = jp.getCurrentName();
+						jp.nextToken();
+						switch (fieldname) {
+							case ("ID"):
+								pc.setID(jp.getText());
+								break;
+							case ("screenName"):
+								pc.setScreenName(jp.getText());
+								break;
+							case ("type"):
+								pc.setType(jp.getText());
+								break;
+							case ("physicsConfig"):
+								physics = jp.getText();
+								break;
+							case ("autonomousConfig"):
+								autos = jp.getText();
+								break;
+							case ("physicsConfigParams"):
+								String a = "";
+								String b = "";
+								if(jp.nextToken() == JsonToken.START_ARRAY) {
+									jp.nextToken();
+									while (jp.nextToken() != JsonToken.END_ARRAY) {
+										jp.nextToken();
+										a = jp.getText();
+										jp.nextToken();
+										b = jp.getText();
+										System.out.println(a);
+										System.out.println(b);
+										physicsMap.put(a, Double.parseDouble(b.trim()));
+									}
+
+								}
+								break;
+							case ("autonomousConfigParams"):
+								jp.nextToken();
+								a = "";
+								b = "";
+								if(jp.nextToken() == JsonToken.START_ARRAY) {
+
+									while (jp.nextToken() != JsonToken.END_ARRAY) {
+
+										a = jp.getText();
+										jp.nextToken();
+										b = jp.getText();
+										System.out.println(a);
+										System.out.println(b);
+										autoMap.put(a, Double.parseDouble(b.trim()));
+									}
+									jp.nextToken();
+								}
+								break;
+							case ("stateParams"):
+								jp.nextToken();
+								a = "";
+								b = "";
+								if(jp.nextToken() == JsonToken.START_ARRAY) {
+									jp.nextToken();
+									while (jp.nextToken() != JsonToken.END_ARRAY) {
+										jp.nextToken();
+										a = jp.getText();
+										jp.nextToken();
+										b = jp.getText();
+										System.out.println(a);
+										System.out.println(b);
+										pc.addStateVariable(a, Double.parseDouble(b.trim()));
+									}
+								}
+								break;
+						}
+					}
+					pc.setPhysicsModel(physics, physicsMap);
+					pc.setAutonomousModel(autos, autoMap);
+					platforms.add(pc.build());
+					System.out.println("built shit");
+					break;
+			}
+			}
 		jp.close();
 		/*
 		this.mapFromFile = input.mapFromFile;
@@ -219,8 +268,6 @@ public class RunConfiguration implements Serializable {
 		g.writeNumberField("mapRough", mapRough);
 		g.writeNumberField("mapDetail", mapDetail);
 		g.writeNumberField("mapSize", mapSize);
-        g.writeEndObject();
-		g.writeObjectFieldStart("TargetHazard");
 		g.writeBooleanField("monoTargets", monoTargets);
 		g.writeBooleanField("monoHazards", monoHazards);
 		g.writeNumberField("targetDensity", targetDensity);
@@ -236,7 +283,7 @@ public class RunConfiguration implements Serializable {
 			g.writeStartArray();
 			for (String s : platforms.get(j).getPhysicsModelParameters().keySet()) {
 				g.writeString(s);
-				g.writeNumber(platforms.get(j).getPhysicsModelParameters().get(s));
+				g.writeString(platforms.get(j).getPhysicsModelParameters().get(s).toString());
 			}
 			g.writeEndArray();
 			g.writeStringField("autonomousConfig", platforms.get(j).getAutonomousModelName());
@@ -244,7 +291,7 @@ public class RunConfiguration implements Serializable {
 			g.writeStartArray();
 			for (String s : platforms.get(j).getAutonomousModelParameters().keySet()) {
 				g.writeString(s);
-				g.writeNumber(platforms.get(j).getAutonomousModelParameters().get(s));
+				g.writeString(platforms.get(j).getAutonomousModelParameters().get(s).toString());
 			}
 			g.writeEndArray();
 			g.writeFieldName("stateParams");
@@ -252,7 +299,7 @@ public class RunConfiguration implements Serializable {
 			for (String s : platforms.get(j).getStateParameters().keySet()) {
 				g.writeStartArray();
 				g.writeString(s);
-				g.writeNumber(platforms.get(j).getStateParameters().get(s));
+				g.writeString(platforms.get(j).getStateParameters().get(s).toString());
 				g.writeEndArray();
 			}
 			g.writeEndArray();

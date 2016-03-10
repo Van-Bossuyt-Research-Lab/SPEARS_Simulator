@@ -8,9 +8,7 @@
     "mapFile" : "test",
     "mapRough" : 0.004,
     "mapDetail" : 3,
-    "mapSize" : 170
-  },
-  "TargetHazard" : {
+    "mapSize" : 170,
     "monoTargets" : true,
     "monoHazards" : true,
     "targetDensity" : 0.004,
@@ -53,7 +51,7 @@
     "physicsConfig" : "Default",
     "physicsConfigParams" : [ ],
     "autonomousConfig" : "Generic",
-    "autonomousConfigParams" : [ "sec", 123.0 ],
+    "autonomousConfigParams" : [ "sec", "123.0" ],
     "stateParams" : [ ]
   },
   "PlatformConfig" : {
@@ -63,7 +61,7 @@
     "physicsConfig" : "Default",
     "physicsConfigParams" : [ ],
     "autonomousConfig" : "GORADRO Adv",
-    "autonomousConfigParams" : [ "mentality1", 1.0, "mentality2", 2.0, "mentality3", 3.0, "mentality4", 3.0, "mentality5", 3.0 ],
+    "autonomousConfigParams" : [ "mentality1", "1.0", "mentality2", "1.0", "mentality3", "1.0", "mentality4", "1.0", "mentality5", "1.0" ],
     "stateParams" : [ ]
   }
 }
