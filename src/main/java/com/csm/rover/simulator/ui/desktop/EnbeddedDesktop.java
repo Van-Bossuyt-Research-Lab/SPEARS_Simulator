@@ -16,7 +16,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 
+import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
+import com.csm.rover.simulator.ui.events.InternalEventHandler;
 import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
+import com.csm.rover.simulator.wrapper.Globals;
 
 public class EnbeddedDesktop extends JDesktopPane {
 
@@ -106,7 +109,8 @@ public class EnbeddedDesktop extends JDesktopPane {
 					e.printStackTrace();
 				}
 			}
-			g.drawString("Version: 1.8.3", 10, getHeight()-60);
+			Globals.getInstance();
+			g.drawString("Version: "+Globals.versionNumber, 10, getHeight()-60);
 			g.drawString("Developed by:", 10, getHeight()-45);
 			g.drawString("Van Bossuyt Group", 10, getHeight()-30);
 			g.drawString("Colorado School of Mines", 10, getHeight()-15);
@@ -118,7 +122,7 @@ public class EnbeddedDesktop extends JDesktopPane {
 	
 	private Component being_moved = null;
 	
-	public Component add(JInternalFrame frame){
+	public Component add(EmbeddedFrame frame){
 		frame.setPreferredSize(frame.getSize());
 		frame.addComponentListener(new ComponentAdapter(){
 			@Override
@@ -136,6 +140,10 @@ public class EnbeddedDesktop extends JDesktopPane {
 				System.out.println("let go");
 			}
 		});
+		InternalEventHandler.fireInternalEvent(EmbeddedFrameEvent.builder()
+				.setAction(EmbeddedFrameEvent.Action.ADDED)
+				.setComponent(frame)
+				.build());
 		return super.add(frame);
 	}
 	

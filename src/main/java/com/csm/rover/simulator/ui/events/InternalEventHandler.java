@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.ui.events;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class InternalEventHandler {
@@ -22,13 +23,15 @@ public class InternalEventHandler {
 	}
 	
 	public static void fireInternalEvent(MenuCommandEvent menuEvent){
-		for (MenuCommandListener menuListen : menuListeners){
+		List<MenuCommandListener> listeners = new ArrayList<>(menuListeners);
+		for (MenuCommandListener menuListen : listeners){
 			menuListen.menuAction(menuEvent);
 		}
 	}
 	
 	public static void fireInternalEvent(EmbeddedFrameEvent frameEvent){
-		for (EmbeddedFrameListener frameListen : frameListeners){
+		List<EmbeddedFrameListener> listeners = new ArrayList<>(frameListeners);
+		for (EmbeddedFrameListener frameListen : listeners){
 			frameListen.frameChanged(frameEvent);
 		}
 	}

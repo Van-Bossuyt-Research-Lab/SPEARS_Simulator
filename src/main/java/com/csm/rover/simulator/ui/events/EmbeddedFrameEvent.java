@@ -4,7 +4,7 @@ import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
 
 public class EmbeddedFrameEvent {
 
-	public static enum Action { ADDED, REMOVED, MOVED, RESIZED, MAXIMIZED, ICONIFIED, CLOSED }
+	public static enum Action { ADDED, MOVED, RESIZED, MAXIMIZED, ICONIFIED, CLOSED }
 	
 	private Action action;
 	private EmbeddedFrame component;
