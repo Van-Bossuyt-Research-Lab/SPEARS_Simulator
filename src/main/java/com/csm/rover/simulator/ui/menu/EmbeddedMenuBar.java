@@ -1,19 +1,16 @@
 package com.csm.rover.simulator.ui.menu;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 
 public class EmbeddedMenuBar extends JMenuBar {
+
+	private static final long serialVersionUID = 1996909612935260422L;
 
 	public EmbeddedMenuBar() {
 		JMenu mnFile = new JMenu("File");

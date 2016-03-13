@@ -1,10 +1,7 @@
 package com.csm.rover.simulator.ui;
 
 import java.awt.AlphaComposite;
-import java.awt.BorderLayout;
 import java.awt.Composite;
-import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -12,30 +9,16 @@ import java.awt.Toolkit;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.JDesktopPane;
 
 import java.awt.Color;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JCheckBoxMenuItem;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyVetoException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JRadioButtonMenuItem;
@@ -44,6 +27,8 @@ import com.csm.rover.simulator.ui.desktop.EnbeddedDesktop;
 import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
 
 public class Form2 extends JFrame {
+
+	private static final long serialVersionUID = -9008675264187922065L;
 
 	public Form2() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/SPEARS icon.png")));

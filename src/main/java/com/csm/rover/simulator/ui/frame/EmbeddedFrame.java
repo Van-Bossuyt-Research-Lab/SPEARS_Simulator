@@ -9,6 +9,8 @@ import javax.swing.event.InternalFrameEvent;
 
 public class EmbeddedFrame extends JInternalFrame {
 	
+	private static final long serialVersionUID = -8256034256255313580L;
+
 	public EmbeddedFrame(){
 		setResizable(true);
 		setMaximizable(true);

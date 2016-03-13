@@ -6,11 +6,8 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,14 +15,13 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
 
 import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
 
 public class EnbeddedDesktop extends JDesktopPane {
 
+	private static final long serialVersionUID = 1092626769481787681L;
+	
 	protected ImageIcon background;
 	protected boolean hasImage = false;
 	

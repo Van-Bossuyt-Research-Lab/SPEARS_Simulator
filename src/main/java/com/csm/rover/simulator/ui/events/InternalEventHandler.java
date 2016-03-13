@@ -1,66 +1,36 @@
 package com.csm.rover.simulator.ui.events;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-
-import javax.swing.JComponent;
 
 public class InternalEventHandler {
 	
 	static {
-		instance = Optional.empty();
-	}
-
-	private Map<JComponent, Map<String, List<InternalEventListener<?>>>> listeners;
-	
-	private InternalEventHandler(){
-		listeners = new HashMap<>();
+		menuListeners = new ArrayList<>();
+		frameListeners = new ArrayList<>();
 	}
 	
-	private static Optional<InternalEventHandler> instance;
-	public static InternalEventHandler getInstance(){
-		if (!instance.isPresent()){
-			instance = Optional.of(new InternalEventHandler());
-		}
-		return instance.get();
+	private static List<MenuCommandListener> menuListeners;
+	private static List<EmbeddedFrameListener> frameListeners;
+	
+	public static void registerInternalListener(MenuCommandListener menuListen){
+		menuListeners.add(menuListen);
 	}
 	
-	public <T> void addInternalEventListener(JComponent component, String action, InternalEventListener<T> listen){
-		if (!listeners.containsKey(component)){
-			listeners.put(component, new TreeMap<String, List<InternalEventListener<?>>>());
-		}
-		if (!listeners.get(component).containsKey(action)){
-			listeners.get(component).put(action, new ArrayList<InternalEventListener<?>>());
-		}
-		listeners.get(component).get(action).add(listen);
+	public static void registerInternalListener(EmbeddedFrameListener frameListen){
+		frameListeners.add(frameListen);
 	}
 	
-	public <T> void fireInternalEvent(JComponent component, String action){
-		fireInternalEvent(component, action, null, null);
+	public static void fireInternalEvent(MenuCommandEvent menuEvent){
+		for (MenuCommandListener menuListen : menuListeners){
+			menuListen.menuAction(menuEvent);
+		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T> void fireInternalEvent(JComponent component, String action, T oldval, T newval){
-		Optional<ClassCastException> error = Optional.empty();
-		if (listeners.containsKey(component) && listeners.get(component).containsKey(action)){
-			InternalEvent<T> event = new InternalEvent<T>(component, action, oldval, newval);
-			for (InternalEventListener<?> listen : listeners.get(component).get(action)){
-				try {
-					((InternalEventListener<T>)listen).internalEvent(event);
-				}
-				catch (ClassCastException ex){
-					error = Optional.of(ex);
-				}
-			}
+	public static void fireInternalEvent(EmbeddedFrameEvent frameEvent){
+		for (EmbeddedFrameListener frameListen : frameListeners){
+			frameListen.frameChanged(frameEvent);
 		}
-		if (error.isPresent()){
-			throw error.get();
-		}
-		
 	}
 	
 }
