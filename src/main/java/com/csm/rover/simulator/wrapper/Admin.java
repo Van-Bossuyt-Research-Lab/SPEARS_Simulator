@@ -36,7 +36,7 @@ public class Admin {
 		LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");
-            HI = new HiForm();
+            HI = new HiUi3();
 			boolean go = false;
 			File config = new File("default.cfg");
 			if (config.exists()) {
