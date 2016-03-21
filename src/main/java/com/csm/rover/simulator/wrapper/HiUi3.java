@@ -14,6 +14,9 @@ import com.csm.rover.simulator.objects.DecimalPoint;
 import com.csm.rover.simulator.rover.RoverObject;
 import com.csm.rover.simulator.satellite.SatelliteObject;
 import com.csm.rover.simulator.ui.Form2;
+import com.csm.rover.simulator.ui.events.InternalEventCheckGate;
+import com.csm.rover.simulator.ui.events.InternalEventHandler;
+import com.csm.rover.simulator.ui.events.MenuCommandEvent;
 
 public class HiUi3 implements HumanInterfaceAbstraction {
 	private static Logger LOG = LogManager.getLogger(HiUi3.class);
@@ -31,6 +34,7 @@ public class HiUi3 implements HumanInterfaceAbstraction {
 		form.setLocation(0, 0);
 		form.setSize(Toolkit.getDefaultToolkit().getScreenSize());
 		form.setVisible(true);
+		InternalEventHandler.registerInternalListener(InternalEventCheckGate.responseWith(() -> exit()).forAction(MenuCommandEvent.Action.EXIT));
 	}
 	
 	@Override

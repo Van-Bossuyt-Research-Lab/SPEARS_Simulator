@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 public class MenuCommandEvent {
 	
-	public static enum Action { OPEN, SAVE, VIEW_LOG, EXIT, NEW_FRAME, GRID_CHANGE, SHOW_FRAME, VOLUME_CHANGE, SETTINGS }
+	public static enum Action { OPEN, NEW_SIM, VIEW_LOG, EXIT, NEW_FRAME, GRID_CHANGE, DIVIDER_CHANGE, SHOW_FRAME, VOLUME_CHANGE, SETTINGS }
 	
 	private Action action;
 	private Object value;
@@ -58,6 +58,12 @@ public class MenuCommandEvent {
 
 	public ActionEvent getOrigin(){
 		return origin;
+	}
+
+	@Override
+	public String toString() {
+		return "MenuCommandEvent [action=" + action + ", value=" + value
+				+ ", origin=" + origin + "]";
 	}
 
 }

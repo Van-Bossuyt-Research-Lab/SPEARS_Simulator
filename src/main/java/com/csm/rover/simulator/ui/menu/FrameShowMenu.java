@@ -8,6 +8,7 @@ import javax.swing.JMenuItem;
 import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
 import com.csm.rover.simulator.ui.events.EmbeddedFrameListener;
 import com.csm.rover.simulator.ui.events.InternalEventHandler;
+import com.csm.rover.simulator.ui.events.MenuCommandEvent;
 import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
 
 public class FrameShowMenu extends JMenuItem {
@@ -34,11 +35,18 @@ public class FrameShowMenu extends JMenuItem {
 		addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				InternalEventHandler.fireInternalEvent(
+						MenuCommandEvent.builder()
+								.setAction(MenuCommandEvent.Action.SHOW_FRAME)
+								.setOrigin(e)
+								.setValue(frame)
+								.build()
+						);
 				if (frame.isIcon()){
 					frame.deiconify();
 				}
 				frame.requestFocus();
-			}			
+			}
 		});
 	}
 	
