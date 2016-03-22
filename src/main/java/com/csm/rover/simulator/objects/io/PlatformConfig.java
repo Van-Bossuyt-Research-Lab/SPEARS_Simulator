@@ -1,14 +1,17 @@
 package com.csm.rover.simulator.objects.io;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
+@JsonIgnoreProperties(ignoreUnknown = true)
 
 public class PlatformConfig implements Serializable {
 
     private String type;
-    private String ID;
+    private String id;
     private String screenName;
 
     private PhysicsConfig physics;
@@ -33,7 +36,7 @@ public class PlatformConfig implements Serializable {
     }
 
     public String getID(){
-        return ID;
+        return id;
     }
 
     public String getPhysicsModelName(){
@@ -72,7 +75,7 @@ public class PlatformConfig implements Serializable {
             if (config.screenName == null){
                 missing += " screenName";
             }
-            if (config.ID == null){
+            if (config.id == null){
                 missing += " ID";
             }
             if (config.physics == null){
@@ -98,7 +101,7 @@ public class PlatformConfig implements Serializable {
         }
 
         public Builder setID(String ID){
-            config.ID = ID;
+            config.id = ID;
             return this;
         }
 

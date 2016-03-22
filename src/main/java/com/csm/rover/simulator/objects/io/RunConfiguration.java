@@ -4,7 +4,9 @@ import com.csm.rover.simulator.control.InterfaceCode;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -24,8 +26,6 @@ public class RunConfiguration implements Serializable {
 	public boolean mapFromFile;
 	public NamesAndTags namesAndTags;
 	public ArrayList<PlatformConfig> platforms;
-	public ArrayList<RoverObject> rovers;
-	public ArrayList<SatelliteObject> satellites;
 	public File mapFile;
 	public double mapRough;
 	public int mapSize;
@@ -82,7 +82,7 @@ public class RunConfiguration implements Serializable {
 			in.close();
 			throw new Exception("Invalid File Version");
 		}
-		*/
+
 		JsonFactory f = new JsonFactory();
 		JsonParser jp = f.createParser(save);
 		ObjectMapper m = new ObjectMapper();
@@ -229,7 +229,7 @@ public class RunConfiguration implements Serializable {
 			}
 			}
 		jp.close();
-		/*
+
 		this.mapFromFile = input.mapFromFile;
 		this.namesAndTags = input.namesAndTags;
 		this.platforms = input.platforms;
@@ -245,6 +245,9 @@ public class RunConfiguration implements Serializable {
 		this.runtime = input.runtime;
 		*/
 		// in.close();
+		ObjectMapper mapper = new ObjectMapper();
+		platforms= mapper.readValue(save, new TypeReference<List<PlatformConfig>>(){});
+
 	}
 
 	public void Save(File file) throws Exception {
@@ -252,7 +255,6 @@ public class RunConfiguration implements Serializable {
 		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file.getAbsolutePath()));
 		out.writeObject(this);
 		out.close();
-		*/
 		JsonFactory f = new JsonFactory();
 		JsonGenerator g = f.createGenerator(new File("jtest.json"), JsonEncoding.UTF8);
 		g.useDefaultPrettyPrinter();
@@ -307,6 +309,13 @@ public class RunConfiguration implements Serializable {
 		}
 		g.writeEndObject();
 		g.close();
+		*/
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writerWithDefaultPrettyPrinter();
+		mapper.writeValue(file, platforms);
+
+
 	}
 
 	public ArrayList<PlatformConfig> getPlatforms(String type){
