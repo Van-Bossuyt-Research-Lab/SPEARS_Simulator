@@ -3,6 +3,7 @@ package com.csm.rover.simulator.ui.menu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
 
 import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
@@ -48,6 +49,8 @@ public class FrameShowMenu extends JMenuItem {
 				frame.requestFocus();
 			}
 		});
+		
+		frame.addPropertyChangeListener(JInternalFrame.TITLE_PROPERTY, (PropertyChangeEvent) -> setText(frame.getTitle()));
 	}
 	
 	public EmbeddedFrame getFrame(){

@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 
 import java.awt.Color;
 
@@ -24,6 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JRadioButtonMenuItem;
 
 import com.csm.rover.simulator.ui.desktop.EnbeddedDesktop;
+import com.csm.rover.simulator.ui.frame.CreditsFrame;
 import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
 import com.csm.rover.simulator.ui.menu.EmbeddedMenuBar;
 
@@ -46,17 +48,6 @@ public class Form2 extends JFrame {
 		desktopPane.setBackground(new Color(250, 255, 255));
 		setContentPane(desktopPane);
 		
-		EmbeddedFrame internalFrame = new EmbeddedFrame();
-		internalFrame.setTitle("New EmbeddedFrame");
-		internalFrame.setBounds(72, 42, 276, 331);
-		desktopPane.add(internalFrame);
-		
-		EmbeddedFrame internalFrame_1 = new EmbeddedFrame();
-		internalFrame_1.setTitle("New EmbeddedFrame");
-		internalFrame_1.setBounds(461, 67, 276, 331);
-		desktopPane.add(internalFrame_1);
-		internalFrame_1.setVisible(true);
-		internalFrame.setVisible(true);
 	}
 	
 }

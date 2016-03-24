@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
 
 import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
 import com.csm.rover.simulator.ui.events.InternalEventHandler;
@@ -132,12 +131,6 @@ public class EnbeddedDesktop extends JDesktopPane {
 					placeInDivision(e.getComponent());
 					being_moved = null;
 				}
-			}
-		});
-		frame.addMouseListener(new MouseAdapter(){
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				System.out.println("let go");
 			}
 		});
 		InternalEventHandler.fireInternalEvent(EmbeddedFrameEvent.builder()
