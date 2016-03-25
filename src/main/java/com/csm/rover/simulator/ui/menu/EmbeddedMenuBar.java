@@ -153,11 +153,11 @@ public class EmbeddedMenuBar extends JMenuBar {
 					showMenu.add(new FrameShowMenu(e.getComponent()));
 				}
 				else if (e.getAction().equals(EmbeddedFrameEvent.Action.CLOSED)){
-					for (java.awt.Component menuitem : showMenu.getComponents()){
+					for (java.awt.Component menuitem : showMenu.getMenuComponents()){
 						try {
 							FrameShowMenu menu = (FrameShowMenu)menuitem;
 							if (menu.getFrame() == e.getComponent()){
-								showMenu.remove(menu);
+								showMenu.remove(menuitem);
 							}
 						}
 						catch (ClassCastException ex){
@@ -175,20 +175,26 @@ public class EmbeddedMenuBar extends JMenuBar {
 		JMenu mnVolume = new JMenu("Volume");
 		mnTools.add(mnVolume);
 		
-		JMenuItem mntmHigh = new JMenuItem("High");
+		ButtonGroup volumeControls = new ButtonGroup();
+		
+		JRadioButtonMenuItem mntmHigh = new JRadioButtonMenuItem("High");
 		mntmHigh.setIcon(getMenuIcon("/gui/speaker_loud.png"));
 		mntmHigh.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.VOLUME_CHANGE).setValue("HIGH").setOrigin(e).build()));
+		mntmHigh.setSelected(true);
 		mnVolume.add(mntmHigh);
+		volumeControls.add(mntmHigh);
 		
-		JMenuItem mntmLow = new JMenuItem("Low");
+		JRadioButtonMenuItem mntmLow = new JRadioButtonMenuItem("Low");
 		mntmLow.setIcon(getMenuIcon("/gui/speaker_quiet.png"));
 		mntmLow.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.VOLUME_CHANGE).setValue("LOW").setOrigin(e).build()));
 		mnVolume.add(mntmLow);
+		volumeControls.add(mntmLow);
 		
-		JMenuItem mntmMute = new JMenuItem("Mute");
+		JRadioButtonMenuItem mntmMute = new JRadioButtonMenuItem("Mute");
 		mntmMute.setIcon(getMenuIcon("/gui/speaker_mute.png"));
 		mntmMute.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.VOLUME_CHANGE).setValue("MUTE").setOrigin(e).build()));
 		mnVolume.add(mntmMute);
+		volumeControls.add(mntmMute);
 		
 		optionsMenu.addSeparator();
 		

@@ -43,6 +43,7 @@ public class FrameShowMenu extends JMenuItem {
 								.setValue(frame)
 								.build()
 						);
+				frame.setVisible(true);
 				if (frame.isIcon()){
 					frame.deiconify();
 				}

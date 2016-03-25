@@ -22,21 +22,29 @@ public class CreditsFrame extends EmbeddedFrame implements HyperlinkListener {
 	private JPanel content;
 	private JTextPane creditsTxt;
 	
-	private String credit = "";
+	private String internal;
+	private String externalHeader;
+	private String externalCredits;
 	
 	public CreditsFrame() {
 		setCredits();
 		initialize();
+		setSize(
+				creditsTxt.getPreferredSize().getWidth() < 500 ? (int)creditsTxt.getPreferredSize().getWidth() : 500,
+				creditsTxt.getPreferredSize().getHeight() < 700 ? (int)creditsTxt.getPreferredSize().getHeight() : 700
+		);
 	}
 	
 	private void setCredits(){
+		internal = String.format("The SPEARS Project is run by:\n%s\n\nDevelopers: %s\nProject Supervisor: %s\nFaculty Advisor: %s", "Van Bossuyt Group\nDepartment of Mechanical Engineering\nColorado School of Mines", "Zac Mimlitz, Robin Coleman", "Adam Short", "Douglas Van Bossuyt Ph.D.");
+		externalHeader = "SPEARS is made possible by the support of the following open source projects:";
+		externalCredits = "";
 		addCredit("Icons from IconFinder sets:\n"+linkTo("https://www.iconfinder.com/iconsets/sem_labs_icon_pack")+"\n"+linkTo("https://www.iconfinder.com/iconsets/miu"));
 		addCredit("Sound effects clips from freeSFX:\n"+linkTo("http://www.freesfx.co.uk"));
 	}
 	
 	private void initialize(){
 		setTitle("Credits");
-		setSize(300, 300);
 		
 		content = new JPanel();
 		content.setLayout(new BorderLayout(0, 0));
@@ -48,13 +56,13 @@ public class CreditsFrame extends EmbeddedFrame implements HyperlinkListener {
 		creditsTxt = new JTextPane();
 		creditsTxt.setContentType("text/html");
 		creditsTxt.setEditable(false);
-		creditsTxt.setText(String.format("<HTML>%s%s</HTML>", "SPEARS is made possible by the support of the following open source projects:", credit).replace("\n", "<br>"));
+		creditsTxt.setText(String.format("<HTML>%s\n\n%s%s</HTML>", internal, externalHeader, externalCredits).replace("\n", "<br>"));
 		creditsTxt.addHyperlinkListener(this);
 		scroll.setViewportView(creditsTxt);	
 	}
 	
 	private void addCredit(String credit){
-		this.credit += "\n\n" + credit;
+		this.externalCredits += "\n\n" + credit;
 	}
 	
 	private String linkTo(String link){

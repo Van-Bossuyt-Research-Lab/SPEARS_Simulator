@@ -1,33 +1,18 @@
 package com.csm.rover.simulator.ui;
 
-import java.awt.AlphaComposite;
-import java.awt.Composite;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.Toolkit;
 
-import javax.swing.ButtonGroup;
-import javax.swing.Icon;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 
 import java.awt.Color;
 
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
-
-import javax.swing.ImageIcon;
-import javax.swing.JRadioButtonMenuItem;
-
 import com.csm.rover.simulator.ui.desktop.EnbeddedDesktop;
-import com.csm.rover.simulator.ui.frame.CreditsFrame;
-import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
+import com.csm.rover.simulator.ui.events.InternalEventCheckGate;
+import com.csm.rover.simulator.ui.events.InternalEventHandler;
+import com.csm.rover.simulator.ui.events.MenuCommandEvent;
 import com.csm.rover.simulator.ui.menu.EmbeddedMenuBar;
+import com.csm.rover.simulator.ui.sound.SoundPlayer;
+import com.csm.rover.simulator.ui.sound.SpearsSound;
 
 public class Form2 extends JFrame {
 
@@ -47,6 +32,8 @@ public class Form2 extends JFrame {
 		EnbeddedDesktop desktopPane = new EnbeddedDesktop();
 		desktopPane.setBackground(new Color(250, 255, 255));
 		setContentPane(desktopPane);
+		
+		InternalEventHandler.registerInternalListener(InternalEventCheckGate.responseWith(() -> SoundPlayer.playSound(SpearsSound.ERROR)).forAction(MenuCommandEvent.Action.SETTINGS));
 		
 	}
 	
