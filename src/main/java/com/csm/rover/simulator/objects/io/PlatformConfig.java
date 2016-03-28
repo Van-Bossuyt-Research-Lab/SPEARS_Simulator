@@ -44,7 +44,13 @@ public class PlatformConfig implements Serializable {
     }
 
     public Map<String, Double> getPhysicsModelParameters(){
-        return Collections.unmodifiableMap(physics.params);
+        try {
+            return Collections.unmodifiableMap(physics.params);
+        }
+        catch(NullPointerException n){
+            System.out.println("stuff");
+        }
+        return null;
     }
 
     public String getAutonomousModelName(){
@@ -52,12 +58,28 @@ public class PlatformConfig implements Serializable {
     }
 
     public Map<String, Double> getAutonomousModelParameters(){
-        return Collections.unmodifiableMap(autonomous.params);
+        try {
+            return Collections.unmodifiableMap(autonomous.params);
+        }
+        catch(NullPointerException n){
+            System.out.println("more stuff");
+            return null;
+        }
     }
 
     public Map<String, Double> getStateParameters(){
         return Collections.unmodifiableMap(stateParameters);
     }
+
+    public void setPhysicsModelParameters( Map<String,Double> params) {
+        try {
+            physics.params = params;
+        }
+        catch(NullPointerException n){
+            System.out.println("stuff");
+        }
+    }
+
 
     public static class Builder {
 
@@ -109,6 +131,7 @@ public class PlatformConfig implements Serializable {
             return setPhysicsModel(name, null);
         }
 
+
         public Builder setPhysicsModel(String name, Map<String, Double> params){
             PhysicsConfig physics = new PhysicsConfig();
             physics.type = name;
@@ -119,6 +142,7 @@ public class PlatformConfig implements Serializable {
             config.physics = physics;
             return this;
         }
+
 
         public Builder setAutonomousModel(String name){
             return setAutonomousModel(name, null);

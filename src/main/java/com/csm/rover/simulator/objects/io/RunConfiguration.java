@@ -5,8 +5,11 @@ import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -246,7 +249,11 @@ public class RunConfiguration implements Serializable {
 		*/
 		// in.close();
 		ObjectMapper mapper = new ObjectMapper();
-		platforms= mapper.readValue(save, new TypeReference<List<PlatformConfig>>(){});
+		mapper.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		platforms= mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).readValue(save, new TypeReference<List<PlatformConfig>>() {
+		});
+
 
 	}
 
