@@ -89,6 +89,10 @@ public class HiUi3 implements HumanInterfaceAbstraction {
 
 	@Override
 	public void exit() {
+		LOG.log(Level.INFO, "Exiting SPEARS");
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {}
 		System.exit(0);
 	}
 

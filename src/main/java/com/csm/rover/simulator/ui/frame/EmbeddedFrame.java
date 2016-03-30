@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.ui.frame;
 
+import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyVetoException;
@@ -16,6 +17,8 @@ public class EmbeddedFrame extends JInternalFrame {
 	
 	private static final long serialVersionUID = -8256034256255313580L;
 
+	private Dimension openState;
+	
 	public EmbeddedFrame(){
 		setResizable(true);
 		setClosable(true);
@@ -50,6 +53,7 @@ public class EmbeddedFrame extends JInternalFrame {
 						.build());
 			}			
 		});
+		openState = new Dimension(0, 0);
 	}
 	
 	private EmbeddedFrame getThis(){
@@ -102,6 +106,18 @@ public class EmbeddedFrame extends JInternalFrame {
 		try {
 			this.setMaximum(false);
 		} catch (PropertyVetoException e) {}
+	}
+	
+	public void setOpenState(Dimension openState){
+		this.openState = openState;
+	}
+	
+	public void setOpenState(int width, int height){
+		setOpenState(new Dimension(width, height));
+	}
+	
+	public Dimension getOpenState(){
+		return new Dimension(openState);
 	}
 
 }

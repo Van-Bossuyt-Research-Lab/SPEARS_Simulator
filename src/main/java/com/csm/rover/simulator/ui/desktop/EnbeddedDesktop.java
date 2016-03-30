@@ -1,29 +1,22 @@
 package com.csm.rover.simulator.ui.desktop;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Graphics;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.ImageIcon;
-import javax.swing.JDesktopPane;
-
+import com.csm.rover.simulator.ui.ImageFunctions;
+import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
+import com.csm.rover.simulator.ui.events.InternalEventHandler;
+import com.csm.rover.simulator.ui.events.MenuCommandEvent;
+import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
+import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
-import com.csm.rover.simulator.ui.events.MenuCommandEvent;
-import com.csm.rover.simulator.ui.events.InternalEventHandler;
-import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
-import com.csm.rover.simulator.wrapper.Globals;
+import javax.swing.ImageIcon;
+import javax.swing.JDesktopPane;
+import javax.swing.JScrollBar;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EnbeddedDesktop extends JDesktopPane {
 	private static final Logger LOG = LogManager.getLogger(EnbeddedDesktop.class);
@@ -50,7 +43,7 @@ public class EnbeddedDesktop extends JDesktopPane {
 	private void setUpWells(){
 		comps_in_wells = new ArrayList<>();
 		hasImage = true;
-		background = new ImageIcon(getClass().getResource("/images/spears logo.png"));
+		background = ImageFunctions.getImage("/images/spears logo.png");
 		this.addMouseMotionListener(new MouseMotionListener(){
 			@Override
 			public void mouseMoved(MouseEvent e) {
@@ -138,7 +131,8 @@ public class EnbeddedDesktop extends JDesktopPane {
 	private Component being_moved = null;
 	
 	public Component add(EmbeddedFrame frame){
-		frame.setPreferredSize(frame.getSize());
+		frame.setOpenState(frame.getSize());
+		frame.setLocation(getOpeningLocation());
 		frame.addComponentListener(new ComponentAdapter(){
 			@Override
 			public void componentMoved(ComponentEvent e) {
@@ -154,7 +148,10 @@ public class EnbeddedDesktop extends JDesktopPane {
 				.setComponent(frame)
 				.build());
 		frame.setVisible(true);
-		return super.add(frame);
+		Component out = super.add(frame);
+		super.setComponentZOrder(frame, 0);
+		setScrollsToTop(frame.getComponents());
+		return out;
 	}
 	
 	private boolean ignore_this_one = false;
@@ -172,8 +169,9 @@ public class EnbeddedDesktop extends JDesktopPane {
 		}
 		if (frame.getX() < 0 && left_divs > 0){
 			comps_in_wells.add(frame);
-			if (!comps_in_wells.contains(frame))
-				frame.setPreferredSize(frame.getSize());
+			if (!comps_in_wells.contains(frame)){
+				frame.setOpenState(frame.getSize());
+			}
 			frame.setResizable(false);
 			int div = (int)Math.ceil((frame.getY() > 0 ? frame.getY() : 1) /(double)getHeight()*left_divs) - 1;
 			ignore_this_one = true;
@@ -182,8 +180,9 @@ public class EnbeddedDesktop extends JDesktopPane {
 		}
 		else if (frame.getX()+frame.getWidth() > getWidth() && right_divs > 0){
 			comps_in_wells.add(frame);
-			if (!comps_in_wells.contains(frame))
-				frame.setPreferredSize(frame.getSize());
+			if (!comps_in_wells.contains(frame)){
+				frame.setOpenState(frame.getSize());
+			}
 			frame.setResizable(false);
 			int div = (int)Math.ceil((frame.getY() > 0 ? frame.getY() : 1) /(double)getHeight()*right_divs) - 1;
 			ignore_this_one = true;
@@ -193,8 +192,8 @@ public class EnbeddedDesktop extends JDesktopPane {
 		else if (comps_in_wells.contains(frame) && frame.getX() > 2 && frame.getX()+frame.getWidth() < getWidth()-2){
 			comps_in_wells.remove(frame);
 			frame.setResizable(true);
-			int x = (frame.getWidth()-frame.getPreferredSize().width)/2;
-			frame.setSize(frame.getPreferredSize());
+			int x = (frame.getWidth()-frame.getOpenState().width)/2;
+			frame.setSize(frame.getOpenState());
 			frame.setLocation(frame.getX()+x, frame.getY());
 		}
 	}
@@ -211,7 +210,7 @@ public class EnbeddedDesktop extends JDesktopPane {
 				@SuppressWarnings("unchecked")
 				EmbeddedFrame frame = ((Class<? extends EmbeddedFrame>)e.getValue()).newInstance();
 				this.add(frame);
-			} 
+			}
 			catch (InstantiationException | IllegalAccessException | ClassCastException e1) {
 				LOG.log(Level.ERROR, "The new frame could not be added", e1);
 			}	
@@ -237,6 +236,38 @@ public class EnbeddedDesktop extends JDesktopPane {
 			}
 			//TODO reset frames already in divisions
 			break;
+		}
+	}
+	
+	private Point startLocation = new Point(100, 100);
+	
+	private Point getOpeningLocation(){
+		Point out = new Point(startLocation);
+		startLocation = new Point(
+				startLocation.getX()+100 < this.getWidth()-500 ? (int)startLocation.getX()+100 : 100,
+				startLocation.getY()+100 < this.getHeight()-500 ? (int)startLocation.getY()+100 : 100
+				);
+		return out;
+	}
+	
+	private void setScrollsToTop(Component[] comps){
+		for (Component comp : comps){
+			System.out.println("Checking: "+comp.toString());
+			if (comp instanceof JScrollBar){
+				((JScrollBar)comp).setValue(((JScrollBar)comp).getMinimum());
+				System.out.println("Set: "+((JScrollBar)comp).toString() + String.format("  Min: %d  Max: %d  Val: %d", ((JScrollBar)comp).getMinimum(), ((JScrollBar)comp).getMaximum(), ((JScrollBar)comp).getValue()));
+			}
+//			else if (comp instanceof JScrollPane){
+//				JScrollBar vert = ((JScrollPane)comp).getVerticalScrollBar();
+//				vert.setValue(vert.getMinimum());
+//				System.out.println("Set: "+vert.toString() + String.format("  Min: %d  Max: %d  Val: %d", vert.getMinimum(), vert.getMaximum(), vert.getValue()));
+//				JScrollBar horz = ((JScrollPane)comp).getHorizontalScrollBar();
+//				horz.setValue(horz.getMinimum());
+//				System.out.println("Set: "+horz.toString() + String.format("  Min: %d  Max: %d  Val: %d", horz.getMinimum(), horz.getMaximum(), horz.getValue()));
+//			}
+			else if (comp instanceof Container){
+				setScrollsToTop(((Container)comp).getComponents());
+			}
 		}
 	}
 	

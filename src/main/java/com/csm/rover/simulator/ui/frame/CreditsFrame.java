@@ -3,16 +3,14 @@ package com.csm.rover.simulator.ui.frame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 
 @FrameMarker(name="Credits Info")
 public class CreditsFrame extends EmbeddedFrame implements HyperlinkListener {
@@ -30,9 +28,9 @@ public class CreditsFrame extends EmbeddedFrame implements HyperlinkListener {
 		setCredits();
 		initialize();
 		setSize(
-				creditsTxt.getPreferredSize().getWidth() < 500 ? (int)creditsTxt.getPreferredSize().getWidth() : 500,
-				creditsTxt.getPreferredSize().getHeight() < 700 ? (int)creditsTxt.getPreferredSize().getHeight() : 700
-		);
+                creditsTxt.getPreferredSize().getWidth() < 500 ? (int) creditsTxt.getPreferredSize().getWidth() : 500,
+                creditsTxt.getPreferredSize().getHeight() < 700 ? (int) creditsTxt.getPreferredSize().getHeight() : 700
+        );
 	}
 	
 	private void setCredits(){
@@ -58,7 +56,7 @@ public class CreditsFrame extends EmbeddedFrame implements HyperlinkListener {
 		creditsTxt.setEditable(false);
 		creditsTxt.setText(String.format("<HTML>%s\n\n%s%s</HTML>", internal, externalHeader, externalCredits).replace("\n", "<br>"));
 		creditsTxt.addHyperlinkListener(this);
-		scroll.setViewportView(creditsTxt);	
+		scroll.setViewportView(creditsTxt);
 	}
 	
 	private void addCredit(String credit){
