@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.ui.menu;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 import javax.swing.ButtonGroup;
@@ -10,8 +11,11 @@ import javax.swing.JRadioButtonMenuItem;
 
 import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
 import com.csm.rover.simulator.ui.events.EmbeddedFrameListener;
+import com.csm.rover.simulator.ui.events.InternalEventCheckGate;
 import com.csm.rover.simulator.ui.events.InternalEventHandler;
 import com.csm.rover.simulator.ui.events.MenuCommandEvent;
+import com.csm.rover.simulator.ui.sound.SoundPlayer;
+import com.csm.rover.simulator.ui.sound.SpearsSound;
 
 import static com.csm.rover.simulator.ui.ImageFunctions.getMenuIcon;
 
@@ -21,6 +25,7 @@ public class EmbeddedMenuBar extends JMenuBar {
 
 	private JMenu fileMenu, viewMenu, optionsMenu;
 	
+	private JMenu newMenu;
 	private JMenu showMenu;
 	
 	public EmbeddedMenuBar() {
@@ -34,8 +39,10 @@ public class EmbeddedMenuBar extends JMenuBar {
 		this.add(optionsMenu);
 		
 		initialize();
+		
+		createInternalFeedback();
 	}
-	
+
 	public void initialize(){
 		
 		JMenuItem mntmOpen = new JMenuItem("Open Simulation");
@@ -65,15 +72,10 @@ public class EmbeddedMenuBar extends JMenuBar {
 		mntmExit.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.EXIT).setOrigin(e).build()));
 		fileMenu.add(mntmExit);
 		
-		JMenu mnNew = new JMenu("New Window");
-		mnNew.setIcon(getMenuIcon("/gui/user_id.png"));
-		viewMenu.add(mnNew);
-		
-		JMenuItem mntmObserver = new JMenuItem("Observer");
-		mnNew.add(mntmObserver);
-		
-		JMenuItem mntmPuppyPicture = new JMenuItem("Puppy Picture");
-		mnNew.add(mntmPuppyPicture);
+		newMenu = new NewFrameMenu();
+		newMenu.setText("New Window");
+		newMenu.setIcon(getMenuIcon("/gui/user_id.png"));
+		viewMenu.add(newMenu);
 		
 		viewMenu.addSeparator();
 		
@@ -202,6 +204,27 @@ public class EmbeddedMenuBar extends JMenuBar {
 		mntmSettings.setIcon(getMenuIcon("/gui/gear_thick.png"));
 		mntmSettings.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.SETTINGS).setOrigin(e).build()));
 		optionsMenu.add(mntmSettings);
+	}
+	
+	private void createInternalFeedback() {
+		InternalEventHandler.registerInternalListener(InternalEventCheckGate.responseWith(() -> SoundPlayer.playSound(SpearsSound.RINGING_LONG)).forAction(MenuCommandEvent.Action.VOLUME_CHANGE));
+		
+		Component[] menus = new Component[this.getMenuCount()];
+		for (int i = 0; i < menus.length; i++){
+			menus[i] = this.getMenu(i);
+		}
+		addButtonClicks(menus);
+	}
+	
+	private void addButtonClicks(Component[] menus){
+		for (Component menu : menus){
+			if (menu instanceof JMenu){
+				addButtonClicks(((JMenu)menu).getMenuComponents());
+			}
+			else if (menu instanceof JMenuItem){
+				((JMenuItem)menu).addActionListener((ActionEvent) -> SoundPlayer.playSound(SpearsSound.BEEP_LOW));
+			}
+		}
 	}
 
 }

@@ -15,12 +15,18 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
+import com.csm.rover.simulator.ui.events.MenuCommandEvent;
 import com.csm.rover.simulator.ui.events.InternalEventHandler;
 import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
 import com.csm.rover.simulator.wrapper.Globals;
 
 public class EnbeddedDesktop extends JDesktopPane {
+	private static final Logger LOG = LogManager.getLogger(EnbeddedDesktop.class);
 
 	private static final long serialVersionUID = 1092626769481787681L;
 	
@@ -37,9 +43,14 @@ public class EnbeddedDesktop extends JDesktopPane {
 	private boolean on_resize = false, resizing = false;
 	
 	public EnbeddedDesktop(){
+		setUpWells();
+		setUpEventListeners();
+	}
+
+	private void setUpWells(){
 		comps_in_wells = new ArrayList<>();
 		hasImage = true;
-		background = new ImageIcon("C:\\Users\\PHM-Lab1\\Eclipse Workspace\\PHM_System_Simulator_V2\\src\\main\\resources\\images\\spears logo.png");
+		background = new ImageIcon(getClass().getResource("/images/spears logo.png"));
 		this.addMouseMotionListener(new MouseMotionListener(){
 			@Override
 			public void mouseMoved(MouseEvent e) {
@@ -93,8 +104,13 @@ public class EnbeddedDesktop extends JDesktopPane {
 				}
 			}
 		});
-	}
+	}		
 	
+	private void setUpEventListeners() {
+		InternalEventHandler.registerInternalListener((EmbeddedFrameEvent e) -> frameEventHandler(e));
+		InternalEventHandler.registerInternalListener((MenuCommandEvent e) -> menuEventHandler(e));
+	}
+
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -137,6 +153,7 @@ public class EnbeddedDesktop extends JDesktopPane {
 				.setAction(EmbeddedFrameEvent.Action.ADDED)
 				.setComponent(frame)
 				.build());
+		frame.setVisible(true);
 		return super.add(frame);
 	}
 	
@@ -181,14 +198,46 @@ public class EnbeddedDesktop extends JDesktopPane {
 			frame.setLocation(frame.getX()+x, frame.getY());
 		}
 	}
-
-	public void setImage(ImageIcon icon){
-		background = icon;
-		hasImage = icon != null;
+	
+	private void frameEventHandler(EmbeddedFrameEvent e){
+		
 	}
 	
-	public ImageIcon getImage(){
-		return background;
+	@SuppressWarnings("incomplete-switch")
+	private void menuEventHandler(MenuCommandEvent e) {
+		switch (e.getAction()){
+		case NEW_FRAME:
+			try {
+				@SuppressWarnings("unchecked")
+				EmbeddedFrame frame = ((Class<? extends EmbeddedFrame>)e.getValue()).newInstance();
+				this.add(frame);
+			} 
+			catch (InstantiationException | IllegalAccessException | ClassCastException e1) {
+				LOG.log(Level.ERROR, "The new frame could not be added", e1);
+			}	
+			break;
+		case SHOW_FRAME:
+			EmbeddedFrame frame = (EmbeddedFrame) e.getValue();
+			frame.setVisible(true);
+			if (frame.isIcon()){
+				frame.deiconify();
+			}
+			frame.requestFocus();
+			break;
+		case GRID_CHANGE:
+			String newval = (String) e.getValue();
+			if (newval.charAt(0) == 'L'){
+				this.left_divs = Integer.parseInt(newval.charAt(1)+"");
+			}
+			else if (newval.charAt(0) == 'R'){
+				this.right_divs = Integer.parseInt(newval.charAt(1)+"");
+			}
+			else {
+				LOG.log(Level.DEBUG, "The divisions value \"{}\" could not be parsed", newval);
+			}
+			//TODO reset frames already in divisions
+			break;
+		}
 	}
 	
 }

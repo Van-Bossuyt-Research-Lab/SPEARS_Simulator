@@ -5,7 +5,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -15,6 +14,7 @@ import java.net.URL;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+@FrameMarker(name="Credits Info")
 public class CreditsFrame extends EmbeddedFrame implements HyperlinkListener {
 
 	private static final long serialVersionUID = 8884625122423593285L;
