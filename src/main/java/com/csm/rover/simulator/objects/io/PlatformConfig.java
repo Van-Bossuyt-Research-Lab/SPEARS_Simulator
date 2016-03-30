@@ -13,11 +13,12 @@ public class PlatformConfig implements Serializable {
     private String type;
     private String id;
     private String screenName;
-
-    private PhysicsConfig physics;
-    private AutonomousConfig autonomous;
+    private String physicsModelName;
+    private String autonomousModelName;
 
     private Map<String, Double> stateParameters;
+    private Map<String, Double> physicsModelParameters;
+    private Map<String, Double> autonomousModelParameters;
 
     private PlatformConfig(){
         stateParameters = new TreeMap<>();
@@ -40,30 +41,30 @@ public class PlatformConfig implements Serializable {
     }
 
     public String getPhysicsModelName(){
-        return physics.type;
+        return physicsModelName;
     }
 
     public Map<String, Double> getPhysicsModelParameters(){
         try {
-            return Collections.unmodifiableMap(physics.params);
+            return Collections.unmodifiableMap(physicsModelParameters);
         }
         catch(NullPointerException n){
-            System.out.println("stuff");
+            System.out.println("no parameters listed");
         }
-        return null;
+        return Collections.emptyMap();
     }
 
     public String getAutonomousModelName(){
-        return autonomous.type;
+        return autonomousModelName;
     }
 
     public Map<String, Double> getAutonomousModelParameters(){
         try {
-            return Collections.unmodifiableMap(autonomous.params);
+            return Collections.unmodifiableMap(autonomousModelParameters);
         }
         catch(NullPointerException n){
-            System.out.println("more stuff");
-            return null;
+            System.out.println("no parameters listed");
+            return Collections.emptyMap();
         }
     }
 
@@ -72,13 +73,19 @@ public class PlatformConfig implements Serializable {
     }
 
     public void setPhysicsModelParameters( Map<String,Double> params) {
-        try {
-            physics.params = params;
-        }
-        catch(NullPointerException n){
-            System.out.println("stuff");
-        }
+            if (params == null){
+                throw new NullPointerException("Parameters cannot be null");
+            }
+            this.physicsModelParameters = params;
     }
+
+    public void setAutonomousModelParameters( Map<String,Double> params) {
+        if (params == null){
+            throw new NullPointerException("Parameters cannot be null");
+        }
+        this.autonomousModelParameters = params;
+    }
+
 
 
     public static class Builder {
@@ -100,10 +107,10 @@ public class PlatformConfig implements Serializable {
             if (config.id == null){
                 missing += " ID";
             }
-            if (config.physics == null){
+            if (config.physicsModelName == null || config.physicsModelParameters == null){
                 missing += " PhysicsModel";
             }
-            if (config.autonomous == null) {
+            if (config.autonomousModelName == null || config.autonomousModelParameters == null) {
                 missing += " AutonomousModel";
             }
             if (!missing.equals("")){
@@ -127,35 +134,49 @@ public class PlatformConfig implements Serializable {
             return this;
         }
 
-        public Builder setPhysicsModel(String name){
-            return setPhysicsModel(name, null);
+        public Builder setPhysicsModelName(String name) {config.physicsModelName = name; return this;}
+
+        public Builder setPhysicsModelParameters(Map<String, Double> params){
+            if (params == null){
+                params = new TreeMap<String, Double>();
+            }
+            config.physicsModelParameters = params;
+            return this;
+        }
+
+        public Builder setPhysicsModel(String name){return setPhysicsModel(name, null);
         }
 
 
         public Builder setPhysicsModel(String name, Map<String, Double> params){
-            PhysicsConfig physics = new PhysicsConfig();
-            physics.type = name;
             if (params == null){
                 params = new TreeMap<String, Double>();
             }
-            physics.params = params;
-            config.physics = physics;
+            config.physicsModelName = name;
+            config.physicsModelParameters = params;
             return this;
         }
 
+        public Builder setAutonomousModelName(String name) {config.autonomousModelName = name; return this;}
+
+        public Builder setAutonomousModelParameters(Map<String, Double> params){
+            if (params == null){
+                params = new TreeMap<String, Double>();
+            }
+            config.autonomousModelParameters= params;
+            return this;
+        }
 
         public Builder setAutonomousModel(String name){
             return setAutonomousModel(name, null);
         }
 
         public Builder setAutonomousModel(String name, Map<String, Double> params){
-            AutonomousConfig autonomous = new AutonomousConfig();
-            autonomous.type = name;
             if (params == null){
                 params = new TreeMap<String, Double>();
             }
-            autonomous.params = params;
-            config.autonomous = autonomous;
+            config.autonomousModelName = name;
+            config.autonomousModelParameters = params;
             return this;
         }
 
@@ -166,14 +187,3 @@ public class PlatformConfig implements Serializable {
 
     }
 }
-
-class PhysicsConfig {
-    String type;
-    Map<String, Double> params;
-}
-
-class AutonomousConfig {
-    String type;
-    Map<String, Double> params;
-}
-

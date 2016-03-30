@@ -227,7 +227,6 @@ public class RunConfiguration implements Serializable {
 					pc.setPhysicsModel(physics, physicsMap);
 					pc.setAutonomousModel(autos, autoMap);
 					platforms.add(pc.build());
-					System.out.println("built shit");
 					break;
 			}
 			}
@@ -251,8 +250,34 @@ public class RunConfiguration implements Serializable {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		platforms= mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).readValue(save, new TypeReference<List<PlatformConfig>>() {
+		platforms= mapper.readValue(save, new TypeReference<List<PlatformConfig>>() {
 		});
+		ArrayList<String> rovername = new ArrayList<String>();
+		ArrayList<String> rovertag = new ArrayList<String>();
+		ArrayList<String> satname = new ArrayList<String>();
+		ArrayList<String> sattag = new ArrayList<String>();
+		for(int i =0; i<platforms.size();i++){
+			if(platforms.get(i).getType() == "Rover"){
+				rovername.add(platforms.get(i).getScreenName());
+				rovertag.add(platforms.get(i).getID());
+			}
+			if(platforms.get(i).getType() == "Satellite"){
+				satname.add(platforms.get(i).getScreenName());
+				sattag.add(platforms.get(i).getID());
+			}
+		}
+		namesAndTags = new NamesAndTags(rovername,rovertag,satname,sattag);
+		mapDetail = 3;
+		mapFromFile = false;
+		mapRough = 1;
+		mapSize = 50;
+		targetDensity = 0.5;
+		hazardDensity = 0.5;
+		monoTargets = false;
+		monoHazards = false;
+		accelerated = false;
+		runtime = 50;
+
 
 
 	}
@@ -319,8 +344,7 @@ public class RunConfiguration implements Serializable {
 		*/
 
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.writerWithDefaultPrettyPrinter();
-		mapper.writeValue(file, platforms);
+		mapper.writerWithDefaultPrettyPrinter().writeValue(file, platforms);
 
 
 	}

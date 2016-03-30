@@ -1,1 +1,48 @@
-[{"type":"Satellite","id":"s1","screenName":"Default 1","stateParameters":{},"physicsModelName":"Default","physicsModelParameters":{},"autonomousModelName":"Default","autonomousModelParameters":{}},{"type":"Satellite","id":"s2","screenName":"Default 2","stateParameters":{},"physicsModelName":"Default","physicsModelParameters":{},"autonomousModelName":"Default","autonomousModelParameters":{}},{"type":"Rover","id":"r1","screenName":"NULL 1","stateParameters":{},"physicsModelName":"Default","physicsModelParameters":{},"autonomousModelName":"NULL","autonomousModelParameters":{}},{"type":"Rover","id":"r2","screenName":"Generic 1","stateParameters":{},"physicsModelName":"Default","physicsModelParameters":{},"autonomousModelName":"Generic","autonomousModelParameters":{"sec":33.0}}]
+[ {
+  "type" : "Satellite",
+  "id" : "s1",
+  "screenName" : "Default 1",
+  "physicsModelName" : "Default",
+  "autonomousModelName" : "Default",
+  "stateParameters" : { },
+  "physicsModelParameters" : { },
+  "autonomousModelParameters" : { }
+}, {
+  "type" : "Satellite",
+  "id" : "s2",
+  "screenName" : "Default 2",
+  "physicsModelName" : "Default",
+  "autonomousModelName" : "Default",
+  "stateParameters" : { },
+  "physicsModelParameters" : { },
+  "autonomousModelParameters" : { }
+}, {
+  "type" : "Rover",
+  "id" : "r1",
+  "screenName" : "NULL 1",
+  "physicsModelName" : "Default",
+  "autonomousModelName" : "NULL",
+  "stateParameters" : { },
+  "physicsModelParameters" : { },
+  "autonomousModelParameters" : { }
+}, {
+  "type" : "Rover",
+  "id" : "r2",
+  "screenName" : "NULL 2",
+  "physicsModelName" : "Default",
+  "autonomousModelName" : "NULL",
+  "stateParameters" : { },
+  "physicsModelParameters" : { },
+  "autonomousModelParameters" : { }
+}, {
+  "type" : "Rover",
+  "id" : "r3",
+  "screenName" : "Generic 1",
+  "physicsModelName" : "Default",
+  "autonomousModelName" : "Generic",
+  "stateParameters" : { },
+  "physicsModelParameters" : { },
+  "autonomousModelParameters" : {
+    "sec" : 33.0
+  }
+} ]
