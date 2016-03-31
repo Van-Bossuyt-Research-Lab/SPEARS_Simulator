@@ -1,9 +1,26 @@
 package com.csm.rover.simulator.objects.io;
 
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.rover.RoverObject;
+import com.csm.rover.simulator.platforms.rover.RoverState;
+import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
+import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
+import com.csm.rover.simulator.platforms.satellite.SatelliteAutonomousCode;
+import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
+import com.csm.rover.simulator.platforms.satellite.SatelliteParametersList;
+import com.csm.rover.simulator.platforms.satellite.SatelliteState;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 
 public class RunConfiguration implements Serializable {
 	
@@ -14,6 +31,8 @@ public class RunConfiguration implements Serializable {
 	public boolean mapFromFile;
 	public NamesAndTags namesAndTags;
 	public ArrayList<PlatformConfig> platforms;
+	public ArrayList<RoverObject> rovers;
+	public ArrayList<SatelliteObject> satellites;
 	public File mapFile;
 	public double mapRough;
 	public int mapSize;
@@ -63,12 +82,122 @@ public class RunConfiguration implements Serializable {
 	}
 	
 	public RunConfiguration(File save) throws Exception {
+		/*
 		ObjectInputStream in = new ObjectInputStream(new FileInputStream(save.getAbsolutePath()));
 		RunConfiguration input = (RunConfiguration) in.readObject();
 		if (!this.fileCode.equals(input.fileCode)){
 			in.close();
 			throw new Exception("Invalid File Version");
 		}
+		*/
+		JsonFactory f = new JsonFactory();
+		JsonParser jp = f.createParser(save);
+		NamesAndTags NT = new NamesAndTags();
+		jp.nextToken();
+		while (jp.nextToken() != JsonToken.END_OBJECT) {
+			String fieldname = jp.getCurrentName();
+			jp.nextToken();
+				while(jp.nextToken() != JsonToken.END_OBJECT){
+					String namefield = jp.getCurrentName();
+					jp.nextToken();
+
+					if("Map".equals(namefield)){
+						mapFromFile = jp.readValueAs(boolean.class);
+						File fle = new File(jp.getValueAsString());
+						mapFile = fle;
+						mapRough = jp.readValueAs(double.class);
+						mapDetail = jp.readValueAs(int.class);
+						mapSize = jp.readValueAs(int.class);
+
+
+					}
+					if("TargetHazard".equals(namefield)){
+						monoTargets = jp.readValueAs(boolean.class);
+						monoHazards = jp.readValueAs(boolean.class);
+						targetDensity = jp.readValueAs(double.class);
+						hazardDensity = jp.readValueAs(double.class);
+					}
+					if("PlatformConfig".equals(namefield)){
+						PlatformConfig pc = new PlatformConfig();
+						Iterator<String> ID = new Iterator<String>() {
+							@Override
+							public boolean hasNext() {
+								return false;
+							}
+
+							@Override
+							public String next() {
+								return null;
+							}
+						};
+						Iterator<String> names = new Iterator<String>() {
+							@Override
+							public boolean hasNext() {
+								return false;
+							}
+
+							@Override
+							public String next() {
+								return null;
+							}
+						};
+						Iterator<String> types = new Iterator<String>() {
+							@Override
+							public boolean hasNext() {
+								return false;
+							}
+
+							@Override
+							public String next() {
+								return null;
+							}
+						};
+						Iterator<String> physics = new Iterator<String>() {
+							@Override
+							public boolean hasNext() {
+								return false;
+							}
+
+							@Override
+							public String next() {
+								return null;
+							}
+						};
+						Iterator<String> autos = new Iterator<String>() {
+							@Override
+							public boolean hasNext() {
+								return false;
+							}
+
+							@Override
+							public String next() {
+								return null;
+							}
+						};
+						ID = jp.readValuesAs(String.class);
+						names = jp.readValuesAs(String.class);
+						types = jp.readValuesAs(String.class);
+						physics = jp.readValuesAs(String.class);
+						autos = jp.readValuesAs(String.class);
+						while (names.hasNext()){
+							pc = PlatformConfig.builder().setID(ID.next())
+									.setScreenName(names.next())
+									.setType(types.next())
+									.setPhysicsModel(physics.next())
+									.setAutonomousModel(autos.next())
+									.build();
+							platforms.add(pc);
+							ID.remove();
+							names.remove();
+							types.remove();
+							physics.remove();
+							autos.remove();
+						}
+					}
+				}
+			}
+		jp.close();
+		/*
 		this.mapFromFile = input.mapFromFile;
 		this.namesAndTags = input.namesAndTags;
 		this.platforms = input.platforms;
@@ -82,13 +211,74 @@ public class RunConfiguration implements Serializable {
 		this.hazardDensity = input.hazardDensity;
 		this.accelerated = input.accelerated;
 		this.runtime = input.runtime;
-		in.close();
+		*/
+		// in.close();
 	}
 
 	public void Save(File file) throws Exception {
+		/*
 		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file.getAbsolutePath()));
 		out.writeObject(this);
 		out.close();
+		*/
+		JsonFactory f = new JsonFactory();
+		JsonGenerator g = f.createGenerator(new File("jtest.json"), JsonEncoding.UTF8);
+		g.writeStartObject();
+		g.writeObjectFieldStart("Runtime");
+		g.writeNumberField("Runtime",runtime);
+		g.writeBooleanField("acclelerated", accelerated);
+		g.writeEndObject();
+		g.writeStartObject();
+		g.writeObjectFieldStart("Map");
+		g.writeBooleanField("RunFromFile",mapFromFile);
+		g.writeFieldName("mapFile");
+		g.writeString(mapFile.toString());
+		g.writeNumberField("mapRough", mapRough);
+		g.writeNumberField("mapDetail", mapDetail);
+		g.writeNumberField("mapSize", mapSize);
+		g.writeEndObject();
+		g.writeStartObject();
+		g.writeObjectFieldStart("TargetHazard");
+		g.writeBooleanField("monoTargets",monoTargets);
+		g.writeBooleanField("(monoHazards", monoHazards);
+		g.writeNumberField("targetDensity", targetDensity);
+		g.writeNumberField("hazardDensity", hazardDensity);
+		g.writeEndObject();
+		g.writeStartObject();;
+		g.writeObjectFieldStart("PlatformConfig");
+		g.writeFieldName("ID");
+		g.writeStartArray();
+		for(int j=0; j<platforms.size(); j++){
+			g.writeString(platforms.get(j).getID());
+		}
+		g.writeEndArray();
+		g.writeFieldName("screenName");
+		g.writeStartArray();
+		for(int j=0; j<platforms.size(); j++){
+			g.writeString(platforms.get(j).getScreenName());
+		}
+		g.writeEndArray();
+		g.writeFieldName("Type");
+		g.writeStartArray();
+		for(int j=0; j<platforms.size(); j++){
+			g.writeString(platforms.get(j).getType());
+		}
+		g.writeEndArray();
+		g.writeFieldName("PhysicsConfig");
+		g.writeStartArray();
+		for(int j=0; j<platforms.size(); j++){
+			g.writeString(platforms.get(j).getPhysicsModelName());
+		}
+		g.writeEndArray();
+		g.writeFieldName("AutonomousConfig");
+		g.writeStartArray();
+		for(int j=0; j<platforms.size(); j++){
+			g.writeString(platforms.get(j).getAutonomousModelName());
+		}
+		g.writeEndArray();
+		g.writeEndObject();
+
+		g.close();
 	}
 
 	public ArrayList<PlatformConfig> getPlatforms(String type){
