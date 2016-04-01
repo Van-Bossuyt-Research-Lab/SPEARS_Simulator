@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.platforms;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -9,6 +10,8 @@ public abstract class Platform {
     private static final Logger LOG = LogManager.getLogger(Platform.class);
 
     protected final String platform_type;
+
+    protected PlatformEnvironment environment;
 
     protected PlatformAutonomousCodeModel autonomousCodeModel;
     protected PlatformPhysicsModel physicsModel;
@@ -22,6 +25,10 @@ public abstract class Platform {
 
     public final String getType(){
         return platform_type;
+    }
+
+    public void setEnvironment(PlatformEnvironment enviro){
+        this.environment = enviro;
     }
 
     @SuppressWarnings("unchecked")
