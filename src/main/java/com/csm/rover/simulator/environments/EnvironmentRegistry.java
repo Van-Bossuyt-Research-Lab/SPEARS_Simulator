@@ -1,17 +1,13 @@
 package com.csm.rover.simulator.environments;
 
 import com.csm.rover.simulator.environments.annotations.Environment;
-import com.csm.rover.simulator.platforms.Platform;
-import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
-import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
-import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
-import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
+import com.csm.rover.simulator.environments.annotations.Modifier;
+import com.csm.rover.simulator.environments.annotations.Populator;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class EnvironmentRegistry {
@@ -46,14 +42,14 @@ public class EnvironmentRegistry {
     }
 
     private void doFillRegistry(){
-        LOG.log(Level.INFO, "Initializing Platform Registry");
+        LOG.log(Level.INFO, "Initializing Environment Registry");
         Reflections reflect = new Reflections("com.csm.rover.simulator");
 
         fillEnvironments(reflect);
         fillModifiers(reflect);
         fillPopulators(reflect);
 
-        LOG.log(Level.INFO, "Platform Registration Complete");
+        LOG.log(Level.INFO, "Environment Registration Complete");
     }
 
     private void fillEnvironments(Reflections reflect){
@@ -93,204 +89,196 @@ public class EnvironmentRegistry {
 
     private void fillModifiers(Reflections reflect){
         for (String type : environments.keySet()){
-            autoModels.put(type, new TreeMap<String, String>());
-            autoModelParameters.put(type, new TreeMap<String, String[]>());
+            modifiers.put(type, new TreeMap<String, String>());
+            modifierParameters.put(type, new TreeMap<String, String[]>());
         }
 
-        Set<Class<? extends PlatformAutonomousCodeModel>> classautos = reflect.getSubTypesOf(PlatformAutonomousCodeModel.class);
-        Set<Class<?>> labelautos = reflect.getTypesAnnotatedWith(com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel.class);
-        List<Set<?>> sortedSets = sortSets(classautos, labelautos);
+        Set<Class<? extends EnvironmentModifier>> classmods = reflect.getSubTypesOf(EnvironmentModifier.class);
+        Set<Class<?>> labelmods = reflect.getTypesAnnotatedWith(com.csm.rover.simulator.environments.annotations.Modifier.class);
+        List<Set<?>> sortedSets = sortSets(classmods, labelmods);
         @SuppressWarnings("unchecked")
         Set<Class<?>> warnset1 = (Set<Class<?>>)sortedSets.get(0);
         for (Class<?> clazz : warnset1){
-            LOG.log(Level.WARN, "{} extends PlatformAutonomousCodeModel but is not registered as an AutonomousCodeModel", clazz.toString());
+            LOG.log(Level.WARN, "{} extends EnvironmentModifier but is not registered as an Modifier", clazz.toString());
         }
         @SuppressWarnings("unchecked")
         Set<Class<?>> warnset2 = (Set<Class<?>>)sortedSets.get(2);
         for (Class<?> clazz : warnset2){
-            LOG.log(Level.WARN, "{} is a registered AutonomousCodeModel but does not extend PlatformAutonomousCodeModel", clazz.toString());
+            LOG.log(Level.WARN, "{} is a registered Modifier but does not extend EnvironmentModifier", clazz.toString());
         }
 
         @SuppressWarnings("unchecked")
-        Set<Class<? extends PlatformAutonomousCodeModel>> realautos = (Set<Class<? extends PlatformAutonomousCodeModel>>)sortedSets.get(1);
-        for (Class<? extends PlatformAutonomousCodeModel> auto : realautos){
-            AutonomousCodeModel annotation = auto.getAnnotation(AutonomousCodeModel.class);
+        Set<Class<? extends EnvironmentModifier>> realmods = (Set<Class<? extends EnvironmentModifier>>)sortedSets.get(1);
+        for (Class<? extends EnvironmentModifier> mod : realmods){
+            Modifier annotation = mod.getAnnotation(com.csm.rover.simulator.environments.annotations.Modifier.class);
             String type = annotation.type();
             String name = annotation.name();
             String[] params = annotation.parameters();
-            String clazz = getClassPath(auto);
-            if (Modifier.isAbstract(auto.getModifiers())){
-                LOG.log(Level.DEBUG, "Abstract parent model {} is ignored", auto.toString());
-                continue;
-            }
-            if (autoModels.keySet().contains(type)){
+            String clazz = getClassPath(mod);
+            if (modifiers.keySet().contains(type)){
                 try {
-                    auto.newInstance();
-                    autoModels.get(type).put(name, clazz);
-                    autoModelParameters.get(type).put(name, params);
+                    mod.newInstance();
+                    modifiers.get(type).put(name, clazz);
+                    modifierParameters.get(type).put(name, params);
                 }
                 catch (InstantiationException | IllegalAccessException e) {
-                    LOG.log(Level.WARN, "{} does not have a default constructor. Parameters should be set using constructParameters()", auto.toString());
+                    LOG.log(Level.WARN, "{} does not have a default constructor", mod.toString());
                 }
             }
             else {
-                LOG.log(Level.WARN, "AutonomousCodeModel {} has type {} which is not a recognized platform", clazz, type);
+                LOG.log(Level.WARN, "Modifier {} has type {} which is not a recognized platform", clazz, type);
             }
         }
-        for (String type : autoModels.keySet()){
-            if (autoModels.get(type).size() == 0){
-                LOG.log(Level.WARN, "Found no AutonomousCodeModels for platform type {}", type);
+        for (String type : modifiers.keySet()){
+            if (modifiers.get(type).size() == 0){
+                LOG.log(Level.WARN, "Found no Modifiers for platform type {}", type);
             }
             else {
-                LOG.log(Level.INFO, "For platform type {} found AutonomousCodeModels: {}", type, autoModels.get(type).toString());
+                LOG.log(Level.INFO, "For platform type {} found Modifiers: {}", type, modifiers.get(type).toString());
             }
         }
     }
 
-    private void fillPhysicsModels(Reflections reflect){
-        for (String type : platforms.keySet()){
-            physicsModels.put(type, new TreeMap<String, String>());
-            physicsModelParameters.put(type, new TreeMap<String, String[]>());
+    private void fillPopulators(Reflections reflect){
+        for (String type : environments.keySet()){
+            populators.put(type, new TreeMap<String, String>());
+            populatorParameters.put(type, new TreeMap<String, String[]>());
         }
 
-        Set<Class<? extends PlatformPhysicsModel>> classphysics = reflect.getSubTypesOf(PlatformPhysicsModel.class);
-        Set<Class<?>> labelphysics = reflect.getTypesAnnotatedWith(com.csm.rover.simulator.platforms.annotations.PhysicsModel.class);
-        List<Set<?>> sortedSets = sortSets(classphysics, labelphysics);
+        Set<Class<? extends EnvironmentPopulator>> classpops = reflect.getSubTypesOf(EnvironmentPopulator.class);
+        Set<Class<?>> labelpops = reflect.getTypesAnnotatedWith(Populator.class);
+        List<Set<?>> sortedSets = sortSets(classpops, labelpops);
         @SuppressWarnings("unchecked")
         Set<Class<?>> warnset1 = (Set<Class<?>>)sortedSets.get(0);
         for (Class<?> clazz : warnset1){
-            LOG.log(Level.WARN, "{} extends PlatformPhysicsModel but is not registered as a PhysicsModel", clazz.toString());
+            LOG.log(Level.WARN, "{} extends EnvironmentPopulator but is not registered as a Populator", clazz.toString());
         }
         @SuppressWarnings("unchecked")
         Set<Class<?>> warnset2 = (Set<Class<?>>)sortedSets.get(2);
         for (Class<?> clazz : warnset2){
-            LOG.log(Level.WARN, "{} is a registered PhysicsModel but does not extend PlatformPhysicsModel", clazz.toString());
+            LOG.log(Level.WARN, "{} is a registered Populator but does not extend EnvironmentPopulator", clazz.toString());
         }
 
         @SuppressWarnings("unchecked")
-        Set<Class<? extends PlatformPhysicsModel>> realphysics = (Set<Class<? extends PlatformPhysicsModel>>)sortedSets.get(1);
-        for (Class<? extends PlatformPhysicsModel> physic : realphysics){
-            PhysicsModel annotation = physic.getAnnotation(PhysicsModel.class);
+        Set<Class<? extends EnvironmentPopulator>> realpops = (Set<Class<? extends EnvironmentPopulator>>)sortedSets.get(1);
+        for (Class<? extends EnvironmentPopulator> pop : realpops){
+            Populator annotation = pop.getAnnotation(Populator.class);
             String type = annotation.type();
             String name = annotation.name();
             String[] params = annotation.parameters();
-            String clazz = getClassPath(physic);
-            if (Modifier.isAbstract(physic.getModifiers())){
-                LOG.log(Level.DEBUG, "Abstract parent model {} is ignored", physic.toString());
-                continue;
-            }
-            if (physicsModels.keySet().contains(type)){
+            String clazz = getClassPath(pop);
+            if (populators.keySet().contains(type)){
                 try {
-                    physic.newInstance();
-                    physicsModels.get(type).put(name, clazz);
-                    physicsModelParameters.get(type).put(name, params);
+                    pop.newInstance();
+                    populators.get(type).put(name, clazz);
+                    populatorParameters.get(type).put(name, params);
                 }
                 catch (InstantiationException | IllegalAccessException e) {
-                    LOG.log(Level.WARN, "{} does not have a default constructor. Parameters should be set using constructParameters()", physic.toString());
+                    LOG.log(Level.WARN, "{} does not have a default constructor", pop.toString());
                 }
             }
             else {
-                LOG.log(Level.WARN, "PhysicsModel {} has type {} which is not a recognized platform", clazz, type);
+                LOG.log(Level.WARN, "Populator {} has type {} which is not a recognized platform", clazz, type);
             }
         }
-        for (String type : autoModels.keySet()){
-            if (physicsModels.get(type).size() == 0){
-                LOG.log(Level.WARN, "Found no PhysicsModels for platform type {}", type);
+        for (String type : populators.keySet()){
+            if (populators.get(type).size() == 0){
+                LOG.log(Level.WARN, "Found no Populators for platform type {}", type);
             }
             else {
-                LOG.log(Level.INFO, "For platform type {} found PhysicsModels: {}", type, physicsModels.get(type).toString());
+                LOG.log(Level.INFO, "For platform type {} found Populators: {}", type, populators.get(type).toString());
             }
         }
     }
 
-    public static Class<? extends Platform> getPlatform(String type){
+    public static Class<? extends PlatformEnvironment> getEnvironment(String type){
         checkInitialized();
-        return instance.get().doGetPlatform(type);
+        return instance.get().doGetEnvironment(type);
     }
 
     @SuppressWarnings("unchecked")
-    private Class<? extends Platform> doGetPlatform(String type){
-        if (platforms.keySet().contains(type)){
+    private Class<? extends PlatformEnvironment> doGetEnvironment(String type){
+        if (environments.keySet().contains(type)){
             try {
-                return (Class<? extends Platform>)Class.forName(platforms.get(type));
+                return (Class<? extends PlatformEnvironment>)Class.forName(environments.get(type));
             }
             catch (ClassNotFoundException | ClassCastException e){
-                LOG.log(Level.ERROR, "Registry failed to properly load class " + platforms.get(type) + " for Platform " + type, e);
+                LOG.log(Level.ERROR, "Registry failed to properly load class " + environments.get(type) + " for Environment " + type, e);
                 return null;
             }
         }
         else {
-            LOG.log(Level.ERROR, "The Platform \"{}\" is not registered and cannot be returned", type);
+            LOG.log(Level.ERROR, "The Environment \"{}\" is not registered and cannot be returned", type);
             return null;
         }
     }
 
-    public static Class<? extends PlatformAutonomousCodeModel> getAutonomousCodeModel(String type, String name){
+    public static Class<? extends EnvironmentModifier> getModifier(String type, String name){
         checkInitialized();
-        return instance.get().doGetAutonomousCodeModel(type, name);
+        return instance.get().doGetModifier(type, name);
     }
 
     @SuppressWarnings("unchecked")
-    private Class<? extends PlatformAutonomousCodeModel> doGetAutonomousCodeModel(String type, String name){
-        if (platforms.keySet().contains(type)){
-            Map<String, String> models = autoModels.get(type);
+    private Class<? extends EnvironmentModifier> doGetModifier(String type, String name){
+        if (environments.keySet().contains(type)){
+            Map<String, String> models = modifiers.get(type);
             if (models.keySet().contains(name)) {
                 try {
-                    return (Class<? extends PlatformAutonomousCodeModel>) Class.forName(models.get(name));
+                    return (Class<? extends EnvironmentModifier>) Class.forName(models.get(name));
                 }
                 catch (ClassNotFoundException | ClassCastException e) {
-                    LOG.log(Level.ERROR, "Registry failed to properly load class " + autoModels.get(type) + " for AutonomousCodeModel " + type + "." + name, e);
+                    LOG.log(Level.ERROR, "Registry failed to properly load class " + modifiers.get(type) + " for Modifier " + type + "." + name, e);
                     return null;
                 }
             }
             else {
-                LOG.log(Level.ERROR, "The AutonomousCodeModel \"{}\" for platform \"{}\" is not registered and cannot be returned", name, type);
+                LOG.log(Level.ERROR, "The Modifier \"{}\" for environment \"{}\" is not registered and cannot be returned", name, type);
                 return null;
             }
         }
         else {
-            LOG.log(Level.ERROR, "The Platform \"{}\" is not registered and cannot be requested", type);
+            LOG.log(Level.ERROR, "The Environment \"{}\" is not registered and cannot be requested", type);
             return null;
         }
     }
 
-    public static Class<? extends PlatformPhysicsModel> getPhysicsModel(String type, String name){
+    public static Class<? extends EnvironmentPopulator> getPopulator(String type, String name){
         checkInitialized();
-        return instance.get().doGetPhysicsModel(type, name);
+        return instance.get().doGetPopulator(type, name);
     }
 
     @SuppressWarnings("unchecked")
-    private Class<? extends PlatformPhysicsModel> doGetPhysicsModel(String type, String name){
-        if (platforms.keySet().contains(type)){
-            Map<String, String> models = physicsModels.get(type);
+    private Class<? extends EnvironmentPopulator> doGetPopulator(String type, String name){
+        if (environments.keySet().contains(type)){
+            Map<String, String> models = populators.get(type);
             if (models.keySet().contains(name)) {
                 try {
-                    return (Class<? extends PlatformPhysicsModel>) Class.forName(models.get(name));
+                    return (Class<? extends EnvironmentPopulator>) Class.forName(models.get(name));
                 }
                 catch (ClassNotFoundException | ClassCastException e) {
-                    LOG.log(Level.ERROR, "Registry failed to properly load class " + autoModels.get(type) + " for PhysicsModel " + type + "." + name, e);
+                    LOG.log(Level.ERROR, "Registry failed to properly load class " + populators.get(type) + " for Populator " + type + "." + name, e);
                     return null;
                 }
             }
             else {
-                LOG.log(Level.ERROR, "The PhysicsModel \"{}\" for platform \"{}\" is not registered and cannot be returned", name, type);
+                LOG.log(Level.ERROR, "The Populator \"{}\" for environment \"{}\" is not registered and cannot be returned", name, type);
                 return null;
             }
         }
         else {
-            LOG.log(Level.ERROR, "The Platform \"{}\" is not registered and cannot be requested", type);
+            LOG.log(Level.ERROR, "The Environment \"{}\" is not registered and cannot be requested", type);
             return null;
         }
     }
 
-    public static List<String> listPhysicsModels(String type){
+    public static List<String> listPopulators(String type){
         checkInitialized();
-        return instance.get().doListPhysicsModels(type);
+        return instance.get().doListPopulators(type);
     }
 
-    private List<String> doListPhysicsModels(String type){
-        if (physicsModels.keySet().contains(type)){
-            return new ArrayList<>(physicsModels.get(type).keySet());
+    private List<String> doListPopulators(String type){
+        if (populators.keySet().contains(type)){
+            return new ArrayList<>(populators.get(type).keySet());
         }
         else {
             LOG.log(Level.ERROR, "Requested type \"{}\" is not registered", type);
@@ -298,14 +286,14 @@ public class EnvironmentRegistry {
         }
     }
 
-    public static List<String> listAutonomousCodeModels(String type){
+    public static List<String> listModifiers(String type){
         checkInitialized();
-        return instance.get().doListAutonomousCodeModels(type);
+        return instance.get().doListModifiers(type);
     }
 
-    private List<String> doListAutonomousCodeModels(String type){
-        if (autoModels.keySet().contains(type)){
-            return new ArrayList<>(autoModels.get(type).keySet());
+    private List<String> doListModifiers(String type){
+        if (modifiers.keySet().contains(type)){
+            return new ArrayList<>(modifiers.get(type).keySet());
         }
         else {
             LOG.log(Level.ERROR, "Requested type \"{}\" is not registered", type);
@@ -313,18 +301,18 @@ public class EnvironmentRegistry {
         }
     }
 
-    public static List<String> getParametersForAutonomousCodeModel(String type, String name){
+    public static List<String> getParametersForModifier(String type, String name){
         checkInitialized();
-        return instance.get().doGetParametersForAutonomousCodeModel(type, name);
+        return instance.get().doGetParametersForModifier(type, name);
     }
 
-    private List<String> doGetParametersForAutonomousCodeModel(String type, String name){
-        if (autoModelParameters.keySet().contains(type)){
-            if (autoModelParameters.get(type).keySet().contains(name)){
-                return Arrays.asList(autoModelParameters.get(type).get(name));
+    private List<String> doGetParametersForModifier(String type, String name){
+        if (modifierParameters.keySet().contains(type)){
+            if (modifierParameters.get(type).keySet().contains(name)){
+                return Arrays.asList(modifierParameters.get(type).get(name));
             }
             else {
-                LOG.log(Level.ERROR, "Requested type autonomous code model \"{}\" of type {} is not registered", name, type);
+                LOG.log(Level.ERROR, "Requested Modifier \"{}\" of type {} is not registered", name, type);
                 return null;
             }
         }
@@ -334,18 +322,18 @@ public class EnvironmentRegistry {
         }
     }
 
-    public static List<String> getParametersForPhysicsModel(String type, String name){
+    public static List<String> getParametersForPopulator(String type, String name){
         checkInitialized();
-        return instance.get().doGetParametersForPhysicsModel(type, name);
+        return instance.get().doGetParametersForPopulator(type, name);
     }
 
-    private List<String> doGetParametersForPhysicsModel(String type, String name){
-        if (physicsModelParameters.keySet().contains(type)){
-            if (physicsModelParameters.get(type).keySet().contains(name)){
-                return Arrays.asList(physicsModelParameters.get(type).get(name));
+    private List<String> doGetParametersForPopulator(String type, String name){
+        if (populatorParameters.keySet().contains(type)){
+            if (populatorParameters.get(type).keySet().contains(name)){
+                return Arrays.asList(populatorParameters.get(type).get(name));
             }
             else {
-                LOG.log(Level.ERROR, "Requested type physics model \"{}\" of type {} is not registered", name, type);
+                LOG.log(Level.ERROR, "Requested Populator \"{}\" of type {} is not registered", name, type);
                 return null;
             }
         }

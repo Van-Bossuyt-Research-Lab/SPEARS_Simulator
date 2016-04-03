@@ -1,5 +1,7 @@
 package com.csm.rover.simulator.platforms;
 
+import com.csm.rover.simulator.environments.EnvironmentRegistry;
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import org.apache.logging.log4j.Level;
@@ -48,6 +50,24 @@ public class PlatformRegistry {
         fillPhysicsModels(reflect);
 
         LOG.log(Level.INFO, "Platform Registration Complete");
+
+        EnvironmentRegistry.fillRegistry();
+
+        compareToEnvironment();
+    }
+
+    private void compareToEnvironment() {
+        LOG.log(Level.INFO, "Initializing Registry Comparison");
+        for (String platform : platforms.keySet()){
+            Class<? extends PlatformEnvironment> enviro = EnvironmentRegistry.getEnvironment(platform);
+            if (enviro == null){
+                LOG.log(Level.WARN, "No environment found corresponding to Platform type {}", platform);
+            }
+            else {
+                LOG.log(Level.INFO, "Linked Platform {} to Environment {}", platforms.get(platform), getClassPath(enviro));
+            }
+        }
+        LOG.log(Level.INFO, "Registry Comparison Complete");
     }
 
     private void fillPlatforms(Reflections reflect){
@@ -262,7 +282,7 @@ public class PlatformRegistry {
                     return (Class<? extends PlatformPhysicsModel>) Class.forName(models.get(name));
                 }
                 catch (ClassNotFoundException | ClassCastException e) {
-                    LOG.log(Level.ERROR, "Registry failed to properly load class " + autoModels.get(type) + " for PhysicsModel " + type + "." + name, e);
+                    LOG.log(Level.ERROR, "Registry failed to properly load class " + physicsModels.get(type) + " for PhysicsModel " + type + "." + name, e);
                     return null;
                 }
             }
