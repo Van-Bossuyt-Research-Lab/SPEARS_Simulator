@@ -664,7 +664,7 @@ public class StartupPanel extends Panel {
     public void saveCurrentConfiguration(){
         new FreeThread(0, new Runnable(){
             public void run(){
-                File config = new File("jtest.json");
+                File config = new File("config.json");
                 if (config.exists()){
                     if ((new PopUp()).showConfirmDialog("There is already a quick run file saved would you like to overwrite it?", "Save Configuration", PopUp.YES_NO_OPTIONS) == PopUp.YES_OPTION){
                         try {

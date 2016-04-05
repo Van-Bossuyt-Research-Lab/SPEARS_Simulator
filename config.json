@@ -28,15 +28,6 @@
 }, {
   "type" : "Rover",
   "id" : "r2",
-  "screenName" : "NULL 2",
-  "physicsModelName" : "Default",
-  "autonomousModelName" : "NULL",
-  "stateParameters" : { },
-  "physicsModelParameters" : { },
-  "autonomousModelParameters" : { }
-}, {
-  "type" : "Rover",
-  "id" : "r3",
   "screenName" : "Generic 1",
   "physicsModelName" : "Default",
   "autonomousModelName" : "Generic",
@@ -44,5 +35,20 @@
   "physicsModelParameters" : { },
   "autonomousModelParameters" : {
     "sec" : 33.0
+  }
+}, {
+  "type" : "Rover",
+  "id" : "r3",
+  "screenName" : "GORADRO Adv 1",
+  "physicsModelName" : "Default",
+  "autonomousModelName" : "GORADRO Adv",
+  "stateParameters" : { },
+  "physicsModelParameters" : { },
+  "autonomousModelParameters" : {
+    "mentality1" : 1.0,
+    "mentality2" : 2.0,
+    "mentality3" : 55.0,
+    "mentality4" : 6.0,
+    "mentality5" : 4.0
   }
 } ]
