@@ -49,9 +49,8 @@ public class PlatformConfig implements Serializable {
             return Collections.unmodifiableMap(physicsModelParameters);
         }
         catch(NullPointerException n){
-            System.out.println("no parameters listed");
+            return Collections.emptyMap();
         }
-        return Collections.emptyMap();
     }
 
     public String getAutonomousModelName(){
@@ -63,7 +62,6 @@ public class PlatformConfig implements Serializable {
             return Collections.unmodifiableMap(autonomousModelParameters);
         }
         catch(NullPointerException n){
-            System.out.println("no parameters listed");
             return Collections.emptyMap();
         }
     }
@@ -79,7 +77,7 @@ public class PlatformConfig implements Serializable {
             this.physicsModelParameters = params;
     }
 
-    public void setAutonomousModelParameters( Map<String,Double> params) {
+    public void setAutonomousModelParameters(Map<String,Double> params) {
         if (params == null){
             throw new NullPointerException("Parameters cannot be null");
         }
