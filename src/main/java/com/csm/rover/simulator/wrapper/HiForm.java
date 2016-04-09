@@ -58,7 +58,7 @@ public class HiForm implements HumanInterfaceAbstraction {
         GUI.setRunTimePanels(wrapperPnl, orbitalPnl, terrainPnl, interfacePnl, roverHubPnl, satelliteHubPnl);
         init = true;
         InterfaceAccess.CODE.setCallTags(namesAndTags);
-        roverHubPnl.setIdentifiers(namesAndTags.getRoverTags(), namesAndTags.getSatelliteTags());
+        roverHubPnl.setIdentifiers(namesAndTags.getTags("Rover"), namesAndTags.getTags("Satellite"));
     }
 
     private void setUpSelectionLists(){

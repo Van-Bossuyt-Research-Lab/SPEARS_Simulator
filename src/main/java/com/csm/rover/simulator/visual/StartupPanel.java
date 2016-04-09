@@ -1,6 +1,11 @@
 package com.csm.rover.simulator.visual;
 
 import com.csm.rover.simulator.control.PopUp;
+import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.map.io.TerrainMapWriter;
+import com.csm.rover.simulator.map.modifiers.NormalizeMapMod;
+import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
+import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
 import com.csm.rover.simulator.objects.io.MapFileFilter;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
@@ -28,11 +33,7 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.TreeMap;
+import java.util.*;
 
 public class StartupPanel extends Panel {
     private static final Logger LOG = LogManager.getLogger(StartupPanel.class);
@@ -691,29 +692,10 @@ public class StartupPanel extends Panel {
     }
 
     public RunConfiguration getConfigurationFromForm(){
-        ArrayList<String> roverNames = new ArrayList<String>();
-        ArrayList<String> roverTags = new ArrayList<String>();
-        ArrayList<String> satelliteNames = new ArrayList<String>();
-        ArrayList<String> satelliteTags = new ArrayList<String>();
-        ArrayList<PlatformConfig> platforms = new ArrayList<PlatformConfig>(roversToAdd.size());
-
-        int x = 0;
-        while (x < SatelliteList.getItems().size()){
-            String key = SatelliteList.getItemAt(x);
-            platforms.add(x, satsToAdd.get(key));
-            satelliteNames.add(key);
-            satelliteTags.add(satsToAdd.get(key).getID());
-            x++;
-        }
-        x = 0;
-        while (x < RoverList.getItems().size()){
-            String key = RoverList.getItemAt(x);
-            platforms.add(roversToAdd.get(key));
-            roverNames.add(key);
-            roverTags.add(roversToAdd.get(key).getID());
-            x++;
-        }
-        NamesAndTags namesAndTags = new NamesAndTags(roverNames, roverTags, satelliteNames, satelliteTags);
+        ArrayList<PlatformConfig> platforms = new ArrayList<PlatformConfig>(roversToAdd.size()+satsToAdd.size());
+        platforms.addAll(roversToAdd.values());
+        platforms.addAll(satsToAdd.values());
+        NamesAndTags namesAndTags = NamesAndTags.newFromPlatforms(platforms);
         if (TypeSelector.getSelectedIndex() == 1){
             File mapFile = new File(FileLocTxt.getText());
             return new RunConfiguration(namesAndTags, platforms, mapFile, AccelChk.isSelected(),
@@ -727,11 +709,31 @@ public class StartupPanel extends Panel {
             double hazardDensity = (Double) HazardDensitySpnr.getValue()/1000.;
             boolean monoTargets = !ValuedTargetsChk.isSelected(); //cause the form says use and the computer reads not using
             boolean monoHazards = !ValuedHazardsChk.isSelected();
-            return new RunConfiguration(namesAndTags, platforms, mapRough,
+            return new RunConfiguration(namesAndTags, platforms, generateTempMap(mapRough,
                     mapSize, mapDetail, targetDensity, hazardDensity, monoTargets,
-                    monoHazards, AccelChk.isSelected(),
+                    monoHazards), AccelChk.isSelected(),
                     (Integer)RuntimeSpnr.getValue());
         }
+    }
+
+    private File generateTempMap(double mapRough,
+                                 int mapSize,
+                                 int mapDetail,
+                                 double targetDensity,
+                                 double hazardDensity,
+                                 boolean monoTargets,
+                                 boolean monoHazards){
+        TerrainMap terrainMap = new TerrainMap();
+        terrainMap.addMapModifier(new PlasmaGeneratorMod(mapRough));
+        terrainMap.addMapModifier(new SurfaceSmoothMod());
+        terrainMap.addMapModifier(new NormalizeMapMod());
+        terrainMap.generateLandscape(mapSize, mapDetail);
+        terrainMap.generateTargets(monoTargets, targetDensity);
+        terrainMap.generateHazards(monoHazards, hazardDensity);
+        Random rnd = new Random();
+        File tempFile = new File((int)(rnd.nextDouble()*10000)+".map");
+        TerrainMapWriter.saveMap(terrainMap, tempFile);
+        return tempFile;
     }
 
     public void addRoverToList(){

@@ -9,62 +9,26 @@ import java.util.*;
 
 public class NamesAndTags implements Cloneable {
 
-    public ArrayList<String> groundNames, groundTags, roverNames, roverTags, satelliteNames, satelliteTags;
     private Map<String, Map<String, String>> correlation;
     //          type        name    tag
 
-    public NamesAndTags(ArrayList<String> roverNames,
-                        ArrayList<String> roverTags,
-                        ArrayList<String> satelliteNames,
-                        ArrayList<String> satelliteTags){
-        groundNames = new ArrayList<String>();
-        groundTags = new ArrayList<String>();
-        groundNames.add("Ground");
-        groundTags.add("g");
-        this.roverNames = roverNames;
-        this.roverTags = roverTags;
-        this.satelliteNames = satelliteNames;
-        this.satelliteTags = satelliteTags;
+    private NamesAndTags(){
+        this.correlation = new TreeMap<>();
     }
 
-    public static Builder newNamesAndTags(){
-        return new Builder();
-    }
-
-    public static class Builder {
-        private NamesAndTags nat;
-
-        private Builder(){
-            nat = new NamesAndTags();
-        }
-
-        public Builder addPlatform(List<PlatformConfig> platforms){
-            if (platforms == null){
-                throw new NullPointerException("platforms cannot be null lists");
-            }
-            if (platforms.size() == 0){
-                throw new IllegalArgumentException("list must have at least one value");
-            }
-            String type = platforms.get(0).getType();
+    public static NamesAndTags newFromPlatforms(List<PlatformConfig> platforms){
+        NamesAndTags nat = new NamesAndTags();
+        for (PlatformConfig platform : platforms){
+            String type = platform.getType();
             if (!nat.correlation.containsKey(type)){
                 nat.correlation.put(type, new TreeMap<String, String>());
             }
-            for (PlatformConfig platform : platforms){
-                nat.correlation.get(type).put(platform.getScreenName(), platform.getID());
-            }
-            return this;
+            nat.correlation.get(type).put(platform.getScreenName(), platform.getID());
         }
-
-        public NamesAndTags build(){
-            Map<String, String> groundMap = new TreeMap<>();
-            groundMap.put("Ground", "g");
-            nat.correlation.put("Ground", groundMap);
-            return nat;
-        }
-    }
-
-    private NamesAndTags(){
-        this.correlation = new TreeMap<>();
+        Map<String, String> groundMap = new TreeMap<>();
+        groundMap.put("Ground", "g");
+        nat.correlation.put("Ground", groundMap);
+        return nat;
     }
 
     private NamesAndTags(NamesAndTags orig){

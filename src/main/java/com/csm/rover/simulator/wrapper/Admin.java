@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class Admin {
-	private static final Logger LOG = LogManager.getFormatterLogger(Admin.class);
+	private static final Logger LOG = LogManager.getLogger(Admin.class);
 
 //	public static Form GUI;
 	private Globals GLOBAL;
@@ -50,10 +50,11 @@ public class Admin {
 			}
 			if (go) {
 				try {
-					admin.beginSimulation(new RunConfiguration(config));
+					admin.beginSimulation(RunConfiguration.fromFile(config));
 				}
 				catch (Exception e){
 					LOG.log(Level.ERROR, "Simulator failed to start", e);
+					(new PopUp()).showConfirmDialog(e.getMessage(), "Failed to Start", PopUp.DEFAULT_OPTIONS);
 					System.exit(2);
 				}
 			}
@@ -64,15 +65,15 @@ public class Admin {
             File cfgFile = new File(args[0]);
             if (cfgFile.exists() && getFileType(cfgFile).equals("cfg")){
                 try {
-                    admin.beginSimulation(new RunConfiguration(cfgFile));
+                    admin.beginSimulation(RunConfiguration.fromFile(cfgFile));
                 }
                 catch (Exception e){
-                    LOG.log(Level.ERROR, "cfg file failed to initiate", e);
+                    LOG.log(Level.ERROR, "configuration file failed to initiate", e);
 					System.exit(2);
                 }
             }
             else {
-                System.err.println("Expected a valid file path to a .cfg file.  Got: \"" + cfgFile.getAbsolutePath() + "\"");
+                LOG.log(Level.FATAL, "Expected a valid file path to a JSON configuration file.  Got: \"{}\"", cfgFile.getAbsolutePath());
 				System.exit(3);
             }
 		}
@@ -113,27 +114,16 @@ public class Admin {
         RoverObject.setSerialBuffers(serialBuffers);
         SatelliteObject.setSerialBuffers(serialBuffers);
 
-		if (config.mapFromFile){
-			try {
-				if (!config.mapFile.exists()){
-					throw new Exception();
-				}
-				terrainMap = TerrainMapReader.loadMap(config.mapFile);
-				LOG.log(Level.INFO, "Start Up: Using map file: {}", config.mapFile.getName());
+		try {
+			if (!config.mapFile.exists()){
+				throw new Exception();
 			}
-			catch (Exception e){
-				LOG.log(Level.WARN, "Start Up: Invalid map file", e);
-				return;
-			}
+			terrainMap = TerrainMapReader.loadMap(config.mapFile);
+			LOG.log(Level.INFO, "Start Up: Using map file: {}", config.mapFile.getName());
 		}
-        else {
-            terrainMap.addMapModifier(new PlasmaGeneratorMod(config.mapRough));
-            terrainMap.addMapModifier(new SurfaceSmoothMod());
-            terrainMap.addMapModifier(new NormalizeMapMod());
-            terrainMap.generateLandscape(config.mapSize, config.mapDetail);
-			terrainMap.generateTargets(config.monoTargets, config.targetDensity);
-			terrainMap.generateHazards(config.monoHazards, config.hazardDensity);
-			LOG.log(Level.INFO, "Startup: Using random map");
+		catch (Exception e){
+			LOG.log(Level.WARN, "Start Up: Invalid map file", e);
+			return;
 		}
         RoverObject.setTerrainMap(terrainMap);
 

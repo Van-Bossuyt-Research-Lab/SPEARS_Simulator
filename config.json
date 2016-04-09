@@ -1,54 +1,55 @@
-[ {
-  "type" : "Satellite",
-  "id" : "s1",
-  "screenName" : "Default 1",
-  "physicsModelName" : "Default",
-  "autonomousModelName" : "Default",
-  "stateParameters" : { },
-  "physicsModelParameters" : { },
-  "autonomousModelParameters" : { }
-}, {
-  "type" : "Satellite",
-  "id" : "s2",
-  "screenName" : "Default 2",
-  "physicsModelName" : "Default",
-  "autonomousModelName" : "Default",
-  "stateParameters" : { },
-  "physicsModelParameters" : { },
-  "autonomousModelParameters" : { }
-}, {
-  "type" : "Rover",
-  "id" : "r1",
-  "screenName" : "NULL 1",
-  "physicsModelName" : "Default",
-  "autonomousModelName" : "NULL",
-  "stateParameters" : { },
-  "physicsModelParameters" : { },
-  "autonomousModelParameters" : { }
-}, {
-  "type" : "Rover",
-  "id" : "r2",
-  "screenName" : "Generic 1",
-  "physicsModelName" : "Default",
-  "autonomousModelName" : "Generic",
-  "stateParameters" : { },
-  "physicsModelParameters" : { },
-  "autonomousModelParameters" : {
-    "sec" : 33.0
-  }
-}, {
-  "type" : "Rover",
-  "id" : "r3",
-  "screenName" : "GORADRO Adv 1",
-  "physicsModelName" : "Default",
-  "autonomousModelName" : "GORADRO Adv",
-  "stateParameters" : { },
-  "physicsModelParameters" : { },
-  "autonomousModelParameters" : {
-    "mentality1" : 1.0,
-    "mentality2" : 2.0,
-    "mentality3" : 55.0,
-    "mentality4" : 6.0,
-    "mentality5" : 4.0
-  }
-} ]
+{
+  "platforms" : [ {
+    "type" : "Rover",
+    "id" : "r2",
+    "screenName" : "Generic 1",
+    "physicsModelName" : "Default",
+    "autonomousModelName" : "Generic",
+    "stateParameters" : { },
+    "physicsModelParameters" : { },
+    "autonomousModelParameters" : {
+      "sec" : 3.0
+    }
+  }, {
+    "type" : "Rover",
+    "id" : "r3",
+    "screenName" : "Generic 2",
+    "physicsModelName" : "Default",
+    "autonomousModelName" : "Generic",
+    "stateParameters" : { },
+    "physicsModelParameters" : { },
+    "autonomousModelParameters" : {
+      "sec" : 8.0
+    }
+  }, {
+    "type" : "Rover",
+    "id" : "r1",
+    "screenName" : "NULL 1",
+    "physicsModelName" : "Default",
+    "autonomousModelName" : "NULL",
+    "stateParameters" : { },
+    "physicsModelParameters" : { },
+    "autonomousModelParameters" : { }
+  }, {
+    "type" : "Satellite",
+    "id" : "s1",
+    "screenName" : "Default 1",
+    "physicsModelName" : "Default",
+    "autonomousModelName" : "Default",
+    "stateParameters" : { },
+    "physicsModelParameters" : { },
+    "autonomousModelParameters" : { }
+  }, {
+    "type" : "Satellite",
+    "id" : "s2",
+    "screenName" : "Default 2",
+    "physicsModelName" : "Default",
+    "autonomousModelName" : "Default",
+    "stateParameters" : { },
+    "physicsModelParameters" : { },
+    "autonomousModelParameters" : { }
+  } ],
+  "mapFile" : "C:\\Users\\PHM-Lab1\\Documents\\Zac\\Maps\\GORADRO Spring 2016 4.map",
+  "accelerated" : true,
+  "runtime" : 1
+}
