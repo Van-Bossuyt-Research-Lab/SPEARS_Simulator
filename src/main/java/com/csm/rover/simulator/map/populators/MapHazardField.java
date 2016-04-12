@@ -2,8 +2,8 @@ package com.csm.rover.simulator.map.populators;
 
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
-import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.objects.GridList;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.GridList;
 
 import java.awt.Dimension;
 

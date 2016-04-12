@@ -1,9 +1,9 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.objects.FreeThread;
+import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.ThreadItem;
-import com.csm.rover.simulator.objects.ZDate;
+import com.csm.rover.simulator.objects.util.ZDate;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

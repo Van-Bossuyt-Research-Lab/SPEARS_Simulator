@@ -4,7 +4,6 @@ import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.ImageButton;
 import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.visual.ZList;
-import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;

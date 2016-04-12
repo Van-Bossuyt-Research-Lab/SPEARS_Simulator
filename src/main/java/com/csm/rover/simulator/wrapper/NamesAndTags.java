@@ -1,113 +1,104 @@
 package com.csm.rover.simulator.wrapper;
 
-import java.io.Serializable;
-import java.util.ArrayList;
+import com.csm.rover.simulator.objects.io.PlatformConfig;
+import com.csm.rover.simulator.platforms.Platform;
+import com.google.common.collect.Lists;
 
-public class NamesAndTags implements Serializable {
+import java.util.*;
 
-    private ArrayList<String> groundNames, groundTags, roverNames, roverTags, satelliteNames, satelliteTags;
 
-    public NamesAndTags(ArrayList<String> roverNames,
-                        ArrayList<String> roverTags,
-                        ArrayList<String> satelliteNames,
-                        ArrayList<String> satelliteTags){
-        groundNames = new ArrayList<String>();
-        groundTags = new ArrayList<String>();
-        groundNames.add("Ground");
-        groundTags.add("g");
-        this.roverNames = roverNames;
-        this.roverTags = roverTags;
-        this.satelliteNames = satelliteNames;
-        this.satelliteTags = satelliteTags;
+public class NamesAndTags implements Cloneable {
+
+    private Map<String, Map<String, String>> correlation;
+    //          type        name    tag
+
+    private NamesAndTags(){
+        this.correlation = new TreeMap<>();
+    }
+
+    public static NamesAndTags newFromPlatforms(List<PlatformConfig> platforms){
+        NamesAndTags nat = new NamesAndTags();
+        for (PlatformConfig platform : platforms){
+            String type = platform.getType();
+            if (!nat.correlation.containsKey(type)){
+                nat.correlation.put(type, new TreeMap<String, String>());
+            }
+            nat.correlation.get(type).put(platform.getScreenName(), platform.getID());
+        }
+        Map<String, String> groundMap = new TreeMap<>();
+        groundMap.put("Ground", "g");
+        nat.correlation.put("Ground", groundMap);
+        return nat;
+    }
+
+    private NamesAndTags(NamesAndTags orig){
+        this();
+        for (String key : orig.correlation.keySet()){
+            this.correlation.put(key, new TreeMap<String, String>());
+            for (String name : orig.correlation.get(key).keySet()){
+                this.correlation.get(key).put(name, orig.correlation.get(key).get(name));
+            }
+        }
     }
 
     public String getNameByTag(String tag){
-        for (int i = 0; i < groundTags.size(); i++){
-            if (groundTags.get(i).equals(tag)){
-                return groundNames.get(i);
+        for (String type : correlation.keySet()){
+            for (String name : correlation.get(type).keySet()){
+                if (correlation.get(type).get(name).equals(tag)){
+                    return name;
+                }
             }
         }
-        for (int i = 0; i < roverTags.size(); i++){
-            if (roverTags.get(i).equals(tag)){
-                return roverNames.get(i);
-            }
-        }
-        for (int i = 0; i < satelliteTags.size(); i++){
-            if (satelliteTags.get(i).equals(tag)){
-                return satelliteNames.get(i);
-            }
-        }
-        return null;
+        throw new IndexOutOfBoundsException("The tag \""+tag+"\" is not registered");
     }
 
     public String getTagByName(String name){
-        for (int i = 0; i < groundNames.size(); i++){
-            if (groundNames.get(i).equals(name)){
-                return groundTags.get(i);
+        for (String type : correlation.keySet()){
+            if (correlation.get(type).containsKey(name)){
+                return correlation.get(type).get(name);
             }
         }
-        for (int i = 0; i < roverNames.size(); i++){
-            if (roverNames.get(i).equals(name)){
-                return roverTags.get(i);
-            }
-        }
-        for (int i = 0; i < satelliteNames.size(); i++){
-            if (satelliteNames.get(i).equals(name)){
-                return satelliteTags.get(i);
-            }
-        }
-        return null;
+        throw new IndexOutOfBoundsException("The name \""+name+"\" is not registered");
     }
 
     public ArrayList<String> getNames(){
-        ArrayList<String> names = new ArrayList<String>();
-        for (String name : groundNames){
-            names.add(name);
-        }
-        for (String name : roverNames){
-            names.add(name);
-        }
-        for (String name : satelliteNames){
-            names.add(name);
+        ArrayList<String> names = new ArrayList<>();
+        for (String type : correlation.keySet()){
+            names.addAll(correlation.get(type).keySet());
         }
         return names;
     }
 
+    public ArrayList<String> getNames(String platform) {
+        if (correlation.containsKey(platform)){
+            return new ArrayList<>(correlation.get(platform).keySet());
+        }
+        else {
+            throw new IndexOutOfBoundsException("The platform \""+platform+"\" is not registered");
+        }
+    }
+
     public ArrayList<String> getTags(){
-        ArrayList<String> tags = new ArrayList<String>();
-        for (String tag : groundTags){
-            tags.add(tag);
-        }
-        for (String tag : roverTags){
-            tags.add(tag);
-        }
-        for (String tag : satelliteTags){
-            tags.add(tag);
+        ArrayList<String> tags = new ArrayList<>();
+        for (String type : correlation.keySet()){
+            for (String name : correlation.get(type).keySet()){
+                tags.add(correlation.get(type).get(name));
+            }
         }
         return tags;
     }
 
-    public ArrayList<String> getGroundNames() {
-        return groundNames;
+    public ArrayList<String> getTags(String platform) {
+        if (correlation.containsKey(platform)) {
+            return new ArrayList<>(correlation.get(platform).values());
+        }
+        else {
+            throw new IndexOutOfBoundsException("The platform \""+platform+"\" is not registered");
+        }
     }
 
-    public ArrayList<String> getGroundTags() {
-        return groundTags;
-    }
-
-    public ArrayList<String> getRoverNames() {
-        return roverNames;
-    }
-
-    public ArrayList<String> getRoverTags() {
-        return roverTags;
-    }
-
-    public ArrayList<String> getSatelliteNames() {
-        return satelliteNames;
-    }
-
-    public ArrayList<String> getSatelliteTags() {
-        return satelliteTags;
+    @Override
+    public NamesAndTags clone(){
+        return new NamesAndTags(this);
     }
 }
