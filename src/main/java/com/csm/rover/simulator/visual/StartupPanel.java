@@ -731,7 +731,10 @@ public class StartupPanel extends Panel {
         terrainMap.generateTargets(monoTargets, targetDensity);
         terrainMap.generateHazards(monoHazards, hazardDensity);
         Random rnd = new Random();
-        File tempFile = new File((int)(rnd.nextDouble()*10000)+".map");
+        File tempFile;
+        do {
+            tempFile = new File(String.format("Temp/%d.map", (int) (rnd.nextDouble() * 10000)));
+        } while (tempFile.exists());
         TerrainMapWriter.saveMap(terrainMap, tempFile);
         return tempFile;
     }

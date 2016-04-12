@@ -10,17 +10,14 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
 @SuppressWarnings("unused")
 @com.csm.rover.simulator.platforms.annotations.Platform(type="Satellite")
-public class SatelliteObject extends Platform implements Serializable {
+public class SatelliteObject extends Platform {
 	private static final Logger LOG = LogManager.getLogger(SatelliteObject.class);
-
-	private static final long serialVersionUID = 1L;
 	
     private static SerialBuffers serialBuffers;
     	

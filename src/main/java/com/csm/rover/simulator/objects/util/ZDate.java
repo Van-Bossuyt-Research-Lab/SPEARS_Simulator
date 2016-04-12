@@ -1,11 +1,8 @@
 package com.csm.rover.simulator.objects.util;
 
-import java.io.Serializable;
 import java.util.Calendar;
 
-public class ZDate implements Serializable {
-    
-    private static final long serialVersionUID = 1354011586595017310L;
+public class ZDate {
 	
     public int year;
     public int month;

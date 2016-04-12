@@ -16,15 +16,12 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.Serializable;
 import java.util.Map;
 
 //TODO add implementation with better time stepping
 @PhysicsModel(type="Rover", name="Default", parameters={})
-public class RoverPhysicsModel extends PlatformPhysicsModel implements Serializable {
+public class RoverPhysicsModel extends PlatformPhysicsModel {
 	private static final Logger LOG = LogManager.getLogger(RoverPhysicsModel.class);
-
-	private static final long serialVersionUID = 1L;
 	
 	private final int FL = 0, FR = 1, BL = 2, BR = 3;
 

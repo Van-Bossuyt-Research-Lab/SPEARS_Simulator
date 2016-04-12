@@ -1,11 +1,8 @@
 package com.csm.rover.simulator.objects.util;
 
 import java.awt.Point;
-import java.io.Serializable;
 
-public class DecimalPoint implements Serializable, Cloneable {
-
-	private static final long serialVersionUID = 1L;
+public class DecimalPoint {
 	
 	private double x, y;
 	

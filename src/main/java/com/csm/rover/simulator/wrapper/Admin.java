@@ -3,13 +3,9 @@ package com.csm.rover.simulator.wrapper;
 import com.csm.rover.simulator.control.PopUp;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.map.io.TerrainMapReader;
-import com.csm.rover.simulator.map.modifiers.NormalizeMapMod;
-import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
-import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.platforms.Platform;
-import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import org.apache.logging.log4j.Level;
@@ -36,7 +32,6 @@ public class Admin {
 
 	public static void main(String[] args) {
         LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
-        PlatformRegistry.fillRegistry();
 		Admin admin = getInstance();
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");

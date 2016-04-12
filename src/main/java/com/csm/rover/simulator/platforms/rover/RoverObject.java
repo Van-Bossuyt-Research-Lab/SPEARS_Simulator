@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.awt.Point;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -24,10 +23,8 @@ import java.util.TreeMap;
 //TODO actually debug instructions
 //TODO make for modular for OCP, SRP
 @com.csm.rover.simulator.platforms.annotations.Platform(type="Rover")
-public class RoverObject extends Platform implements Serializable {
+public class RoverObject extends Platform {
 	private static final Logger LOG = LogManager.getLogger(RoverObject.class);
-	
-	private static final long serialVersionUID = 1L;
 
 	private static TerrainMap MAP;
     private static SerialBuffers serialBuffers;
@@ -807,9 +804,7 @@ public class RoverObject extends Platform implements Serializable {
 		}
 	}
 
-//PHYSCIS Related Stuff *****************************************************************************************************************************************************************************************************
-	
-	public void addToSerialHistory(String out){
+    public void addToSerialHistory(String out){
 		serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis + "\n";
 	}
 	

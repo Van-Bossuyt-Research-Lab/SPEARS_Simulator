@@ -2,13 +2,12 @@ package com.csm.rover.simulator.objects.io;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class PlatformConfig implements Serializable {
+public class PlatformConfig {
 
     private String type;
     private String id;
