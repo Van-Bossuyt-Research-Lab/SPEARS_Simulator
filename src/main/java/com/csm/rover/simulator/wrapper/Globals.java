@@ -1,9 +1,9 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.objects.FreeThread;
+import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.ThreadItem;
-import com.csm.rover.simulator.objects.ZDate;
+import com.csm.rover.simulator.objects.util.ZDate;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Globals {
 	private static final Logger LOG = LogManager.getFormatterLogger(Globals.class);
 
-	public static String versionNumber = "2.4.1";
+	public static String versionNumber = "2.5.0";
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;

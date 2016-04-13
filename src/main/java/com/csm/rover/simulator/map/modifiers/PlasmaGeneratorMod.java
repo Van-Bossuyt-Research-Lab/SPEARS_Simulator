@@ -1,7 +1,7 @@
 package com.csm.rover.simulator.map.modifiers;
 
-import com.csm.rover.simulator.objects.ArrayGrid;
-import com.csm.rover.simulator.objects.FloatArrayArrayGrid;
+import com.csm.rover.simulator.objects.util.ArrayGrid;
+import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 
 import java.util.Random;
 

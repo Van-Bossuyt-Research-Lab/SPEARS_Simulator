@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.map.populators;
 
-import com.csm.rover.simulator.objects.GridList;
+import com.csm.rover.simulator.objects.util.GridList;
 
 import java.awt.Dimension;
 import java.awt.Point;

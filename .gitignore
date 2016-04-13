@@ -5,8 +5,10 @@ bin/*
 Photos/*
 Logs/*
 Data/*
+Temp/
 /bin/
 default.cfg
+config.json
 .idea/*
 *.iml
 target/*
