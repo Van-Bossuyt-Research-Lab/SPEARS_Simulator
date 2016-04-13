@@ -3,10 +3,10 @@ package com.csm.rover.simulator.map;
 import com.csm.rover.simulator.map.modifiers.MapModifier;
 import com.csm.rover.simulator.map.populators.MapHazardField;
 import com.csm.rover.simulator.map.populators.MapTargetField;
-import com.csm.rover.simulator.objects.ArrayGrid;
+import com.csm.rover.simulator.objects.util.ArrayGrid;
 import com.csm.rover.simulator.objects.ArrayGrid3D;
-import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.objects.FloatArrayArrayGrid;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.csm.rover.simulator.objects.FloatArrayArrayArrayGrid;
 
 import java.awt.Dimension;

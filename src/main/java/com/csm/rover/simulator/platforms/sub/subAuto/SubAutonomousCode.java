@@ -1,9 +1,11 @@
-package com.csm.rover.simulator.sub.subAuto;
+package com.csm.rover.simulator.platforms.sub.subAuto;
 
 import com.csm.rover.simulator.control.InterfaceAccess;
 import com.csm.rover.simulator.map.SubMap;
-import com.csm.rover.simulator.objects.DecimalPoint;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.wrapper.Globals;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import java.io.*;
 import java.util.Map;
@@ -54,20 +56,20 @@ public abstract class SubAutonomousCode implements Serializable, Cloneable {
     protected void writeToLog(String message){
         try {
             BufferedWriter write = new BufferedWriter(new FileWriter(logFile, true));
-            write.write(message + "\t\t" + InterfaceAccess.CODE.DateTime.toString("[MM/dd/yyyy hh:mm:ss.") + (Globals.getInstance().timeMillis %1000) + "]\r\n");
+            write.write(message + "\t\t" +  new DateTime().toString(DateTimeFormat.forPattern("[MM/dd/yyyy hh:mm:ss.")) + (Globals.getInstance().timeMillis %1000) + "]\r\n");
             write.flush();
             write.close();
         }
         catch (NullPointerException e){
             if (!tried){
                 tried = true;
-                logFile = new File("Logs/" + roverName + " Log " + InterfaceAccess.CODE.DateTime.toString("MM-dd-yyyy hh-mm") + ".txt");
-                Globals.getInstance().writeToLogFile(roverName, "Writing rover's autonomous log file to: " + logFile.getAbsolutePath());
+                logFile = new File("Logs/" + roverName + " Log " +  new DateTime().toString(DateTimeFormat.forPattern("[MM/dd/yyyy hh:mm:ss.")) + ".txt");
+                //Globals.getInstance().writeToLogFile(roverName, "Writing rover's autonomous log file to: " + logFile.getAbsolutePath());
                 writeToLog(message);
             }
             else {
                 e.printStackTrace();
-                Globals.getInstance().writeToLogFile(roverName, "Rover's autonomous log file failed to initalize.");
+                //Globals.getInstance().writeToLogFile(roverName, "Rover's autonomous log file failed to initalize.");
             }
         }
         catch (IOException e){

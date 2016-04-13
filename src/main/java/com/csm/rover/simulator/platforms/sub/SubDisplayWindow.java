@@ -1,6 +1,5 @@
-package com.csm.rover.simulator.sub;
+package com.csm.rover.simulator.platforms.sub;
 
-import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.visual.LEDIndicator;
 

@@ -1,14 +1,11 @@
-package com.csm.rover.simulator.sub.physicsModels;
+package com.csm.rover.simulator.platforms.sub.physicsModels;
 
 import java.io.Serializable;
 
 import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.rover.MotorState;
-import com.csm.rover.simulator.sub.subProp;
-import com.csm.rover.simulator.wrapper.Globals;
-
-
+import com.csm.rover.simulator.platforms.rover.MotorState;
+import com.csm.rover.simulator.platforms.sub.subProp;
 
 
 public class subPhysicsModel implements Serializable, Cloneable {

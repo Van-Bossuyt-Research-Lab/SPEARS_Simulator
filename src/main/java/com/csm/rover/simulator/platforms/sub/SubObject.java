@@ -1,13 +1,16 @@
-package com.csm.rover.simulator.sub;
+package com.csm.rover.simulator.platforms.sub;
 
 import com.csm.rover.simulator.map.SubMap;
-import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.sub.physicsModels.subPhysicsModel;
-import com.csm.rover.simulator.sub.subAuto.SubAutonomousCode;
+import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.sub.physicsModels.subPhysicsModel;
+import com.csm.rover.simulator.platforms.sub.subAuto.SubAutonomousCode;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
-import com.csm.rover.simulator.rover.MotorState;
+import com.csm.rover.simulator.platforms.rover.MotorState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.awt.Point;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -18,7 +21,8 @@ import java.util.TreeMap;
 
 //TODO actually debug instructions
 //TODO make for modular for OCP, SRP
-public class SubObject implements Serializable {
+public class SubObject extends Platform {
+    private static final Logger LOG = LogManager.getLogger(SubObject.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -79,17 +83,11 @@ public class SubObject implements Serializable {
     private String serialHistory = "";
     private Map<String, Boolean> LEDs = new TreeMap<String, Boolean>();
 
-    public SubObject(String name, String ID, subPhysicsModel param, SubAutonomousCode code, double[] loc, double dir, double temp){
-        this.name = name;
-        IDcode = ID;
-        physics = param;
-        autoCode = code;
-        physics.initalizeConditions(name, physics.getbattery_max_charge(), temp);
-        physics.setLocation(loc);
-        physics.setDirection_xy(dir);
+    public SubObject(){
+        super("Sub");
         LEDs.put("Mute", false);
         LEDs.put("Instructions", false);
-        LEDs.put("Autonomus", false);
+        LEDs.put("Autonomous", false);
     }
 
     public static void setSubMap(SubMap map){
@@ -581,11 +579,11 @@ public class SubObject implements Serializable {
             } catch (Exception e) {
                 // something went wrong
                 System.out.println("Error in Sub Run Code");
-                Globals.getInstance().reportError("SubCode", "runCode - code", e);
+                //Globals.getInstance().reportError("SubCode", "runCode - code", e);
             }
         } catch (Exception f){
             System.out.println("Something's bad");
-            Globals.getInstance().reportError("SubCode", "runCode - code", f);
+           // Globals.getInstance().reportError("SubCode", "runCode - code", f);
         }
     }
 
@@ -609,7 +607,7 @@ public class SubObject implements Serializable {
             }
         }
         catch (Exception e){
-            Globals.getInstance().reportError("RoverCode", "takePicture", e);
+           // Globals.getInstance().reportError("RoverCode", "takePicture", e);
         }
     }
 
@@ -708,12 +706,12 @@ public class SubObject implements Serializable {
                 x++;
             }
             addToSerialHistory(mess);
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+            //Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
             return true;
         }
         else {
             addToSerialHistory("Surpressed: " + mess);
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Surpressed: \'" + mess + "\'");
+            //Globals.getInstance().writeToLogFile(name + " Serial", "Message Surpressed: \'" + mess + "\'");
             return false;
         }
     }
@@ -726,11 +724,11 @@ public class SubObject implements Serializable {
         if (!mute) {
             serialBuffers.writeToSerial(mess, IDcode);
             addToSerialHistory(mess + "");
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+            //Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
             return true;
         } else {
             addToSerialHistory("Supressed: " + mess);
-            Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
+            //Globals.getInstance().writeToLogFile(name + " Serial", "Message Sent: \'" + mess + "\'");
             return false;
         }
     }
@@ -757,7 +755,7 @@ public class SubObject implements Serializable {
                 return 0;
             }
         } catch (Exception e) {
-            Globals.getInstance().reportError("RoverCode", "strcmp", e);
+            //Globals.getInstance().reportError("RoverCode", "strcmp", e);
         }
         return 1;
     }

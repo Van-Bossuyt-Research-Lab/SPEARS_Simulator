@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.sub;
+package com.csm.rover.simulator.platforms.sub;
 
 public enum subProp {
 

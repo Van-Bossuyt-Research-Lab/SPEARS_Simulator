@@ -1,8 +1,7 @@
-package com.csm.rover.simulator.sub;
+package com.csm.rover.simulator.platforms.sub;
 
 import com.csm.rover.simulator.control.InterfaceCode;
 import com.csm.rover.simulator.map.SubMap;
-import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
@@ -24,7 +23,7 @@ public class SubHub extends Panel {
     private static final long serialVersionUID = 1L;
 
     private SerialBuffers serialBuffers;
-    private ArrayList<SubObject> rovers;
+    private ArrayList<SubObject> subs;
     private boolean inHUDmode = false;
     private Map<Integer, Map<Integer, Integer>> standardDisplayLinks;
 
@@ -62,7 +61,7 @@ public class SubHub extends Panel {
             HUDDisplayLinks.put(x, -1);
         }
 
-        this.rovers = rovers;
+        this.subs = subs;
 
         initialize(map);
         this.addKeyListener(new KeyAdapter() {
@@ -180,7 +179,7 @@ public class SubHub extends Panel {
     //adds the rover objects to the hub
     public void setRovers(ArrayList<SubObject> subs){
         for (SubObject sub : subs){
-            this.subs.add(sub);
+            this.subs.adds(sub);
         }
 
         int x = 0;
@@ -198,7 +197,7 @@ public class SubHub extends Panel {
     }
 
     public void setFocusedRover(int which){
-        if (which >= 0 && which < rovers.size()){
+        if (which >= 0 && which < subs.size()){
             HUDDisplayLinks.put(0, which);
             displayWindows.get(0).lockOnSub(which);
             updateDisplays();
@@ -224,7 +223,7 @@ public class SubHub extends Panel {
 
     //change which rover is connected to a certain display
     private void changeLinkedRover(int display, int by){
-        if (rovers.size() == 0){
+        if (subs.size() == 0){
             return;
         }
         if (inHUDmode){
@@ -242,7 +241,7 @@ public class SubHub extends Panel {
             display.setHUDMode(b);
         }
         if (b){
-            displayWindows.get(0).lockOnRover(HUDDisplayLinks.get(0));
+            displayWindows.get(0).lockOnSub(HUDDisplayLinks.get(0));
         }
         else {
             displayWindows.get(0).unlock();
