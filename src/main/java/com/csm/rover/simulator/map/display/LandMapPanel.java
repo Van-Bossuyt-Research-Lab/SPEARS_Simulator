@@ -2,9 +2,9 @@ package com.csm.rover.simulator.map.display;
 
 import com.csm.rover.simulator.map.PlanetParametersList;
 import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.rover.RoverHub;
-import com.csm.rover.simulator.rover.RoverObject;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.rover.RoverHub;
+import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.visual.Panel;
 
 import java.awt.Color;
@@ -175,7 +175,7 @@ public class LandMapPanel extends Panel{
 		roverIcons = new ArrayList<RoverIcon>();
 		int x = 0;
 		while (x < rovers.size()){
-			roverIcons.add(new RoverIcon(rovers.get(x).getName(), rovers.get(x).getLocation(), rovers.get(x).getDirection()));
+			roverIcons.add(new RoverIcon(rovers.get(x).getName(), new DecimalPoint(rovers.get(x).getState().<Double>get("x"), rovers.get(x).getState().<Double>get("y")), rovers.get(x).getState().<Double>get("direction")));
 			this.add(roverIcons.get(x));
 			this.setComponentZOrder(roverIcons.get(x), 0);
 			x++;

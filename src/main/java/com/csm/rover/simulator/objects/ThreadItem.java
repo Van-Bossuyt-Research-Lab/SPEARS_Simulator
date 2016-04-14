@@ -2,11 +2,7 @@ package com.csm.rover.simulator.objects;
 
 import com.csm.rover.simulator.wrapper.Globals;
 
-import java.io.Serializable;
-
-public class ThreadItem implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
+public class ThreadItem {
 	
 	private String name;
 	private int delay;

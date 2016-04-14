@@ -1,8 +1,8 @@
 package com.csm.rover.simulator.map.io;
 
 import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.objects.ArrayGrid;
-import com.csm.rover.simulator.objects.FloatArrayArrayGrid;
+import com.csm.rover.simulator.objects.util.ArrayGrid;
+import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

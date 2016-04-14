@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.map.modifiers;
 
-import com.csm.rover.simulator.objects.ArrayGrid;
+import com.csm.rover.simulator.objects.util.ArrayGrid;
 
 public class NormalizeMapMod implements MapModifier {
 
