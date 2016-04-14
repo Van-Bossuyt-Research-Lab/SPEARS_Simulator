@@ -6,6 +6,7 @@ import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
+import com.csm.rover.simulator.platforms.rover.RoverWheels;
 import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -14,12 +15,12 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 import java.io.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 @AutonomousCodeModel(type="Rover", name="parent", parameters = {})
-public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel implements Serializable {
+public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel {
 	private static final Logger LOG = LogManager.getLogger(RoverAutonomousCode.class);
-
-	private static final long serialVersionUID = 1L;
 
 	protected static TerrainMap MAP;
 
@@ -39,11 +40,12 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel im
         if (!state.getType().equals("Rover")){
             throw new IllegalArgumentException("The provided state is not a RoverState");
         }
-        return doNextCommand(millitime, new DecimalPoint(state.get("x"), state.get("y")), state.get("dir"));
+        return doNextCommand(millitime, new DecimalPoint(state.<Double>get("x"), state.<Double>get("y")),
+                state.<Double>get("direction"), getAutonomousParameters(state));
     }
 
     protected abstract String doNextCommand(long milliTime, DecimalPoint location,
-                                          double direction);
+                                          double direction, Map<String, Double> params);
 
     public static void setTerrainMap(TerrainMap map){
         MAP = map;
@@ -81,6 +83,28 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel im
 			e.printStackTrace();
 		}
 	}
+
+    private Map<String, Double> getAutonomousParameters(PlatformState state){
+        String[] required = new String[] { "acceleration", "angular_acceleration", "battery_voltage", "battery_current",
+                "battery_temp", "battery_charge" };
+        String[] fromLists = new String[] { "wheel_speed", "motor_current", "motor_temp" };
+        Map<String, Double> params = new TreeMap<>();
+        for (String param : required){
+            params.put(param, state.<Double>get(param));
+        }
+        for (String param : fromLists){
+            Double[] list = state.get(param);
+            for (int i = 0; i < list.length; i++){
+                for (RoverWheels wheel : RoverWheels.values()){
+                    if (wheel.getValue() == i && wheel.name().length() < 4){
+                        params.put(param+"_"+wheel.name(), list[i]);
+                        break;
+                    }
+                }
+            }
+        }
+        return params;
+    }
 
 	private String generateFilepath(){
 		DateTime date = new DateTime();

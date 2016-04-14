@@ -1,54 +1,42 @@
 package com.csm.rover.simulator.objects.io;
 
-import com.csm.rover.simulator.objects.util.DecimalPoint;
-import com.csm.rover.simulator.platforms.Platform;
-import com.csm.rover.simulator.platforms.rover.RoverObject;
-import com.csm.rover.simulator.platforms.rover.RoverState;
-import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
-import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
-import com.csm.rover.simulator.platforms.satellite.SatelliteAutonomousCode;
-import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
-import com.csm.rover.simulator.platforms.satellite.SatelliteParametersList;
-import com.csm.rover.simulator.platforms.satellite.SatelliteState;
+import com.csm.rover.simulator.control.InterfaceCode;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
-
-import java.io.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-
-import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class RunConfiguration implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
-	
-	private String fileCode = "ent";
-	
-	public boolean mapFromFile;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
+public class RunConfiguration implements Cloneable {
+	@JsonIgnore
+	private static final Logger LOG = LogManager.getLogger(InterfaceCode.class);
+
+	@JsonIgnore
+	private static final ObjectMapper mapper = new ObjectMapper();
+
+	@JsonIgnore
 	public NamesAndTags namesAndTags;
 	public ArrayList<PlatformConfig> platforms;
-	public ArrayList<RoverObject> rovers;
-	public ArrayList<SatelliteObject> satellites;
 	public File mapFile;
-	public double mapRough;
-	public int mapSize;
-	public int mapDetail;
-	public double targetDensity;
-	public double hazardDensity;
-	public boolean monoTargets;
-	public boolean monoHazards;
 	public boolean accelerated;
 	public int runtime;
-	
+
 	public RunConfiguration(NamesAndTags namesAndTags,
 							ArrayList<PlatformConfig> platforms,
 							File mapFile,
-			boolean accelerated, int runtime) {
-		mapFromFile = true;
+							boolean accelerated,
+							int runtime) {
 		this.namesAndTags = namesAndTags;
 		this.platforms = platforms;
 		this.mapFile = mapFile;
@@ -56,239 +44,75 @@ public class RunConfiguration implements Serializable {
 		this.runtime = runtime;
 	}
 
-	public RunConfiguration(NamesAndTags namesAndTags,
-                            ArrayList<PlatformConfig> platforms,
-                            double mapRough,
-							int mapSize,
-							int mapDetail,
-							double targetDensity,
-							double hazardDensity,
-							boolean monoTargets,
-							boolean monoHazards,
-							boolean accelerated,
-							int runtime) {
-		mapFromFile = false;
-		this.namesAndTags = namesAndTags;
+	@JsonCreator
+	public RunConfiguration(@JsonProperty("platforms") ArrayList<PlatformConfig> platforms,
+							@JsonProperty("mapFile") File mapFile,
+							@JsonProperty("accelerated") boolean accelerated,
+							@JsonProperty("runtime") int runtime) {
 		this.platforms = platforms;
-		this.mapRough = mapRough;
-		this.mapSize = mapSize;
-		this.mapDetail = mapDetail;
-		this.targetDensity = targetDensity;
-		this.hazardDensity = hazardDensity;
-		this.monoTargets = monoTargets;
-		this.monoHazards = monoHazards;
+		this.mapFile = mapFile;
 		this.accelerated = accelerated;
 		this.runtime = runtime;
+		this.namesAndTags = NamesAndTags.newFromPlatforms(platforms);
+	}
+
+	private RunConfiguration(RunConfiguration orig){
+		this.namesAndTags = orig.namesAndTags.clone();
+		this.platforms = new ArrayList<>(orig.platforms);
+		this.mapFile = new File(orig.mapFile.getAbsolutePath());
+		this.accelerated = orig.accelerated;
+		this.runtime = orig.runtime;
 	}
 	
-	public RunConfiguration(File save) throws Exception {
-		/*
-		ObjectInputStream in = new ObjectInputStream(new FileInputStream(save.getAbsolutePath()));
-		RunConfiguration input = (RunConfiguration) in.readObject();
-		if (!this.fileCode.equals(input.fileCode)){
-			in.close();
-			throw new Exception("Invalid File Version");
+	public static RunConfiguration fromFile(File save) throws Exception {
+		LOG.log(Level.INFO, "Loading saved configuration file from: {}", save.getAbsolutePath());
+		mapper.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		try {
+			return mapper.readValue(save, RunConfiguration.class);
 		}
-		*/
-		JsonFactory f = new JsonFactory();
-		JsonParser jp = f.createParser(save);
-		NamesAndTags NT = new NamesAndTags();
-		jp.nextToken();
-		while (jp.nextToken() != JsonToken.END_OBJECT) {
-			String fieldname = jp.getCurrentName();
-			jp.nextToken();
-				while(jp.nextToken() != JsonToken.END_OBJECT){
-					String namefield = jp.getCurrentName();
-					jp.nextToken();
+		catch (JsonParseException e){
+			LOG.log(Level.ERROR, "File was not parsable to RunConfiguration", e);
+			throw new Exception("File was not parsable to RunConfiguration", e);
 
-					if("Map".equals(namefield)){
-						mapFromFile = jp.readValueAs(boolean.class);
-						File fle = new File(jp.getValueAsString());
-						mapFile = fle;
-						mapRough = jp.readValueAs(double.class);
-						mapDetail = jp.readValueAs(int.class);
-						mapSize = jp.readValueAs(int.class);
-
-
-					}
-					if("TargetHazard".equals(namefield)){
-						monoTargets = jp.readValueAs(boolean.class);
-						monoHazards = jp.readValueAs(boolean.class);
-						targetDensity = jp.readValueAs(double.class);
-						hazardDensity = jp.readValueAs(double.class);
-					}
-					if("PlatformConfig".equals(namefield)){
-						PlatformConfig pc = new PlatformConfig();
-						Iterator<String> ID = new Iterator<String>() {
-							@Override
-							public boolean hasNext() {
-								return false;
-							}
-
-							@Override
-							public String next() {
-								return null;
-							}
-						};
-						Iterator<String> names = new Iterator<String>() {
-							@Override
-							public boolean hasNext() {
-								return false;
-							}
-
-							@Override
-							public String next() {
-								return null;
-							}
-						};
-						Iterator<String> types = new Iterator<String>() {
-							@Override
-							public boolean hasNext() {
-								return false;
-							}
-
-							@Override
-							public String next() {
-								return null;
-							}
-						};
-						Iterator<String> physics = new Iterator<String>() {
-							@Override
-							public boolean hasNext() {
-								return false;
-							}
-
-							@Override
-							public String next() {
-								return null;
-							}
-						};
-						Iterator<String> autos = new Iterator<String>() {
-							@Override
-							public boolean hasNext() {
-								return false;
-							}
-
-							@Override
-							public String next() {
-								return null;
-							}
-						};
-						ID = jp.readValuesAs(String.class);
-						names = jp.readValuesAs(String.class);
-						types = jp.readValuesAs(String.class);
-						physics = jp.readValuesAs(String.class);
-						autos = jp.readValuesAs(String.class);
-						while (names.hasNext()){
-							pc = PlatformConfig.builder().setID(ID.next())
-									.setScreenName(names.next())
-									.setType(types.next())
-									.setPhysicsModel(physics.next())
-									.setAutonomousModel(autos.next())
-									.build();
-							platforms.add(pc);
-							ID.remove();
-							names.remove();
-							types.remove();
-							physics.remove();
-							autos.remove();
-						}
-					}
-				}
-			}
-		jp.close();
-		/*
-		this.mapFromFile = input.mapFromFile;
-		this.namesAndTags = input.namesAndTags;
-		this.platforms = input.platforms;
-		this.mapFile = input.mapFile;
-		this.mapRough = input.mapRough;
-		this.mapSize = input.mapSize;
-		this.mapDetail = input.mapDetail;
-		this.monoTargets = input.monoTargets;
-		this.monoHazards = input.monoHazards;
-		this.targetDensity = input.targetDensity;
-		this.hazardDensity = input.hazardDensity;
-		this.accelerated = input.accelerated;
-		this.runtime = input.runtime;
-		*/
-		// in.close();
+		}
+		catch (JsonMappingException e){
+			LOG.log(Level.ERROR, "RunConfiguration could not be mapped from file", e);
+			throw new Exception("RunConfiguration could not be mapped from file", e);
+		}
+		catch (IOException e){
+			LOG.log(Level.ERROR, "File could not be found/accessed", e);
+			throw new Exception("File could not be found/accessed", e);
+		}
 	}
 
 	public void Save(File file) throws Exception {
-		/*
-		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file.getAbsolutePath()));
-		out.writeObject(this);
-		out.close();
-		*/
-		JsonFactory f = new JsonFactory();
-		JsonGenerator g = f.createGenerator(new File("jtest.json"), JsonEncoding.UTF8);
-		g.writeStartObject();
-		g.writeObjectFieldStart("Runtime");
-		g.writeNumberField("Runtime",runtime);
-		g.writeBooleanField("acclelerated", accelerated);
-		g.writeEndObject();
-		g.writeStartObject();
-		g.writeObjectFieldStart("Map");
-		g.writeBooleanField("RunFromFile",mapFromFile);
-		g.writeFieldName("mapFile");
-		g.writeString(mapFile.toString());
-		g.writeNumberField("mapRough", mapRough);
-		g.writeNumberField("mapDetail", mapDetail);
-		g.writeNumberField("mapSize", mapSize);
-		g.writeEndObject();
-		g.writeStartObject();
-		g.writeObjectFieldStart("TargetHazard");
-		g.writeBooleanField("monoTargets",monoTargets);
-		g.writeBooleanField("(monoHazards", monoHazards);
-		g.writeNumberField("targetDensity", targetDensity);
-		g.writeNumberField("hazardDensity", hazardDensity);
-		g.writeEndObject();
-		g.writeStartObject();;
-		g.writeObjectFieldStart("PlatformConfig");
-		g.writeFieldName("ID");
-		g.writeStartArray();
-		for(int j=0; j<platforms.size(); j++){
-			g.writeString(platforms.get(j).getID());
+		LOG.log(Level.INFO, "Saving run configuration to: {}", file.getAbsolutePath());
+		try {
+			mapper.writerWithDefaultPrettyPrinter().writeValue(file, this);
 		}
-		g.writeEndArray();
-		g.writeFieldName("screenName");
-		g.writeStartArray();
-		for(int j=0; j<platforms.size(); j++){
-			g.writeString(platforms.get(j).getScreenName());
+		catch (Exception e){
+			LOG.log(Level.WARN, "Configuration failed to save to file", e);
+			throw e;
 		}
-		g.writeEndArray();
-		g.writeFieldName("Type");
-		g.writeStartArray();
-		for(int j=0; j<platforms.size(); j++){
-			g.writeString(platforms.get(j).getType());
-		}
-		g.writeEndArray();
-		g.writeFieldName("PhysicsConfig");
-		g.writeStartArray();
-		for(int j=0; j<platforms.size(); j++){
-			g.writeString(platforms.get(j).getPhysicsModelName());
-		}
-		g.writeEndArray();
-		g.writeFieldName("AutonomousConfig");
-		g.writeStartArray();
-		for(int j=0; j<platforms.size(); j++){
-			g.writeString(platforms.get(j).getAutonomousModelName());
-		}
-		g.writeEndArray();
-		g.writeEndObject();
-
-		g.close();
 	}
 
 	public ArrayList<PlatformConfig> getPlatforms(String type){
-		ArrayList<PlatformConfig> out = new ArrayList<PlatformConfig>();
+		ArrayList<PlatformConfig> out = new ArrayList<>();
 		for (PlatformConfig cnfg : this.platforms){
 			if (cnfg.getType().equals(type)){
 				out.add(cnfg);
 			}
 		}
+		if (out.size() == 0){
+			throw new IndexOutOfBoundsException("No platforms of type \""+type+"\" registered");
+		}
 		return out;
+	}
+
+	@Override
+	public RunConfiguration clone(){
+		return new RunConfiguration(this);
 	}
 	
 }

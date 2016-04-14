@@ -1,12 +1,9 @@
 package com.csm.rover.simulator.objects.util;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-public class GridList<T> implements Serializable {
-
-	private static final long serialVersionUID = -5680890788280888934L;
+public class GridList<T> {
 	
 	private ArrayList<TreeMap<Integer, ArrayList<TreeMap<Integer, T>>>> data;
 	private int size;

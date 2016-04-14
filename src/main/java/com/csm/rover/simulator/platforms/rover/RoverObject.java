@@ -5,6 +5,7 @@ import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
+import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverDriveCommands;
 import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverPhysicsModel;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
@@ -14,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.awt.Point;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -23,10 +23,8 @@ import java.util.TreeMap;
 //TODO actually debug instructions
 //TODO make for modular for OCP, SRP
 @com.csm.rover.simulator.platforms.annotations.Platform(type="Rover")
-public class RoverObject extends Platform implements Serializable {
+public class RoverObject extends Platform {
 	private static final Logger LOG = LogManager.getLogger(RoverObject.class);
-	
-	private static final long serialVersionUID = 1L;
 
 	private static TerrainMap MAP;
     private static SerialBuffers serialBuffers;
@@ -47,10 +45,10 @@ public class RoverObject extends Platform implements Serializable {
 	private boolean run_auto = false; // are we running autonomously
 	private String temperatureData = ""; // "file" for recorded temperature data
 
-	private float boardVoltage = 9; // The measured voltage of the battery powering the board
-	private float motorVoltage = 12; // The measured voltage of the battery powering the motors
-	private float armVoltage = 0; // measured voltage powering the arm
-	private float motorCurrent = 0; // how much current the motors are pulling
+	private double boardVoltage = 9; // The measured voltage of the battery powering the board
+	private double motorVoltage = 12; // The measured voltage of the battery powering the motors
+	private double armVoltage = 0; // measured voltage powering the arm
+	private double motorCurrent = 0; // how much current the motors are pulling
 
 	private boolean waitingForResponse = false; // are we waiting for a response
 	private long responseWaitTime = 0; // how long to wait for response
@@ -113,18 +111,18 @@ public class RoverObject extends Platform implements Serializable {
 		try {
 			//Globals.getInstance().writeToLogFile(this.name, Globals.getInstance().timeMillis + "\t" + physicsModel.getLocation().getX() + "\t" + physicsModel.getLocation().getY() + "\t" + Access.getMapHeightatPoint(physicsModel.getLocation()) + "\t" + visitedScience.size()*10 + "\t" + physicsModel.getBatteryCharge());
 			try {
-				motorVoltage = (float) getBatteryVoltage(); // check battery voltage
+				motorVoltage = physicsModel.getState().get("battery_voltage"); // check battery voltage
 				if (motorVoltage < 0.0001){
 					LOG.log(Level.INFO, "{}: Rover ran out of power", name);
 				}
-				motorCurrent = (float) getBatteryCurrent(); // measure current draw				
+				motorCurrent = physicsModel.getState().get("battery_current"); // measure current draw
 				if (checkCurrent){
 					currentIntegral += motorCurrent * (Globals.getInstance().timeMillis - lastCurrentCheck); // predict life (really simply)
 					lastCurrentCheck = Globals.getInstance().timeMillis;
 					averageCurrent = currentIntegral / (Globals.getInstance().timeMillis - startCurretIntegral);
 				}
 			} catch (Exception e) {
-				LOG.log(Level.ERROR, "{}: Error in voltage check", name);
+				LOG.log(Level.ERROR, name+": Error in voltage check", e);
 			}
 			
 			if (serialBuffers.RFAvailable(ID) > 1) { // if there is a message
@@ -244,8 +242,9 @@ public class RoverObject extends Platform implements Serializable {
 							sendSerial("s1 g %");
 						}
 						else if (strcmp(data, "score") == 0){
-							if (MAP.isPointAtTarget(getLocation())){
-								this.visitedScience.add(MAP.getMapSquare(getLocation()));
+                            DecimalPoint loc = new DecimalPoint(this.physicsModel.getState().<Double>get("x"), this.physicsModel.getState().<Double>get("y"));
+							if (MAP.isPointAtTarget(loc)){
+								this.visitedScience.add(MAP.getMapSquare(loc));
 								System.out.println("Aquired.  New Score = " + visitedScience.size());
 							}
 						}
@@ -580,7 +579,7 @@ public class RoverObject extends Platform implements Serializable {
 			    			wheel = RoverWheels.BR;
 			    			break;
 			    		}
-			    		((RoverPhysicsModel)physicsModel).setMotorPower(wheel, power);
+			    		physicsModel.sendDriveCommand(RoverDriveCommands.CHANGE_MOTOR_PWR.getCmd(), wheel.getValue(), power);
 			    	}
 			    }
 				
@@ -682,66 +681,39 @@ public class RoverObject extends Platform implements Serializable {
 	
 	// how to move the motors for driving
 	private void driveForward(){
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.FORWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.FORWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.FORWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.FORWARD);
+        physicsModel.sendDriveCommand(RoverDriveCommands.DRIVE_FORWARD.getCmd());
 	}
 	
 	private void driveBackward(){
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.BACKWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.BACKWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.BACKWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+        physicsModel.sendDriveCommand(RoverDriveCommands.DRIVE_BACKWARD.getCmd());
 	}
 	
 	private void driveSpinCW(){
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.FORWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.FORWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.BACKWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+        physicsModel.sendDriveCommand(RoverDriveCommands.SPIN_CW.getCmd());
 	}
 	
 	private void driveSpinCCW(){
-        ((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.BACKWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.BACKWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.FORWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.FORWARD);
+        physicsModel.sendDriveCommand(RoverDriveCommands.SPIN_CCW.getCmd());
 	}
 	
 	private void driveStop(){
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.RELEASE);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.RELEASE);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.RELEASE);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.RELEASE);
+        physicsModel.sendDriveCommand(RoverDriveCommands.STOP.getCmd());
 	}
 	
 	private void driveTurnFL(){
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.RELEASE);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.RELEASE);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.FORWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.FORWARD);
+        physicsModel.sendDriveCommand(RoverDriveCommands.TURN_FRONT_LEFT.getCmd());
 	}
 	
 	private void driveTurnFR(){
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.FORWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.FORWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.RELEASE);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.RELEASE);
+        physicsModel.sendDriveCommand(RoverDriveCommands.TURN_FRONT_RIGHT.getCmd());
 	}
 	
 	private void driveTurnBL(){
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.RELEASE);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.RELEASE);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.BACKWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+        physicsModel.sendDriveCommand(RoverDriveCommands.TURN_BACK_LEFT.getCmd());
 	}
 	
 	private void driveTurnBR(){
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FL, MotorState.BACKWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BL, MotorState.BACKWARD);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.BR, MotorState.RELEASE);
-		((RoverPhysicsModel)physicsModel).setMotorState(RoverWheels.FR, MotorState.RELEASE);
+        physicsModel.sendDriveCommand(RoverDriveCommands.TURN_BACK_RIGHT.getCmd());
 	}
 	
 	// set up waiting for a response
@@ -775,7 +747,7 @@ public class RoverObject extends Platform implements Serializable {
 		}
 	}
 
-	private boolean sendSerial(float val) {
+	private boolean sendSerial(double val) {
 		return sendSerial(val + "");
 	}
 
@@ -832,9 +804,7 @@ public class RoverObject extends Platform implements Serializable {
 		}
 	}
 
-//PHYSCIS Related Stuff *****************************************************************************************************************************************************************************************************
-	
-	public void addToSerialHistory(String out){
+    public void addToSerialHistory(String out){
 		serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis + "\n";
 	}
 	
@@ -853,80 +823,5 @@ public class RoverObject extends Platform implements Serializable {
 	public boolean getLEDisLit(String name){
 		return LEDs.get(name);
 	}
-	
-	public RoverPhysicsModel getParameters(){
-		return ((RoverPhysicsModel)physicsModel);
-	}
-	
-	public DecimalPoint getLocation(){
-		return ((RoverPhysicsModel)physicsModel).getLocation();
-	}
-	
-	public double getDirection(){
-		return ((RoverPhysicsModel)physicsModel).getDirection();
-	}
-	
-	public double getBatteryVoltage(){
-		return ((RoverPhysicsModel)physicsModel).getBatteryVoltage();
-	}
 
-	public double getBatteryCharge(){
-		return ((RoverPhysicsModel)physicsModel).getBatteryCharge();
-	}
-	
-	public double getBatterCPCharge(){
-		return ((RoverPhysicsModel)physicsModel).getBattery_cp_charge();
-	}
-	
-	public double getSOC(){
-		return ((RoverPhysicsModel)physicsModel).getSOC();
-	}
-	
-	public double getBatteryCurrent(){
-		return ((RoverPhysicsModel)physicsModel).getBatteryCurrent();
-	}
-
-	public double getSpeed(){
-		return ((RoverPhysicsModel)physicsModel).getSpeed();
-	}
-
-	public double getAngularVelocity(){
-		return ((RoverPhysicsModel)physicsModel).getAngularVelocity();
-	}
-	
-	public double getSlipVelocity(){
-		return ((RoverPhysicsModel)physicsModel).getSlipVelocity();
-	}
-
-	public double getAcceleration(){
-		return ((RoverPhysicsModel)physicsModel).getAcceleration();
-	}
-
-	public double getAngularAcceleration(){
-		return ((RoverPhysicsModel)physicsModel).getAngularAcceleration();
-	}
-	
-	public double getSlipAcceleration(){
-		return ((RoverPhysicsModel)physicsModel).getSlip_acceleration();
-	}
-
-	public double getWheelSpeed(RoverWheels which){
-		return ((RoverPhysicsModel)physicsModel).getWheelSpeed()[which.getValue()];
-	}
-	
-	public double getMotorCurrent(RoverWheels which){
-		return ((RoverPhysicsModel)physicsModel).getMotor_current()[which.getValue()];
-	}
-	
-	public double getMotorVoltage(RoverWheels which){
-		return (((RoverPhysicsModel)physicsModel).getMotor_power()[which.getValue()]/255.0)*((RoverPhysicsModel)physicsModel).getBatteryVoltage()*((RoverPhysicsModel)physicsModel).getMotorStates()[which.getValue()];
-	}
-	
-	public double getBatteryTemperature(){
-		return ((RoverPhysicsModel)physicsModel).getBatteryTemperature();
-	}
-	
-	public double getMotorTemp(RoverWheels which){
-		return ((RoverPhysicsModel)physicsModel).getMotorTemp(which);
-	}
 }

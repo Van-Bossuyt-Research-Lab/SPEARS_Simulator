@@ -4,6 +4,7 @@ import com.csm.rover.simulator.environments.EnvironmentRegistry;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
+import com.csm.rover.simulator.platforms.annotations.State;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,36 +17,32 @@ public class PlatformRegistry {
     private static final Logger LOG = LogManager.getLogger(PlatformRegistry.class);
 
     static {
-        instance = Optional.empty();
+        fillRegistry();
     }
 
-    private static Optional<PlatformRegistry> instance;
-    private PlatformRegistry(){
+    private static Map<String, String> platforms;
+
+    private static Map<String, String> platformStates;
+
+    private static Map<String, Map<String, String>> autoModels;
+    private static Map<String, Map<String, String>> physicsModels;
+
+    private static Map<String, Map<String, String[]>> autoModelParameters;
+    private static Map<String, Map<String, String[]>> physicsModelParameters;
+
+    private static void fillRegistry(){
         platforms = new TreeMap<>();
+        platformStates = new TreeMap<>();
         autoModels = new TreeMap<>();
         physicsModels = new TreeMap<>();
         autoModelParameters = new TreeMap<>();
         physicsModelParameters = new TreeMap<>();
-    }
 
-    private Map<String, String> platforms;
-    private Map<String, Map<String, String>> autoModels;
-    private Map<String, Map<String, String>> physicsModels;
-
-    private Map<String, Map<String, String[]>> autoModelParameters;
-    private Map<String, Map<String, String[]>> physicsModelParameters;
-
-    public static void fillRegistry(){
-        PlatformRegistry reg = new PlatformRegistry();
-        instance = Optional.of(reg);
-        instance.get().doFillRegistry();
-    }
-
-    private void doFillRegistry(){
         LOG.log(Level.INFO, "Initializing Platform Registry");
         Reflections reflect = new Reflections("com.csm.rover.simulator");
 
         fillPlatforms(reflect);
+        fillStates(reflect);
         fillAutoModels(reflect);
         fillPhysicsModels(reflect);
 
@@ -70,7 +67,7 @@ public class PlatformRegistry {
         LOG.log(Level.INFO, "Registry Comparison Complete");
     }
 
-    private void fillPlatforms(Reflections reflect){
+    private static void fillPlatforms(Reflections reflect){
         Set<Class<? extends Platform>> classplatforms = reflect.getSubTypesOf(Platform.class);
         Set<Class<?>> labelplatforms = reflect.getTypesAnnotatedWith(com.csm.rover.simulator.platforms.annotations.Platform.class);
         List<Set<?>> sortedSets = sortSets(classplatforms, labelplatforms);
@@ -91,21 +88,65 @@ public class PlatformRegistry {
             String type = platform.getAnnotation(com.csm.rover.simulator.platforms.annotations.Platform.class).type();
             try {
                 platform.newInstance();
-                this.platforms.put(type, getClassPath(platform));
+                platforms.put(type, getClassPath(platform));
             }
             catch (InstantiationException | IllegalAccessException e) {
                 LOG.log(Level.WARN, "{} does not have a default constructor", platform.toString());
             }
         }
-        if (this.platforms.size() == 0){
+        if (platforms.size() == 0){
             LOG.log(Level.WARN, "No platforms were found to load");
         }
         else {
-            LOG.log(Level.INFO, "Identified Platforms: {}", this.platforms.toString());
+            LOG.log(Level.INFO, "Identified Platforms: {}", platforms.toString());
         }
     }
 
-    private void fillAutoModels(Reflections reflect){
+    private static void fillStates(Reflections reflect){
+        Set<Class<? extends PlatformState>> classstates = reflect.getSubTypesOf(PlatformState.class);
+        Set<Class<?>> labeledstates = reflect.getTypesAnnotatedWith(com.csm.rover.simulator.platforms.annotations.State.class);
+        List<Set<?>> sortedSets = sortSets(classstates, labeledstates);
+        @SuppressWarnings("unchecked")
+        Set<Class<?>> warnset1 = (Set<Class<?>>)sortedSets.get(0);
+        for (Class<?> clazz : warnset1){
+            LOG.log(Level.WARN, "{} extends PlatformState but is not registered as a PlatformState", clazz.toString());
+        }
+        @SuppressWarnings("unchecked")
+        Set<Class<?>> warnset2 = (Set<Class<?>>)sortedSets.get(2);
+        for (Class<?> clazz : warnset2){
+            LOG.log(Level.WARN, "{} is a registered PlatformState but does not extend PlatformState", clazz.toString());
+        }
+
+        @SuppressWarnings("unchecked")
+        Set<Class<? extends PlatformState>> realstates = (Set<Class<? extends PlatformState>>)sortedSets.get(1);
+        for (Class<? extends PlatformState> state: realstates){
+            String type = state.getAnnotation(State.class).type();
+            if (platforms.keySet().contains(type)){
+                try {
+                    state.newInstance();
+                    platformStates.put(type, getClassPath(state));
+                }
+                catch (InstantiationException | IllegalAccessException e) {
+                    LOG.log(Level.WARN, "{} does not have a default constructor.", state.toString());
+                }
+            }
+            else {
+                LOG.log(Level.WARN, "PlatformState {} has type {} which is not a recognized platform", getClassPath(state), type);
+            }
+        }
+        if (platformStates.size() == 0){
+            LOG.log(Level.WARN, "No PlatformStates were found");
+            return;
+        }
+        for (String type : platforms.keySet()){
+            if (!platformStates.containsKey(type)){
+                LOG.log(Level.WARN, "No PlatformState found for type {}", type);
+            }
+        }
+        LOG.log(Level.INFO, "Found PlatformStates: {}", platformStates.toString());
+    }
+
+    private static void fillAutoModels(Reflections reflect){
         for (String type : platforms.keySet()){
             autoModels.put(type, new TreeMap<String, String>());
             autoModelParameters.put(type, new TreeMap<String, String[]>());
@@ -161,7 +202,7 @@ public class PlatformRegistry {
         }
     }
 
-    private void fillPhysicsModels(Reflections reflect){
+    private static void fillPhysicsModels(Reflections reflect){
         for (String type : platforms.keySet()){
             physicsModels.put(type, new TreeMap<String, String>());
             physicsModelParameters.put(type, new TreeMap<String, String[]>());
@@ -217,13 +258,8 @@ public class PlatformRegistry {
         }
     }
 
-    public static Class<? extends Platform> getPlatform(String type){
-        checkInitialized();
-        return instance.get().doGetPlatform(type);
-    }
-
     @SuppressWarnings("unchecked")
-    private Class<? extends Platform> doGetPlatform(String type){
+    public static Class<? extends Platform> getPlatform(String type){
         if (platforms.keySet().contains(type)){
             try {
                 return (Class<? extends Platform>)Class.forName(platforms.get(type));
@@ -239,13 +275,25 @@ public class PlatformRegistry {
         }
     }
 
-    public static Class<? extends PlatformAutonomousCodeModel> getAutonomousCodeModel(String type, String name){
-        checkInitialized();
-        return instance.get().doGetAutonomousCodeModel(type, name);
+    @SuppressWarnings("unchecked")
+    public static Class<? extends PlatformState> getPlatformState(String type){
+        if (platformStates.containsKey(type)){
+            try {
+                return (Class<? extends PlatformState>)Class.forName(platformStates.get(type));
+            }
+            catch (ClassNotFoundException | ClassCastException e){
+                LOG.log(Level.ERROR, "Registry failed to properly load class " + platforms.get(type) + " as a PlatformState of " + type, e);
+                return null;
+            }
+        }
+        else {
+            LOG.log(Level.ERROR, "The platform type {} is not registered and cannot be returned");
+            return null;
+        }
     }
 
     @SuppressWarnings("unchecked")
-    private Class<? extends PlatformAutonomousCodeModel> doGetAutonomousCodeModel(String type, String name){
+    public static Class<? extends PlatformAutonomousCodeModel> getAutonomousCodeModel(String type, String name){
         if (platforms.keySet().contains(type)){
             Map<String, String> models = autoModels.get(type);
             if (models.keySet().contains(name)) {
@@ -268,13 +316,8 @@ public class PlatformRegistry {
         }
     }
 
-    public static Class<? extends PlatformPhysicsModel> getPhysicsModel(String type, String name){
-        checkInitialized();
-        return instance.get().doGetPhysicsModel(type, name);
-    }
-
     @SuppressWarnings("unchecked")
-    private Class<? extends PlatformPhysicsModel> doGetPhysicsModel(String type, String name){
+    public static Class<? extends PlatformPhysicsModel> getPhysicsModel(String type, String name){
         if (platforms.keySet().contains(type)){
             Map<String, String> models = physicsModels.get(type);
             if (models.keySet().contains(name)) {
@@ -297,12 +340,8 @@ public class PlatformRegistry {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static List<String> listPhysicsModels(String type){
-        checkInitialized();
-        return instance.get().doListPhysicsModels(type);
-    }
-
-    private List<String> doListPhysicsModels(String type){
         if (physicsModels.keySet().contains(type)){
             return new ArrayList<>(physicsModels.get(type).keySet());
         }
@@ -312,12 +351,8 @@ public class PlatformRegistry {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static List<String> listAutonomousCodeModels(String type){
-        checkInitialized();
-        return instance.get().doListAutonomousCodeModels(type);
-    }
-
-    private List<String> doListAutonomousCodeModels(String type){
         if (autoModels.keySet().contains(type)){
             return new ArrayList<>(autoModels.get(type).keySet());
         }
@@ -327,12 +362,8 @@ public class PlatformRegistry {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static List<String> getParametersForAutonomousCodeModel(String type, String name){
-        checkInitialized();
-        return instance.get().doGetParametersForAutonomousCodeModel(type, name);
-    }
-
-    private List<String> doGetParametersForAutonomousCodeModel(String type, String name){
         if (autoModelParameters.keySet().contains(type)){
             if (autoModelParameters.get(type).keySet().contains(name)){
                 return Arrays.asList(autoModelParameters.get(type).get(name));
@@ -348,12 +379,8 @@ public class PlatformRegistry {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static List<String> getParametersForPhysicsModel(String type, String name){
-        checkInitialized();
-        return instance.get().doGetParametersForPhysicsModel(type, name);
-    }
-
-    private List<String> doGetParametersForPhysicsModel(String type, String name){
         if (physicsModelParameters.keySet().contains(type)){
             if (physicsModelParameters.get(type).keySet().contains(name)){
                 return Arrays.asList(physicsModelParameters.get(type).get(name));
@@ -369,17 +396,11 @@ public class PlatformRegistry {
         }
     }
 
-    private static void checkInitialized(){
-        if (!instance.isPresent()){
-            throw new IllegalStateException("The registry has not been filled initialized");
-        }
-    }
-
     private static String getClassPath(Class<?> clazz){
         return clazz.toString().substring(clazz.toString().indexOf(' ')+1);
     }
 
-    private <T,V> List<Set<?>> sortSets(Set<T> set1, Set<V> set2){
+    private static <T,V> List<Set<?>> sortSets(Set<T> set1, Set<V> set2){
         Map<String,T> strs1 = new HashMap<>();
         for (T t : set1){
             strs1.put(t.toString(), t);

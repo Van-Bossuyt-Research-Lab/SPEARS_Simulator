@@ -1,11 +1,8 @@
 package com.csm.rover.simulator.objects.util;
 
 import com.csm.rover.simulator.wrapper.Globals;
-import java.io.Serializable;
 
-public class FreeThread extends Thread implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class FreeThread extends Thread {
 	
 	private int delay;
 	private Runnable action;

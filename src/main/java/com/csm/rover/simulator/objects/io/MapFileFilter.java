@@ -1,13 +1,9 @@
 package com.csm.rover.simulator.objects.io;
 
-import java.io.File;
-import java.io.Serializable;
-
 import javax.swing.filechooser.FileFilter;
+import java.io.File;
 
-public class MapFileFilter extends FileFilter implements Serializable {
-	
-	private static final long serialVersionUID = -7881971699253008902L;
+public class MapFileFilter extends FileFilter {
 
 	@Override
 	public boolean accept(File arg0) {
