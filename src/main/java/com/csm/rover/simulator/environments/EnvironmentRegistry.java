@@ -15,33 +15,23 @@ public class EnvironmentRegistry {
     private static final Logger LOG = LogManager.getLogger(EnvironmentRegistry.class);
 
     static {
-        instance = Optional.empty();
-    }
-
-    private static Optional<EnvironmentRegistry> instance;
-    private EnvironmentRegistry(){
         environments = new TreeMap<>();
         modifiers = new TreeMap<>();
         modifierParameters = new TreeMap<>();
         populators = new TreeMap<>();
         populatorParameters = new TreeMap<>();
+        fillRegistry();
     }
 
-    private Map<String, String> environments;
+    private static Map<String, String> environments;
 
-    private Map<String, Map<String, String>> modifiers;
-    private Map<String, Map<String, String[]>> modifierParameters;
+    private static Map<String, Map<String, String>> modifiers;
+    private static Map<String, Map<String, String[]>> modifierParameters;
 
-    private Map<String, Map<String, String>> populators;
-    private Map<String, Map<String, String[]>> populatorParameters;
+    private static Map<String, Map<String, String>> populators;
+    private static Map<String, Map<String, String[]>> populatorParameters;
 
-    public static void fillRegistry(){
-        EnvironmentRegistry reg = new EnvironmentRegistry();
-        instance = Optional.of(reg);
-        instance.get().doFillRegistry();
-    }
-
-    private void doFillRegistry(){
+    private static void fillRegistry(){
         LOG.log(Level.INFO, "Initializing Environment Registry");
         Reflections reflect = new Reflections("com.csm.rover.simulator");
 
@@ -52,7 +42,7 @@ public class EnvironmentRegistry {
         LOG.log(Level.INFO, "Environment Registration Complete");
     }
 
-    private void fillEnvironments(Reflections reflect){
+    private static void fillEnvironments(Reflections reflect){
         Set<Class<? extends PlatformEnvironment>> classenviros = reflect.getSubTypesOf(PlatformEnvironment.class);
         Set<Class<?>> labelenviros = reflect.getTypesAnnotatedWith(Environment.class);
         List<Set<?>> sortedSets = sortSets(classenviros, labelenviros);
@@ -73,21 +63,21 @@ public class EnvironmentRegistry {
             String type = enviro.getAnnotation(Environment.class).type();
             try {
                 enviro.newInstance();
-                this.environments.put(type, getClassPath(enviro));
+                environments.put(type, getClassPath(enviro));
             }
             catch (InstantiationException | IllegalAccessException e) {
                 LOG.log(Level.WARN, "{} does not have a default constructor", enviro.toString());
             }
         }
-        if (this.environments.size() == 0){
+        if (environments.size() == 0){
             LOG.log(Level.WARN, "No Environments were found to load");
         }
         else {
-            LOG.log(Level.INFO, "Identified Environments: {}", this.environments.toString());
+            LOG.log(Level.INFO, "Identified Environments: {}", environments.toString());
         }
     }
 
-    private void fillModifiers(Reflections reflect){
+    private static void fillModifiers(Reflections reflect){
         for (String type : environments.keySet()){
             modifiers.put(type, new TreeMap<String, String>());
             modifierParameters.put(type, new TreeMap<String, String[]>());
@@ -139,7 +129,7 @@ public class EnvironmentRegistry {
         }
     }
 
-    private void fillPopulators(Reflections reflect){
+    private static void fillPopulators(Reflections reflect){
         for (String type : environments.keySet()){
             populators.put(type, new TreeMap<String, String>());
             populatorParameters.put(type, new TreeMap<String, String[]>());
@@ -191,13 +181,12 @@ public class EnvironmentRegistry {
         }
     }
 
-    public static Class<? extends PlatformEnvironment> getEnvironment(String type){
-        checkInitialized();
-        return instance.get().doGetEnvironment(type);
+    public static List<String> getTypes(){
+        return new ArrayList<>(environments.keySet());
     }
 
     @SuppressWarnings("unchecked")
-    private Class<? extends PlatformEnvironment> doGetEnvironment(String type){
+    public static Class<? extends PlatformEnvironment> getEnvironment(String type){
         if (environments.keySet().contains(type)){
             try {
                 return (Class<? extends PlatformEnvironment>)Class.forName(environments.get(type));
@@ -213,13 +202,8 @@ public class EnvironmentRegistry {
         }
     }
 
-    public static Class<? extends EnvironmentModifier> getModifier(String type, String name){
-        checkInitialized();
-        return instance.get().doGetModifier(type, name);
-    }
-
     @SuppressWarnings("unchecked")
-    private Class<? extends EnvironmentModifier> doGetModifier(String type, String name){
+    public static Class<? extends EnvironmentModifier> getModifier(String type, String name){
         if (environments.keySet().contains(type)){
             Map<String, String> models = modifiers.get(type);
             if (models.keySet().contains(name)) {
@@ -242,13 +226,8 @@ public class EnvironmentRegistry {
         }
     }
 
-    public static Class<? extends EnvironmentPopulator> getPopulator(String type, String name){
-        checkInitialized();
-        return instance.get().doGetPopulator(type, name);
-    }
-
     @SuppressWarnings("unchecked")
-    private Class<? extends EnvironmentPopulator> doGetPopulator(String type, String name){
+    public static Class<? extends EnvironmentPopulator> getPopulator(String type, String name){
         if (environments.keySet().contains(type)){
             Map<String, String> models = populators.get(type);
             if (models.keySet().contains(name)) {
@@ -272,11 +251,6 @@ public class EnvironmentRegistry {
     }
 
     public static List<String> listPopulators(String type){
-        checkInitialized();
-        return instance.get().doListPopulators(type);
-    }
-
-    private List<String> doListPopulators(String type){
         if (populators.keySet().contains(type)){
             return new ArrayList<>(populators.get(type).keySet());
         }
@@ -287,11 +261,6 @@ public class EnvironmentRegistry {
     }
 
     public static List<String> listModifiers(String type){
-        checkInitialized();
-        return instance.get().doListModifiers(type);
-    }
-
-    private List<String> doListModifiers(String type){
         if (modifiers.keySet().contains(type)){
             return new ArrayList<>(modifiers.get(type).keySet());
         }
@@ -302,11 +271,6 @@ public class EnvironmentRegistry {
     }
 
     public static List<String> getParametersForModifier(String type, String name){
-        checkInitialized();
-        return instance.get().doGetParametersForModifier(type, name);
-    }
-
-    private List<String> doGetParametersForModifier(String type, String name){
         if (modifierParameters.keySet().contains(type)){
             if (modifierParameters.get(type).keySet().contains(name)){
                 return Arrays.asList(modifierParameters.get(type).get(name));
@@ -323,11 +287,6 @@ public class EnvironmentRegistry {
     }
 
     public static List<String> getParametersForPopulator(String type, String name){
-        checkInitialized();
-        return instance.get().doGetParametersForPopulator(type, name);
-    }
-
-    private List<String> doGetParametersForPopulator(String type, String name){
         if (populatorParameters.keySet().contains(type)){
             if (populatorParameters.get(type).keySet().contains(name)){
                 return Arrays.asList(populatorParameters.get(type).get(name));
@@ -343,17 +302,11 @@ public class EnvironmentRegistry {
         }
     }
 
-    private static void checkInitialized(){
-        if (!instance.isPresent()){
-            throw new IllegalStateException("The registry has not been filled initialized");
-        }
-    }
-
     private static String getClassPath(Class<?> clazz){
         return clazz.toString().substring(clazz.toString().indexOf(' ')+1);
     }
 
-    private <T,V> List<Set<?>> sortSets(Set<T> set1, Set<V> set2){
+    private static <T,V> List<Set<?>> sortSets(Set<T> set1, Set<V> set2){
         Map<String,T> strs1 = new HashMap<>();
         for (T t : set1){
             strs1.put(t.toString(), t);

@@ -32,6 +32,7 @@ public class Admin {
 
 	public static void main(String[] args) {
         LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
+        RegistryManager.checkRegistries();
 		Admin admin = getInstance();
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");

@@ -1,7 +1,5 @@
 package com.csm.rover.simulator.platforms;
 
-import com.csm.rover.simulator.environments.EnvironmentRegistry;
-import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import com.csm.rover.simulator.platforms.annotations.State;
@@ -30,7 +28,7 @@ public class PlatformRegistry {
     private static Map<String, Map<String, String[]>> autoModelParameters;
     private static Map<String, Map<String, String[]>> physicsModelParameters;
 
-    private static void fillRegistry(){
+    private static void fillRegistry() {
         platforms = new TreeMap<>();
         platformStates = new TreeMap<>();
         autoModels = new TreeMap<>();
@@ -47,24 +45,6 @@ public class PlatformRegistry {
         fillPhysicsModels(reflect);
 
         LOG.log(Level.INFO, "Platform Registration Complete");
-
-        EnvironmentRegistry.fillRegistry();
-
-        compareToEnvironment();
-    }
-
-    private void compareToEnvironment() {
-        LOG.log(Level.INFO, "Initializing Registry Comparison");
-        for (String platform : platforms.keySet()){
-            Class<? extends PlatformEnvironment> enviro = EnvironmentRegistry.getEnvironment(platform);
-            if (enviro == null){
-                LOG.log(Level.WARN, "No environment found corresponding to Platform type {}", platform);
-            }
-            else {
-                LOG.log(Level.INFO, "Linked Platform {} to Environment {}", platforms.get(platform), getClassPath(enviro));
-            }
-        }
-        LOG.log(Level.INFO, "Registry Comparison Complete");
     }
 
     private static void fillPlatforms(Reflections reflect){
@@ -256,6 +236,10 @@ public class PlatformRegistry {
                 LOG.log(Level.INFO, "For platform type {} found PhysicsModels: {}", type, physicsModels.get(type).toString());
             }
         }
+    }
+
+    public static List<String> getTypes(){
+        return new ArrayList<>(platforms.keySet());
     }
 
     @SuppressWarnings("unchecked")
