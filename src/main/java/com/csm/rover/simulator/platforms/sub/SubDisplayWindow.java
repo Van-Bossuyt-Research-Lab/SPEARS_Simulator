@@ -344,7 +344,7 @@ public class SubDisplayWindow extends JPanel {
         AutonomousLED.setSelected(false);
     }
 
-    public void setRoverList(ArrayList<SubObject> rovers){
+    public void setSubList(ArrayList<SubObject> subs){
         this.subs = subs;
     }
 

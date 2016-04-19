@@ -99,13 +99,13 @@ public class SubHub extends Panel {
             displayWindow.addPageForwardAction(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
-                    changeLinkedRover(a, 1);
+                    changeLinkedSub(a, 1);
                 }
             });
             displayWindow.addPageBackAction(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
-                    changeLinkedRover(a, -1);
+                    changeLinkedSub(a, -1);
                 }
             });
             displayWindows.add(x, displayWindow);
@@ -155,7 +155,7 @@ public class SubHub extends Panel {
             public void run(){
                 updateDisplays();
             }
-        }, SynchronousThread.FOREVER, "Rover Hub Update");
+        }, SynchronousThread.FOREVER, "Sub Hub Update");
     }
 
     public void setIdentifiers(ArrayList<String> rovs, ArrayList<String> sats){
@@ -176,15 +176,15 @@ public class SubHub extends Panel {
         } catch (ArrayIndexOutOfBoundsException e) { e.printStackTrace(); }
     }
 
-    //adds the rover objects to the hub
-    public void setRovers(ArrayList<SubObject> subs){
+    //adds the sub objects to the hub
+    public void setSubs(ArrayList<SubObject> subs){
         for (SubObject sub : subs){
-            this.subs.adds(sub);
+            this.subs.add(sub);
         }
 
         int x = 0;
         while (x < subs.size()){
-            //set the first n displays to the the nth rover
+            //set the first n displays to the the nth sub
             standardDisplayLinks.get(x/numberOfDisplays).put(x%numberOfDisplays, x);
             x++;
         }
@@ -196,7 +196,7 @@ public class SubHub extends Panel {
         updateDisplays();
     }
 
-    public void setFocusedRover(int which){
+    public void setFocusedSub(int which){
         if (which >= 0 && which < subs.size()){
             HUDDisplayLinks.put(0, which);
             displayWindows.get(0).lockOnSub(which);
@@ -221,8 +221,8 @@ public class SubHub extends Panel {
         }
     }
 
-    //change which rover is connected to a certain display
-    private void changeLinkedRover(int display, int by){
+    //change which sub is connected to a certain display
+    private void changeLinkedSub(int display, int by){
         if (subs.size() == 0){
             return;
         }
