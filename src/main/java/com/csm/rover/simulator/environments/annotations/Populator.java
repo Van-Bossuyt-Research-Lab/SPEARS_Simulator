@@ -8,6 +8,7 @@ public @interface Populator {
 
     String type();
     String name();
+    String[] coordinates();
     String[] parameters();
 
 }
