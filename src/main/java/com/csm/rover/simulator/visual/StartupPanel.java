@@ -733,7 +733,7 @@ public class StartupPanel extends Panel {
         Random rnd = new Random();
         File tempFile;
         do {
-            tempFile = new File(String.format("Temp/%d.map", (int) (rnd.nextDouble() * 10000)));
+            tempFile = new File("temp.map");
         } while (tempFile.exists());
         TerrainMapWriter.saveMap(terrainMap, tempFile);
         return tempFile;

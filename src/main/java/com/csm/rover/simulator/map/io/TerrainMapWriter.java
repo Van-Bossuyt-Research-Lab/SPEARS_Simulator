@@ -103,7 +103,8 @@ public class TerrainMapWriter {
     public static void saveMap(TerrainMap map, File file){
         LOG.log(Level.INFO, "Saving map file to {}", file.getAbsolutePath());
         try {
-            BufferedWriter write = new BufferedWriter(new FileWriter(file, true));
+             // BufferedWriter write = new BufferedWriter(new FileWriter(file, true));
+            BufferedWriter write = new BufferedWriter(new FileWriter(file));
 
             write.write(fileID + "\n");
 
