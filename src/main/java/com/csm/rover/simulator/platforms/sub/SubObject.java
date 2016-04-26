@@ -429,7 +429,7 @@ public class SubObject extends Platform {
                     LEDs.put("Autonomus", true);
                     LEDs.put("Instructions", false);
 
-                    String cmd = autoCode.nextCommand();
+                    String cmd = autoCode.nextCommand(Globals.getInstance().timeMillis,physicsModel.getState());
                     //TODO switch all known commands
                     if (strcmp(cmd, "") == 0) { /*Do Nothing*/ } else if (strcmp(cmd, "move") == 0) {
                         Forward();

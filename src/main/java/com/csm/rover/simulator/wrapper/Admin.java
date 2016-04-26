@@ -8,6 +8,7 @@ import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
+import com.csm.rover.simulator.platforms.sub.SubObject;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +29,7 @@ public class Admin {
     private TerrainMap terrainMap;
     private ArrayList<PlatformConfig> roverCfgs;
     private ArrayList<PlatformConfig> satCfgs;
+	private ArrayList<PlatformConfig> subCfgs;
     private SerialBuffers serialBuffers;
 
 	public static void main(String[] args) {
@@ -100,7 +102,8 @@ public class Admin {
 	public void beginSimulation(RunConfiguration config){
 		this.roverCfgs = config.getPlatforms("Rover");
 		this.satCfgs = config.getPlatforms("Satellite");
-		if (roverCfgs.size() == 0 || satCfgs.size() == 0){
+		this.subCfgs = config.getPlatforms("Sub");
+		if ((roverCfgs.size() == 0 || satCfgs.size() == 0) && subCfgs.size()==0){
 			LOG.log(Level.WARN, "Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;
 		}
@@ -124,6 +127,7 @@ public class Admin {
 
 		ArrayList<RoverObject> rovers = buildRoversFromConfig(roverCfgs);
 		ArrayList<SatelliteObject> satellites = buildSatellitesFromConfig(satCfgs);
+		ArrayList<SubObject> subs = buildSubsFromConfig(subCfgs);
 
         HI.initialize(config.namesAndTags, serialBuffers, rovers, satellites, terrainMap);
 
@@ -138,6 +142,9 @@ public class Admin {
         for (SatelliteObject sat : satellites){
             sat.start();
         }
+		for (SubObject sub : subs){
+			sub.start();
+		}
         HI.start();
 		GLOBAL.startTime(config.accelerated);
 
@@ -158,6 +165,14 @@ public class Admin {
             out.add(Platform.<SatelliteObject>buildFromConfiguration(config));
         }
         return out;
+	}
+
+	private ArrayList<SubObject> buildSubsFromConfig(ArrayList<PlatformConfig> configs){
+		ArrayList<SubObject> out = new ArrayList<>();
+		for (PlatformConfig config : configs){
+			out.add(Platform.<SubObject>buildFromConfiguration(config));
+		}
+		return out;
 	}
 
 }

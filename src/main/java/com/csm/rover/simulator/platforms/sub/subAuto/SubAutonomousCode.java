@@ -48,7 +48,7 @@ public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel impl
     protected abstract String doNextCommand(long milliTime, DecimalPoint location,
                                             double direction, Map<String, Double> params);
 
-    public static void setTerrainMap(SubMap map){
+    public static void setSubMap(SubMap map){
         MAP = map;
     }
 
