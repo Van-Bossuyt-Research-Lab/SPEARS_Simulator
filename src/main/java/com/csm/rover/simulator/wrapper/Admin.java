@@ -100,13 +100,14 @@ public class Admin {
     }
 
 	public void beginSimulation(RunConfiguration config){
-		this.roverCfgs = config.getPlatforms("Rover");
-		this.satCfgs = config.getPlatforms("Satellite");
+		//this.roverCfgs = config.getPlatforms("Rover");
+		//this.satCfgs = config.getPlatforms("Satellite");
 		this.subCfgs = config.getPlatforms("Sub");
 		if ((roverCfgs.size() == 0 || satCfgs.size() == 0) && subCfgs.size()==0){
 			LOG.log(Level.WARN, "Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;
 		}
+
 
         serialBuffers = new SerialBuffers(config.namesAndTags.getTags(), HI);
         RoverObject.setSerialBuffers(serialBuffers);

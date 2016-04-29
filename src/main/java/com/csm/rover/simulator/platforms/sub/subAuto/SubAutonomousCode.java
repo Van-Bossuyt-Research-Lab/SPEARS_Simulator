@@ -1,12 +1,11 @@
 package com.csm.rover.simulator.platforms.sub.subAuto;
 
-import com.csm.rover.simulator.control.InterfaceAccess;
 import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.platforms.PlatformState;
-import com.csm.rover.simulator.platforms.rover.RoverWheels;
+import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import com.csm.rover.simulator.platforms.sub.subProp;
 import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
@@ -15,12 +14,15 @@ import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-
-public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel implements Serializable, Cloneable {
+@AutonomousCodeModel(type = "Sub", name = "Default", parameters = {})
+public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
     private static final Logger LOG = LogManager.getLogger(SubAutonomousCode.class);
 
 

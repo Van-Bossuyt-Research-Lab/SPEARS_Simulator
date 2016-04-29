@@ -3,17 +3,16 @@ package com.csm.rover.simulator.platforms.sub;
 import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.rover.MotorState;
 import com.csm.rover.simulator.platforms.sub.physicsModels.subPhysicsModel;
 import com.csm.rover.simulator.platforms.sub.subAuto.SubAutonomousCode;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
-import com.csm.rover.simulator.platforms.rover.MotorState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.Point;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -21,6 +20,7 @@ import java.util.TreeMap;
 
 //TODO actually debug instructions
 //TODO make for modular for OCP, SRP
+@com.csm.rover.simulator.platforms.annotations.Platform(type="Sub")
 public class SubObject extends Platform {
     private static final Logger LOG = LogManager.getLogger(SubObject.class);
 
