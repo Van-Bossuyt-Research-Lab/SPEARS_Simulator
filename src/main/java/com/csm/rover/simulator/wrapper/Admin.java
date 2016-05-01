@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.wrapper;
 
 import com.csm.rover.simulator.control.PopUp;
+import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.map.io.TerrainMapReader;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
@@ -27,6 +28,7 @@ public class Admin {
 
     //Runtime Variables
     private TerrainMap terrainMap;
+	private SubMap subMap;
     private ArrayList<PlatformConfig> roverCfgs;
     private ArrayList<PlatformConfig> satCfgs;
 	private ArrayList<PlatformConfig> subCfgs;
@@ -103,15 +105,16 @@ public class Admin {
 		//this.roverCfgs = config.getPlatforms("Rover");
 		//this.satCfgs = config.getPlatforms("Satellite");
 		this.subCfgs = config.getPlatforms("Sub");
-		if ((roverCfgs.size() == 0 || satCfgs.size() == 0) && subCfgs.size()==0){
+		if (/*( roverCfgs.size() == 0 || satCfgs.size() == 0) && */ subCfgs.size()==0){
 			LOG.log(Level.WARN, "Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;
 		}
 
 
         serialBuffers = new SerialBuffers(config.namesAndTags.getTags(), HI);
-        RoverObject.setSerialBuffers(serialBuffers);
-        SatelliteObject.setSerialBuffers(serialBuffers);
+        //RoverObject.setSerialBuffers(serialBuffers);
+        //SatelliteObject.setSerialBuffers(serialBuffers);
+		SubObject.setSerialBuffers(serialBuffers);
 
 		try {
 			if (!config.mapFile.exists()){
@@ -124,25 +127,27 @@ public class Admin {
 			LOG.log(Level.WARN, "Start Up: Invalid map file", e);
 			return;
 		}
-        RoverObject.setTerrainMap(terrainMap);
+        //RoverObject.setTerrainMap(terrainMap);
 
-		ArrayList<RoverObject> rovers = buildRoversFromConfig(roverCfgs);
-		ArrayList<SatelliteObject> satellites = buildSatellitesFromConfig(satCfgs);
+		//ArrayList<RoverObject> rovers = buildRoversFromConfig(roverCfgs);
+		//ArrayList<SatelliteObject> satellites = buildSatellitesFromConfig(satCfgs);
 		ArrayList<SubObject> subs = buildSubsFromConfig(subCfgs);
 
-        HI.initialize(config.namesAndTags, serialBuffers, rovers, satellites, terrainMap);
+        HI.initialize(config.namesAndTags, serialBuffers, subs, subMap);
 
 		if (config.accelerated){
 			LOG.log(Level.INFO, "Start Up: Accelerating Simulation");
             Globals.getInstance().setUpAcceleratedRun(HI, 3600000 * config.runtime);
 		}
 
+		/*
         for (RoverObject rover : rovers){
             rover.start();
         }
         for (SatelliteObject sat : satellites){
             sat.start();
         }
+        */
 		for (SubObject sub : subs){
 			sub.start();
 		}

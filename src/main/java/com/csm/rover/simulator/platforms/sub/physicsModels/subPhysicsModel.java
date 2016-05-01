@@ -1,14 +1,27 @@
 package com.csm.rover.simulator.platforms.sub.physicsModels;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import com.csm.rover.simulator.map.SubMap;
+import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.DriveCommandHandler;
+import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
+import com.csm.rover.simulator.platforms.PlatformState;
+import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import com.csm.rover.simulator.platforms.rover.MotorState;
+import com.csm.rover.simulator.platforms.rover.RoverState;
+import com.csm.rover.simulator.platforms.rover.RoverWheels;
+import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverDriveCommands;
+import com.csm.rover.simulator.platforms.sub.SubState;
 import com.csm.rover.simulator.platforms.sub.subProp;
+import com.csm.rover.simulator.wrapper.Admin;
+import org.apache.logging.log4j.Level;
 
-
-public class subPhysicsModel implements Serializable, Cloneable {
+@PhysicsModel(type= "Sub", name="default", parameters = {})
+public class subPhysicsModel extends PlatformPhysicsModel {
 
 	private static final long serialversionUID = 1L;
 	protected static SubMap SMAP;
@@ -16,6 +29,8 @@ public class subPhysicsModel implements Serializable, Cloneable {
 	private final int L = 0, R = 1, F = 3, B = 4;
 
 	private final double g = 9.81;
+
+	private SubState sub_state;
 
 	protected String subName;
 	public final double time_step = 0.01;
@@ -76,6 +91,7 @@ public class subPhysicsModel implements Serializable, Cloneable {
 	protected double[] location = {0, 0, 0}; //m x m from center of map
 	protected double theta = 0; //rad off of positive X
 	protected double phi = 0; //rad off xy plane
+	protected double[] direction = {theta, phi};
 	protected double speed = 0; //m/s
 	protected double speed_x = 0; //m/s
 	protected double speed_y = 0; //m/s
@@ -91,273 +107,312 @@ public class subPhysicsModel implements Serializable, Cloneable {
 
 
 	public subPhysicsModel() {
+		super("Sub");
 	}
 
-	protected subPhysicsModel(subPhysicsModel origin) {
-		subName = origin.subName;
-		battery_max_charge = origin.battery_max_charge;
-		motor_power = origin.motor_power.clone();
-		motor_states = origin.motor_states.clone();
-		prop_speed = origin.prop_speed.clone();
-		motor_current = origin.motor_current.clone();
-		battery_charge = origin.battery_charge;
-		battery_cp_charge = origin.battery_cp_charge;
-		battery_voltage = origin.battery_voltage;
-		battery_current = origin.battery_current;
-		SOC = origin.SOC;
-		battery_temperature = origin.battery_temperature;
-		winding_temp = origin.winding_temp.clone();
-		motor_temp = origin.motor_temp.clone();
-		location = origin.location.clone();
-		theta = origin.theta;
-		phi = origin.phi;
-		speed = origin.speed;
-		angular_velocity_xy = origin.angular_velocity_xy;
-		angular_velocity_z = origin.angular_velocity_z;
-		acceleration_xy = origin.acceleration_xy;
-		acceleration_z = origin.acceleration_z;
-		angular_acceleration_xy = origin.angular_acceleration_xy;
-		angular_acceleration_z = origin.angular_acceleration_z;
-		prop_thrust = origin.prop_thrust;
+	private void establishDriveResponses() {
+		super.addCommandHandler(RoverDriveCommands.DRIVE_FORWARD.getCmd(), new DriveCommandHandler() {
+			@Override
+			public void processCommand(double[] params) {
+				setMotorState(RoverWheels.F, MotorState.FORWARD);
+				setMotorState(subProp.B, MotorState.FORWARD);
+				setMotorState(RoverWheels.BR, MotorState.FORWARD);
+				setMotorState(RoverWheels.FR, MotorState.FORWARD);
+			}
+		});
+		super.addCommandHandler(RoverDriveCommands.DRIVE_BACKWARD.getCmd(), new DriveCommandHandler() {
+			@Override
+			public void processCommand(double[] params) {
+				setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+				setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+				setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+				setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+			}
+		});
+		super.addCommandHandler(RoverDriveCommands.SPIN_CW.getCmd(), new DriveCommandHandler() {
+			@Override
+			public void processCommand(double[] params) {
+				setMotorState(RoverWheels.FL, MotorState.FORWARD);
+				setMotorState(RoverWheels.BL, MotorState.FORWARD);
+				setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+				setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+			}
+		});
+		super.addCommandHandler(RoverDriveCommands.SPIN_CCW.getCmd(), new DriveCommandHandler() {
+			@Override
+			public void processCommand(double[] params) {
+				setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+				setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+				setMotorState(RoverWheels.BR, MotorState.FORWARD);
+				setMotorState(RoverWheels.FR, MotorState.FORWARD);
+			}
+		});
+		super.addCommandHandler(RoverDriveCommands.STOP.getCmd(), new DriveCommandHandler() {
+			@Override
+			public void processCommand(double[] params) {
+				setMotorState(RoverWheels.FL, MotorState.RELEASE);
+				setMotorState(RoverWheels.BL, MotorState.RELEASE);
+				setMotorState(RoverWheels.BR, MotorState.RELEASE);
+				setMotorState(RoverWheels.FR, MotorState.RELEASE);
+			}
+		});
+		super.addCommandHandler(RoverDriveCommands.TURN_FRONT_LEFT.getCmd(), new DriveCommandHandler() {
+			@Override
+			public void processCommand(double[] params) {
+				setMotorState(RoverWheels.FL, MotorState.RELEASE);
+				setMotorState(RoverWheels.BL, MotorState.RELEASE);
+				setMotorState(RoverWheels.BR, MotorState.FORWARD);
+				setMotorState(RoverWheels.FR, MotorState.FORWARD);
+			}
+		});
+		super.addCommandHandler(RoverDriveCommands.TURN_FRONT_RIGHT.getCmd(), new DriveCommandHandler() {
+			@Override
+			public void processCommand(double[] params) {
+				setMotorState(RoverWheels.FL, MotorState.FORWARD);
+				setMotorState(RoverWheels.BL, MotorState.FORWARD);
+				setMotorState(RoverWheels.BR, MotorState.RELEASE);
+				setMotorState(RoverWheels.FR, MotorState.RELEASE);
+			}
+		});
+		super.addCommandHandler(RoverDriveCommands.TURN_BACK_LEFT.getCmd(), new DriveCommandHandler() {
+			@Override
+			public void processCommand(double[] params) {
+				setMotorState(RoverWheels.FL, MotorState.RELEASE);
+				setMotorState(RoverWheels.BL, MotorState.RELEASE);
+				setMotorState(RoverWheels.BR, MotorState.BACKWARD);
+				setMotorState(RoverWheels.FR, MotorState.BACKWARD);
+			}
+		});
+		super.addCommandHandler(RoverDriveCommands.TURN_BACK_RIGHT.getCmd(), new DriveCommandHandler() {
+			@Override
+			public void processCommand(double[] params) {
+				setMotorState(RoverWheels.FL, MotorState.BACKWARD);
+				setMotorState(RoverWheels.BL, MotorState.BACKWARD);
+				setMotorState(RoverWheels.BR, MotorState.RELEASE);
+				setMotorState(RoverWheels.FR, MotorState.RELEASE);
+			}
+		});
+		super.addCommandHandler(RoverDriveCommands.CHANGE_MOTOR_PWR.getCmd(), new DriveCommandHandler() {
+			@Override
+			public void processCommand(double[] params) {
+				setMotorPower((int) params[0], (int) params[1]);
+			}
+		});
 	}
 
-	public void initalizeConditions(String name, double bat_charge, double temp) {
-		subName = name;
-		battery_charge = bat_charge;
-		battery_max_charge = bat_charge;
-		battery_temperature = temp;
-		winding_temp = new double[]{temp, temp, temp, temp};
-		motor_temp = new double[]{temp, temp, temp, temp};
+	public static void setSubMap(SubMap map){
+		SMAP = map;
 	}
 
-	public void start() {
-		new SynchronousThread((int) (time_step * 1000), new Runnable() {
-			public void run() {
+	@Override
+	public void setPlatformName(String name) {
+		this.subName = name;
+	}
+
+	@Override
+	public void constructParameters(Map<String, Double> params) {}
+
+	@Override
+	public void start(){
+		new SynchronousThread((int) (time_step*1000), new Runnable(){
+			public void run(){
 				try {
-					excecute();
-					//System.out.println(SubName + "-physics\t" + Globals.TimeMillis);
-					//SubEvents.updateStats();
-				} catch (Exception e) {
-					System.out.println("sync thread exception");
+					updatePhysics();
+					//System.out.println(roverName + "-physics\t" + Globals.getInstance.timeMillis);
+					//RoverEvents.updateStats();
+				}
+				catch (Exception e){
+					//LOG.log(Level.ERROR, String.format("Rover %s failed to execute", subName), e);
 				}
 			}
 		},
-				SynchronousThread.FOREVER, subName + "-physics");
+				SynchronousThread.FOREVER, subName+"-physics");
 	}
 
-	public void excecute() throws Exception {
+	@Override
+	public void initializeState(PlatformState state) {
+		if (state.getType().equals("Sub")){
+			try {
+				this.sub_state = (RoverState)state;
+				this.location = {state.<Double>get("x"), state.<Double>get("y"), state.<Double>get("z")};
+				this.direction = state.get("direction");
+				double temp = -30; //TODO temp
+				battery_charge = battery_max_charge;
+				battery_temperature = temp;
+				winding_temp = new double[] { temp, temp, temp, temp };
+				motor_temp = new double[] { temp, temp, temp, temp };
+				return;
+			}
+			catch (ClassCastException e){
+				//Let the error throw
+			}
+		}
+		throw new IllegalArgumentException("The given state is not a RoverState");
+	}
+
+	@Override
+	public PlatformState getState() {
+		return rov_state.immutableCopy();
+	}
+
+	@Override
+	public void updatePhysics() {
 		// Motor Currents, based on voltage
-		motor_current[L] += (motor_power[L] * motor_states[L] / 255.0 * battery_voltage - motor_voltage_transform * prop_speed[L] - motor_current[L] * motor_resistance) / motor_inductance * time_step;
-		motor_current[R] += (motor_power[R] * motor_states[R] / 255.0 * battery_voltage - motor_voltage_transform * prop_speed[R] - motor_current[R] * motor_resistance) / motor_inductance * time_step;
-		motor_current[F] += (motor_power[F] * motor_states[F] / 255.0 * battery_voltage - motor_voltage_transform * prop_speed[F] - motor_current[F] * motor_resistance) / motor_inductance * time_step;
-		motor_current[B] += (motor_power[B] * motor_states[B] / 255.0 * battery_voltage - motor_voltage_transform * prop_speed[B] - motor_current[B] * motor_resistance) / motor_inductance * time_step;
+		motor_current[F] += ( motor_power[FL]*motor_states[FL]/255.0*battery_voltage - motor_voltage_transform*wheel_speed[FL] - motor_current[FL]*motor_resistance) / motor_inductance * time_step;
+		motor_current[R] += ( motor_power[FR]*motor_states[FR]/255.0*battery_voltage - motor_voltage_transform*wheel_speed[FR] - motor_current[FR]*motor_resistance) / motor_inductance * time_step;
+		motor_current[BL] += ( motor_power[BL]*motor_states[BL]/255.0*battery_voltage - motor_voltage_transform*wheel_speed[BL] - motor_current[BL]*motor_resistance) / motor_inductance * time_step;
+		motor_current[BR] += ( motor_power[BR]*motor_states[BR]/255.0*battery_voltage - motor_voltage_transform*wheel_speed[BR] - motor_current[BR]*motor_resistance) / motor_inductance * time_step;
 		// min currents at 0, motor cannot generate current
-		/*if (motor_current[L]*motor_states[L] <= 0){
-			motor_current[L] = 0;
+		/*if (motor_current[FL]*motor_states[FL] <= 0){
+			motor_current[FL] = 0;
 		}
-		if (motor_current[R]*motor_states[R] <= 0){
-			motor_current[R] = 0;
+		if (motor_current[FR]*motor_states[FR] <= 0){
+			motor_current[FR] = 0;
 		}
-		if (motor_current[F]*motor_states[F] <= 0){
-			motor_current[F] = 0;
+		if (motor_current[BL]*motor_states[BL] <= 0){
+			motor_current[BL] = 0;
 		}
-		if (motor_current[B]*motor_states[B] <= 0){
-			motor_current[B] = 0;
+		if (motor_current[BR]*motor_states[BR] <= 0){
+			motor_current[BR] = 0;
 		}*/
 		// angular motor speeds, based on torques
-		prop_speed[L] += 1 / prop_inertia * (motor_energy_transform * motor_current[L] - friction_axle * prop_speed[L] / prop_radius) * time_step;
-		prop_speed[R] += 1 / prop_inertia * (motor_energy_transform * motor_current[R] - friction_axle * prop_speed[R] / prop_radius) * time_step;
-		prop_speed[F] += 1 / prop_inertia * (motor_energy_transform * motor_current[F] - friction_axle * prop_speed[F] / prop_radius) * time_step;
-		prop_speed[B] += 1 / prop_inertia * (motor_energy_transform * motor_current[B] - friction_axle * prop_speed[B] / prop_radius) * time_step;
+		wheel_speed[FL] += 1/wheel_inertia * ( motor_energy_transform*motor_current[FL] - wheel_radius*slip[FL] + wheel_radius*fric_gr_all*Math.cos(gamma) - friction_axle*wheel_speed[FL]/wheel_radius) * time_step;
+		wheel_speed[FR] += 1/wheel_inertia * ( motor_energy_transform*motor_current[FR] - wheel_radius*slip[FR] - wheel_radius*fric_gr_all*Math.cos(gamma) - friction_axle*wheel_speed[FR]/wheel_radius) * time_step;
+		wheel_speed[BL] += 1/wheel_inertia * ( motor_energy_transform*motor_current[BL] - wheel_radius*slip[BL] + wheel_radius*fric_gr_all*Math.cos(gamma) - friction_axle*wheel_speed[BL]/wheel_radius) * time_step;
+		wheel_speed[BR] += 1/wheel_inertia * ( motor_energy_transform*motor_current[BR] - wheel_radius*slip[BR] - wheel_radius*fric_gr_all*Math.cos(gamma) - friction_axle*wheel_speed[BR]/wheel_radius) * time_step;
+		// translational friction, approximately the same for all wheels
+		fric_gr_all = friction_gr * motor_arm * angular_velocity;
+		// Slip forces on wheels, based on speed differences
+		slip[FL] = friction_s * (wheel_speed[FL]*wheel_radius - speed);
+		slip[FR] = friction_s * (wheel_speed[FR]*wheel_radius - speed);
+		slip[BL] = friction_s * (wheel_speed[BL]*wheel_radius - speed);
+		slip[BR] = friction_s * (wheel_speed[BR]*wheel_radius - speed);
 		// Acceleration changes based on forces
-		acceleration_xy = 1 / total_mass * ((prop_thrust[L] + prop_thrust[R] - drag_xy) * Math.cos(phi) + (prop_thrust[F] + prop_thrust[B] - drag_z) * Math.sin(phi));
-		acceleration_z = 1 / total_mass * ((prop_thrust[L] + prop_thrust[R] - drag_xy) * Math.sin(phi) + (prop_thrust[F] + prop_thrust[B] - drag_z) * Math.cos(phi));
-		angular_acceleration_xy = 1 / moment_of_inertia * ((prop_thrust[R] - prop_thrust[L] * dist_CMtoP_xy));
-		angular_acceleration_z = 1 / moment_of_inertia * (prop_thrust[F] - prop_thrust[B]) * dist_CMtoP_z;
+		acceleration = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - planetParams.getgrav_accel()*Math.sin(MAP.getIncline(location, direction));
+		angular_acceleration = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
 		// Speed changes based on Acceleration
-		speed_x += (acceleration_xy * time_step) * Math.sin(theta);
-		speed_y += (acceleration_xy * time_step) * Math.cos(theta);
-		speed_z += acceleration_z * time_step;
-		angular_velocity_xy += angular_acceleration_xy * time_step;
-		angular_velocity_z += angular_acceleration_z * time_step;
-
+		speed += acceleration * time_step;
+		angular_velocity += angular_acceleration * time_step;
+		//System.out.println(round(wheel_speed[FL]) + " rad/s -> " + round(slip[FL]) + " N");
+		//System.out.println(round(wheel_speed[FR]) + " rad/s -> " + round(slip[FR]) + " N -> " + round(acceleration) + " m/s^2 -> " + round(speed) + " m/s");
+		//System.out.println(round(wheel_speed[BL]) + " rad/s -> " + round(slip[BL]) + " N -> " + round(angular_acceleration) + " rad/s^2 -> " + round(angular_velocity) + " rad/s");
+		//System.out.println(round(wheel_speed[BR]) + " rad/s -> " + round(slip[BR]) + " N");
+		// Calculate the amount the rover slips sideways
+		slip_acceleration = (-friction_gr*slip_velocity*4 - rover_mass*planetParams.getgrav_accel()*Math.sin(MAP.getCrossSlope(location, direction)) / rover_mass);
+		slip_velocity += slip_acceleration * time_step;
 		// Calculate new location
-		location[0] = +(speed_x * time_step);
-		location[1] = +speed_y * time_step;
-		location[2] = +speed_z * time_step;
-		theta = (theta + angular_velocity_xy * time_step + 2 * Math.PI) % (2 * Math.PI);
-		phi = (phi + angular_velocity_z * time_step + 2 * Math.PI) % (2 * Math.PI);
+		location.offsetThis(speed*time_step*Math.cos(direction), speed*time_step*(Math.sin(direction)));
+		//TODO													  + here??
+		location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
+		direction = (direction + angular_velocity*time_step + 2*Math.PI) % (2*Math.PI);
+
+		// update state
+		rov_state.set("x", location.getX());
+		rov_state.set("y", location.getY());
+		rov_state.set("direction", direction);
+		rov_state.set("motor_power", convertToDoubleArray(motor_power));
+		rov_state.set("motor_state", convertToDoubleArray(motor_states));
+		rov_state.set("motor_current", convertToDoubleArray(motor_current));
+		rov_state.set("motor_voltage", getMotorVoltage());
+		rov_state.set("motor_temp", convertToDoubleArray(motor_temp));
+		rov_state.set("wheel_speed", convertToDoubleArray(wheel_speed));
+		rov_state.set("battery_charge", battery_charge);
+		rov_state.set("battery_voltage", battery_voltage);
+		rov_state.set("battery_current", battery_current);
+		rov_state.set("battery_temp", battery_temperature);
+		rov_state.set("speed", speed);
+		rov_state.set("angular_velocity", angular_velocity);
+		rov_state.set("acceleration", acceleration);
+		rov_state.set("angular_acceleration", angular_acceleration);
+		rov_state.set("slip_acceleration", slip_acceleration);
+		rov_state.set("slip_velocity", slip_velocity);
+
 		// report new location to map
+		Admin.getCurrentInterface().updateRover(roverName, location, direction);
 
 		//Determining the current of the battery and the change in the stored charge
-		if (motor_current[L] * motor_states[L] <= 0) {
-			motor_current[L] = 0;
+		if (motor_current[FL]*motor_states[FL] <= 0){
+			motor_current[FL] = 0;
 		}
-		if (motor_current[R] * motor_states[R] <= 0) {
-			motor_current[R] = 0;
+		if (motor_current[FR]*motor_states[FR] <= 0){
+			motor_current[FR] = 0;
 		}
-		if (motor_current[F] * motor_states[F] <= 0) {
-			motor_current[F] = 0;
+		if (motor_current[BL]*motor_states[BL] <= 0){
+			motor_current[BL] = 0;
 		}
-		if (motor_current[B] * motor_states[B] <= 0) {
-			motor_current[B] = 0;
+		if (motor_current[BR]*motor_states[BR] <= 0){
+			motor_current[BR] = 0;
 		}
+		battery_current = Math.abs(motor_current[FL]) + Math.abs(motor_current[FR]) + Math.abs(motor_current[BL]) + Math.abs(motor_current[BR]);
+		double battery_change = battery_charge / capacitance_battery / resistance_parasite + battery_current;
+		double cp_change = battery_current - (battery_cp_charge / capacitance_cp / resistance_cp());
+		battery_charge -= battery_change * time_step;
+		battery_cp_charge += cp_change * time_step;
+		battery_voltage = battery_charge/capacitance_battery - battery_cp_charge/capacitance_cp - resistance_s*battery_current;
+		SOC = 1 - (battery_max_charge - battery_charge) / battery_max_charge;
+		//System.out.println("Vb: " + battery_voltage + "\tVm: " + getMotorVoltage(FR) + "\tQcp: " + battery_cp_charge + "\tIb: " + battery_current + "\tIm: " + motor_current[FR]);
+
+		//TODO temp map stuff here
+		double temperature = -30;
+
+		//Determining the temperature of the battery
+		battery_temperature += ((resistance_parasite*Math.pow(battery_change-battery_current, 2) + resistance_s*Math.pow(battery_current, 2) + capacitance_cp*Math.pow(battery_current-cp_change, 2)) - battery_heat_transfer*(battery_temperature - temperature) / battery_thermal_cap) * time_step;
+		//Determining the temperature of the motor coils
+		winding_temp[FL] += ((motor_resistance*Math.pow(motor_current[FL], 2) - winding_heat_transfer*(winding_temp[FL] - motor_temp[FL])) / winding_thermal_cap) * time_step;
+		winding_temp[FR] += ((motor_resistance*Math.pow(motor_current[FR], 2) - winding_heat_transfer*(winding_temp[FR] - motor_temp[FR])) / winding_thermal_cap) * time_step;
+		winding_temp[BL] += ((motor_resistance*Math.pow(motor_current[BL], 2) - winding_heat_transfer*(winding_temp[BL] - motor_temp[BL])) / winding_thermal_cap) * time_step;
+		winding_temp[BR] += ((motor_resistance*Math.pow(motor_current[BR], 2) - winding_heat_transfer*(winding_temp[BR] - motor_temp[BR])) / winding_thermal_cap) * time_step;
+		//Determining the surface temperature of the motor
+		motor_temp[FL] += ((winding_heat_transfer*(winding_temp[FL] - motor_temp[FL]) - motor_surface_heat_transfer*(motor_temp[FL] - temperature)) / motor_thermal_cap) * time_step;
+		motor_temp[FR] += ((winding_heat_transfer*(winding_temp[FR] - motor_temp[FR]) - motor_surface_heat_transfer*(motor_temp[FR] - temperature)) / motor_thermal_cap) * time_step;
+		motor_temp[BL] += ((winding_heat_transfer*(winding_temp[BL] - motor_temp[BL]) - motor_surface_heat_transfer*(motor_temp[BL] - temperature)) / motor_thermal_cap) * time_step;
+		motor_temp[BR] += ((winding_heat_transfer*(winding_temp[BR] - motor_temp[BR]) - motor_surface_heat_transfer*(motor_temp[BR] - temperature)) / motor_thermal_cap) * time_step;
 	}
 
-	//System.out.println("Vb: " + battery_voltage + "\tVm: " + getMotorVoltage(R) + "\tQcp: " + battery_cp_charge + "\tIb: " + battery_current + "\tIm: " + motor_current[R])
-
-
-	private double resistance_cp() { // get the resistance of the CP resistor as a function of SOC
-		return R_cp0 + R_cp1 * Math.exp(R_cp2 * (1 - SOC));
+	private double resistance_cp(){ // get the resistance of the CP resistor as a function of SOC
+		return R_cp0+R_cp1*Math.exp(R_cp2*(1-SOC));
 	}
 
-	public double getprop_radius() {
-		return prop_radius;
+	private Double[] convertToDoubleArray(double[] array){
+		Double[] out = new Double[array.length];
+		for (int i = 0; i < out.length; i++){
+			out[i] = array[i];
+		}
+		return out;
 	}
 
-	public double getProp_inertia() {
-		return prop_inertia;
+	private Double[] convertToDoubleArray(int[] array){
+		Double[] out = new Double[array.length];
+		for (int i = 0; i < out.length; i++){
+			out[i] = (double)array[i];
+		}
+		return out;
 	}
 
-	public double getsub_width() {
-		return sub_width;
+	private Double[] getMotorVoltage(){
+		Double[] out = new Double[4];
+		for (int i = 0; i < out.length; i++){
+			out[i] = motor_power[i]*motor_states[i]/255.0*battery_voltage;
+		}
+		return out;
 	}
 
-	public double getsub_length() {
-		return sub_length;
-	}
-
-	public double getmotor_arm() {
-		return dist_CMtoP_xy;
-	}
-
-	public double getsub_mass() {
-		return total_mass;
-	}
-
-	public double getsub_inertia() {
-		return sub_inertia;
-	}
-
-	public double getmotor_energy_transform() {
-		return motor_energy_transform;
-	}
-
-	public double getmotor_voltage_transform() {
-		return motor_voltage_transform;
-	}
-
-	public double getmotor_resistance() {
-		return motor_resistance;
-	}
-
-	public double getmotor_inductance() {
-		return motor_inductance;
-	}
-
-	public double getfriction_axle() {
-		return friction_axle;
-	}
-
-	public double getfriction_gr() {
-		return friction_gr;
-	}
-
-	public double getfriction_s() {
-		return friction_s;
-	}
-
-	public double getgamma() {
-		return gamma;
-	}
-
-	public double getR_cp0() {
-		return R_cp0;
-	}
-
-	public double getR_cp1() {
-		return R_cp1;
-	}
-
-	public double getR_cp2() {
-		return R_cp2;
-	}
-
-	public double getcapacitance_battery() {
-		return capacitance_battery;
-	}
-
-	public double getcapacitance_cp() {
-		return capacitance_cp;
-	}
-
-	public double getresistance_s() {
-		return resistance_s;
-	}
-
-	public double getresistance_parasite() {
-		return resistance_parasite;
-	}
-
-	public double getbattery_max_charge() {
-		return battery_max_charge;
-	}
-
-	public double getbattery_heat_transfer() {
-		return battery_heat_transfer;
-	}
-
-	public double getbattery_thermal_cap() {
-		return battery_thermal_cap;
-	}
-
-	public double getwinding_heat_transfer() {
-		return winding_heat_transfer;
-	}
-
-	public double getwinding_thermal_cap() {
-		return winding_thermal_cap;
-	}
-
-	public double getmotor_surface_heat_transfer() {
-		return motor_surface_heat_transfer;
-	}
-
-	public double getmotor_thermal_cap() {
-		return motor_thermal_cap;
-	}
-
-	public int[] getMotor_power() {
-		return motor_power;
-	}
-
-	public int getMotor_power(int motor) {
+	private int getMotor_power(int motor) {
 		return motor_power[motor];
 	}
 
-	public void setMotorPower(subProp motor, int motor_power) {
-		if (motor_power < 0) {
+	private void setMotorPower(int motor, int motor_power) {
+		if (motor_power < 0){
 			motor_power = 0;
-		} else if (motor_power > 255) {
+		}
+		else if (motor_power > 255){
 			motor_power = 255;
 		}
-		this.motor_power[motor.getValue()] = motor_power;
+		this.motor_power[motor] = motor_power;
 	}
 
-	public int[] getMotorStates() {
-		return motor_states;
-	}
-
-	public void setMotorState(subProp wheel, MotorState state) {
+	private void setMotorState(RoverWheels wheel, MotorState state) {
 		this.motor_states[wheel.getValue()] = state.getValue();
-	}
-
-	public double[] getMotor_current() {
-		return motor_current;
-	}
-
-	public double getMotorCurrent(subProp prop) {
-		return motor_current[prop.getValue()];
 	}
 
 	public double[] getLocation() {
@@ -368,91 +423,12 @@ public class subPhysicsModel implements Serializable, Cloneable {
 		this.location = location;
 	}
 
-	public double getTheta() {
-		return theta;
+	public double[] getDirection() {
+		return direction;
 	}
 
-	public double getPhi() {
-		return phi;
+	public void setDirection(double[] direction) {
+		this.direction = direction;
 	}
 
-	public void setTheta(double direction) {
-		this.theta = direction;
-	}
-
-	public double getFrictionAxle() {
-		return friction_axle;
-	}
-
-	public double getFriction_gr() {
-		return friction_gr;
-	}
-
-	public double getFriction_s() {
-		return friction_s;
-	}
-
-	public double[] getProp_speed() {
-		return prop_speed;
-	}
-
-	public double getPropSpeed(subProp prop) {
-		return prop_speed[prop.getValue()];
-	}
-
-	public double getSOC() {
-		return SOC;
-	}
-
-	public double getSpeed() {
-		return speed;
-	}
-
-	public double getMotorTemp(subProp motor) {
-		return this.motor_temp[motor.getValue()];
-	}
-
-
-	public double[] getWindingTemp() {
-		return winding_temp;
-	}
-
-	public double[] getMotorTemp() {
-		return motor_temp;
-	}
-
-
-	public double getAngularVelocity_xy() {
-		return angular_velocity_xy;
-	}
-
-	public double getAngularVelocity_z() {
-		return angular_velocity_z;
-	}
-
-	public double getAcceleration_xy() {
-		return acceleration_xy;
-	}
-
-	public double getAcceleration_z() {
-		return acceleration_z;
-	}
-
-	public double getAngularAcceleration_xy() {
-		return angular_acceleration_xy;
-	}
-
-	public double getAngularAcceleration_z() {
-		return angular_acceleration_z;
-	}
-
-	public void setMotorPower(int[] motor_power) {
-		this.motor_power = motor_power;
-	}
-
-	public void setDirection_xy(double dir) {
-		theta = dir;
-	}
-
-	public static void setSubMap(SubMap map){ SMAP = map;}
 }

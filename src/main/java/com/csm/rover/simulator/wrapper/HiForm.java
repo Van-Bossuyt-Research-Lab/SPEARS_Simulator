@@ -3,6 +3,7 @@ package com.csm.rover.simulator.wrapper;
 import com.csm.rover.simulator.control.InterfaceAccess;
 import com.csm.rover.simulator.control.InterfacePanel;
 import com.csm.rover.simulator.map.PlanetParametersList;
+import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.map.display.LandMapPanel;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
@@ -12,6 +13,8 @@ import com.csm.rover.simulator.platforms.rover.RoverHub;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteHub;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
+import com.csm.rover.simulator.platforms.sub.SubHub;
+import com.csm.rover.simulator.platforms.sub.SubObject;
 import com.csm.rover.simulator.visual.AccelPopUp;
 import com.csm.rover.simulator.visual.Form;
 import com.csm.rover.simulator.visual.Panel;
@@ -34,6 +37,7 @@ public class HiForm implements HumanInterfaceAbstraction {
     private InterfacePanel interfacePnl;
     private RoverHub roverHubPnl;
     private SatelliteHub satelliteHubPnl;
+    private SubHub subHubPn1;
 
     private AccelPopUp informer;
 
@@ -55,6 +59,18 @@ public class HiForm implements HumanInterfaceAbstraction {
         terrainPnl = new LandMapPanel(screenSize, new PlanetParametersList(), roverHubPnl, rovers, map);
         interfacePnl = new InterfacePanel(screenSize, buffers);
         satelliteHubPnl = new SatelliteHub(screenSize, satellites);
+        GUI.setRunTimePanels(wrapperPnl, orbitalPnl, terrainPnl, interfacePnl, roverHubPnl, satelliteHubPnl);
+        init = true;
+        InterfaceAccess.CODE.setCallTags(namesAndTags);
+        roverHubPnl.setIdentifiers(namesAndTags.getTags("Rover"), namesAndTags.getTags("Satellite"));
+    }
+
+    public void initialize(NamesAndTags namesAndTags, SerialBuffers buffers, ArrayList<SubObject> subs, SubMap map) {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        wrapperPnl = new MainWrapper(screenSize, buffers, namesAndTags);
+        orbitalPnl = new Panel(screenSize, "Orbital View");
+        subHubPn1 = new SubHub(screenSize,buffers,subs,map);
+        interfacePnl = new InterfacePanel(screenSize, buffers);
         GUI.setRunTimePanels(wrapperPnl, orbitalPnl, terrainPnl, interfacePnl, roverHubPnl, satelliteHubPnl);
         init = true;
         InterfaceAccess.CODE.setCallTags(namesAndTags);
