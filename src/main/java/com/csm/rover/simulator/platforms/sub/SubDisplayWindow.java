@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.platforms.sub;
 
 import com.csm.rover.simulator.map.SubMap;
+import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.visual.LEDIndicator;
 
 import javax.swing.*;
@@ -296,22 +297,25 @@ public class SubDisplayWindow extends JPanel {
         tabbedPane.setVisible(true);
 
         SubObject sub = subs.get(whichRover);
+        PlatformState state = sub.getState();
         SubNameLbl.setText(sub.getName());
         SerialHistoryLbl.setText(sub.getSerialHistory());
         MovementStatsLbl.setText(String.format(movementPattern,
-                formatDouble(sub.getLocation()[0]),
-                formatDouble(Math.toDegrees(sub.getPropSpeed(subProp.F))),
-                formatDouble(sub.getLocation()[1]),
-                formatDouble(Math.toDegrees(sub.getPropSpeed(subProp.B))),
-                formatDouble(Math.toDegrees(sub.getTheta())),
-                formatDouble(Math.toDegrees(sub.getPropSpeed(subProp.L))),
-                formatDouble(Math.toDegrees(sub.getPropSpeed(subProp.R))),
-                formatDouble(sub.getSpeed()),
-                formatDouble(Math.cos(sub.getTheta()) * sub.getSpeed()),
-                formatDouble(Math.sin(sub.getTheta()) * sub.getSpeed()),
-                formatDouble(Math.toDegrees(sub.getAngularVelocity_xy())),
-                formatDouble(sub.getAcceleration_xy()),
-                formatDouble(Math.toDegrees(sub.getAngularAcceleration_xy()))));
+                formatDouble(state.<Double>get("x")),
+                formatDouble(Math.toDegrees(state.<Double[]>get("wheel_speed")[SubProp.F.getValue()])),
+                formatDouble(state.<Double>get("y")),
+                formatDouble(Math.toDegrees(state.<Double[]>get("wheel_speed")[SubProp.R.getValue()])),
+                formatDouble(Math.toDegrees(state.<Double>get("direction"))),
+                formatDouble(Math.toDegrees(state.<Double[]>get("wheel_speed")[SubProp.L.getValue()])),
+                formatDouble(Math.toDegrees(state.<Double[]>get("wheel_speed")[SubProp.B.getValue()])),
+                formatDouble(state.<Double>get("speed")),
+                formatDouble(Math.cos(state.<Double>get("direction") * state.<Double>get("speed"))),
+                formatDouble(Math.sin(state.<Double>get("direction") * state.<Double>get("speed"))),
+                formatDouble(Math.toDegrees(state.<Double>get("angular_velocity"))),
+                formatDouble(state.<Double>get("slip_velocity")),
+                formatDouble(state.<Double>get("acceleration")),
+                formatDouble(Math.toDegrees(state.<Double>get("angular_acceleration"))),
+                formatDouble(state.<Double>get("slip_acceleration"))));
         /*
         ElectricalStatsLbl.setText(String.format(electricalPattern,
                 formatDouble(Math.abs(sub.getMotorCurrent(subProp.F))),

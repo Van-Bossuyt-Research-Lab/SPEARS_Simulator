@@ -5,7 +5,7 @@ import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 
 import java.util.Map;
 
-@AutonomousCodeModel(type="Rover", name="NULL", parameters={})
+@AutonomousCodeModel(type="Sub", name="NULL", parameters={})
 public class BlankSubAuto extends SubAutonomousCode {
 
     private static final long serialVersionUID = 4270320886718139449L;

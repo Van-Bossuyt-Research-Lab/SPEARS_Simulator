@@ -6,7 +6,7 @@ import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
-import com.csm.rover.simulator.platforms.sub.subProp;
+import com.csm.rover.simulator.platforms.sub.SubProp;
 import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -98,7 +98,7 @@ public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
         for (String param : fromLists){
             Double[] list = state.get(param);
             for (int i = 0; i < list.length; i++){
-                for (subProp prop : subProp.values()){
+                for (SubProp prop : SubProp.values()){
                     if (prop.getValue() == i && prop.name().length() < 4){
                         params.put(param+"_"+prop.name(), list[i]);
                         break;

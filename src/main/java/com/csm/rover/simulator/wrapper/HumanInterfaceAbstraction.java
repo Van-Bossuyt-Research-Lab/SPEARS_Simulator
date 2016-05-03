@@ -33,6 +33,8 @@ public interface HumanInterfaceAbstraction {
 
     void updateSatellite(String name);
 
+    void updateSub(String name, double[] location, double[] direction);
+
     void updateSerialBuffers();
 
     void viewAccelerated(int runtime, double accelerant);

@@ -46,6 +46,11 @@ public class HiCmd implements HumanInterfaceAbstraction {
     }
 
     @Override
+    public void updateSub(String name, double[] location, double[] direction) {
+
+    }
+
+    @Override
     public void updateSatellite(String name) {
 
     }
