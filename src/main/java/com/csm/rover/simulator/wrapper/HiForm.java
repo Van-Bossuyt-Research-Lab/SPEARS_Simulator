@@ -68,13 +68,13 @@ public class HiForm implements HumanInterfaceAbstraction {
     public void initialize(NamesAndTags namesAndTags, SerialBuffers buffers, ArrayList<SubObject> subs, SubMap map) {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         wrapperPnl = new MainWrapper(screenSize, buffers, namesAndTags);
-        orbitalPnl = new Panel(screenSize, "Orbital View");
+       // orbitalPnl = new Panel(screenSize, "Orbital View");
         subHubPn1 = new SubHub(screenSize,buffers,subs,map);
         interfacePnl = new InterfacePanel(screenSize, buffers);
-        GUI.setRunTimePanels(wrapperPnl, orbitalPnl, terrainPnl, interfacePnl, roverHubPnl, satelliteHubPnl);
+        //GUI.setRunTimePanels(wrapperPnl, orbitalPnl, terrainPnl, interfacePnl, roverHubPnl, satelliteHubPnl);
         init = true;
         InterfaceAccess.CODE.setCallTags(namesAndTags);
-        roverHubPnl.setIdentifiers(namesAndTags.getTags("Rover"), namesAndTags.getTags("Satellite"));
+        //roverHubPnl.setIdentifiers(namesAndTags.getTags("Rover"), namesAndTags.getTags("Satellite"));
     }
 
     private void setUpSelectionLists(){
@@ -95,8 +95,8 @@ public class HiForm implements HumanInterfaceAbstraction {
     @Override
     public void start(){
         interfacePnl.CODE.start();
-        roverHubPnl.start();
-        satelliteHubPnl.start();
+        //roverHubPnl.start();
+       // satelliteHubPnl.start();
     }
 
     @Override

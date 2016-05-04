@@ -234,7 +234,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 				this.sub_state = (SubState)state;
 				this.location[1] = state.<Double>get("x");
 				this.location[2] = state.<Double>get("y");
-				this.location[3] = state.<Double>get("z");
+				//this.location[3] = state.<Double>get("z");
 				this.direction = state.get("direction");
 				double temp = -30; //TODO temp
 				battery_charge = battery_max_charge;
@@ -247,7 +247,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 				//Let the error throw
 			}
 		}
-		throw new IllegalArgumentException("The given state is not a subState");
+		//throw new IllegalArgumentException("The given state is not a subState");
 	}
 
 	@Override
@@ -299,6 +299,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		//TODO													  + here??
 		//                           location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
 		theta = (theta + angular_velocity_xy*time_step + 2*Math.PI) % (2*Math.PI);
+		System.out.println(getLocation());
 
 		// update state
 		sub_state.set("x", location[1]);

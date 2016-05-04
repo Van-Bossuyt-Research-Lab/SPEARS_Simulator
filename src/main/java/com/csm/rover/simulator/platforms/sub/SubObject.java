@@ -32,7 +32,7 @@ public class SubObject extends Platform {
 
     private String name;
     private String IDcode;
-    private subPhysicsModel physics;
+    private subPhysicsModel physics = new subPhysicsModel();
     private SubAutonomousCode autoCode;
 
     @SuppressWarnings("unused")

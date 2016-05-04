@@ -10,7 +10,7 @@ import com.csm.rover.simulator.platforms.annotations.State;
 public class SubState extends PlatformState {
     public SubState(){
         super(
-                PlatformState.builder("Rover")
+                PlatformState.builder("Sub")
                         .addParameter("motor_state", Double[].class, new Double[]{0., 0., 0., 0.})
                         .addParameter("motor_power", Double[].class, new Double[]{250., 250., 250., 250.})
                         .addParameter("motor_current", Double[].class, new Double[]{0., 0., 0., 0.})
