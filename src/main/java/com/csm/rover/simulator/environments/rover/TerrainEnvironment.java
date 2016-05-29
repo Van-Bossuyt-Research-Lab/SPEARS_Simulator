@@ -9,25 +9,10 @@ import com.csm.rover.simulator.platforms.rover.RoverObject;
 import java.util.ArrayList;
 
 @Environment(type="Rover")
-public class TerrainEnvironment extends PlatformEnvironment {
-
-    private ArrayList<RoverObject> rovers;
-
-    private TerrainMap map;
+public class TerrainEnvironment extends PlatformEnvironment<RoverObject, TerrainMap> {
 
     public TerrainEnvironment(){
         super("Rover");
-        rovers = new ArrayList<>();
-    }
-
-    @Override
-    protected void doPlacePlatform(Platform platform) {
-        rovers.add((RoverObject)platform);
-    }
-
-    @Override
-    protected void buildActions(){
-        this.map = (TerrainMap) super.map;
     }
 
     public double getHeightAt(DecimalPoint point){
@@ -47,18 +32,7 @@ public class TerrainEnvironment extends PlatformEnvironment {
     }
 
     public <T> T getPopulatorValue(String pop, DecimalPoint point){
-        if (populators.containsKey(pop)){
-            Object ret = populators.get(pop).getValue(point.getX(), point.getY());
-            try {
-                return (T)ret;
-            }
-            catch (ClassCastException e){
-                throw new RuntimeException("The populator "+pop+" does not return the requested type", e);
-            }
-        }
-        else {
-            throw new NullPointerException("The requested populator "+pop+" is not defined");
-        }
+        return super.getPopulatorValue(pop, point.getX(), point.getY());
     }
 
 }
