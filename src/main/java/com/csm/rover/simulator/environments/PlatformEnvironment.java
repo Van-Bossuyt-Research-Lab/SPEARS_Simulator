@@ -12,8 +12,8 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
 
     protected List<P> platforms;
 
-    private EnvironmentModifier baseGen;
-    private ArrayList<EnvironmentModifier> modifiers;
+    private EnvironmentModifier<M> baseGen;
+    private ArrayList<EnvironmentModifier<M>> modifiers;
 
     private Map<String, EnvironmentPopulator> populators;
 
@@ -58,7 +58,7 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         baseGen = mod;
     }
 
-    public final void addModifier(EnvironmentModifier mod){
+    public final void addModifier(EnvironmentModifier<M> mod){
         if (!mod.getType().equals(this.platform_type)){
             throw new IllegalArgumentException(String.format("Types do not match %s != %s", platform_type, mod.getType()));
         }
@@ -80,9 +80,9 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
 
     @SuppressWarnings("unchecked")
     public final void build(Map<String, Double> params){
-        map = (M)baseGen.modify(null, params);
-        for (EnvironmentModifier mod : modifiers){
-            map = (M)mod.modify(map, params);
+        map = baseGen.modify(null, params);
+        for (EnvironmentModifier<M> mod : modifiers){
+            map = mod.modify(map, params);
         }
         for (String pop : populators.keySet()){
             populators.get(pop).build(map, params);

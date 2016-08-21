@@ -118,6 +118,8 @@ public class TerrainMap extends EnvironmentMap {
         return detail;
     }
 
-    
+    public ArrayGrid<Float> rawValues(){
+        return heightMap.clone();
+    }
 
 }

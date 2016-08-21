@@ -2,7 +2,7 @@ package com.csm.rover.simulator.environments;
 
 import java.util.Map;
 
-public abstract class EnvironmentModifier {
+public abstract class EnvironmentModifier<T extends EnvironmentMap> {
 
     protected final String platform_type;
     protected final boolean generator;
@@ -25,13 +25,13 @@ public abstract class EnvironmentModifier {
         return generator;
     }
 
-    public final EnvironmentMap modify(EnvironmentMap map, Map<String, Double> params){
+    public final T modify(T map, Map<String, Double> params){
         if (!generator && !map.getType().equals(platform_type)){
             throw new IllegalArgumentException(String.format("Types do not match %s != %s", platform_type, map.getType()));
         }
         return doModify(map, params);
     }
 
-    abstract protected EnvironmentMap doModify(final EnvironmentMap map, final Map<String, Double> params);
+    abstract protected T doModify(final T map, final Map<String, Double> params);
 
 }

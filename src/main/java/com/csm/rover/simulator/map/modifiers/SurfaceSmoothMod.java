@@ -12,16 +12,16 @@ public class SurfaceSmoothMod implements MapModifier {
             for (int y = 0; y < map.getHeight(); y++){
                 if (x > 2 && y > 2 && x < map.getWidth()-2 && y < map.getHeight()-2) {
                     if (count % 4 == 0) {
-                        map.put(x, y, average(values2.get(x, y), average(values2.get(x - 1, y - 2), values2.get(x + 1, y + 2))));
+                        map.put(x, y, (values2.get(x, y) + values2.get(x - 1, y - 2) + values2.get(x + 1, y + 2))/3.f);
                     }
                     else if (count % 4 == 1) {
-                        map.put(x, y, average(values2.get(x, y), average(values2.get(x - 2, y - 1), values2.get(x + 2, y + 1))));
+                        map.put(x, y, (values2.get(x, y) + values2.get(x - 2, y - 1) + values2.get(x + 2, y + 1))/3.f);
                     }
                     else if (count % 4 == 2) {
-                        map.put(x, y, average(values2.get(x, y), average(values2.get(x - 2, y + 1), values2.get(x + 2, y - 1))));
+                        map.put(x, y, (values2.get(x, y) + values2.get(x - 2, y + 1) + values2.get(x + 2, y - 1))/3.f);
                     }
                     else {
-                        map.put(x, y, average(values2.get(x, y), average(values2.get(x - 1, y + 2), values2.get(x + 1, y - 2))));
+                        map.put(x, y, (values2.get(x, y) + values2.get(x - 1, y + 2) + values2.get(x + 1, y - 2))/3.f);
                     }
                 }
             }
