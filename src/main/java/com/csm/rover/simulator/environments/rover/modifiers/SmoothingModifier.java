@@ -8,8 +8,7 @@ import java.util.Map;
 
 public class SmoothingModifier extends EnvironmentModifier<TerrainMap> {
 
-
-    protected SmoothingModifier() {
+    public SmoothingModifier() {
         super("Rover");
     }
 

@@ -1,11 +1,10 @@
 package com.csm.rover.simulator.visual;
 
 import com.csm.rover.simulator.control.PopUp;
-import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.map.io.TerrainMapWriter;
-import com.csm.rover.simulator.map.modifiers.NormalizeMapMod;
-import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
-import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
+import com.csm.rover.simulator.environments.rover.TerrainMap;
+import com.csm.rover.simulator.environments.rover.modifiers.PlasmaFractalGen;
+import com.csm.rover.simulator.environments.rover.modifiers.SmoothingModifier;
 import com.csm.rover.simulator.objects.io.MapFileFilter;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
@@ -14,7 +13,6 @@ import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +24,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -247,7 +244,7 @@ public class StartupPanel extends Panel {
         SatelliteListLbl.setBounds(510, 492, 142, 21);
         this.add(SatelliteListLbl);
 
-        MapConfigTtl = new JLabel("Congiure Map");
+        MapConfigTtl = new JLabel("Configure Map");
         MapConfigTtl.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
         MapConfigTtl.setBounds(912, 10, 118, 21);
         this.add(MapConfigTtl);
@@ -723,19 +720,18 @@ public class StartupPanel extends Panel {
                                  double hazardDensity,
                                  boolean monoTargets,
                                  boolean monoHazards){
-        TerrainMap terrainMap = new TerrainMap();
-        terrainMap.addMapModifier(new PlasmaGeneratorMod(mapRough));
-        terrainMap.addMapModifier(new SurfaceSmoothMod());
-        terrainMap.addMapModifier(new NormalizeMapMod());
-        terrainMap.generateLandscape(mapSize, mapDetail);
-        terrainMap.generateTargets(monoTargets, targetDensity);
-        terrainMap.generateHazards(monoHazards, hazardDensity);
+        TerrainEnvironment terrainEnvironment = new TerrainEnvironment();
+        terrainEnvironment.setBaseGenerator(new PlasmaFractalGen());
+        terrainEnvironment.addModifier(new SmoothingModifier());
+        terrainEnvironment.generate(mapSize, mapDetail);
+        terrainEnvironment.generateTargets(monoTargets, targetDensity);
+        terrainEnvironment.generateHazards(monoHazards, hazardDensity);
         Random rnd = new Random();
         File tempFile;
         do {
             tempFile = new File(String.format("Temp/%d.map", (int) (rnd.nextDouble() * 10000)));
         } while (tempFile.exists());
-        TerrainMapWriter.saveMap(terrainMap, tempFile);
+        TerrainMapWriter.saveMap(terrainEnvironment, tempFile);
         return tempFile;
     }
 

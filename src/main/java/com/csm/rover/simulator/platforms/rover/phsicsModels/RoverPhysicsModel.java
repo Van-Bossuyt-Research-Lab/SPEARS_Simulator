@@ -1,7 +1,6 @@
 package com.csm.rover.simulator.platforms.rover.phsicsModels;
 
-import com.csm.rover.simulator.map.PlanetParametersList;
-import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.DriveCommandHandler;
@@ -27,9 +26,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
 
     private RoverState rov_state;
 
-    //TODO variable planet params
-	private PlanetParametersList planetParams = new PlanetParametersList();
-	protected static TerrainMap MAP;
+	protected static PlatformEnvironment MAP;
 
 	protected String roverName;
 	public final double time_step = 0.01; // time step of physics, in seconds
@@ -193,7 +190,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
         });
     }
 
-    public static void setTerrainMap(TerrainMap map){
+    public static void setTerrainMap(PlatformEnvironment map){
         MAP = map;
     }
 

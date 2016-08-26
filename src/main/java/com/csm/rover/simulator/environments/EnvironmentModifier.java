@@ -8,8 +8,7 @@ public abstract class EnvironmentModifier<T extends EnvironmentMap> {
     protected final boolean generator;
 
     protected EnvironmentModifier(String type){
-        platform_type = type;
-        generator = false;
+        this(type, false);
     }
 
     protected EnvironmentModifier(String type, boolean generator){

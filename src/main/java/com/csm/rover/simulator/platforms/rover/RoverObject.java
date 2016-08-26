@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.platforms.rover;
 
-import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.Platform;
@@ -26,7 +27,7 @@ import java.util.TreeMap;
 public class RoverObject extends Platform {
 	private static final Logger LOG = LogManager.getLogger(RoverObject.class);
 
-	private static TerrainMap MAP;
+	private static TerrainEnvironment MAP;
     private static SerialBuffers serialBuffers;
 
 	@SuppressWarnings("unused")
@@ -85,7 +86,7 @@ public class RoverObject extends Platform {
 		LEDs.put("Autonomous", false);
 	}
 
-    public static void setTerrainMap(TerrainMap map){
+    public static void setTerrainMap(TerrainEnvironment map){
         MAP = map;
         RoverAutonomousCode.setTerrainMap(map);
         RoverPhysicsModel.setTerrainMap(map);

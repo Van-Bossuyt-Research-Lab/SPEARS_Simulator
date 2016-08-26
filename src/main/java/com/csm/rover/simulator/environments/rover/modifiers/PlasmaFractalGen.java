@@ -1,6 +1,5 @@
 package com.csm.rover.simulator.environments.rover.modifiers;
 
-import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.EnvironmentModifier;
 import com.csm.rover.simulator.environments.annotations.Modifier;
 import com.csm.rover.simulator.environments.rover.TerrainMap;
@@ -13,7 +12,7 @@ import java.util.Random;
 @Modifier(name="Plasma Fractal", type="Rover", parameters={"range", "rough"}, generator=true)
 public class PlasmaFractalGen extends EnvironmentModifier<TerrainMap> {
 
-    protected PlasmaFractalGen() {
+    public PlasmaFractalGen() {
         super("Rover", true);
     }
 

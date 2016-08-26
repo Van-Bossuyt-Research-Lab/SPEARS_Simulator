@@ -1,7 +1,6 @@
 package com.csm.rover.simulator.visual;
 
 import com.csm.rover.simulator.control.InterfacePanel;
-import com.csm.rover.simulator.map.display.LandMapPanel;
 import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.platforms.rover.RoverHub;
 import com.csm.rover.simulator.platforms.satellite.SatelliteHub;
