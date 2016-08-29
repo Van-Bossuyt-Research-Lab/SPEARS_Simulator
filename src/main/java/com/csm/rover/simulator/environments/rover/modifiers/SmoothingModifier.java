@@ -1,11 +1,13 @@
 package com.csm.rover.simulator.environments.rover.modifiers;
 
 import com.csm.rover.simulator.environments.EnvironmentModifier;
+import com.csm.rover.simulator.environments.annotations.Modifier;
 import com.csm.rover.simulator.environments.rover.TerrainMap;
 import com.csm.rover.simulator.objects.util.ArrayGrid;
 
 import java.util.Map;
 
+@Modifier(name="Smoother", type="Rover", parameters={})
 public class SmoothingModifier extends EnvironmentModifier<TerrainMap> {
 
     public SmoothingModifier() {

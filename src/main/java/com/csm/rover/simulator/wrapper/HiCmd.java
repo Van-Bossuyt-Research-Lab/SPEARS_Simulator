@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
@@ -14,7 +14,7 @@ public class HiCmd implements HumanInterfaceAbstraction {
     private final static Logger LOG = LogManager.getLogger(HiCmd.class);
 
     @Override
-    public void initialize(NamesAndTags namesAndTags, SerialBuffers buffers, ArrayList<RoverObject> rovers, ArrayList<SatelliteObject> satellites, TerrainMap map) {
+    public void initialize(NamesAndTags namesAndTags, SerialBuffers buffers, ArrayList<RoverObject> rovers, ArrayList<SatelliteObject> satellites, PlatformEnvironment map) {
 
     }
 

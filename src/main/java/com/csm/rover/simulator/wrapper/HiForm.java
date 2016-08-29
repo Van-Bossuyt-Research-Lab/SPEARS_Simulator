@@ -2,6 +2,7 @@ package com.csm.rover.simulator.wrapper;
 
 import com.csm.rover.simulator.control.InterfaceAccess;
 import com.csm.rover.simulator.control.InterfacePanel;
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.map.PlanetParametersList;
 import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.map.display.LandMapPanel;
@@ -47,7 +48,7 @@ public class HiForm implements HumanInterfaceAbstraction {
     }
 
     @Override
-    public void initialize(NamesAndTags namesAndTags, SerialBuffers buffers, ArrayList<RoverObject> rovers, ArrayList<SatelliteObject> satellites, TerrainMap map) {
+    public void initialize(NamesAndTags namesAndTags, SerialBuffers buffers, ArrayList<RoverObject> rovers, ArrayList<SatelliteObject> satellites, PlatformEnvironment map) {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         wrapperPnl = new MainWrapper(screenSize, buffers, namesAndTags);
         orbitalPnl = new Panel(screenSize, "Orbital View");

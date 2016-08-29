@@ -1,14 +1,16 @@
 package com.csm.rover.simulator.visual;
 
 import com.csm.rover.simulator.control.PopUp;
+import com.csm.rover.simulator.environments.EnvironmentIO;
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
-import com.csm.rover.simulator.environments.rover.TerrainMap;
 import com.csm.rover.simulator.environments.rover.modifiers.PlasmaFractalGen;
 import com.csm.rover.simulator.environments.rover.modifiers.SmoothingModifier;
+import com.csm.rover.simulator.environments.rover.populators.TerrainTargetsPop;
 import com.csm.rover.simulator.objects.io.MapFileFilter;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.objects.util.ParamMap;
 import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
@@ -723,15 +725,21 @@ public class StartupPanel extends Panel {
         TerrainEnvironment terrainEnvironment = new TerrainEnvironment();
         terrainEnvironment.setBaseGenerator(new PlasmaFractalGen());
         terrainEnvironment.addModifier(new SmoothingModifier());
-        terrainEnvironment.generate(mapSize, mapDetail);
-        terrainEnvironment.generateTargets(monoTargets, targetDensity);
-        terrainEnvironment.generateHazards(monoHazards, hazardDensity);
+        terrainEnvironment.addPopulator("Targets", new TerrainTargetsPop());
+        terrainEnvironment.generate(ParamMap.newParamMap()
+                .addParameter("size", mapSize)
+                .addParameter("detail", mapDetail)
+                .addParameter("rough", 0.003)
+                .addParameter("range", 10)
+                .addParameter("trgt_density", 0.02)
+                .addParameter("mono", 1)
+                .build());
         Random rnd = new Random();
         File tempFile;
         do {
             tempFile = new File(String.format("Temp/%d.map", (int) (rnd.nextDouble() * 10000)));
         } while (tempFile.exists());
-        TerrainMapWriter.saveMap(terrainEnvironment, tempFile);
+        EnvironmentIO.saveEnvironment(terrainEnvironment, tempFile);
         return tempFile;
     }
 

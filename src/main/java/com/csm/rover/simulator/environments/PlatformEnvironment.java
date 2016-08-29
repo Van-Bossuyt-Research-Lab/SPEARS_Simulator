@@ -79,7 +79,7 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
     }
 
     @SuppressWarnings("unchecked")
-    public final void build(Map<String, Double> params){
+    public final void generate(Map<String, Double> params){
         map = baseGen.modify(null, params);
         for (EnvironmentModifier<M> mod : modifiers){
             map = mod.modify(map, params);
@@ -97,11 +97,11 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
     }
 
     @SuppressWarnings("unchecked")
-    public final <T> T getPopulatorValue(String pop, double... cooordinates){
+    public final <T> T getPopulatorValue(String pop, double... coordinates){
         if (populators.containsKey(pop)){
             T out;
             try {
-                out = (T)populators.get(pop).getValue(cooordinates);
+                out = (T)populators.get(pop).getValue(coordinates);
                 return out;
             }
             catch (ClassCastException e){

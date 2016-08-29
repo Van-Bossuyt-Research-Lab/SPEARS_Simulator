@@ -9,7 +9,7 @@ import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import java.util.Map;
 import java.util.Random;
 
-@Modifier(name="Plasma Fractal", type="Rover", parameters={"range", "rough"}, generator=true)
+@Modifier(name="Plasma Fractal", type="Rover", parameters={"size", "detail", "range", "rough"}, generator=true)
 public class PlasmaFractalGen extends EnvironmentModifier<TerrainMap> {
 
     public PlasmaFractalGen() {
@@ -18,8 +18,8 @@ public class PlasmaFractalGen extends EnvironmentModifier<TerrainMap> {
 
     @Override
     protected TerrainMap doModify(TerrainMap map, Map<String, Double> params) {
-        int size = map.getSize();
-        int detail = map.getDetail();
+        int size = params.get("size").intValue();
+        int detail = params.get("detail").intValue();
         int true_size = size*detail;
         int build_size = getBuildSize(true_size);
         ArrayGrid<Float> grid = new FloatArrayArrayGrid();
