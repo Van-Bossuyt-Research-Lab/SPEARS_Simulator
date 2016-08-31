@@ -96,17 +96,18 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         buildActions = Optional.of(run);
     }
 
-    @SuppressWarnings("unchecked")
-    public final <T> T getPopulatorValue(String pop, double... coordinates){
+    public final double getPopulatorValue(String pop, double... coordinates){
         if (populators.containsKey(pop)){
-            T out;
-            try {
-                out = (T)populators.get(pop).getValue(coordinates);
-                return out;
-            }
-            catch (ClassCastException e){
-                throw new RuntimeException("Wrong return type request", e);
-            }
+            return populators.get(pop).getValue(coordinates);
+        }
+        else {
+            throw new IllegalArgumentException("No populator with name "+pop);
+        }
+    }
+
+    public final boolean isPopulatorAt(String pop, double... coordinates){
+        if (populators.containsKey(pop)){
+            return populators.get(pop).getValue(coordinates) > 0;
         }
         else {
             throw new IllegalArgumentException("No populator with name "+pop);

@@ -3,10 +3,7 @@ package com.csm.rover.simulator.environments.rover;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.annotations.Environment;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
-import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
-
-import java.util.ArrayList;
 
 @Environment(type="Rover")
 public class TerrainEnvironment extends PlatformEnvironment<RoverObject, TerrainMap> {
@@ -31,8 +28,17 @@ public class TerrainEnvironment extends PlatformEnvironment<RoverObject, Terrain
         return getSlopeAt(point, (direction - Math.PI / 2.0 + Math.PI * 2) % (2 * Math.PI));
     }
 
-    public <T> T getPopulatorValue(String pop, DecimalPoint point){
+    public double getGravity(){
+        //TODO handle this better
+        return 9.81;
+    }
+
+    public double getPopulatorValue(String pop, DecimalPoint point){
         return super.getPopulatorValue(pop, point.getX(), point.getY());
+    }
+
+    public boolean isPopulatorAt(String pop, DecimalPoint point){
+        return super.isPopulatorAt(pop, point.getX(), point.getY());
     }
 
 }

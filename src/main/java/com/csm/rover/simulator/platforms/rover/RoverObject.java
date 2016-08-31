@@ -1,9 +1,7 @@
 package com.csm.rover.simulator.platforms.rover;
 
-import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
 import com.csm.rover.simulator.platforms.rover.phsicsModels.RoverDriveCommands;
@@ -14,9 +12,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.Point;
 import java.io.InputStream;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
@@ -73,8 +69,6 @@ public class RoverObject extends Platform {
 	private long startCurretIntegral = 0; // time of initial integral check
 	@SuppressWarnings("unused")
 	private float averageCurrent = 0; // integral divided by time
-	
-	private HashSet<Point> visitedScience = new HashSet<Point>();
 		
 	private String serialHistory = "";
 	private Map<String, Boolean> LEDs = new TreeMap<String, Boolean>();
@@ -241,13 +235,6 @@ public class RoverObject extends Platform {
 						else if (strcmp(data, "auto") == 0){ // force into autonomous mode
 							run_auto = true;
 							sendSerial("s1 g %");
-						}
-						else if (strcmp(data, "score") == 0){
-                            DecimalPoint loc = new DecimalPoint(this.physicsModel.getState().<Double>get("x"), this.physicsModel.getState().<Double>get("y"));
-							if (MAP.isPointAtTarget(loc)){
-								this.visitedScience.add(MAP.getMapSquare(loc));
-								System.out.println("Aquired.  New Score = " + visitedScience.size());
-							}
 						}
 					} 
 					// if there isn't more to the message interpret the tag

@@ -30,7 +30,7 @@ public class Form extends JFrame {
     private StartupPanel startupPanel;
 	private MainWrapper wrapperPnl;
 	private Panel orbitalPnl;
-	private LandMapPanel terrainPnl;
+	private Panel terrainPnl;
 	private InterfacePanel interfacePnl;
 	private RoverHub roverHubPnl;
 	private SatelliteHub satelliteHubPnl;
@@ -53,7 +53,7 @@ public class Form extends JFrame {
 
     public void setRunTimePanels(MainWrapper WrapperPnl,
                                  Panel OrbitalPnl,
-                                 LandMapPanel TerrainPnl,
+                                 Panel TerrainPnl,
                                  InterfacePanel InterfacePnl,
                                  RoverHub RoverHubPnl,
                                  SatelliteHub SatelliteHubPnl){

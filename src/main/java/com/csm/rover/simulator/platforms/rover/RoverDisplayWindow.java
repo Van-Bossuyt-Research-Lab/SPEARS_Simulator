@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.platforms.rover;
 
-import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.visual.LEDIndicator;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class RoverDisplayWindow extends JPanel {
 
-    private TerrainMap map;
+    private TerrainEnvironment map;
 
     private ArrayList<RoverObject> rovers = new ArrayList<>();
     private int roverLock = -1;
@@ -80,7 +80,7 @@ public class RoverDisplayWindow extends JPanel {
             "\n\nBattery Temperature: %s \u00B0c" +
             "\n\nAir Temperature: %s \u00B0c";
 
-    public RoverDisplayWindow(TerrainMap map){
+    public RoverDisplayWindow(TerrainEnvironment map){
         initialize();
         setToBlank();
         this.map = map;
@@ -309,9 +309,9 @@ public class RoverDisplayWindow extends JPanel {
                 formatDouble(Math.toDegrees(state.<Double[]>get("wheel_speed")[RoverWheels.BR.getValue()])),
                 formatDouble(state.<Double>get("speed")),
                 formatDouble(Math.cos(state.<Double>get("direction") * state.<Double>get("speed"))),
-                formatDouble(Math.toDegrees(map.getIncline(new DecimalPoint(state.<Double>get("x"), state.<Double>get("y")), state.<Double>get("direction")))),
+                formatDouble(Math.toDegrees(map.getSlopeAt(new DecimalPoint(state.<Double>get("x"), state.<Double>get("y")), state.<Double>get("direction")))),
                 formatDouble(Math.sin(state.<Double>get("direction") * state.<Double>get("speed"))),
-                formatDouble(Math.toDegrees(map.getCrossSlope(new DecimalPoint(state.<Double>get("x"), state.<Double>get("y")), state.<Double>get("direction")))),
+                formatDouble(Math.toDegrees(map.getCrossSlopeAt(new DecimalPoint(state.<Double>get("x"), state.<Double>get("y")), state.<Double>get("direction")))),
                 formatDouble(Math.toDegrees(state.<Double>get("angular_velocity"))),
                 formatDouble(state.<Double>get("slip_velocity")),
                 formatDouble(state.<Double>get("acceleration")),

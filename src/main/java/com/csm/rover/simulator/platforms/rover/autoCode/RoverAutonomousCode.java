@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.platforms.rover.autoCode;
 
-import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
@@ -25,7 +25,7 @@ import java.util.TreeMap;
 public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel {
 	private static final Logger LOG = LogManager.getLogger(RoverAutonomousCode.class);
 
-	protected static PlatformEnvironment MAP;
+	protected static TerrainEnvironment MAP;
 
 	private String name;
 	private String roverName;
@@ -50,7 +50,7 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel {
     protected abstract String doNextCommand(long milliTime, DecimalPoint location,
                                           double direction, Map<String, Double> params);
 
-    public static void setTerrainMap(PlatformEnvironment map){
+    public static void setTerrainMap(TerrainEnvironment map){
         MAP = map;
     }
 	

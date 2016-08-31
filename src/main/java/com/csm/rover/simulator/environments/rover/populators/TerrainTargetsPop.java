@@ -13,20 +13,14 @@ import java.util.Random;
 import java.util.Set;
 
 @Populator(type="Rover", name="Targets", coordinates={"x", "y"}, parameters={"trgt_density", "mono"})
-public class TerrainTargetsPop extends EnvironmentPopulator<Integer> {
+public class TerrainTargetsPop extends EnvironmentPopulator {
 
     public TerrainTargetsPop() {
-        super(
-            EnvironmentPopulator.builder(Integer.class)
-                .setType("Rover")
-                .setName("Targets")
-                .setDefaultValue(0)
-                .build()
-        );
+        super("Rover", "Targets", 0);
     }
 
     @Override
-    protected RecursiveGridList<Integer> doBuild(EnvironmentMap map, Map<String, Double> params) {
+    protected RecursiveGridList doBuild(EnvironmentMap map, Map<String, Double> params) {
         int size = ((TerrainMap)map).getSize();
         int targetCount = (int)(Math.pow(size, 2) / 100.0 * params.get("trgt_density"));
         Random rnd = new Random();

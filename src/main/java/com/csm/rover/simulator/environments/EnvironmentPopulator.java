@@ -4,64 +4,18 @@ import com.csm.rover.simulator.objects.util.RecursiveGridList;
 
 import java.util.Map;
 
-public abstract class EnvironmentPopulator<T> {
+public abstract class EnvironmentPopulator {
 
     protected final String platform_type;
     protected final String name;
 
-    protected RecursiveGridList<T> value_map;
-    protected final T default_value;
+    protected RecursiveGridList<Double> value_map;
+    protected final double default_value;
 
-    protected EnvironmentPopulator(Built<T> build){
-        platform_type = build.type;
-        this.name = build.name;
-        this.default_value = build.default_val;
-    }
-
-    protected static <U> Builder<U> builder(Class<U> type){
-        return new Builder<>();
-    }
-
-    protected static class Builder<T> {
-
-        private String type, name;
-        private T default_val;
-
-        private Builder(){}
-
-        public Builder setType(String type){
-            this.type = type;
-            return this;
-        }
-
-        public Builder setName(String name){
-            this.name = name;
-            return this;
-        }
-
-        public Builder setDefaultValue(T default_val){
-            this.default_val = default_val;
-            return this;
-        }
-
-        public Built<T> build(){
-            if (type == null || name == null || default_val == null){
-                throw new IllegalStateException("The builder is not fully initialized");
-            }
-            return new Built<T>(type, name, default_val);
-        }
-    }
-
-    private static class Built<T> {
-
-        private String type, name;
-        private T default_val;
-
-        private Built(String type, String name, T default_val){
-            this.type = type;
-            this.name = name;
-            this.default_val = default_val;
-        }
+    protected EnvironmentPopulator(String type, String name, double default_value){
+        platform_type = type;
+        this.name = name;
+        this.default_value = default_value;
     }
 
     public final String getType(){
@@ -75,9 +29,9 @@ public abstract class EnvironmentPopulator<T> {
         value_map = doBuild(map, params);
     }
 
-    abstract protected RecursiveGridList<T> doBuild(final EnvironmentMap map, final Map<String, Double> params);
+    abstract protected RecursiveGridList<Double> doBuild(final EnvironmentMap map, final Map<String, Double> params);
 
-    public T getValue(double... coordinates){
+    public double getValue(double... coordinates){
         if (value_map == null){
             return default_value;
         }
