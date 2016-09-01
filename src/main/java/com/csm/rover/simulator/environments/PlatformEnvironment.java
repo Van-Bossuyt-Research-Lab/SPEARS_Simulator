@@ -52,7 +52,7 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         if (!mod.getType().equals(this.platform_type)){
             throw new IllegalArgumentException(String.format("Types do not match %s != %s", platform_type, mod.getType()));
         }
-        if (!baseGen.isGenerator()){
+        if (!mod.isGenerator()){
             throw new IllegalArgumentException("Base Generator must be a generation modifier");
         }
         baseGen = mod;

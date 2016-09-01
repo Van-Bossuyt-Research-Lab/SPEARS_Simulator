@@ -38,7 +38,7 @@ public class SmoothingModifier extends EnvironmentModifier<TerrainMap> {
             }
             count = (count +1) % Integer.MAX_VALUE;
         }
-        return new TerrainMap(map.getSize(), map.getSize(), values);
+        return new TerrainMap(params.get("size").intValue(), params.get("detail").intValue(), values);
     }
 
 }

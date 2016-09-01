@@ -197,4 +197,9 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
     public ArrayGrid<Float> clone() {
         return new FloatArrayArrayGrid(this);
     }
+
+    @Override
+    public String toString(){
+        return String.format("ArrayGrid:[type=Float, width=%d, height=%d]", getWidth(), getHeight());
+    }
 }

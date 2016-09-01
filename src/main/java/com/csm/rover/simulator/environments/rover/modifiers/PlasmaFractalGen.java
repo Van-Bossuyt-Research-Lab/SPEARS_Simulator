@@ -21,38 +21,78 @@ public class PlasmaFractalGen extends EnvironmentModifier<TerrainMap> {
         int size = params.get("size").intValue();
         int detail = params.get("detail").intValue();
         int true_size = size*detail;
-        int build_size = getBuildSize(true_size);
-        ArrayGrid<Float> grid = new FloatArrayArrayGrid();
+        ArrayGrid<Float> values = new FloatArrayArrayGrid();
 
         Random rnd = new Random();
+        double rough = params.get("rough");
         double range = params.get("range");
 
-
-        return new TerrainMap(size, detail, trim(grid, true_size));
-    }
-
-    private int getBuildSize(int map_size){
-        int base = 3;
-        while (base <= map_size){
-            base += base-1;
-        }
-        return base;
-    }
-
-    private ArrayGrid<Float> trim(ArrayGrid<Float> orig, int size){
-        if (orig.getWidth() < size || orig.getHeight() < size){
-            throw new IllegalArgumentException("Grid is smaller than crop size");
-        }
-        int xstart = (orig.getWidth()-size)/2;
-        int ystart = (orig.getHeight()-size)/2;
-        ArrayGrid<Float> out = new FloatArrayArrayGrid();
-        out.fillToSize(size, size);
-        for (int i = 0; i < size; i++){
-            for (int j = 0; j < size; j++){
-                out.put(i, j, orig.get(i+xstart, j+ystart));
+        double seed = rnd.nextInt(30) * rnd.nextDouble();
+        values.put(0, 0, (float) Math.abs(seed + rnd.nextDouble()/5.));
+        values.put(0, 1, (float) Math.abs(seed + rnd.nextDouble()/5.));
+        values.put(1, 0, (float) Math.abs(seed + rnd.nextDouble()/5.));
+        values.put(1, 1, (float) Math.abs(seed + rnd.nextDouble()/5.));
+        while (values.getWidth() < true_size){
+            expand(values);
+            for (int x = 0; x < values.getWidth(); x++){
+                for (int y = 0; y < values.getHeight(); y++){
+                    if ((x+1) % 2 == 0){
+                        if ((y+1) % 2 == 0){
+                            values.put(x, y, (float)((values.get(x - 1, y - 1)+values.get(x - 1, y + 1)+values.get(x + 1, y - 1)+values.get(x + 1, y + 1))/4. + rnd.nextDouble()*rough));
+                        }
+                        else {
+                            values.put(x, y, (float)((values.get(x - 1, y)+values.get(x + 1, y))/2. + rnd.nextDouble()*rough));
+                        }
+                    }
+                    else {
+                        if ((y+1) % 2 == 0){
+                            values.put(x, y, (float)((values.get(x, y - 1)+values.get(x, y + 1))/2. + rnd.nextDouble()*rough));
+                        }
+                    }
+                }
+            }
+            rough *= 0.7;
+            if (rough < 0){
+                rough = 0;
             }
         }
-        return out;
+
+        double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
+        for (int x = 0; x < values.getWidth(); x++){
+            for (int y = 0; y < values.getHeight(); y++){
+                double val = values.get(x, y);
+                if (val < min){
+                    min = val;
+                }
+                else if (val > max){
+                    max = val;
+                }
+            }
+        }
+        max -= min;
+
+        ArrayGrid<Float> heightmap = new FloatArrayArrayGrid();
+        int xstart = (values.getWidth() - true_size)/2;
+        int ystart = (values.getHeight() - true_size)/2;
+        for (int x = 0; x < true_size; x++) {
+            for (int y = 0; y < true_size; y++) {
+                heightmap.put(x, y, (float) ((values.get(x + xstart, y + ystart) - min) * (max / range)));
+            }
+        }
+
+        System.out.println("Creating terrain map");
+        return new TerrainMap(size, detail, heightmap);
+    }
+
+    //part of the plasma fractal generation, pushes the array from |x|x|x| to |x|_|x|_|x|
+    private void expand(ArrayGrid<Float> vals){
+        int width = vals.getWidth();
+        int height = vals.getHeight();
+        for (int x = width-1; x >=0; x--){
+            for (int y = height-1; y >= 0; y--){
+                vals.put(x*2, y*2, vals.get(x, y));
+            }
+        }
     }
 
 }
