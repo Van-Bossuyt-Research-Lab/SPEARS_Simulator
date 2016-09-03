@@ -1,13 +1,19 @@
 package com.csm.rover.simulator.test.objects;
 
 import com.csm.rover.simulator.objects.util.ArrayGrid;
+import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.csm.rover.simulator.objects.util.GenericArrayGrid;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class ArrayGridTest {
 
@@ -54,6 +60,44 @@ public class ArrayGridTest {
         assertEquals(5, grid.getWidth());
         assertEquals(6, grid.getHeight());
         assertEquals("b", grid.get(1, 5));
+    }
+
+    @Test
+    public void jsonSerializationTest(){
+        ArrayGrid<Float> grid = new FloatArrayArrayGrid();
+        grid.put(0, 0, 5f);
+        grid.put(1, 1, 5f);
+        grid.put(1, 3, 2f);
+        grid.put(0, 2, 9f);
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writeValueAsString(grid);
+            assertArrayEquals("[[5.0,0.0],[0.0,5.0],[9.0,0.0],[0.0,2.0]]".toCharArray(), json.toCharArray());
+        }
+        catch (JsonProcessingException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void jsonDeserializerTest(){
+        ArrayGrid<Float> grid = new GenericArrayGrid<>();
+        grid.put(0, 0, 5f);
+        grid.put(1, 1, 5f);
+        grid.put(1, 3, 2f);
+        grid.put(0, 2, 9f);
+
+        String json = "[[5.0,null],[null,5.0],[9.0,null],[null,2.0]]";
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            ArrayGrid<Object> obj = mapper.readValue(json, ArrayGrid.class);
+            assertEquals(grid, obj);
+        }
+        catch (IOException e) {
+            fail();
+        }
     }
 
 //    @Test

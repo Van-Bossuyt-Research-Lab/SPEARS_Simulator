@@ -155,10 +155,15 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
     }
 
     @Override
+    public boolean equals(Object other) {
+        return other instanceof ArrayGrid && this.toString().equals(other.toString());
+    }
+
+    @Override
     public String toString(){
         ArrayList<String> rows = new ArrayList<String>(getHeight());
         for (int y = 0; y < getHeight(); y++){
-            String row = "|\t";
+            String row = "| ";
             for (int x = 0; x < getWidth()-1; x++){
                 row += get(x, y) + ",\t";
             }
