@@ -1,7 +1,14 @@
 package com.csm.rover.simulator.objects.util;
 
+import com.csm.rover.simulator.objects.io.RecursiveGridListDeserializer;
+import com.csm.rover.simulator.objects.io.RecursiveGridListSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.util.*;
 
+@JsonSerialize(using=RecursiveGridListSerializer.class)
+@JsonDeserialize(using=RecursiveGridListDeserializer.class)
 public class RecursiveGridList<T> {
 
     private Map<Integer, RecursiveGridList<T>> list;
@@ -68,11 +75,24 @@ public class RecursiveGridList<T> {
         return out;
     }
 
+    public int getDimension(){
+        return layers;
+    }
+
     private int[] prepend(int val, int[] list) {
         int[] out = new int[list.length+1];
         out[0] = val;
         System.arraycopy(list, 0, out, 1, list.length);
         return out;
+    }
+
+    @Override
+    public boolean equals(Object other){
+        return other instanceof RecursiveGridList &&
+                this.layers == ((RecursiveGridList)other).layers &&
+                this.layers == 0 ?
+                    this.value.get().equals(((RecursiveGridList)other).value.get()) :
+                    this.list.equals(((RecursiveGridList)other).list);
     }
 
     @Override
