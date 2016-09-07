@@ -1,7 +1,7 @@
 package com.csm.rover.simulator.platforms.rover;
 
 import com.csm.rover.simulator.control.InterfaceCode;
-import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
@@ -40,7 +40,7 @@ public class RoverHub extends Panel {
 	private JComboBox<String> rovSelect;
 	private JTextField commandInput;
 
-	public RoverHub(Dimension size, SerialBuffers serialBuffers, ArrayList<RoverObject> rovers, TerrainMap map){
+	public RoverHub(Dimension size, SerialBuffers serialBuffers, ArrayList<RoverObject> rovers, TerrainEnvironment map){
 		super(size, "Rover Hub");
 		this.serialBuffers = serialBuffers;
 
@@ -91,7 +91,7 @@ public class RoverHub extends Panel {
 		setVisible(false);
 	}
 	
-	private void initialize(TerrainMap map){
+	private void initialize(TerrainEnvironment map){
 		for (int x = 0; x < numberOfDisplays; x++){
             final int a = x;
             RoverDisplayWindow displayWindow = new RoverDisplayWindow(map);

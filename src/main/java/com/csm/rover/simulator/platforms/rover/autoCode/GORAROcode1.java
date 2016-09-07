@@ -39,7 +39,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
 	private static final int STALL_TIME = 3000;
 	private static final int RUN_TIME = 4000;
 	
-	private ArrayList<DecimalPoint> visitedScience = new ArrayList<DecimalPoint>();
+	private ArrayList<DecimalPoint> visitedScience = new ArrayList<>();
 	
 	private double[] mentality = new double[] { 10000, 3000, 1200, 500, 50 };
 
@@ -65,7 +65,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
 		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + MAP.getHeightAt(location) + "\t" + score + "\t" + state);
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
-			score += MAP.getTargetValueAt(location);
+			score += MAP.<Integer>getPopulatorValue("Targets", location)/10;
 			visitedScience.add(location.clone());
 			for (int x = 0; x < histories; x++){
 				for (int y = 0; y < sampleDirections; y++){
@@ -118,7 +118,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
 				
 				//if there is a hazard at the point get less excited
 				int hazard = 0;
-				if (MAP.isPointInHazard(examine)){
+				if (MAP.<Integer>getPopulatorValue("Hazards", examine) > 0){
 					hazard = 1;
 				}
 				
@@ -138,7 +138,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
 				double hazardArea = 0;
 				for (double radius = sampleRadius; radius <= averagingRadius; radius += averagingRStep){
 					for (double phi = -averagingAngle/2.0; phi <= averagingAngle/2.0; phi += averagingPStep){
-						if (MAP.isPointInHazard(location.offset(radius * Math.cos(theta + phi), radius * Math.sin(theta + phi)))){
+						if (MAP.<Integer>getPopulatorValue("Hazard", location.offset(radius * Math.cos(theta + phi), radius * Math.sin(theta + phi))) > 0){
 							hazardArea += sampleRadius/radius;
 							hazards[i] += 1;
 						}
@@ -202,7 +202,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
 	}
 
 	private boolean hasUnvisitedScience(DecimalPoint loc){
-		if (MAP.isPointAtTarget(loc)){
+		if (MAP.<Integer>getPopulatorValue("Targets", loc) > 0){
 			for (DecimalPoint past : visitedScience){
 				if (Math.sqrt(Math.pow(loc.getX()-past.getX(), 2) + Math.pow(loc.getY()-past.getY(), 2)) < 3){
 					return false;

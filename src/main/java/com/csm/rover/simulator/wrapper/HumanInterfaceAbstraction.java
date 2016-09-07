@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
@@ -13,7 +13,7 @@ public interface HumanInterfaceAbstraction {
                     SerialBuffers buffers,
                     ArrayList<RoverObject> rovers,
                     ArrayList<SatelliteObject> satellites,
-                    TerrainMap map);
+                    PlatformEnvironment map);
 
     void start();
 

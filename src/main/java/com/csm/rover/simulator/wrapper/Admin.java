@@ -1,8 +1,9 @@
 package com.csm.rover.simulator.wrapper;
 
 import com.csm.rover.simulator.control.PopUp;
-import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.map.io.TerrainMapReader;
+import com.csm.rover.simulator.environments.EnvironmentIO;
+import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.platforms.Platform;
@@ -25,13 +26,14 @@ public class Admin {
     private static HumanInterfaceAbstraction HI;
 
     //Runtime Variables
-    private TerrainMap terrainMap;
+    private PlatformEnvironment environment;
     private ArrayList<PlatformConfig> roverCfgs;
     private ArrayList<PlatformConfig> satCfgs;
     private SerialBuffers serialBuffers;
 
 	public static void main(String[] args) {
         LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
+        RegistryManager.checkRegistries();
 		Admin admin = getInstance();
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");
@@ -82,7 +84,6 @@ public class Admin {
 	//TODO clean up this interface for OCP
 	private Admin(){
 		GLOBAL = Globals.getInstance();
-        terrainMap = new TerrainMap();
 	}
 
     private static Optional<Admin> singleton_instance = Optional.empty();
@@ -113,19 +114,19 @@ public class Admin {
 			if (!config.mapFile.exists()){
 				throw new Exception();
 			}
-			terrainMap = TerrainMapReader.loadMap(config.mapFile);
-			LOG.log(Level.INFO, "Start Up: Using map file: {}", config.mapFile.getName());
+			environment = EnvironmentIO.loadEnvironment(config.mapFile, TerrainEnvironment.class);
+            LOG.log(Level.INFO, "Start Up: Using map file: {}", config.mapFile.getName());
 		}
 		catch (Exception e){
 			LOG.log(Level.WARN, "Start Up: Invalid map file", e);
 			return;
 		}
-        RoverObject.setTerrainMap(terrainMap);
+        RoverObject.setTerrainMap((TerrainEnvironment)environment);
 
 		ArrayList<RoverObject> rovers = buildRoversFromConfig(roverCfgs);
 		ArrayList<SatelliteObject> satellites = buildSatellitesFromConfig(satCfgs);
 
-        HI.initialize(config.namesAndTags, serialBuffers, rovers, satellites, terrainMap);
+        HI.initialize(config.namesAndTags, serialBuffers, rovers, satellites, environment);
 
 		if (config.accelerated){
 			LOG.log(Level.INFO, "Start Up: Accelerating Simulation");
