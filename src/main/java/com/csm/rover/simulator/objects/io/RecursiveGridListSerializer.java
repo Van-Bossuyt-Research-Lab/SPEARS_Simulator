@@ -27,6 +27,8 @@ public class RecursiveGridListSerializer extends JsonSerializer<RecursiveGridLis
             jsonGenerator.writeObjectField("value", gridList.get(key));
             jsonGenerator.writeEndObject();
         }
+        jsonGenerator.writeEndArray();
+        jsonGenerator.writeEndObject();
     }
 
 }

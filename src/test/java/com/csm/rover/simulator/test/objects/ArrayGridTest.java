@@ -1,7 +1,6 @@
 package com.csm.rover.simulator.test.objects;
 
 import com.csm.rover.simulator.objects.util.ArrayGrid;
-import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.csm.rover.simulator.objects.util.GenericArrayGrid;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,9 +10,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class ArrayGridTest {
 
@@ -64,16 +61,16 @@ public class ArrayGridTest {
 
     @Test
     public void jsonSerializationTest(){
-        ArrayGrid<Float> grid = new FloatArrayArrayGrid();
-        grid.put(0, 0, 5f);
-        grid.put(1, 1, 5f);
-        grid.put(1, 3, 2f);
-        grid.put(0, 2, 9f);
+        ArrayGrid<String> grid = new GenericArrayGrid<>();
+        grid.put(0, 0, "a");
+        grid.put(1, 1, "a");
+        grid.put(1, 3, "b");
+        grid.put(0, 2, "c");
 
         ObjectMapper mapper = new ObjectMapper();
         try {
             String json = mapper.writeValueAsString(grid);
-            assertArrayEquals("[[5.0,0.0],[0.0,5.0],[9.0,0.0],[0.0,2.0]]".toCharArray(), json.toCharArray());
+            assertArrayEquals("[[\"a\",null],[null,\"a\"],[\"c\",null],[null,\"b\"]]".toCharArray(), json.toCharArray());
         }
         catch (JsonProcessingException e) {
             fail();
@@ -82,17 +79,17 @@ public class ArrayGridTest {
 
     @Test
     public void jsonDeserializerTest(){
-        ArrayGrid<Float> grid = new GenericArrayGrid<>();
-        grid.put(0, 0, 5f);
-        grid.put(1, 1, 5f);
-        grid.put(1, 3, 2f);
-        grid.put(0, 2, 9f);
+        ArrayGrid<String> grid = new GenericArrayGrid<>();
+        grid.put(0, 0, "a");
+        grid.put(1, 1, "a");
+        grid.put(1, 3, "b");
+        grid.put(0, 2, "c");
 
-        String json = "[[5.0,null],[null,5.0],[9.0,null],[null,2.0]]";
+        String json = "[[\"a\",null],[null,\"a\"],[\"c\",null],[null,\"b\"]]";
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            ArrayGrid<Object> obj = mapper.readValue(json, ArrayGrid.class);
+            ArrayGrid<String> obj = mapper.readValue(json, ArrayGrid.class);
             assertEquals(grid, obj);
         }
         catch (IOException e) {
