@@ -723,17 +723,19 @@ public class StartupPanel extends Panel {
                                  boolean monoTargets,
                                  boolean monoHazards){
         TerrainEnvironment terrainEnvironment = new TerrainEnvironment();
-        terrainEnvironment.setBaseGenerator(new PlasmaFractalGen());
-        terrainEnvironment.addModifier(new SmoothingModifier());
-        terrainEnvironment.addPopulator("Targets", new TerrainTargetsPop());
-        terrainEnvironment.generate(ParamMap.newParamMap()
-                .addParameter("size", mapSize)
-                .addParameter("detail", mapDetail)
-                .addParameter("rough", 0.003)
-                .addParameter("range", 10)
-                .addParameter("trgt_density", 0.02)
-                .addParameter("mono", 1)
-                .build());
+        terrainEnvironment.generateNewMap(new PlasmaFractalGen(), ParamMap.newParamMap()
+                        .addParameter("size", mapSize)
+                        .addParameter("detail", mapDetail)
+                        .addParameter("rough", 0.003)
+                        .addParameter("range", 10)
+                        .build()
+                )
+                .addMapModifier(new SmoothingModifier(), ParamMap.emptyParamMap())
+                .addPopulator("Targets", new TerrainTargetsPop(), ParamMap.newParamMap()
+                        .addParameter("trgt_density", 0.02)
+                        .addParameter("mono", 1)
+                        .build())
+                .generate();
         Random rnd = new Random();
         File tempFile;
         do {
@@ -777,7 +779,12 @@ public class StartupPanel extends Panel {
             roversToAdd.remove(RoverList.getSelectedItem());
             RoverList.removeValue(RoverList.getSelectedIndex());
         }
-        catch (Exception e){ e.printStackTrace(); }
+        catch (NullPointerException e){
+            //Nothing selected: don't worry about it
+        }
+        catch (Exception e){
+            LOG.log(Level.WARN, "trouble removing", e);
+        }
     }
 
     public void addSatelliteToList(){
@@ -815,8 +822,11 @@ public class StartupPanel extends Panel {
             satsToAdd.remove(SatelliteList.getSelectedItem());
             SatelliteList.removeValue(SatelliteList.getSelectedIndex());
         }
+        catch (NullPointerException e){
+            //Nothing selected: don't worry about it
+        }
         catch (Exception e){
-            e.printStackTrace();
+            LOG.log(Level.WARN, "trouble removing", e);
         }
     }
 

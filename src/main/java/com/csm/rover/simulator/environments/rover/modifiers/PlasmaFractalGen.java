@@ -79,8 +79,6 @@ public class PlasmaFractalGen extends EnvironmentModifier<TerrainMap> {
                 heightmap.put(x, y, (float) ((values.get(x + xstart, y + ystart) - min) * (max / range)));
             }
         }
-
-        System.out.println("Creating terrain map");
         return new TerrainMap(size, detail, heightmap);
     }
 

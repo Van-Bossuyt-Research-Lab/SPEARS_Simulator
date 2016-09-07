@@ -1,18 +1,31 @@
 package com.csm.rover.simulator.environments.rover;
 
 import com.csm.rover.simulator.environments.EnvironmentMap;
+import com.csm.rover.simulator.environments.annotations.Map;
 import com.csm.rover.simulator.objects.util.ArrayGrid;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.awt.Point;
 import java.util.Optional;
 
+@Map(type="Rover")
+@JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
+@JsonIgnoreProperties({"type"})
 public class TerrainMap extends EnvironmentMap {
 
+    @JsonProperty("heightMap")
     private ArrayGrid<Float> heightMap;
 
-    private int size, detail;
+    @JsonProperty("size")
+    private int size;
+    @JsonProperty("detail")
+    private int detail;
 
     private TerrainMap(int size, int detail) {
         super("Rover");
@@ -20,7 +33,12 @@ public class TerrainMap extends EnvironmentMap {
         this.detail = detail;
     }
 
-    public TerrainMap(int size, int detail, ArrayGrid<Float> values){
+    public TerrainMap(){
+        this(0, 0);
+    }
+
+    @JsonCreator
+    public TerrainMap(@JsonProperty("size") int size, @JsonProperty("detail") int detail, @JsonProperty("heightMap") ArrayGrid<Float> values){
         this(size, detail);
         this.heightMap = new FloatArrayArrayGrid((FloatArrayArrayGrid)values);
         checkSize();
@@ -38,7 +56,9 @@ public class TerrainMap extends EnvironmentMap {
         }
     }
 
+    @JsonIgnore
     private Optional<Float> max_val = Optional.empty();
+    @JsonIgnore
     private Optional<Float> min_val = Optional.empty();
 
     private void findMaxMin(){
@@ -59,6 +79,7 @@ public class TerrainMap extends EnvironmentMap {
         min_val = Optional.of(min);
     }
 
+    @JsonIgnore
     public float getMaxValue(){
         if (!max_val.isPresent()){
             findMaxMin();
@@ -66,6 +87,7 @@ public class TerrainMap extends EnvironmentMap {
         return max_val.get();
     }
 
+    @JsonIgnore
     public float getMinValue(){
         if (!min_val.isPresent()){
             findMaxMin();

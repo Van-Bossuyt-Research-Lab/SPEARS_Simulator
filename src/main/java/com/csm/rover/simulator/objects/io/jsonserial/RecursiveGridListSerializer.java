@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.objects.io;
+package com.csm.rover.simulator.objects.io.jsonserial;
 
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
 import com.fasterxml.jackson.core.JsonGenerator;

@@ -114,7 +114,7 @@ public class Admin {
 			if (!config.mapFile.exists()){
 				throw new Exception();
 			}
-			environment = EnvironmentIO.loadEnvironment(config.mapFile);
+			environment = EnvironmentIO.loadEnvironment(config.mapFile, TerrainEnvironment.class);
             LOG.log(Level.INFO, "Start Up: Using map file: {}", config.mapFile.getName());
 		}
 		catch (Exception e){

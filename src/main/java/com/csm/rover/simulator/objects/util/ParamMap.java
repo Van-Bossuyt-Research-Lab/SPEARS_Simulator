@@ -10,6 +10,10 @@ public class ParamMap {
         return new Builder();
     }
 
+    public static Map<String, Double> emptyParamMap(){
+        return Collections.emptyMap();
+    }
+
     public static class Builder {
 
         private Map<String, Double> map;

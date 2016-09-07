@@ -1,7 +1,7 @@
 package com.csm.rover.simulator.objects.util;
 
-import com.csm.rover.simulator.objects.io.RecursiveGridListDeserializer;
-import com.csm.rover.simulator.objects.io.RecursiveGridListSerializer;
+import com.csm.rover.simulator.objects.io.jsonserial.RecursiveGridListDeserializer;
+import com.csm.rover.simulator.objects.io.jsonserial.RecursiveGridListSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

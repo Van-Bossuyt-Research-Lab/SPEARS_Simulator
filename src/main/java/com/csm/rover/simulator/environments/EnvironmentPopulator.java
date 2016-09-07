@@ -1,15 +1,20 @@
 package com.csm.rover.simulator.environments;
 
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
 public abstract class EnvironmentPopulator {
 
+    @JsonProperty("type")
     protected final String platform_type;
+    @JsonProperty("name")
     protected final String name;
 
+    @JsonProperty("values")
     protected RecursiveGridList<Double> value_map;
+    @JsonProperty("default")
     protected final double default_value;
 
     protected EnvironmentPopulator(String type, String name, double default_value){
@@ -30,6 +35,10 @@ public abstract class EnvironmentPopulator {
     }
 
     abstract protected RecursiveGridList<Double> doBuild(final EnvironmentMap map, final Map<String, Double> params);
+
+    public final String getName(){
+        return name;
+    }
 
     public double getValue(double... coordinates){
         if (value_map == null){

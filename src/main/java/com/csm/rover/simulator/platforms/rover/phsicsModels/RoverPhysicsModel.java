@@ -1,6 +1,5 @@
 package com.csm.rover.simulator.platforms.rover.phsicsModels;
 
-import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
@@ -232,13 +231,14 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
                 battery_temperature = temp;
                 winding_temp = new double[] { temp, temp, temp, temp };
                 motor_temp = new double[] { temp, temp, temp, temp };
-                return;
             }
             catch (ClassCastException e){
-                //Let the error throw
+                LOG.log(Level.ERROR, "Failed to read state");
             }
         }
-        throw new IllegalArgumentException("The given state is not a RoverState");
+        else {
+            throw new IllegalArgumentException("The given state is not a RoverState");
+        }
     }
 
     @Override

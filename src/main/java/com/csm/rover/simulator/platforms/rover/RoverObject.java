@@ -298,7 +298,7 @@ public class RoverObject extends Platform {
 			}
 
 			// Autonomous and Instruction handling
-			if (Globals.getInstance().timeMillis - timeOfLastCmd > 60000){ // if it has been a minute since we heard from them
+            if (Globals.getInstance().timeMillis - timeOfLastCmd > 60000){ // if it has been a minute since we heard from them
 				//System.out.println(this.name);
 				if (hasInstructions && !mute) { // if we have instructions, can send things
 					LEDs.put("Instructions", true);

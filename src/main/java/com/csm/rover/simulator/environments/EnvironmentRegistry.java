@@ -16,6 +16,7 @@ public class EnvironmentRegistry {
 
     static {
         environments = new TreeMap<>();
+        maps = new TreeMap<>();
         modifiers = new TreeMap<>();
         modifierParameters = new TreeMap<>();
         populators = new TreeMap<>();
@@ -24,6 +25,7 @@ public class EnvironmentRegistry {
     }
 
     private static Map<String, String> environments;
+    private static Map<String, String> maps;
 
     private static Map<String, Map<String, String>> modifiers;
     private static Map<String, Map<String, String[]>> modifierParameters;
@@ -36,6 +38,7 @@ public class EnvironmentRegistry {
         Reflections reflect = new Reflections("com.csm.rover.simulator");
 
         fillEnvironments(reflect);
+        fillMaps(reflect);
         fillModifiers(reflect);
         fillPopulators(reflect);
 
@@ -74,6 +77,41 @@ public class EnvironmentRegistry {
         }
         else {
             LOG.log(Level.INFO, "Identified Environments: {}", environments.toString());
+        }
+    }
+
+    private static void fillMaps(Reflections reflect){
+        Set<Class<? extends EnvironmentMap>> classmaps = reflect.getSubTypesOf(EnvironmentMap.class);
+        Set<Class<?>> labelmaps = reflect.getTypesAnnotatedWith(com.csm.rover.simulator.environments.annotations.Map.class);
+        List<Set<?>> sortedSets = sortSets(classmaps, labelmaps);
+        @SuppressWarnings("unchecked")
+        Set<Class<?>> warnset1 = (Set<Class<?>>)sortedSets.get(0);
+        for (Class<?> clazz : warnset1){
+            LOG.log(Level.WARN, "{} extends EnvironmentMap but is not registered as a Map", clazz.toString());
+        }
+        @SuppressWarnings("unchecked")
+        Set<Class<?>> warnset2 = (Set<Class<?>>)sortedSets.get(2);
+        for (Class<?> clazz : warnset2){
+            LOG.log(Level.WARN, "{} is a registered Map but does not extend EnvironmentMap", clazz.toString());
+        }
+
+        @SuppressWarnings("unchecked")
+        Set<Class<? extends EnvironmentMap>> realmaps = (Set<Class<? extends EnvironmentMap>>)sortedSets.get(1);
+        for (Class<? extends EnvironmentMap> map : realmaps){
+            String type = map.getAnnotation(com.csm.rover.simulator.environments.annotations.Map.class).type();
+            try {
+                map.newInstance();
+                maps.put(type, getClassPath(map));
+            }
+            catch (InstantiationException | IllegalAccessException e) {
+                LOG.log(Level.WARN, "{} does not have a default constructor", map.toString());
+            }
+        }
+        if (maps.size() == 0){
+            LOG.log(Level.WARN, "No Maps were found to load");
+        }
+        else {
+            LOG.log(Level.INFO, "Identified Maps: {}", maps.toString());
         }
     }
 
@@ -198,6 +236,23 @@ public class EnvironmentRegistry {
         }
         else {
             LOG.log(Level.ERROR, "The Environment \"{}\" is not registered and cannot be returned", type);
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Class<? extends EnvironmentMap> getMap(String type){
+        if (maps.keySet().contains(type)){
+            try {
+                return (Class<? extends EnvironmentMap>)Class.forName(maps.get(type));
+            }
+            catch (ClassNotFoundException | ClassCastException e){
+                LOG.log(Level.ERROR, "Registry failed to properly load class " + maps.get(type) + " for " + type + " map", e);
+                return null;
+            }
+        }
+        else {
+            LOG.log(Level.ERROR, "The Map \"{}\" is not registered and cannot be returned", type);
             return null;
         }
     }
