@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.ArrayList;
 
 @JsonSerialize(using=ArrayGridSerializer.class)
-@JsonDeserialize(using= ArrayGridDeserializer.class)
+@JsonDeserialize(using=ArrayGridDeserializer.class)
 public interface ArrayGrid<T> extends Cloneable {
 
     void loadFromArray(T[][] values);
