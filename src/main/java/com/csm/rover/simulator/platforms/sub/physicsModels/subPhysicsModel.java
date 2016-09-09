@@ -1,22 +1,17 @@
 package com.csm.rover.simulator.platforms.sub.physicsModels;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import com.csm.rover.simulator.map.SubMap;
-import com.csm.rover.simulator.map.TerrainMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.DriveCommandHandler;
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import com.csm.rover.simulator.platforms.rover.MotorState;
-import com.csm.rover.simulator.platforms.sub.physicsModels.SubDriveCommands;
-import com.csm.rover.simulator.platforms.sub.SubState;
 import com.csm.rover.simulator.platforms.sub.SubProp;
+import com.csm.rover.simulator.platforms.sub.SubState;
 import com.csm.rover.simulator.wrapper.Admin;
-import org.apache.logging.log4j.Level;
+
+import java.util.Map;
 
 @PhysicsModel(type= "Sub", name="Default", parameters = {})
 public class subPhysicsModel extends PlatformPhysicsModel {

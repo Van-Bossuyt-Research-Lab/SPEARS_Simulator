@@ -1,7 +1,6 @@
 package com.csm.rover.simulator.platforms.rover.phsicsModels;
 
-import com.csm.rover.simulator.map.PlanetParametersList;
-import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.DriveCommandHandler;
@@ -27,9 +26,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
 
     private RoverState rov_state;
 
-    //TODO variable planet params
-	private PlanetParametersList planetParams = new PlanetParametersList();
-	protected static TerrainMap MAP;
+	protected static TerrainEnvironment MAP;
 
 	protected String roverName;
 	public final double time_step = 0.01; // time step of physics, in seconds
@@ -193,7 +190,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
         });
     }
 
-    public static void setTerrainMap(TerrainMap map){
+    public static void setTerrainMap(TerrainEnvironment map){
         MAP = map;
     }
 
@@ -234,13 +231,14 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
                 battery_temperature = temp;
                 winding_temp = new double[] { temp, temp, temp, temp };
                 motor_temp = new double[] { temp, temp, temp, temp };
-                return;
             }
             catch (ClassCastException e){
-                //Let the error throw
+                LOG.log(Level.ERROR, "Failed to read state");
             }
         }
-        throw new IllegalArgumentException("The given state is not a RoverState");
+        else {
+            throw new IllegalArgumentException("The given state is not a RoverState");
+        }
     }
 
     @Override
@@ -281,7 +279,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
 		slip[BL] = friction_s * (wheel_speed[BL]*wheel_radius - speed);
 		slip[BR] = friction_s * (wheel_speed[BR]*wheel_radius - speed);
 		// Acceleration changes based on forces
-		acceleration = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - planetParams.getgrav_accel()*Math.sin(MAP.getIncline(location, direction));
+		acceleration = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - MAP.getGravity()*Math.sin(MAP.getSlopeAt(location, direction));
 		angular_acceleration = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
 		// Speed changes based on Acceleration
 		speed += acceleration * time_step;
@@ -291,7 +289,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
 			//System.out.println(round(wheel_speed[BL]) + " rad/s -> " + round(slip[BL]) + " N -> " + round(angular_acceleration) + " rad/s^2 -> " + round(angular_velocity) + " rad/s");
 			//System.out.println(round(wheel_speed[BR]) + " rad/s -> " + round(slip[BR]) + " N");
 		// Calculate the amount the rover slips sideways
-		slip_acceleration = (-friction_gr*slip_velocity*4 - rover_mass*planetParams.getgrav_accel()*Math.sin(MAP.getCrossSlope(location, direction)) / rover_mass);
+		slip_acceleration = (-friction_gr*slip_velocity*4 - rover_mass*MAP.getGravity()*Math.sin(MAP.getCrossSlopeAt(location, direction)) / rover_mass);
 		slip_velocity += slip_acceleration * time_step;
 		// Calculate new location
 		location.offsetThis(speed*time_step*Math.cos(direction), speed*time_step*(Math.sin(direction)));

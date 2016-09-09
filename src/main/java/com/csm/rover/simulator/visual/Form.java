@@ -1,7 +1,6 @@
 package com.csm.rover.simulator.visual;
 
 import com.csm.rover.simulator.control.InterfacePanel;
-import com.csm.rover.simulator.map.display.LandMapPanel;
 import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.platforms.rover.RoverHub;
 import com.csm.rover.simulator.platforms.satellite.SatelliteHub;
@@ -31,7 +30,7 @@ public class Form extends JFrame {
     private StartupPanel startupPanel;
 	private MainWrapper wrapperPnl;
 	private Panel orbitalPnl;
-	private LandMapPanel terrainPnl;
+	private Panel terrainPnl;
 	private InterfacePanel interfacePnl;
 	private RoverHub roverHubPnl;
 	private SatelliteHub satelliteHubPnl;
@@ -54,7 +53,7 @@ public class Form extends JFrame {
 
     public void setRunTimePanels(MainWrapper WrapperPnl,
                                  Panel OrbitalPnl,
-                                 LandMapPanel TerrainPnl,
+                                 Panel TerrainPnl,
                                  InterfacePanel InterfacePnl,
                                  RoverHub RoverHubPnl,
                                  SatelliteHub SatelliteHubPnl){

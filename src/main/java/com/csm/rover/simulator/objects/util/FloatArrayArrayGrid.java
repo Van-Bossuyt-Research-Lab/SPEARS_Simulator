@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.objects.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class FloatArrayArrayGrid implements ArrayGrid<Float> {
 
@@ -195,5 +196,15 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
     @Override
     public ArrayGrid<Float> clone() {
         return new FloatArrayArrayGrid(this);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof FloatArrayArrayGrid && Arrays.deepEquals(this.grid, ((FloatArrayArrayGrid) other).grid);
+    }
+
+    @Override
+    public String toString(){
+        return String.format("ArrayGrid:[type=Float, width=%d, height=%d]", getWidth(), getHeight());
     }
 }

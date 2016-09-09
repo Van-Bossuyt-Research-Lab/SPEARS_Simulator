@@ -1,20 +1,22 @@
 package com.csm.rover.simulator.platforms.rover.autoCode;
 
-import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import com.csm.rover.simulator.platforms.rover.RoverWheels;
-import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -22,7 +24,7 @@ import java.util.TreeMap;
 public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel {
 	private static final Logger LOG = LogManager.getLogger(RoverAutonomousCode.class);
 
-	protected static TerrainMap MAP;
+	protected static TerrainEnvironment MAP;
 
 	private String name;
 	private String roverName;
@@ -47,7 +49,7 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel {
     protected abstract String doNextCommand(long milliTime, DecimalPoint location,
                                           double direction, Map<String, Double> params);
 
-    public static void setTerrainMap(TerrainMap map){
+    public static void setTerrainMap(TerrainEnvironment map){
         MAP = map;
     }
 	
@@ -63,7 +65,7 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel {
 	protected void writeToLog(String message){
 		try {
 			BufferedWriter write = new BufferedWriter(new FileWriter(logFile, true));
-			write.write(message + "\t\t" + new DateTime().toString(DateTimeFormat.forPattern("[MM/dd/yyyy hh:mm:ss.")) + (Globals.getInstance().timeMillis %1000) + "]\r\n");
+			write.write(message + "\t\t" + new DateTime().toString(DateTimeFormat.forPattern("[MM/dd/yyyy hh:mm:ss.SS]\r\n")));
 			write.flush();
 			write.close();
 		}

@@ -1,13 +1,10 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.map.SubMap;
-import com.csm.rover.simulator.map.TerrainMap;
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
-import com.csm.rover.simulator.platforms.sub.SubObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public interface HumanInterfaceAbstraction {
@@ -16,18 +13,15 @@ public interface HumanInterfaceAbstraction {
                     SerialBuffers buffers,
                     ArrayList<RoverObject> rovers,
                     ArrayList<SatelliteObject> satellites,
-                    TerrainMap map);
-
-    void initialize(NamesAndTags namesAndTags,
-                    SerialBuffers buffers,
-                    ArrayList<SubObject> subs,
-                    SubMap map);
+                    PlatformEnvironment map);
 
     void start();
 
     void updateRovers();
 
     void updateSatellites();
+
+    void updateSubs();
 
     void updateRover(String name, DecimalPoint location, double direction);
 
