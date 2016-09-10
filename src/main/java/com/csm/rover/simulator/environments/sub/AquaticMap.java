@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.environments.sub;
 import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.annotations.Map;
+import com.csm.rover.simulator.objects.ArrayGrid3D;
 import com.csm.rover.simulator.objects.util.ArrayGrid;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
@@ -18,8 +19,8 @@ import java.util.Optional;
 @JsonIgnoreProperties({"type"})
 public class AquaticMap extends EnvironmentMap {
 
-    @JsonProperty("heightMap")
-    private ArrayGrid<Float> heightMap;
+    @JsonProperty("SubMap")
+    private FloatArrayArrayGrid SubMap;
 
     @JsonProperty("size")
     private int size;
@@ -27,7 +28,7 @@ public class AquaticMap extends EnvironmentMap {
     private int detail;
 
     private AquaticMap(int size, int detail) {
-        super("Rover");
+        super("Sub");
         this.size = size;
         this.detail = detail;
     }
@@ -37,20 +38,20 @@ public class AquaticMap extends EnvironmentMap {
     }
 
     @JsonCreator
-    public AquaticMap(@JsonProperty("size") int size, @JsonProperty("detail") int detail, @JsonProperty("heightMap") ArrayGrid<Float> values) {
+    public AquaticMap(@JsonProperty("size") int size, @JsonProperty("detail") int detail, @JsonProperty("SubMap") FloatArrayArrayGrid values) {
         this(size, detail);
-        this.heightMap = new FloatArrayArrayGrid((FloatArrayArrayGrid) values);
+        this.SubMap = new ArrayGrid3D<Float>(values);
         checkSize();
     }
 
     public AquaticMap(int size, int detail, Float[][] values) {
         this(size, detail);
-        this.heightMap = new FloatArrayArrayGrid(values);
+        this.SubMap = new FloatArrayArrayGrid(values);
         checkSize();
     }
 
     private void checkSize() {
-        if (heightMap.getWidth() != size * detail || heightMap.getHeight() != size * detail) {
+        if (SubMap.getWidth() != size * detail || SubMap.getHeight() != size * detail) {
             throw new IllegalArgumentException("The map does not match the given sizes");
         }
     }
@@ -63,9 +64,9 @@ public class AquaticMap extends EnvironmentMap {
     private void findMaxMin() {
         float max = Float.MIN_VALUE;
         float min = Float.MAX_VALUE;
-        for (int i = 0; i < heightMap.getWidth(); i++) {
-            for (int j = 0; j < heightMap.getHeight(); j++) {
-                float val = heightMap.get(i, j);
+        for (int i = 0; i < SubMap.getWidth(); i++) {
+            for (int j = 0; j < SubMap.getHeight(); j++) {
+                float val = SubMap.get(i, j);
                 if (val > max) {
                     max = val;
                 }
@@ -95,7 +96,7 @@ public class AquaticMap extends EnvironmentMap {
     }
 
     private Point getMapSquare(DecimalPoint loc) { // says which display square a given coordinate falls in
-        int shift = heightMap.getWidth() / (detail * 2);
+        int shift = SubMap.getWidth() / (detail * 2);
         double x = loc.getX() + shift;
         double y = shift - loc.getY();
         int outx = (int) (x * detail);
@@ -116,7 +117,7 @@ public class AquaticMap extends EnvironmentMap {
         DecimalPoint lifePnt = new DecimalPoint(loc.getX() + getSize() / 2.0, getSize() / 2.0 - loc.getY());
         double locx = ((int) ((lifePnt.getX() - (int) lifePnt.getX()) * 1000) % (1000 / detail)) / 1000.0 * detail;
         double locy = ((int) ((lifePnt.getY() - (int) lifePnt.getY()) * 1000) % (1000 / detail)) / 1000.0 * detail;
-        return getIntermediateValue(heightMap.get(x, y), heightMap.get(x + 1, y), heightMap.get(x, y + 1), heightMap.get(x + 1, y + 1), locx, locy);
+        return getIntermediateValue(SubMap.get(x, y), SubMap.get(x + 1, y), SubMap.get(x, y + 1), SubMap.get(x + 1, y + 1), locx, locy);
     }
 
     private double getIntermediateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey) { //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
@@ -138,7 +139,7 @@ public class AquaticMap extends EnvironmentMap {
     }
 
     public ArrayGrid<Float> rawValues() {
-        return heightMap.clone();
+        return SubMap.clone();
     }
 }
 
