@@ -1,20 +1,20 @@
 package com.csm.rover.simulator.visual;
 
 import com.csm.rover.simulator.control.PopUp;
-import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.map.io.TerrainMapWriter;
-import com.csm.rover.simulator.map.modifiers.NormalizeMapMod;
-import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
-import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
+import com.csm.rover.simulator.environments.EnvironmentIO;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
+import com.csm.rover.simulator.environments.rover.modifiers.PlasmaFractalGen;
+import com.csm.rover.simulator.environments.rover.modifiers.SmoothingModifier;
+import com.csm.rover.simulator.environments.rover.populators.TerrainTargetsPop;
 import com.csm.rover.simulator.objects.io.MapFileFilter;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.objects.util.ParamMap;
 import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +26,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -247,7 +246,7 @@ public class StartupPanel extends Panel {
         SatelliteListLbl.setBounds(510, 492, 142, 21);
         this.add(SatelliteListLbl);
 
-        MapConfigTtl = new JLabel("Congiure Map");
+        MapConfigTtl = new JLabel("Configure Map");
         MapConfigTtl.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
         MapConfigTtl.setBounds(912, 10, 118, 21);
         this.add(MapConfigTtl);
@@ -723,19 +722,26 @@ public class StartupPanel extends Panel {
                                  double hazardDensity,
                                  boolean monoTargets,
                                  boolean monoHazards){
-        TerrainMap terrainMap = new TerrainMap();
-        terrainMap.addMapModifier(new PlasmaGeneratorMod(mapRough));
-        terrainMap.addMapModifier(new SurfaceSmoothMod());
-        terrainMap.addMapModifier(new NormalizeMapMod());
-        terrainMap.generateLandscape(mapSize, mapDetail);
-        terrainMap.generateTargets(monoTargets, targetDensity);
-        terrainMap.generateHazards(monoHazards, hazardDensity);
+        TerrainEnvironment terrainEnvironment = new TerrainEnvironment();
+        terrainEnvironment.generateNewMap(new PlasmaFractalGen(), ParamMap.newParamMap()
+                        .addParameter("size", mapSize)
+                        .addParameter("detail", mapDetail)
+                        .addParameter("rough", 0.003)
+                        .addParameter("range", 10)
+                        .build()
+                )
+                .addMapModifier(new SmoothingModifier(), ParamMap.emptyParamMap())
+                .addPopulator("Targets", new TerrainTargetsPop(), ParamMap.newParamMap()
+                        .addParameter("trgt_density", 0.02)
+                        .addParameter("mono", 1)
+                        .build())
+                .generate();
         Random rnd = new Random();
         File tempFile;
         do {
-            tempFile = new File(String.format("Temp/%d.map", (int) (rnd.nextDouble() * 10000)));
+            tempFile = new File("temp.map");
         } while (tempFile.exists());
-        TerrainMapWriter.saveMap(terrainMap, tempFile);
+        EnvironmentIO.saveEnvironment(terrainEnvironment, tempFile);
         return tempFile;
     }
 
@@ -773,7 +779,12 @@ public class StartupPanel extends Panel {
             roversToAdd.remove(RoverList.getSelectedItem());
             RoverList.removeValue(RoverList.getSelectedIndex());
         }
-        catch (Exception e){ e.printStackTrace(); }
+        catch (NullPointerException e){
+            //Nothing selected: don't worry about it
+        }
+        catch (Exception e){
+            LOG.log(Level.WARN, "trouble removing", e);
+        }
     }
 
     public void addSatelliteToList(){
@@ -811,8 +822,11 @@ public class StartupPanel extends Panel {
             satsToAdd.remove(SatelliteList.getSelectedItem());
             SatelliteList.removeValue(SatelliteList.getSelectedIndex());
         }
+        catch (NullPointerException e){
+            //Nothing selected: don't worry about it
+        }
         catch (Exception e){
-            e.printStackTrace();
+            LOG.log(Level.WARN, "trouble removing", e);
         }
     }
 

@@ -2,9 +2,8 @@ package com.csm.rover.simulator.wrapper;
 
 import com.csm.rover.simulator.control.InterfaceAccess;
 import com.csm.rover.simulator.control.InterfacePanel;
-import com.csm.rover.simulator.map.PlanetParametersList;
-import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.map.display.LandMapPanel;
+import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.platforms.PlatformRegistry;
@@ -30,7 +29,6 @@ public class HiForm implements HumanInterfaceAbstraction {
 
     private MainWrapper wrapperPnl;
     private Panel orbitalPnl;
-    private LandMapPanel terrainPnl;
     private InterfacePanel interfacePnl;
     private RoverHub roverHubPnl;
     private SatelliteHub satelliteHubPnl;
@@ -47,15 +45,14 @@ public class HiForm implements HumanInterfaceAbstraction {
     }
 
     @Override
-    public void initialize(NamesAndTags namesAndTags, SerialBuffers buffers, ArrayList<RoverObject> rovers, ArrayList<SatelliteObject> satellites, TerrainMap map) {
+    public void initialize(NamesAndTags namesAndTags, SerialBuffers buffers, ArrayList<RoverObject> rovers, ArrayList<SatelliteObject> satellites, PlatformEnvironment map) {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         wrapperPnl = new MainWrapper(screenSize, buffers, namesAndTags);
         orbitalPnl = new Panel(screenSize, "Orbital View");
-        roverHubPnl = new RoverHub(screenSize, buffers, rovers, map);
-        terrainPnl = new LandMapPanel(screenSize, new PlanetParametersList(), roverHubPnl, rovers, map);
+        roverHubPnl = new RoverHub(screenSize, buffers, rovers, (TerrainEnvironment)map);
         interfacePnl = new InterfacePanel(screenSize, buffers);
         satelliteHubPnl = new SatelliteHub(screenSize, satellites);
-        GUI.setRunTimePanels(wrapperPnl, orbitalPnl, terrainPnl, interfacePnl, roverHubPnl, satelliteHubPnl);
+        GUI.setRunTimePanels(wrapperPnl, orbitalPnl, new Panel(screenSize, "Terrain View"), interfacePnl, roverHubPnl, satelliteHubPnl);
         init = true;
         InterfaceAccess.CODE.setCallTags(namesAndTags);
         roverHubPnl.setIdentifiers(namesAndTags.getTags("Rover"), namesAndTags.getTags("Satellite"));
@@ -99,9 +96,7 @@ public class HiForm implements HumanInterfaceAbstraction {
 
     @Override
     public void updateRover(String name, DecimalPoint location, double direction) {
-        if (init){
-            terrainPnl.updateRover(name, location, direction);
-        }
+
     }
 
     @Override

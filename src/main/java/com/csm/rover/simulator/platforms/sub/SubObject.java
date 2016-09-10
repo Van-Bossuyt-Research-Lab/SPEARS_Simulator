@@ -3,17 +3,17 @@ package com.csm.rover.simulator.platforms.sub;
 import com.csm.rover.simulator.map.SubMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.rover.MotorState;
+import com.csm.rover.simulator.platforms.sub.physicsModels.SubDriveCommands;
 import com.csm.rover.simulator.platforms.sub.physicsModels.subPhysicsModel;
 import com.csm.rover.simulator.platforms.sub.subAuto.SubAutonomousCode;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
-import com.csm.rover.simulator.platforms.rover.MotorState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.Point;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -21,6 +21,7 @@ import java.util.TreeMap;
 
 //TODO actually debug instructions
 //TODO make for modular for OCP, SRP
+@com.csm.rover.simulator.platforms.annotations.Platform(type="Sub")
 public class SubObject extends Platform {
     private static final Logger LOG = LogManager.getLogger(SubObject.class);
 
@@ -31,7 +32,7 @@ public class SubObject extends Platform {
 
     private String name;
     private String IDcode;
-    private subPhysicsModel physics;
+    private subPhysicsModel physics = new subPhysicsModel();
     private SubAutonomousCode autoCode;
 
     @SuppressWarnings("unused")
@@ -137,39 +138,39 @@ public class SubObject extends Platform {
                             // switch through commands
                             if (strcmp(data, "move") == 0) {
                                 sendSerial("s1 g %"); // confirm message reciet
-                                Forward();
+                                driveForward();
                                 moving = true;
                             } else if (strcmp(data, "stop") == 0) {
                                 sendSerial("s1 g %");
-                                Stop();
+                                driveStop();
                                 moving = true;
                             } else if (strcmp(data, "spin_ccw") == 0) {
                                 sendSerial("s1 g %");
-                                YawCCW();
+                                driveSpinCCW();
                                 moving = true;
                             } else if (strcmp(data, "spin_cw") == 0) {
                                 sendSerial("s1 g %");
-                                YawCW();
+                                driveSpinCW();
                                 moving = true;
                             } else if (strcmp(data, "backward") == 0) {
                                 sendSerial("s1 g %");
-                                Backward();
+                                driveBackward();
                                 moving = true;
                             } else if (strcmp(data, "turnFL") == 0) {
                                 sendSerial("s1 g %");
-                                TurnFL();
+                                driveTurnFL();
                                 moving = true;
                             } else if (strcmp(data, "turnFR") == 0) {
                                 sendSerial("s1 g %");
-                                TurnFR();
+                                driveTurnFR();
                                 moving = true;
                             } else if (strcmp(data, "turnBL") == 0) {
                                 sendSerial("s1 g %");
-                                TurnBL();
+                                driveTurnBL();
                                 moving = true;
                             } else if (strcmp(data, "turnBR") == 0) {
                                 sendSerial("s1 g %");
-                                TurnBR();
+                                driveTurnBR();
                                 moving = true;
                             } else if (strcmp(data, "getvolts") == 0) {
                                 sendSerial("s1 g %");
@@ -211,7 +212,7 @@ public class SubObject extends Platform {
                                 hasInstructions = false; // we don't have instructions
                                 instructions = ""; // delete "file"
                                 if (moving) {
-                                    Stop(); // stop the rover
+                                    driveStop(); // stop the rover
                                 }
                                 delay(1000);
                                 sendSerial("s1 g KillDone"); // confirm abort
@@ -314,38 +315,38 @@ public class SubObject extends Platform {
                                 System.out.println(cmd);
                                 // switch all known commands
                                 if (strcmp(cmd, "move") == 0) {
-                                    Forward();
+                                    driveForward();
                                     moving = true;
                                     motorState = cmd;
                                 } else if (strcmp(cmd, "backward") == 0) {
-                                    Backward();
+                                    driveBackward();
                                     moving = true;
                                     motorState = cmd;
                                 } else if (strcmp(cmd, "spin_cw") == 0) {
-                                    YawCW();
+                                    driveSpinCW();
                                     moving = true;
                                     motorState = cmd;
                                 } else if (strcmp(cmd, "spin_ccw") == 0) {
-                                    YawCCW();
+                                    driveSpinCCW();
                                     moving = true;
                                     motorState = cmd;
                                 } else if (strcmp(cmd, "stop") == 0) {
-                                    Stop();
+                                    driveStop();
                                     moving = false;
                                 } else if (strcmp(cmd, "turnFL") == 0) {
-                                    TurnFL();
+                                    driveTurnFL();
                                     moving = true;
                                     motorState = cmd;
                                 } else if (strcmp(cmd, "turnFR") == 0) {
-                                    TurnFR();
+                                    driveTurnFR();
                                     moving = true;
                                     motorState = cmd;
                                 } else if (strcmp(cmd, "turnBL") == 0) {
-                                    TurnBL();
+                                    driveTurnBL();
                                     moving = true;
                                     motorState = cmd;
                                 } else if (strcmp(cmd, "turnBR") == 0) {
-                                    TurnBR();
+                                    driveTurnBR();
                                     moving = true;
                                     motorState = cmd;
                                 } else if (cmd.equals("photo")) {
@@ -429,41 +430,41 @@ public class SubObject extends Platform {
                     LEDs.put("Autonomus", true);
                     LEDs.put("Instructions", false);
 
-                    String cmd = autoCode.nextCommand();
+                    String cmd = autoCode.nextCommand(Globals.getInstance().timeMillis,physicsModel.getState());
                     //TODO switch all known commands
                     if (strcmp(cmd, "") == 0) { /*Do Nothing*/ } else if (strcmp(cmd, "move") == 0) {
-                        Forward();
+                        driveForward();
                         moving = true;
                         motorState = cmd;
                     } else if (strcmp(cmd, "backward") == 0) {
-                        Backward();
+                        driveBackward();
                         moving = true;
                         motorState = cmd;
                     } else if (strcmp(cmd, "spin_cw") == 0) {
-                        YawCW();
+                        driveSpinCW();
                         moving = true;
                         motorState = cmd;
                     } else if (strcmp(cmd, "spin_ccw") == 0) {
-                        YawCCW();
+                        driveSpinCCW();
                         moving = true;
                         motorState = cmd;
                     } else if (strcmp(cmd, "stop") == 0) {
-                        Stop();
+                        driveStop();
                         moving = false;
                     } else if (strcmp(cmd, "turnFL") == 0) {
-                        TurnFL();
+                        driveTurnFL();
                         moving = true;
                         motorState = cmd;
                     } else if (strcmp(cmd, "turnFR") == 0) {
-                        TurnFR();
+                        driveTurnFR();
                         moving = true;
                         motorState = cmd;
                     } else if (strcmp(cmd, "turnBL") == 0) {
-                        TurnBL();
+                        driveTurnBL();
                         moving = true;
                         motorState = cmd;
                     } else if (strcmp(cmd, "turnBR") == 0) {
-                        TurnBR();
+                        driveTurnBR();
                         moving = true;
                         motorState = cmd;
                     } else if (cmd.equals("photo")) {
@@ -501,23 +502,23 @@ public class SubObject extends Platform {
                             power = 255;
                         }
                         if (motor >= 0 && motor < 4) {
-                            subProp prop;
+                            SubProp prop;
                             switch (motor) {
                                 case 0:
-                                    prop = subProp.L;
+                                    prop = SubProp.L;
                                     break;
                                 case 1:
-                                    prop = subProp.R;
+                                    prop = SubProp.R;
                                     break;
                                 case 2:
-                                    prop = subProp.F;
+                                    prop = SubProp.F;
                                     break;
                                 case 3:
                                 default:
-                                    prop = subProp.B;
+                                    prop = SubProp.B;
                                     break;
                             }
-                            physics.setMotorPower(prop, power);
+                            physicsModel.sendDriveCommand(SubDriveCommands.CHANGE_MOTOR_PWR.getCmd(), prop.getValue(), power);
                         }
                     }
 
@@ -622,67 +623,40 @@ public class SubObject extends Platform {
     }
 
     // how to move the motors for driving
-    private void Forward(){
-        physics.setMotorState(subProp.L, MotorState.FORWARD);
-        physics.setMotorState(subProp.R, MotorState.FORWARD);
-        physics.setMotorState(subProp.F, MotorState.RELEASE);
-        physics.setMotorState(subProp.B, MotorState.RELEASE);
+    private void driveForward(){
+        physicsModel.sendDriveCommand(SubDriveCommands.DRIVE_FORWARD.getCmd());
     }
 
-    private void Backward(){
-        physics.setMotorState(subProp.L, MotorState.BACKWARD);
-        physics.setMotorState(subProp.R, MotorState.BACKWARD);
-        physics.setMotorState(subProp.F, MotorState.RELEASE);
-        physics.setMotorState(subProp.B, MotorState.RELEASE);
+    private void driveBackward(){
+        physicsModel.sendDriveCommand(SubDriveCommands.DRIVE_BACKWARD.getCmd());
     }
 
-    private void YawCW(){
-        physics.setMotorState(subProp.L, MotorState.BACKWARD);
-        physics.setMotorState(subProp.R, MotorState.FORWARD);
-        physics.setMotorState(subProp.F, MotorState.RELEASE);
-        physics.setMotorState(subProp.B, MotorState.RELEASE);
+    private void driveSpinCW(){
+        physicsModel.sendDriveCommand(SubDriveCommands.SPIN_CW.getCmd());
     }
 
-    private void YawCCW(){
-        physics.setMotorState(subProp.L, MotorState.FORWARD);
-        physics.setMotorState(subProp.R, MotorState.BACKWARD);
-        physics.setMotorState(subProp.F, MotorState.RELEASE);
-        physics.setMotorState(subProp.B, MotorState.RELEASE);
+    private void driveSpinCCW(){
+        physicsModel.sendDriveCommand(SubDriveCommands.SPIN_CCW.getCmd());
     }
 
-    private void Stop(){
-        physics.setMotorState(subProp.L, MotorState.RELEASE);
-        physics.setMotorState(subProp.R, MotorState.RELEASE);
-        physics.setMotorState(subProp.F, MotorState.RELEASE);
-        physics.setMotorState(subProp.B, MotorState.RELEASE);
+    private void driveStop(){
+        physicsModel.sendDriveCommand(SubDriveCommands.STOP.getCmd());
     }
 
-    private void TurnFL(){
-        physics.setMotorState(subProp.L, MotorState.RELEASE);
-        physics.setMotorState(subProp.R, MotorState.FORWARD);
-        physics.setMotorState(subProp.F, MotorState.RELEASE);
-        physics.setMotorState(subProp.B, MotorState.RELEASE);
+    private void driveTurnFL(){
+        physicsModel.sendDriveCommand(SubDriveCommands.TURN_FRONT_LEFT.getCmd());
     }
 
-    private void TurnFR(){
-        physics.setMotorState(subProp.L, MotorState.FORWARD);
-        physics.setMotorState(subProp.R, MotorState.RELEASE);
-        physics.setMotorState(subProp.F, MotorState.RELEASE);
-        physics.setMotorState(subProp.B, MotorState.RELEASE);
+    private void driveTurnFR(){
+        physicsModel.sendDriveCommand(SubDriveCommands.TURN_FRONT_RIGHT.getCmd());
     }
 
-    private void TurnBL(){
-        physics.setMotorState(subProp.L, MotorState.RELEASE);
-        physics.setMotorState(subProp.R, MotorState.BACKWARD);
-        physics.setMotorState(subProp.F, MotorState.RELEASE);
-        physics.setMotorState(subProp.B, MotorState.RELEASE);
+    private void driveTurnBL(){
+        physicsModel.sendDriveCommand(SubDriveCommands.TURN_BACK_LEFT.getCmd());
     }
 
-    private void TurnBR(){
-        physics.setMotorState(subProp.L, MotorState.BACKWARD);
-        physics.setMotorState(subProp.R, MotorState.RELEASE);
-        physics.setMotorState(subProp.F, MotorState.RELEASE);
-        physics.setMotorState(subProp.B, MotorState.RELEASE);
+    private void driveTurnBR(){
+        physicsModel.sendDriveCommand(SubDriveCommands.TURN_BACK_RIGHT.getCmd());
     }
 
     // set up waiting for a response
@@ -773,24 +747,6 @@ public class SubObject extends Platform {
         }
     }
 
-    private Map<String, Double> getAutonomousParameters(){
-        Map<String, Double> params = new TreeMap<String, Double>();
-        params.put("acceleration", physics.getAcceleration_xy());
-        params.put("angular_acceleration", physics.getAngularAcceleration_xy());
-        params.put("prop_speed_L", physics.getPropSpeed(subProp.L));
-        params.put("prop_speed_R", physics.getPropSpeed(subProp.R));
-        params.put("prop_speed_F", physics.getPropSpeed(subProp.F));
-        params.put("prop_speed_B", physics.getPropSpeed(subProp.B));
-        params.put("motor_current_L", physics.getMotorCurrent(subProp.L));
-        params.put("motor_current_R", physics.getMotorCurrent(subProp.R));
-        params.put("motor_current_F", physics.getMotorCurrent(subProp.F));
-        params.put("motor_current_B", physics.getMotorCurrent(subProp.B));
-        params.put("motor_temp_L", physics.getMotorTemp(subProp.L));
-        params.put("motor_temp_R", physics.getMotorTemp(subProp.R));
-        params.put("motor_temp_F", physics.getMotorTemp(subProp.F));
-        params.put("motor_temp_B", physics.getMotorTemp(subProp.B));
-        return params;
-    }
 
 //PHYSCIS Related Stuff *****************************************************************************************************************************************************************************************************
 
@@ -814,67 +770,5 @@ public class SubObject extends Platform {
         return LEDs.get(name);
     }
 
-    public subPhysicsModel getParameters(){
-        return physics;
-    }
-
-    public double[] getLocation(){
-        return physics.getLocation();
-    }
-
-    public double getTheta(){
-        return physics.getTheta();
-    }
-    public double getPhi(){
-        return physics.getPhi();
-    }
-
-
-    public double getSOC(){
-        return physics.getSOC();
-    }
-
-    public double getSpeed(){
-        return physics.getSpeed();
-    }
-
-    public double getAngularVelocity_xy(){
-        return physics.getAngularVelocity_xy();
-    }
-
-    public double getAngularVelocity_z(){
-        return physics.getAngularVelocity_z();
-    }
-
-    public double getAcceleration_xy(){
-        return physics.getAcceleration_xy();
-    }
-
-    public double getAcceleration_z(){
-        return physics.getAcceleration_z();
-    }
-
-    public double getAngularAcceleration_xy(){
-        return physics.getAngularAcceleration_xy();
-    }
-
-    public double getAngularAcceleration_z(){
-        return physics.getAngularAcceleration_z();
-    }
-
-
-    public double getPropSpeed(subProp which){
-        return physics.getPropSpeed(which);
-    }
-
-    public double getMotorCurrent(subProp which){
-        return physics.getMotor_current()[which.getValue()];
-    }
-
-
-
-    public double getMotorTemp(subProp which){
-        return physics.getMotorTemp(which);
-    }
 
 }

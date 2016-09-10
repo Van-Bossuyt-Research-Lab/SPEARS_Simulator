@@ -16,14 +16,7 @@ public class SynchronousThread extends Thread {
 	private boolean running = false;
 	
 	public SynchronousThread(int interval, Runnable run, int times, String name){
-		super.setName(name);
-		GLOBAL = Globals.getInstance();
-		delay = interval;
-		action = run;
-		actions = times;
-		forever = (times == FOREVER);
-		GLOBAL.registerNewThread(name, delay, this);
-		this.start();
+		this(interval, run, times, name, true);
 	}
 	
 	public SynchronousThread(int interval, Runnable run, int times, String name, boolean start){

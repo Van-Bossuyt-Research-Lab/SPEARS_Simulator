@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.platforms.sub;
 
-public enum subProp {
+public enum SubProp {
 
     L(0),
     LEFT(0),
@@ -13,7 +13,7 @@ public enum subProp {
 
     private int value;
 
-    subProp(int value){
+    SubProp(int value){
         this.value = value;
     }
 
@@ -21,7 +21,7 @@ public enum subProp {
         return value;
     }
 
-    public boolean equals(subProp other){
+    public boolean equals(SubProp other){
         return value == other.value;
     }
 }

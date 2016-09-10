@@ -28,7 +28,7 @@ public class PlatformRegistry {
     private static Map<String, Map<String, String[]>> autoModelParameters;
     private static Map<String, Map<String, String[]>> physicsModelParameters;
 
-    private static void fillRegistry(){
+    private static void fillRegistry() {
         platforms = new TreeMap<>();
         platformStates = new TreeMap<>();
         autoModels = new TreeMap<>();
@@ -238,6 +238,10 @@ public class PlatformRegistry {
         }
     }
 
+    public static List<String> getTypes(){
+        return new ArrayList<>(platforms.keySet());
+    }
+
     @SuppressWarnings("unchecked")
     public static Class<? extends Platform> getPlatform(String type){
         if (platforms.keySet().contains(type)){
@@ -305,7 +309,7 @@ public class PlatformRegistry {
                     return (Class<? extends PlatformPhysicsModel>) Class.forName(models.get(name));
                 }
                 catch (ClassNotFoundException | ClassCastException e) {
-                    LOG.log(Level.ERROR, "Registry failed to properly load class " + autoModels.get(type) + " for PhysicsModel " + type + "." + name, e);
+                    LOG.log(Level.ERROR, "Registry failed to properly load class " + physicsModels.get(type) + " for PhysicsModel " + type + "." + name, e);
                     return null;
                 }
             }

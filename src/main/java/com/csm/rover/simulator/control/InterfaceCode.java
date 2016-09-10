@@ -202,7 +202,7 @@ public class InterfaceCode {
 	
 	public void setCallTags(NamesAndTags namesAndTags){
 		this.namesAndTags = namesAndTags;
-		GUI.setNamesLists(namesAndTags.getNames("Rover"), namesAndTags.getNames("Satellite"));
+		//GUI.setNamesLists(namesAndTags.getNames("Rover"), namesAndTags.getNames("Satellite"));
 	}
 	
 	// COM CONNECTION STUFF
