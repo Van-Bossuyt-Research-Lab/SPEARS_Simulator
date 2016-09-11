@@ -11,7 +11,7 @@ import java.util.*;
 @JsonDeserialize(using=RecursiveGridListDeserializer.class)
 public class RecursiveGridList<T> {
 
-    private Map<Integer, RecursiveGridList<T>> list;
+    private Map<Double, RecursiveGridList<T>> list;
 
     private int layers;
     private Optional<T> value;
@@ -26,7 +26,7 @@ public class RecursiveGridList<T> {
         value = Optional.empty();
     }
 
-    public T get(int... coords){
+    public T get(double... coords){
         if (coords.length != layers){
             throw new ArrayIndexOutOfBoundsException("The number of coordinates expected did not meet the expected "+layers);
         }
@@ -44,7 +44,7 @@ public class RecursiveGridList<T> {
         }
     }
 
-    public void put(T val, int... coords){
+    public void put(T val, double... coords){
         if (coords.length != layers){
             throw new ArrayIndexOutOfBoundsException("The number of coordinates expected did not meet the expected "+layers);
         }
@@ -58,16 +58,16 @@ public class RecursiveGridList<T> {
         list.get(coords[0]).put(val, Arrays.copyOfRange(coords, 1, layers));
     }
 
-    public Set<int[]> keySet(){
-        Set<int[]> out = new HashSet<>();
+    public Set<double[]> keySet(){
+        Set<double[]> out = new HashSet<>();
         if (layers == 1){
-            for (Integer key : list.keySet()){
-                out.add(new int[]{ key });
+            for (Double key : list.keySet()){
+                out.add(new double[]{ key });
             }
         }
         else {
-            for (Integer key : list.keySet()){
-                for (int[] recKeys : list.get(key).keySet()){
+            for (Double key : list.keySet()){
+                for (double[] recKeys : list.get(key).keySet()){
                     out.add(prepend(key, recKeys));
                 }
             }
@@ -75,12 +75,12 @@ public class RecursiveGridList<T> {
         return out;
     }
 
-    public int getDimension(){
+    public double getDimension(){
         return layers;
     }
 
-    private int[] prepend(int val, int[] list) {
-        int[] out = new int[list.length+1];
+    private double[] prepend(double val, double[] list) {
+        double[] out = new double[list.length+1];
         out[0] = val;
         System.arraycopy(list, 0, out, 1, list.length);
         return out;

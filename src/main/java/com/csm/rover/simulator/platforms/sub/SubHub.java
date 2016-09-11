@@ -1,7 +1,7 @@
 package com.csm.rover.simulator.platforms.sub;
 
 import com.csm.rover.simulator.control.InterfaceCode;
-import com.csm.rover.simulator.map.SubMap;
+import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.visual.Panel;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
@@ -40,7 +40,7 @@ public class SubHub extends Panel {
     private JComboBox<String> rovSelect;
     private JTextField commandInput;
 
-    public SubHub(Dimension size, SerialBuffers serialBuffers, ArrayList<SubObject> subs, SubMap map){
+    public SubHub(Dimension size, SerialBuffers serialBuffers, ArrayList<SubObject> subs, AquaticMap map){
         super(size, "Sub Hub");
         this.serialBuffers = serialBuffers;
 
@@ -91,7 +91,7 @@ public class SubHub extends Panel {
         setVisible(false);
     }
 
-    private void initialize(SubMap map){
+    private void initialize(AquaticMap map){
         for (int x = 0; x < numberOfDisplays; x++){
             final int a = x;
             SubDisplayWindow displayWindow = new SubDisplayWindow(map);

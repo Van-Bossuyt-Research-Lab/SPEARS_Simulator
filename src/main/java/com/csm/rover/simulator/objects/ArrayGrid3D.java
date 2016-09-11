@@ -1,6 +1,4 @@
 package com.csm.rover.simulator.objects;
-import com.csm.rover.simulator.objects.util.ArrayGrid;
-
 import java.util.ArrayList;
 /**
  * Created by PHM-Lab2 on 1/12/2016.
@@ -27,7 +25,7 @@ public interface ArrayGrid3D<T> extends Cloneable {
 
     void addLayerAt(int z, ArrayList<T> lay);
 
-    T get(int x, int y, int z);
+    int get(int x, int y, int z);
 
     ArrayList<T> getColumn(int x);
 
@@ -49,6 +47,6 @@ public interface ArrayGrid3D<T> extends Cloneable {
 
     boolean isEmpty();
 
-    ArrayGrid<T> clone();
+    ArrayGrid3D<T> clone();
 
 }

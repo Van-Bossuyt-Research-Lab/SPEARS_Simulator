@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.platforms.sub.physicsModels;
 
-import com.csm.rover.simulator.map.SubMap;
+import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.platforms.DriveCommandHandler;
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class subPhysicsModel extends PlatformPhysicsModel {
 
 	private static final long serialversionUID = 1L;
-	protected static SubMap SMAP;
+	protected static AquaticMap SMAP;
 
 	private final int L = 0, R = 1, F = 3, B = 4;
 
@@ -193,7 +193,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		});
 	}
 
-	public static void setSubMap(SubMap map){
+	public static void setSubMap(AquaticMap map){
 		SMAP = map;
 	}
 

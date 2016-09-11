@@ -1,9 +1,8 @@
 package com.csm.rover.simulator.platforms.sub;
 
-import com.csm.rover.simulator.map.SubMap;
+import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.platforms.Platform;
-import com.csm.rover.simulator.platforms.rover.MotorState;
 import com.csm.rover.simulator.platforms.sub.physicsModels.SubDriveCommands;
 import com.csm.rover.simulator.platforms.sub.physicsModels.subPhysicsModel;
 import com.csm.rover.simulator.platforms.sub.subAuto.SubAutonomousCode;
@@ -27,7 +26,7 @@ public class SubObject extends Platform {
 
     private static final long serialVersionUID = 1L;
 
-    private static SubMap MAP;
+    private static AquaticMap MAP;
     private static SerialBuffers serialBuffers;
 
     private String name;
@@ -91,7 +90,7 @@ public class SubObject extends Platform {
         LEDs.put("Autonomous", false);
     }
 
-    public static void setSubMap(SubMap map){
+    public static void setSubMap(AquaticMap map){
         SubAutonomousCode.setSubMap(map);
         subPhysicsModel.setSubMap(map);
     }

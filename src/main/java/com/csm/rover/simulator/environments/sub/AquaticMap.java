@@ -2,7 +2,6 @@ package com.csm.rover.simulator.environments.sub;
 import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.annotations.Map;
 import com.csm.rover.simulator.objects.ArrayGrid3D;
-import com.csm.rover.simulator.objects.util.ArrayGrid;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -10,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import javafx.geometry.Point3D;
 
-import java.awt.Point;
 import java.util.Optional;
 
 @Map(type="Sub")
@@ -20,7 +19,7 @@ import java.util.Optional;
 public class AquaticMap extends EnvironmentMap {
 
     @JsonProperty("SubMap")
-    private FloatArrayArrayGrid SubMap;
+    private ArrayGrid3D SubMap;
 
     @JsonProperty("size")
     private int size;
@@ -40,13 +39,12 @@ public class AquaticMap extends EnvironmentMap {
     @JsonCreator
     public AquaticMap(@JsonProperty("size") int size, @JsonProperty("detail") int detail, @JsonProperty("SubMap") FloatArrayArrayGrid values) {
         this(size, detail);
-        this.SubMap = new ArrayGrid3D<Float>(values);
         checkSize();
     }
 
-    public AquaticMap(int size, int detail, Float[][] values) {
+    public AquaticMap(int size, int detail, ArrayGrid3D values) {
         this(size, detail);
-        this.SubMap = new FloatArrayArrayGrid(values);
+        this.SubMap = values;
         checkSize();
     }
 
@@ -66,12 +64,14 @@ public class AquaticMap extends EnvironmentMap {
         float min = Float.MAX_VALUE;
         for (int i = 0; i < SubMap.getWidth(); i++) {
             for (int j = 0; j < SubMap.getHeight(); j++) {
-                float val = SubMap.get(i, j);
-                if (val > max) {
-                    max = val;
-                }
-                if (val < min) {
-                    min = val;
+                for (int k = 0; k < SubMap.getLength(); k++) {
+                    float val = SubMap.get(i, j, k);
+                    if (val > max) {
+                        max = val;
+                    }
+                    if (val < min) {
+                        min = val;
+                    }
                 }
             }
         }
@@ -95,41 +95,45 @@ public class AquaticMap extends EnvironmentMap {
         return min_val.get();
     }
 
-    private Point getMapSquare(DecimalPoint loc) { // says which display square a given coordinate falls in
+    private Point3D getMapSquare(DecimalPoint loc) { // says which display square a given coordinate falls in
         int shift = SubMap.getWidth() / (detail * 2);
         double x = loc.getX() + shift;
         double y = shift - loc.getY();
+        double z = shift - loc.getZ();
         int outx = (int) (x * detail);
         int outy = (int) (y * detail);
-        return new Point(outx, outy);
+        int outz = (int) (z * detail);
+        return new Point3D(outx, outy, outz);
     }
 
-    private Point getGridSquare(DecimalPoint loc) {
-        Point square = getMapSquare(loc);
-        return new Point(square.x / 3, square.y / 3);
+    private Point3D getGridSquare(DecimalPoint loc) {
+        Point3D square = getMapSquare(loc);
+        return new Point3D(square.getX() / 3, square.getY() / 3, square.getZ()/3);
     }
+    /*
+        //returns the height of the map at the given point
+        public double getHeightAt(DecimalPoint loc) {
+            Point3D mapSquare = getMapSquare(loc);
+            int x = (int) mapSquare.getX();
+            int y = (int) mapSquare.getY();
+            int z = (int) mapSquare.getZ();
+            DecimalPoint lifePnt = new DecimalPoint(loc.getX() + getSize() / 2.0, getSize() / 2.0 - loc.getY());
+            double locx = ((int) ((lifePnt.getX() - (int) lifePnt.getX()) * 1000) % (1000 / detail)) / 1000.0 * detail;
+            double locy = ((int) ((lifePnt.getY() - (int) lifePnt.getY()) * 1000) % (1000 / detail)) / 1000.0 * detail;
+            double locz = ((int) ((lifePnt.getZ() - (int) lifePnt.getZ()) * 1000) % (1000 / detail)) / 1000.0 * detail;
 
-    //returns the height of the map at the given point
-    public double getHeightAt(DecimalPoint loc) {
-        Point mapSquare = getMapSquare(loc);
-        int x = (int) mapSquare.getX();
-        int y = (int) mapSquare.getY();
-        DecimalPoint lifePnt = new DecimalPoint(loc.getX() + getSize() / 2.0, getSize() / 2.0 - loc.getY());
-        double locx = ((int) ((lifePnt.getX() - (int) lifePnt.getX()) * 1000) % (1000 / detail)) / 1000.0 * detail;
-        double locy = ((int) ((lifePnt.getY() - (int) lifePnt.getY()) * 1000) % (1000 / detail)) / 1000.0 * detail;
-        return getIntermediateValue(SubMap.get(x, y), SubMap.get(x + 1, y), SubMap.get(x, y + 1), SubMap.get(x + 1, y + 1), locx, locy);
-    }
-
-    private double getIntermediateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey) { //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
-        if (relativex > relativey) { //top right triangle
-            return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
-        } else if (relativex < relativey) { //bottom left triangle
-            return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey + topleft;
-        } else { //center line
-            return ((bottomright - topleft) * relativex + topleft);
+            return getIntermediateValue(SubMap.get(x, y, z), SubMap.get(x + 1, y, z), SubMap.get(x, y + 1, z), SubMap.get(x + 1, y + 1, z), locx, locy, locz);
         }
-    }
-
+        private double getIntermediateValue(Object topleft, Object topright, Object bottomleft, Object bottomright, double relativex, double relativey, double relativez) { //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
+            if (relativex > relativey) { //top right triangle
+                return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
+            } else if (relativex < relativey) { //bottom left triangle
+                return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey + topleft;
+            } else { //center line
+                return ((bottomright - topleft) * relativex + topleft);
+            }
+        }
+    */
     public int getSize() {
         return size;
     }
@@ -138,8 +142,8 @@ public class AquaticMap extends EnvironmentMap {
         return detail;
     }
 
-    public ArrayGrid<Float> rawValues() {
-        return SubMap.clone();
+    public ArrayGrid3D rawValues() {
+        return SubMap;
     }
 }
 

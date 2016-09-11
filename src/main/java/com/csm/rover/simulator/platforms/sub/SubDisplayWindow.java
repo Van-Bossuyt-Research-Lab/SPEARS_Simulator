@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.platforms.sub;
 
-import com.csm.rover.simulator.map.SubMap;
+import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.visual.LEDIndicator;
 
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class SubDisplayWindow extends JPanel {
 
-    private SubMap map;
+    private AquaticMap map;
 
     private ArrayList<SubObject> subs = new ArrayList<SubObject>();
     private int subLock = -1;
@@ -81,7 +81,7 @@ public class SubDisplayWindow extends JPanel {
             "\n\nBattery Temperature: %s \u00B0c" +
             "\n\nAir Temperature: %s \u00B0c";
 
-    public SubDisplayWindow(SubMap map){
+    public SubDisplayWindow(AquaticMap map){
         initialize();
         setToBlank();
         this.map = map;

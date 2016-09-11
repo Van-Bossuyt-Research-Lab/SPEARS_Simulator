@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.platforms.sub.subAuto;
 
-import com.csm.rover.simulator.map.SubMap;
+import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
@@ -26,7 +26,7 @@ public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
     private static final Logger LOG = LogManager.getLogger(SubAutonomousCode.class);
 
 
-    protected static SubMap MAP;
+    protected static AquaticMap MAP;
 
     private String name;
     private String subName;
@@ -50,7 +50,7 @@ public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
     protected abstract String doNextCommand(long milliTime, DecimalPoint location,
                                             double direction, Map<String, Double> params);
 
-    public static void setSubMap(SubMap map){
+    public static void setSubMap(AquaticMap map){
         MAP = map;
     }
 
