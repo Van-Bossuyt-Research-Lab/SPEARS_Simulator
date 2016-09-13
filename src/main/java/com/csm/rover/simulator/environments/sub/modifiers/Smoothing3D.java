@@ -2,11 +2,8 @@ package com.csm.rover.simulator.environments.sub.modifiers;
 
 import com.csm.rover.simulator.environments.EnvironmentModifier;
 import com.csm.rover.simulator.environments.annotations.Modifier;
-import com.csm.rover.simulator.environments.rover.TerrainMap;
 import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.ArrayGrid3D;
-import com.csm.rover.simulator.objects.util.ArrayGrid;
-import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 
 import java.util.Map;
 
@@ -27,13 +24,13 @@ public class Smoothing3D extends EnvironmentModifier<AquaticMap> {
                 for (int z = 0; z < values.getLength(); z++) {
                     if (x > 2 && y > 2 && x < values.getWidth() - 2 && y < values.getHeight() - 2) {
                         if (count % 4 == 0) {
-                            values.put(x, y, (values2.get(x, y, z) + values2.get(x - 1, y - 2, z-3) + values2.get(x + 1, y + 2, z +3)) / 3.f);
+                            values.put(x, y, z, (values2.get(x, y, z) + values2.get(x - 1, y - 2, z-3) + values2.get(x + 1, y + 2, z +3)) / 3.f);
                         } else if (count % 4 == 1) {
-                            values.put(x, y, (values2.get(x, y, z) + values2.get(x - 2, y - 1, z-3) + values2.get(x + 2, y + 1, z +3)) / 3.f);
+                            values.put(x, y, z, (values2.get(x, y, z) + values2.get(x - 2, y - 1, z-3) + values2.get(x + 2, y + 1, z +3)) / 3.f);
                         } else if (count % 4 == 2) {
-                            values.put(x, y, (values2.get(x, y, z) + values2.get(x - 2, y + 1, z-3) + values2.get(x + 2, y - 1, z +3))/ 3.f);
+                            values.put(x, y, z, (values2.get(x, y, z) + values2.get(x - 2, y + 1, z-3) + values2.get(x + 2, y - 1, z +3))/ 3.f);
                         } else {
-                            values.put(x, y, (values2.get(x, y, z) + values2.get(x - 1, y + 2, z-3) + values2.get(x + 1, y - 2, z +3)) / 3.f);
+                            values.put(x, y, z, (values2.get(x, y, z) + values2.get(x - 1, y + 2, z-3) + values2.get(x + 1, y - 2, z +3)) / 3.f);
                         }
                     }
                 }
