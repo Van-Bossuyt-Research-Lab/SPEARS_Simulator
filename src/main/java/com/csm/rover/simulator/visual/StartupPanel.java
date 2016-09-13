@@ -5,6 +5,8 @@ import com.csm.rover.simulator.environments.EnvironmentIO;
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.environments.rover.modifiers.PlasmaFractalGen;
 import com.csm.rover.simulator.environments.rover.modifiers.SmoothingModifier;
+import com.csm.rover.simulator.environments.rover.modifiers.TruncateModifier;
+import com.csm.rover.simulator.environments.rover.populators.TerrainHazardsPop;
 import com.csm.rover.simulator.environments.rover.populators.TerrainTargetsPop;
 import com.csm.rover.simulator.objects.io.MapFileFilter;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
@@ -731,10 +733,12 @@ public class StartupPanel extends Panel {
                         .build()
                 )
                 .addMapModifier(new SmoothingModifier(), ParamMap.emptyParamMap())
+                .addMapModifier(new TruncateModifier(), ParamMap.newParamMap().addParameter("places", 4).build())
                 .addPopulator("Targets", new TerrainTargetsPop(), ParamMap.newParamMap()
                         .addParameter("trgt_density", 0.02)
                         .addParameter("mono", 1)
                         .build())
+                .addPopulator("Hazards", new TerrainHazardsPop(), ParamMap.emptyParamMap())
                 .generate();
         Random rnd = new Random();
         File tempFile;
