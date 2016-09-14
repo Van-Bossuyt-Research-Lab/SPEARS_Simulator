@@ -22,7 +22,7 @@ public class TerrainTargetsPop extends EnvironmentPopulator {
     @Override
     protected RecursiveGridList doBuild(EnvironmentMap map, Map<String, Double> params) {
         int size = ((TerrainMap)map).getSize();
-        int targetCount = (int)(Math.pow(size, 2) / 100.0 * params.get("trgt_density"));
+        int targetCount = (int)(Math.pow(size, 2) * params.get("trgt_density"));
         Random rnd = new Random();
         Set<Point> points = new HashSet<>();
         while (points.size() < targetCount){
