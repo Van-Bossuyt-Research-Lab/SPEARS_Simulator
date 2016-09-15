@@ -37,7 +37,7 @@ public class PlatformRegistry {
         physicsModelParameters = new TreeMap<>();
 
         LOG.log(Level.INFO, "Initializing Platform Registry");
-        Reflections reflect = new Reflections("com.csm.rover.simulator");
+        Reflections reflect = new Reflections("com.csm.rover.simulator.platforms");
 
         fillPlatforms(reflect);
         fillStates(reflect);

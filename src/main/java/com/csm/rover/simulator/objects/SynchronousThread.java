@@ -57,7 +57,6 @@ public class SynchronousThread extends Thread {
 			}			
 		}
 		GLOBAL.checkOutThread(getName());
-		return;
 	}
 	
 	public void Stop(){
