@@ -150,11 +150,17 @@ public class Globals {
 	
 	public void checkOutThread(String name){
 		if (!name.contains("delay")){
-            LOG.log(Level.WARN, name + " out.");
+            LOG.log(Level.DEBUG, name + " out.");
 		}
+        threadCheckIn(name);
 		threads.remove(name);
-		threadCheckIn(name);
 	}
+
+    public void killThread(String name){
+        if (threads.containsKey(name)){
+            threads.get(name).killThread();
+        }
+    }
 	
 	public void threadCheckIn(String name){
         if (!name.equals("milli-clock")){

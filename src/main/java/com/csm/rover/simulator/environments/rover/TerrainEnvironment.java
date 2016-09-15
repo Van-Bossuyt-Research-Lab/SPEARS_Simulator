@@ -5,14 +5,19 @@ import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.annotations.Environment;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
+import com.csm.rover.simulator.wrapper.Globals;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
 @Environment(type="Rover")
 public class TerrainEnvironment extends PlatformEnvironment<RoverObject, TerrainMap> {
+    private static final Logger LOG = LogManager.getLogger(TerrainEnvironment.class);
 
     public TerrainEnvironment(){
         super("Rover");
@@ -27,7 +32,15 @@ public class TerrainEnvironment extends PlatformEnvironment<RoverObject, Terrain
     }
 
     public double getHeightAt(DecimalPoint point){
-        return map.getHeightAt(point);
+        try {
+            return map.getHeightAt(point);
+        }
+        catch (ArrayIndexOutOfBoundsException e){
+            String current = Thread.currentThread().getName();
+            LOG.log(Level.WARN, String.format("Rover \'%s\' has reached the end of the map - TERMINATING", current.substring(0, current.indexOf('-'))));
+            Globals.getInstance().killThread(current);
+            return 0;
+        }
     }
 
     public double getSlopeAt(DecimalPoint point, double direction){
