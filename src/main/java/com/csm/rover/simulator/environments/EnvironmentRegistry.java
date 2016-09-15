@@ -35,7 +35,7 @@ public class EnvironmentRegistry {
 
     private static void fillRegistry(){
         LOG.log(Level.INFO, "Initializing Environment Registry");
-        Reflections reflect = new Reflections("com.csm.rover.simulator");
+        Reflections reflect = new Reflections("com.csm.rover.simulator.environments");
 
         fillEnvironments(reflect);
         fillMaps(reflect);
