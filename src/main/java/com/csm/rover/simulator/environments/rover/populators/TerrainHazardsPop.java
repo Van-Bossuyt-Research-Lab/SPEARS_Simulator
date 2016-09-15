@@ -8,6 +8,7 @@ import com.csm.rover.simulator.environments.rover.modifiers.PlasmaFractalGen;
 import com.csm.rover.simulator.environments.rover.modifiers.ScalingModifier;
 import com.csm.rover.simulator.environments.rover.modifiers.TruncateModifier;
 import com.csm.rover.simulator.objects.util.ArrayGrid;
+import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.csm.rover.simulator.objects.util.ParamMap;
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
 
@@ -25,29 +26,39 @@ public class TerrainHazardsPop extends EnvironmentPopulator {
         boolean mono = params.get("mono") == 1;
         int size = ((TerrainMap)map).getSize();
         double rough = params.get("rough");
-        ArrayGrid<Float> plasma1 = getLayer(size, rough, mono);
-        ArrayGrid<Float> plasma2 = getLayer(size, rough, mono);
+        ArrayGrid<Float> plasma1 = getLayer(size, rough, 3);
+        ArrayGrid<Float> plasma2 = getLayer(size, rough*20, 8);
+        ArrayGrid<Float> added = new FloatArrayArrayGrid();
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                added.put(x, y, (plasma1.get(x, y) + plasma2.get(x, y)));
+            }
+        }
+        added = new TruncateModifier().modify(
+                new ScalingModifier().modify(
+                        new TerrainMap(((TerrainMap) map).getSize(), 1, added),
+                        ParamMap.newParamMap().addParameter("range", 10).build()),
+                ParamMap.newParamMap().addParameter("places", 0).build()
+        ).rawValues();
         RecursiveGridList<Double> hzrds = RecursiveGridList.newGridList(Double.class, 2);
         for (int x = 0; x < size; x++){
             for (int y = 0; y < size; y++){
-                hzrds.put((double)(plasma1.get(x, y) + plasma2.get(x, y)), x, y);
+                double value = (double)added.get(x, y);
+                hzrds.put(mono ? (value >=7 ? 10 : 0) : value, x, y);
             }
         }
         return hzrds;
     }
 
-    private ArrayGrid<Float> getLayer(int size, double rough, boolean mono){
-        return new TruncateModifier().modify(
-                new ScalingModifier().modify(
-                    new PlasmaFractalGen().modify(
-                            null,
-                            ParamMap.newParamMap()
-                                    .addParameter("size", size)
-                                    .addParameter("detail", 1)
-
-                                    .addParameter("rough", rough).build()),
-                        ParamMap.newParamMap().addParameter("range", 5).build()),
-                ParamMap.newParamMap().addParameter("places", mono ? -1 : 0).build()).rawValues();
+    private ArrayGrid<Float> getLayer(int size, double rough, int range){
+        return new ScalingModifier().modify(
+                new PlasmaFractalGen().modify(
+                        null,
+                        ParamMap.newParamMap()
+                                .addParameter("size", size)
+                                .addParameter("detail", 1)
+                                .addParameter("rough", rough).build()),
+                    ParamMap.newParamMap().addParameter("range", range).build()).rawValues();
     }
 
 }

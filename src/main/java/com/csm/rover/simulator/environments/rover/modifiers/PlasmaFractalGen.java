@@ -38,15 +38,15 @@ public class PlasmaFractalGen extends EnvironmentModifier<TerrainMap> {
                     float value;
                     if ((x+1) % 2 == 0){
                         if ((y+1) % 2 == 0){
-                            value = (float)((values.get(x - 1, y - 1)+values.get(x - 1, y + 1)+values.get(x + 1, y - 1)+values.get(x + 1, y + 1))/4. + rnd.nextDouble()*rough);
+                            value = (float)((values.get(x - 1, y - 1)+values.get(x - 1, y + 1)+values.get(x + 1, y - 1)+values.get(x + 1, y + 1))/4. + rnd.nextDouble()*rough*(rnd.nextBoolean() ? 1 : -1));
                         }
                         else {
-                            value = (float)((values.get(x - 1, y)+values.get(x + 1, y))/2. + rnd.nextDouble()*rough);
+                            value = (float)((values.get(x - 1, y)+values.get(x + 1, y))/2. + rnd.nextDouble()*rough*(rnd.nextBoolean() ? 1 : -1));
                         }
                     }
                     else {
                         if ((y+1) % 2 == 0){
-                            value = (float)((values.get(x, y - 1)+values.get(x, y + 1))/2. + rnd.nextDouble()*rough);
+                            value = (float)((values.get(x, y - 1)+values.get(x, y + 1))/2. + rnd.nextDouble()*rough*(rnd.nextBoolean() ? 1 : -1));
                         }
                         else {
                             continue;
