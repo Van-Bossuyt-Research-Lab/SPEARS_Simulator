@@ -1,9 +1,9 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.objects.FreeThread;
+import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.ThreadItem;
-import com.csm.rover.simulator.objects.ZDate;
+import com.csm.rover.simulator.objects.util.ZDate;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Globals {
 	private static final Logger LOG = LogManager.getFormatterLogger(Globals.class);
 
-	public static String versionNumber = "2.4.1";
+	public static String versionNumber = "2.6.1";
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;
@@ -150,17 +150,28 @@ public class Globals {
 	
 	public void checkOutThread(String name){
 		if (!name.contains("delay")){
-			System.err.println(name + " out.");
+            LOG.log(Level.DEBUG, name + " out.");
 		}
+        threadCheckIn(name);
 		threads.remove(name);
-		threadCheckIn(name);
 	}
+
+    public void killThread(String name){
+        if (threads.containsKey(name)){
+            threads.get(name).killThread();
+        }
+    }
 	
 	public void threadCheckIn(String name){
-		try {
-			threads.get(name).markFinished();
-			threads.get(name).advance();
-		} catch (NullPointerException e) { };//System.err.println("In thread " + name); e.printStackTrace(); }
+        if (!name.equals("milli-clock")){
+            try {
+                threads.get(name).markFinished();
+                threads.get(name).advance();
+            }
+            catch (NullPointerException e) {
+                LOG.log(Level.WARN, "Null in thread: " + name, e);
+            }
+        }
 		if (name.equals("milli-clock") || milliDone){
 			for (Object o : threads.keySet()){
 				String key = (String) o;

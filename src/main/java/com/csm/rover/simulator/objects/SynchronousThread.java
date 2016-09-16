@@ -1,12 +1,9 @@
 package com.csm.rover.simulator.objects;
 
 import com.csm.rover.simulator.wrapper.Globals;
-import java.io.Serializable;
 
 
-public class SynchronousThread extends Thread implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class SynchronousThread extends Thread {
 	
 	private Globals GLOBAL;
 	
@@ -19,14 +16,7 @@ public class SynchronousThread extends Thread implements Serializable {
 	private boolean running = false;
 	
 	public SynchronousThread(int interval, Runnable run, int times, String name){
-		super.setName(name);
-		GLOBAL = Globals.getInstance();
-		delay = interval;
-		action = run;
-		actions = times;
-		forever = (times == FOREVER);
-		GLOBAL.registerNewThread(name, delay, this);
-		this.start();
+		this(interval, run, times, name, true);
 	}
 	
 	public SynchronousThread(int interval, Runnable run, int times, String name, boolean start){
@@ -67,7 +57,6 @@ public class SynchronousThread extends Thread implements Serializable {
 			}			
 		}
 		GLOBAL.checkOutThread(getName());
-		return;
 	}
 	
 	public void Stop(){

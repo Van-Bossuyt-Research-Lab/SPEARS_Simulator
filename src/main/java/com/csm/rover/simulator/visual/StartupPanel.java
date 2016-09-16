@@ -1,16 +1,20 @@
 package com.csm.rover.simulator.visual;
 
 import com.csm.rover.simulator.control.PopUp;
-import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.objects.FreeThread;
-import com.csm.rover.simulator.objects.MapFileFilter;
-import com.csm.rover.simulator.objects.RunConfiguration;
-import com.csm.rover.simulator.rover.RoverObject;
-import com.csm.rover.simulator.rover.autoCode.RoverAutonomousCode;
-import com.csm.rover.simulator.rover.phsicsModels.RoverPhysicsModel;
-import com.csm.rover.simulator.satellite.SatelliteAutonomusCode;
-import com.csm.rover.simulator.satellite.SatelliteObject;
-import com.csm.rover.simulator.satellite.SatelliteParametersList;
+import com.csm.rover.simulator.environments.EnvironmentIO;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
+import com.csm.rover.simulator.environments.rover.modifiers.PlasmaFractalGen;
+import com.csm.rover.simulator.environments.rover.modifiers.ScalingModifier;
+import com.csm.rover.simulator.environments.rover.modifiers.SmoothingModifier;
+import com.csm.rover.simulator.environments.rover.modifiers.TruncateModifier;
+import com.csm.rover.simulator.environments.rover.populators.TerrainHazardsPop;
+import com.csm.rover.simulator.environments.rover.populators.TerrainTargetsPop;
+import com.csm.rover.simulator.objects.io.MapFileFilter;
+import com.csm.rover.simulator.objects.io.PlatformConfig;
+import com.csm.rover.simulator.objects.io.RunConfiguration;
+import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.objects.util.ParamMap;
+import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.wrapper.Admin;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
@@ -21,49 +25,42 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 
 public class StartupPanel extends Panel {
     private static final Logger LOG = LogManager.getLogger(StartupPanel.class);
 
-    Random rnd = new Random();
-
-    private Globals GLOBAL;
-
-    private Map<String, RoverPhysicsModel> roverParameters = new TreeMap<String, RoverPhysicsModel>();
-    private Map<String, RoverAutonomousCode> roverLogics = new TreeMap<String, RoverAutonomousCode>();
-    private Map<String, SatelliteParametersList> satelliteParameters = new TreeMap<String, SatelliteParametersList>();
-    private Map<String, SatelliteAutonomusCode> satelliteLogics = new TreeMap<String, SatelliteAutonomusCode>();
-    private Map<String, RoverObject> roversToAdd = new TreeMap<String, RoverObject>();
-    private Map<String, SatelliteObject> satsToAdd = new TreeMap<String, SatelliteObject>();
+    private Map<String, PlatformConfig> roversToAdd = new TreeMap<String, PlatformConfig>();
+    private Map<String, PlatformConfig> satsToAdd = new TreeMap<String, PlatformConfig>();
 
     private JLabel RovAddTtl;
     private JLabel RovDriveModelLbl;
-    ZList RovDriveModelList;
-    private JLabel RovAutonomusCodeLbl;
-    ZList RovAutonomusCodeList;
+    ZList<String> RovPhysicsModelList;
+    private JLabel RovAutonomousCodeLbj;
+    ZList<String> RovAutonomousCodeList;
     private JButton RovAddBtn;
     private JButton RovRemoveBtn;
     private JLabel RoversListLbl;
-    ZList RoverList;
+    ZList<String> RoverList;
     private JLabel SatAddTtl;
     private JLabel SatDriveModelLbl;
-    ZList SatDriveModelList;
-    private JLabel SatAutonomusCodeLbl;
-    ZList SatAutonomusCodeList;
+    ZList<String> SatPhysicsModelList;
+    private JLabel SatAutonomousCodeLbl;
+    ZList<String> SatAutonomousCodeList;
     private JButton SatAddBtn;
     private JButton SatRemoveBtn;
     private JLabel SatelliteListLbl;
-    ZList SatelliteList;
+    ZList<String> SatelliteList;
     private JLabel MapConfigTtl;
     JTabbedPane TypeSelector;
     JSlider MapRoughSlider;
@@ -82,10 +79,24 @@ public class StartupPanel extends Panel {
     JLabel RunAltLbl;
     private JLabel SaveConfigLbl;
     JButton StartBtn;
+    private JScrollPane roverPhysicsParamScrl;
+    private JTable roverPhysicsParamTbl;
+    private JScrollPane roverCodeParamScrl;
+    private JTable roverCodeParamTbl;
+    private JScrollPane satPhysicsParamScrl;
+    private JTable satPhysicsParamTbl;
+    private JScrollPane satCodeParamScrl;
+    private JTable satCodeParamTbl;
 
     public StartupPanel(Dimension size){
         super(size, "Start Up");
-        GLOBAL = Globals.getInstance();
+        initialize();
+        align();
+    }
+    
+
+    public StartupPanel(){
+        super(new Dimension(1920, 1080), "Start Up");
         initialize();
         align();
     }
@@ -103,20 +114,38 @@ public class StartupPanel extends Panel {
         RovDriveModelLbl.setBounds(10, 43, 118, 21);
         this.add(RovDriveModelLbl);
 
-        RovDriveModelList = new ZList();
-        RovDriveModelList.setFont(new Font("Trebuchet MS", Font.PLAIN, 18));
-        RovDriveModelList.setBounds(10, 63, 200, 250);
-        this.add(RovDriveModelList);
+        RovPhysicsModelList = new ZList<String>();
+        RovPhysicsModelList.addListSelectionListener(new ListSelectionListener() {
+        	@Override
+        	public void valueChanged(ListSelectionEvent e) {
+        		if (RovAutonomousCodeList.getSelectedIndex() != -1){
+					roverPhysicsParamTbl.setModel(generateTableModel(
+						PlatformRegistry.getParametersForPhysicsModel("Rover", RovPhysicsModelList.getSelectedItem())));
+				}
+        	}
+        });
+        RovPhysicsModelList.setFont(new Font("Trebuchet MS", Font.PLAIN, 18));
+        RovPhysicsModelList.setBounds(10, 63, 200, 174);
+        this.add(RovPhysicsModelList);
 
-        RovAutonomusCodeLbl = new JLabel("Autonomous Logic");
-        RovAutonomusCodeLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
-        RovAutonomusCodeLbl.setBounds(220, 43, 142, 21);
-        this.add(RovAutonomusCodeLbl);
+        RovAutonomousCodeLbj = new JLabel("Autonomous Logic");
+        RovAutonomousCodeLbj.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
+        RovAutonomousCodeLbj.setBounds(220, 43, 142, 21);
+        this.add(RovAutonomousCodeLbj);
 
-        RovAutonomusCodeList = new ZList();
-        RovAutonomusCodeList.setFont(new Font("Trebuchet MS", Font.PLAIN, 18));
-        RovAutonomusCodeList.setBounds(220, 63, 200, 250);
-        this.add(RovAutonomusCodeList);
+        RovAutonomousCodeList = new ZList<String>();
+        RovAutonomousCodeList.setFont(new Font("Trebuchet MS", Font.PLAIN, 18));
+        RovAutonomousCodeList.setBounds(220, 63, 200, 174);
+        RovAutonomousCodeList.addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (RovAutonomousCodeList.getSelectedIndex() != -1){
+					roverCodeParamTbl.setModel(generateTableModel(
+						PlatformRegistry.getParametersForAutonomousCodeModel("Rover", RovAutonomousCodeList.getSelectedItem())));
+				}
+			}	
+        });
+        this.add(RovAutonomousCodeList);
 
         RovAddBtn = new JButton("<HTML><center>=><br>Add</center></HTML>");
         RovAddBtn.addActionListener(new ActionListener() {
@@ -143,37 +172,53 @@ public class StartupPanel extends Panel {
         RoversListLbl.setBounds(510, 43, 142, 21);
         this.add(RoversListLbl);
 
-        RoverList = new ZList();
+        RoverList = new ZList<String>();
         RoverList.setFont(new Font("Trebuchet MS", Font.PLAIN, 18));
-        RoverList.setBounds(510, 63, 200, 250);
+        RoverList.setBounds(510, 63, 200, 174);
         this.add(RoverList);
 
         SatAddTtl = new JLabel("Adding Satellites");
         SatAddTtl.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
-        SatAddTtl.setBounds(10, 460, 142, 21);
+        SatAddTtl.setBounds(10, 457, 142, 21);
         this.add(SatAddTtl);
 
         SatDriveModelLbl = new JLabel("Physics Model");
         SatDriveModelLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
-        SatDriveModelLbl.setBounds(10, 492, 118, 21);
+        SatDriveModelLbl.setBounds(10, 488, 118, 21);
         this.add(SatDriveModelLbl);
 
-        SatDriveModelList = new ZList();
-        SatDriveModelList.setFont(new Font("Trebuchet MS", Font.PLAIN, 18));
-        SatDriveModelList.setBounds(10, 512, 200, 250);
-        this.add(SatDriveModelList);
+        SatPhysicsModelList = new ZList<String>();
+        SatPhysicsModelList.addListSelectionListener(new ListSelectionListener() {
+        	public void valueChanged(ListSelectionEvent e) {
+        		if (SatPhysicsModelList.getSelectedIndex() != -1){
+					satPhysicsParamTbl.setModel(generateTableModel(
+						PlatformRegistry.getParametersForPhysicsModel("Satellite", SatPhysicsModelList.getSelectedItem())));
+				}
+        	}
+        });
+        SatPhysicsModelList.setFont(new Font("Trebuchet MS", Font.PLAIN, 18));
+        SatPhysicsModelList.setBounds(10, 512, 200, 250);
+        this.add(SatPhysicsModelList);
 
-        SatAutonomusCodeList = new ZList();
-        SatAutonomusCodeList.setFont(new Font("Trebuchet MS", Font.PLAIN, 18));
-        SatAutonomusCodeList.setBounds(220, 512, 200, 250);
-        this.add(SatAutonomusCodeList);
+        SatAutonomousCodeList = new ZList<String>();
+        SatAutonomousCodeList.addListSelectionListener(new ListSelectionListener() {
+        	public void valueChanged(ListSelectionEvent e) {
+        		if (SatAutonomousCodeList.getSelectedIndex() != -1){
+					satCodeParamTbl.setModel(generateTableModel(
+						PlatformRegistry.getParametersForAutonomousCodeModel("Satellite", SatAutonomousCodeList.getSelectedItem())));
+				}
+        	}
+        });
+        SatAutonomousCodeList.setFont(new Font("Trebuchet MS", Font.PLAIN, 18));
+        SatAutonomousCodeList.setBounds(220, 512, 200, 250);
+        this.add(SatAutonomousCodeList);
 
-        SatAutonomusCodeLbl = new JLabel("Autonomous Logic");
-        SatAutonomusCodeLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
-        SatAutonomusCodeLbl.setBounds(220, 492, 142, 21);
-        this.add(SatAutonomusCodeLbl);
+        SatAutonomousCodeLbl = new JLabel("Autonomous Logic");
+        SatAutonomousCodeLbl.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
+        SatAutonomousCodeLbl.setBounds(220, 492, 142, 21);
+        this.add(SatAutonomousCodeLbl);
 
-        SatelliteList = new ZList();
+        SatelliteList = new ZList<String>();
         SatelliteList.setFont(new Font("Trebuchet MS", Font.PLAIN, 18));
         SatelliteList.setBounds(510, 512, 200, 250);
         this.add(SatelliteList);
@@ -204,7 +249,7 @@ public class StartupPanel extends Panel {
         SatelliteListLbl.setBounds(510, 492, 142, 21);
         this.add(SatelliteListLbl);
 
-        MapConfigTtl = new JLabel("Congiure Map");
+        MapConfigTtl = new JLabel("Configure Map");
         MapConfigTtl.setFont(new Font("Trebuchet MS", Font.BOLD, 18));
         MapConfigTtl.setBounds(912, 10, 118, 21);
         this.add(MapConfigTtl);
@@ -426,6 +471,108 @@ public class StartupPanel extends Panel {
         this.add(RunAltLbl);
         RuntimeSpnr.setValue((Integer)RuntimeSpnr.getValue()+1);
         RuntimeSpnr.setValue((Integer)RuntimeSpnr.getValue()-1);
+        
+        roverPhysicsParamScrl = new JScrollPane();
+        roverPhysicsParamScrl.setBounds(10, 248, 200, 107);
+        add(roverPhysicsParamScrl);
+        
+        roverPhysicsParamTbl = new JTable();
+        roverPhysicsParamTbl.setModel(new DefaultTableModel(
+        	new Object[][] {
+        	},
+        	new String[] {
+        		"Parameter", "Value"
+        	}
+        ) {
+        	Class[] columnTypes = new Class[] {
+        		String.class, Double.class
+        	};
+        	public Class getColumnClass(int columnIndex) {
+        		return columnTypes[columnIndex];
+        	}
+        });
+        roverPhysicsParamTbl.getColumnModel().getColumn(0).setResizable(false);
+        roverPhysicsParamTbl.getColumnModel().getColumn(1).setResizable(false);
+        roverPhysicsParamTbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+        roverPhysicsParamScrl.setViewportView(roverPhysicsParamTbl);
+        
+        roverCodeParamScrl = new JScrollPane();
+        roverCodeParamScrl.setBounds(220, 248, 200, 107);
+        add(roverCodeParamScrl);
+        
+        roverCodeParamTbl = new JTable();
+        roverCodeParamTbl.setModel(new DefaultTableModel(
+        	new Object[][] {
+        	},
+        	new String[] {
+        		"Paramter", "Value"
+        	}
+        ) {
+        	Class[] columnTypes = new Class[] {
+        		String.class, Double.class
+        	};
+        	public Class getColumnClass(int columnIndex) {
+        		return columnTypes[columnIndex];
+        	}
+        	boolean[] columnEditables = new boolean[] {
+        		false, true
+        	};
+        	public boolean isCellEditable(int row, int column) {
+        		return columnEditables[column];
+        	}
+        });
+        roverCodeParamTbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+        roverCodeParamScrl.setViewportView(roverCodeParamTbl);
+        
+        satPhysicsParamScrl = new JScrollPane();
+        satPhysicsParamScrl.setBounds(10, 773, 200, 107);
+        add(satPhysicsParamScrl);
+        
+        satPhysicsParamTbl = new JTable();
+        satPhysicsParamTbl.setModel(new DefaultTableModel(
+        	new Object[][] {
+        	},
+        	new String[] {
+        		"Parameter", "Value"
+        	}
+        ) {
+        	Class[] columnTypes = new Class[] {
+        		String.class, Double.class
+        	};
+        	public Class getColumnClass(int columnIndex) {
+        		return columnTypes[columnIndex];
+        	}
+        });
+        satPhysicsParamTbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+        satPhysicsParamScrl.setViewportView(satPhysicsParamTbl);
+        
+        satCodeParamScrl = new JScrollPane();
+        satCodeParamScrl.setBounds(220, 773, 200, 107);
+        add(satCodeParamScrl);
+        
+        satCodeParamTbl = new JTable();
+        satCodeParamTbl.setModel(new DefaultTableModel(
+        	new Object[][] {
+        	},
+        	new String[] {
+        		"Parameter", "Value"
+        	}
+        ) {
+        	Class[] columnTypes = new Class[] {
+        		String.class, Double.class
+        	};
+        	public Class getColumnClass(int columnIndex) {
+        		return columnTypes[columnIndex];
+        	}
+        	boolean[] columnEditables = new boolean[] {
+        		false, true
+        	};
+        	public boolean isCellEditable(int row, int column) {
+        		return columnEditables[column];
+        	}
+        });
+        satCodeParamTbl.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+        satCodeParamScrl.setViewportView(satCodeParamTbl);
 
     }
 
@@ -436,23 +583,27 @@ public class StartupPanel extends Panel {
         int listHeight = (int) ((panelSize.getHeight() - spacing*6 - RovAddTtl.getHeight() - RovDriveModelLbl.getHeight() - SatAddTtl.getHeight() - SatDriveModelLbl.getHeight()) / 2);
         this.RovAddTtl.setLocation(spacing, super.getTopOfPage()+spacing);
         this.RovDriveModelLbl.setLocation(RovAddTtl.getX(), RovAddTtl.getY() + RovAddTtl.getHeight() + spacing);
-        this.RovDriveModelList.setBounds(RovDriveModelLbl.getX(), RovDriveModelLbl.getY()+RovDriveModelLbl.getHeight(), listWidth, listHeight);
-        this.RovAutonomusCodeList.setBounds(RovDriveModelList.getX()+RovDriveModelList.getWidth()+spacing, RovDriveModelList.getY(), listWidth, listHeight);
-        this.RovAutonomusCodeLbl.setLocation(RovAutonomusCodeList.getX(), RovAutonomusCodeList.getY()-RovAutonomusCodeLbl.getHeight());
-        this.RovAddBtn.setLocation(RovAutonomusCodeList.getX()+RovAutonomusCodeList.getWidth()+spacing, RovAutonomusCodeList.getY());
+        this.RovPhysicsModelList.setBounds(RovDriveModelLbl.getX(), RovDriveModelLbl.getY()+RovDriveModelLbl.getHeight(), listWidth, listHeight/2);
+        this.roverPhysicsParamScrl.setBounds(RovDriveModelLbl.getX(), RovPhysicsModelList.getY()+RovPhysicsModelList.getHeight()+5, listWidth, RovPhysicsModelList.getY()+listHeight-(RovPhysicsModelList.getY()+RovPhysicsModelList.getHeight()+5));
+        this.RovAutonomousCodeList.setBounds(RovPhysicsModelList.getX()+ RovPhysicsModelList.getWidth()+spacing, RovPhysicsModelList.getY(), listWidth, this.RovPhysicsModelList.getHeight());
+        this.roverCodeParamScrl.setBounds(RovAutonomousCodeList.getX(), roverPhysicsParamScrl.getY(), roverPhysicsParamScrl.getWidth(), roverPhysicsParamScrl.getHeight());
+        this.RovAutonomousCodeLbj.setLocation(RovAutonomousCodeList.getX(), RovAutonomousCodeList.getY() - RovAutonomousCodeLbj.getHeight());
+        this.RovAddBtn.setLocation(RovAutonomousCodeList.getX() + RovAutonomousCodeList.getWidth() + spacing, RovAutonomousCodeList.getY());
         this.RovRemoveBtn.setLocation(RovAddBtn.getX(), RovAddBtn.getY()+RovAddBtn.getHeight()+spacing);
-        this.RoverList.setBounds(RovAddBtn.getX()+RovAddBtn.getWidth()+spacing, this.RovAutonomusCodeList.getY(), listWidth, listHeight);
-        this.RoversListLbl.setLocation(RoverList.getX(), this.RovAutonomusCodeLbl.getY());
+        this.RoverList.setBounds(RovAddBtn.getX()+RovAddBtn.getWidth()+spacing, this.RovAutonomousCodeList.getY(), listWidth, listHeight);
+        this.RoversListLbl.setLocation(RoverList.getX(), this.RovAutonomousCodeLbj.getY());
 
-        this.SatAddTtl.setLocation(RovAddTtl.getX(), RovDriveModelList.getY()+RovDriveModelList.getHeight()+spacing*2);
+        this.SatAddTtl.setLocation(RovAddTtl.getX(), roverPhysicsParamScrl.getY()+ roverPhysicsParamScrl.getHeight()+spacing*2);
         this.SatDriveModelLbl.setLocation(SatAddTtl.getX(), SatAddTtl.getY()+SatAddTtl.getHeight()+spacing);
-        this.SatDriveModelList.setBounds(SatDriveModelLbl.getX(), SatDriveModelLbl.getY()+SatDriveModelLbl.getHeight(), listWidth, listHeight);
-        this.SatAutonomusCodeList.setBounds(SatDriveModelList.getX()+SatDriveModelList.getWidth()+spacing, SatDriveModelList.getY(), listWidth, listHeight);
-        this.SatAutonomusCodeLbl.setLocation(SatAutonomusCodeList.getX(), SatAutonomusCodeList.getY()-SatAutonomusCodeLbl.getHeight());
-        this.SatAddBtn.setLocation(SatAutonomusCodeList.getX()+SatAutonomusCodeList.getWidth()+spacing, SatAutonomusCodeList.getY());
+        this.SatPhysicsModelList.setBounds(SatDriveModelLbl.getX(), SatDriveModelLbl.getY()+SatDriveModelLbl.getHeight(), listWidth, RovPhysicsModelList.getHeight());
+        this.satPhysicsParamScrl.setBounds(SatPhysicsModelList.getX(), SatPhysicsModelList.getY()+SatPhysicsModelList.getHeight()+5, roverPhysicsParamScrl.getWidth(), roverPhysicsParamScrl.getHeight());
+        this.SatAutonomousCodeList.setBounds(SatPhysicsModelList.getX()+ SatPhysicsModelList.getWidth()+spacing, SatPhysicsModelList.getY(), listWidth, RovPhysicsModelList.getHeight());
+        this.satCodeParamScrl.setBounds(SatAutonomousCodeList.getX(), satPhysicsParamScrl.getY(), satPhysicsParamScrl.getWidth(), satPhysicsParamScrl.getHeight());
+        this.SatAutonomousCodeLbl.setLocation(SatAutonomousCodeList.getX(), SatAutonomousCodeList.getY() - SatAutonomousCodeLbl.getHeight());
+        this.SatAddBtn.setLocation(SatAutonomousCodeList.getX() + SatAutonomousCodeList.getWidth() + spacing, SatAutonomousCodeList.getY());
         this.SatRemoveBtn.setLocation(SatAddBtn.getX(), SatAddBtn.getY()+SatAddBtn.getHeight()+spacing);
-        this.SatelliteList.setBounds(SatAddBtn.getX()+SatAddBtn.getWidth()+spacing, this.SatAutonomusCodeList.getY(), listWidth, listHeight);
-        this.SatelliteListLbl.setLocation(SatelliteList.getX(), this.SatAutonomusCodeLbl.getY());
+        this.SatelliteList.setBounds(SatAddBtn.getX()+SatAddBtn.getWidth()+spacing, this.SatAutonomousCodeList.getY(), listWidth, listHeight);
+        this.SatelliteListLbl.setLocation(SatelliteList.getX(), this.SatAutonomousCodeLbl.getY());
 
         this.MapConfigTtl.setLocation(RoverList.getX()+RoverList.getWidth()+spacing*3, this.RovAddTtl.getY());
         this.TypeSelector.setLocation(MapConfigTtl.getX(), MapConfigTtl.getY()+MapConfigTtl.getHeight()+spacing);
@@ -467,11 +618,56 @@ public class StartupPanel extends Panel {
         this.StartBtn.setLocation((int)panelSize.getWidth()-StartBtn.getWidth()-spacing, (int)this.getHeight()-StartBtn.getHeight()-spacing);
         this.SaveConfigLbl.setLocation((int)panelSize.getWidth()-SaveConfigLbl.getWidth()-spacing, StartBtn.getY()-spacing-SaveConfigLbl.getHeight());
     }
+    
+    private TableModel generateTableModel(List<String> options){
+    	Object[][] entries = new Object[options.size()][2];
+    	for (int i = 0; i < options.size(); i++){
+    		entries[i][0] = options.get(i);
+    		entries[i][1] = null;
+    	}
+    	return new DefaultTableModel(
+            	entries,
+            	new String[] {
+            		"Parameter", "Value"
+            	}
+            ) {
+            	Class[] columnTypes = new Class[] {
+            		String.class, Double.class
+            	};
+            	public Class getColumnClass(int columnIndex) {
+            		return columnTypes[columnIndex];
+            	}
+            	boolean[] columnEditables = new boolean[] {
+            		false, true
+            	};
+            	public boolean isCellEditable(int row, int column) {
+            		return columnEditables[column];
+            	}
+            };
+    }
+    
+    private Map<String, Double> getParametersFromTableModel(TableModel model) throws NoSuchElementException {
+    	Map<String, Double> params = new TreeMap<String, Double>();
+    	for (int i = 0; i < model.getRowCount(); i++){
+    		if (model.getValueAt(i, 1) == null){
+    			throw new NoSuchElementException();
+    		}
+    		else {
+    			 try {
+    				 params.put((String)model.getValueAt(i,  0), (Double)model.getValueAt(i, 1));
+    			 }
+    			 catch (ClassCastException e){
+    				 throw new NoSuchElementException(e.getMessage());
+    			 }
+    		}
+    	}
+    	return params;
+    }
 
     public void saveCurrentConfiguration(){
         new FreeThread(0, new Runnable(){
             public void run(){
-                File config = new File("default.cfg");
+                File config = new File("config.json");
                 if (config.exists()){
                     if ((new PopUp()).showConfirmDialog("There is already a quick run file saved would you like to overwrite it?", "Save Configuration", PopUp.YES_NO_OPTIONS) == PopUp.YES_OPTION){
                         try {
@@ -498,54 +694,70 @@ public class StartupPanel extends Panel {
     }
 
     public RunConfiguration getConfigurationFromForm(){
-        ArrayList<String> roverNames = new ArrayList<String>();
-        ArrayList<String> roverTags = new ArrayList<String>();
-        ArrayList<RoverObject> rovers = new ArrayList<RoverObject>(roversToAdd.size());
-        ArrayList<String> satelliteNames = new ArrayList<String>();
-        ArrayList<String> satelliteTags = new ArrayList<String>();
-        ArrayList<SatelliteObject> satellites = new ArrayList<SatelliteObject>(satsToAdd.size());
-        int x = 0;
-        while (x < SatelliteList.getItems().size()){
-            String key = (String)SatelliteList.getItemAt(x);
-            satellites.add(x, satsToAdd.get(key));
-            satelliteNames.add(key);
-            satelliteTags.add(satellites.get(x).getIDCode());
-            x++;
-        }
-        x = 0;
-        while (x < RoverList.getItems().size()){
-            String key = (String)RoverList.getItemAt(x);
-            rovers.add(roversToAdd.get(key));
-            roverNames.add(key);
-            roverTags.add(rovers.get(x).getIDTag());
-            x++;
-        }
-        NamesAndTags namesAndTags = new NamesAndTags(roverNames, roverTags, satelliteNames, satelliteTags);
+        ArrayList<PlatformConfig> platforms = new ArrayList<PlatformConfig>(roversToAdd.size()+satsToAdd.size());
+        platforms.addAll(roversToAdd.values());
+        platforms.addAll(satsToAdd.values());
+        NamesAndTags namesAndTags = NamesAndTags.newFromPlatforms(platforms);
         if (TypeSelector.getSelectedIndex() == 1){
             File mapFile = new File(FileLocTxt.getText());
-            return new RunConfiguration(namesAndTags, rovers, satellites, mapFile, AccelChk.isSelected(),
+            return new RunConfiguration(namesAndTags, platforms, mapFile, AccelChk.isSelected(),
                     (Integer)RuntimeSpnr.getValue());
         }
         else {
             double mapRough = MapRoughSlider.getValue()/50000.0;
             int mapSize = (Integer) MapSizeSpnr.getValue();
             int mapDetail = (Integer) MapDetailSpnr.getValue();
-            double targetDensity = (Double) TargetDensitySpnr.getValue()/1000.;
-            double hazardDensity = (Double) HazardDensitySpnr.getValue()/1000.;
+            double targetDensity = (Double) TargetDensitySpnr.getValue()/100.;
+            double hazardDensity = (Double) HazardDensitySpnr.getValue()/100.;
             boolean monoTargets = !ValuedTargetsChk.isSelected(); //cause the form says use and the computer reads not using
             boolean monoHazards = !ValuedHazardsChk.isSelected();
-            return new RunConfiguration(namesAndTags, rovers, satellites, mapRough,
+            return new RunConfiguration(namesAndTags, platforms, generateTempMap(mapRough,
                     mapSize, mapDetail, targetDensity, hazardDensity, monoTargets,
-                    monoHazards, AccelChk.isSelected(),
+                    monoHazards), AccelChk.isSelected(),
                     (Integer)RuntimeSpnr.getValue());
         }
     }
 
+    private File generateTempMap(double mapRough,
+                                 int mapSize,
+                                 int mapDetail,
+                                 double targetDensity,
+                                 double hazardDensity,
+                                 boolean monoTargets,
+                                 boolean monoHazards){
+        TerrainEnvironment terrainEnvironment = new TerrainEnvironment();
+        terrainEnvironment.generateNewMap(new PlasmaFractalGen(), ParamMap.newParamMap()
+                        .addParameter("size", mapSize)
+                        .addParameter("detail", mapDetail)
+                        .addParameter("rough", 0.003)
+                        .build()
+                )
+                .addMapModifier(new SmoothingModifier(), ParamMap.emptyParamMap())
+                .addMapModifier(new ScalingModifier(), ParamMap.newParamMap().addParameter("range", 10).build())
+                .addMapModifier(new TruncateModifier(), ParamMap.newParamMap().addParameter("places", 4).build())
+                .addPopulator("Targets", new TerrainTargetsPop(), ParamMap.newParamMap()
+                        .addParameter("trgt_density", targetDensity)
+                        .addParameter("mono", monoTargets ? 1 : 0)
+                        .build())
+                .addPopulator("Hazards", new TerrainHazardsPop(), ParamMap.newParamMap()
+                        .addParameter("mono", monoHazards ? 1 : 0)
+                        .addParameter("rough", hazardDensity)
+                        .build())
+                .generate();
+        Random rnd = new Random();
+        File tempFile;
+        do {
+            tempFile = new File(String.format("Temp/%d.map", (int) (rnd.nextDouble() * 10000)));
+        } while (tempFile.exists());
+        EnvironmentIO.saveEnvironment(terrainEnvironment, tempFile);
+        return tempFile;
+    }
+
     public void addRoverToList(){
-        if (RovAutonomusCodeList.getSelectedIndex() != -1 && RovDriveModelList.getSelectedIndex() != -1){
+        if (RovAutonomousCodeList.getSelectedIndex() != -1 && RovPhysicsModelList.getSelectedIndex() != -1){
             int numb = 1;
-            String namebase = (String)RovAutonomusCodeList.getSelectedItem();
-            if (RovAutonomusCodeList.getSelectedItem().equals("[null]")){
+            String namebase = RovAutonomousCodeList.getSelectedItem();
+            if (RovAutonomousCodeList.getSelectedItem().equals("[null]")){
                 namebase = "Rover";
             }
             String newName = namebase + " " + numb;
@@ -553,40 +765,59 @@ public class StartupPanel extends Panel {
                 numb++;
                 newName = namebase + " " + numb;
             }
-            //TODO change temp to map temp
-            RoverList.addValue(newName);
-            //if you're getting errors with rovers 'sharing' data it's the pass reference value here
-            RoverAutonomousCode autoCode = roverLogics.get((String)RovAutonomusCodeList.getSelectedItem()).clone();
-            autoCode.setRoverName(newName);
-            RoverPhysicsModel params = roverParameters.get((String)RovDriveModelList.getSelectedItem()).clone();
-            // for randomized start position roversToAdd.add(newName, new RoverObject(newName, "r"+GUI.RoverList.getItems().length, params, autoCode, new DecimalPoint(340*rnd.nextDouble()-170, 340*rnd.nextDouble()-170), 360*rnd.nextDouble(), 0));
-            DecimalPoint location = new DecimalPoint(0, 0);
-            roversToAdd.put(newName, new RoverObject(newName, "r"+RoverList.getItems().size(), params, autoCode, location, Math.PI/2, -30));
+            try {
+	            PlatformConfig cfg = PlatformConfig.builder()
+	                    .setType("Rover")
+	                    .setScreenName(newName)
+	                    .setID("r" + (RoverList.getItems().size()+1))
+	                    .setAutonomousModel(RovAutonomousCodeList.getSelectedItem(), getParametersFromTableModel(roverCodeParamTbl.getModel()))
+	                    .setPhysicsModel(RovPhysicsModelList.getSelectedItem(), getParametersFromTableModel(roverPhysicsParamTbl.getModel()))
+	                    .build();
+	            roversToAdd.put(newName, cfg);
+	            RoverList.addValue(newName);
+            }
+            catch (NoSuchElementException e){
+            	//The parameter table was incomplete
+            }
         }
     }
 
     public void removeRoverFromList(){
         try {
-            roversToAdd.remove(RoverList.getSelectedItem().toString());
+            roversToAdd.remove(RoverList.getSelectedItem());
             RoverList.removeValue(RoverList.getSelectedIndex());
         }
-        catch (Exception e){ e.printStackTrace(); }
+        catch (NullPointerException e){
+            //Nothing selected: don't worry about it
+        }
+        catch (Exception e){
+            LOG.log(Level.WARN, "trouble removing", e);
+        }
     }
 
     public void addSatelliteToList(){
         try {
-            if (SatAutonomusCodeList.getSelectedIndex() != -1 && SatDriveModelList.getSelectedIndex() != -1){
+            if (SatAutonomousCodeList.getSelectedIndex() != -1 && SatPhysicsModelList.getSelectedIndex() != -1){
                 int numb = 1;
-                //TODO change to code name
-                String newName = "Satellite " + numb;
-                //newName = (String)GUI.SatAutonomusCodeList.getSelectedItem() + " " + numb;
+                String newName = SatAutonomousCodeList.getSelectedItem() + " " + numb;
                 while (SatelliteList.getItems().contains(newName)){
                     numb++;
-                    newName = "Satellite " + numb;
-                    //newName = (String)GUI.SatAutonomusCodeList.getSelectedItem() + " " + numb;
+                    newName = SatAutonomousCodeList.getSelectedItem() + " " + numb;
                 }
-                SatelliteList.addValue(newName);
-                this.satsToAdd.put(newName, new SatelliteObject(newName, "s"+SatelliteList.getItems().size(), null, null, rnd.nextDouble()*100000+10000000, rnd.nextDouble()*90, rnd.nextDouble()*360));
+                try {
+		            PlatformConfig cfg = PlatformConfig.builder()
+		                    .setType("Satellite")
+		                    .setScreenName(newName)
+		                    .setID("s"+(SatelliteList.getItems().size()+1))
+		                    .setAutonomousModel(SatAutonomousCodeList.getSelectedItem(), getParametersFromTableModel(satCodeParamTbl.getModel()))
+		                    .setPhysicsModel(SatPhysicsModelList.getSelectedItem(), getParametersFromTableModel(satPhysicsParamTbl.getModel()))
+		                    .build();
+		            satsToAdd.put(newName, cfg);
+		            SatelliteList.addValue(newName);
+                }
+                catch (NoSuchElementException e){
+                	//The parameter table was incomplete
+                }
             }
         }
         catch (Exception e) {
@@ -596,32 +827,30 @@ public class StartupPanel extends Panel {
 
     public void removeSatelliteFromList(){
         try {
-            satsToAdd.remove(SatelliteList.getSelectedItem().toString());
+            satsToAdd.remove(SatelliteList.getSelectedItem());
             SatelliteList.removeValue(SatelliteList.getSelectedIndex());
         }
+        catch (NullPointerException e){
+            //Nothing selected: don't worry about it
+        }
         catch (Exception e){
-            e.printStackTrace();
+            LOG.log(Level.WARN, "trouble removing", e);
         }
     }
 
-    public void addItemToSelectionList(String name, RoverPhysicsModel item){
-        roverParameters.put(name, item);
-        RovDriveModelList.addValue(name);
+    public void addItemToRoverPhysicsList(String name){
+        RovPhysicsModelList.addValue(name);
     }
 
-    public void addItemToSelectionList(String name, RoverAutonomousCode item){
-        roverLogics.put(name, item);
-        RovAutonomusCodeList.addValue(name);
+    public void addItemToRoverAutoList(String name){
+        RovAutonomousCodeList.addValue(name);
     }
 
-    public void addItemToSelectionList(String name, SatelliteParametersList item){
-        satelliteParameters.put(name, item);
-        SatDriveModelList.addValue(name);
+    public void addItemToSatellitePhysicsList(String name){
+        SatPhysicsModelList.addValue(name);
     }
 
-    public void addItemToSelectionList(String name, SatelliteAutonomusCode item){
-        satelliteLogics.put(name, item);
-        SatAutonomusCodeList.addValue(name);
+    public void addItemToSatelliteAutoList(String name){
+        SatAutonomousCodeList.addValue(name);
     }
-
 }

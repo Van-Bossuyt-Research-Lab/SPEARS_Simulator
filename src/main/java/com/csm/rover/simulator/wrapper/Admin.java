@@ -1,14 +1,14 @@
 package com.csm.rover.simulator.wrapper;
 
 import com.csm.rover.simulator.control.PopUp;
-import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.map.io.TerrainMapReader;
-import com.csm.rover.simulator.map.modifiers.NormalizeMapMod;
-import com.csm.rover.simulator.map.modifiers.PlasmaGeneratorMod;
-import com.csm.rover.simulator.map.modifiers.SurfaceSmoothMod;
-import com.csm.rover.simulator.objects.RunConfiguration;
-import com.csm.rover.simulator.rover.RoverObject;
-import com.csm.rover.simulator.satellite.SatelliteObject;
+import com.csm.rover.simulator.environments.EnvironmentIO;
+import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
+import com.csm.rover.simulator.objects.io.PlatformConfig;
+import com.csm.rover.simulator.objects.io.RunConfiguration;
+import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.rover.RoverObject;
+import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class Admin {
-	private static final Logger LOG = LogManager.getFormatterLogger(Admin.class);
+	private static final Logger LOG = LogManager.getLogger(Admin.class);
 
 //	public static Form GUI;
 	private Globals GLOBAL;
@@ -26,19 +26,20 @@ public class Admin {
     private static HumanInterfaceAbstraction HI;
 
     //Runtime Variables
-    private TerrainMap terrainMap;
-    private ArrayList<RoverObject> rovers;
-    private ArrayList<SatelliteObject> satellites;
+    private PlatformEnvironment environment;
+    private ArrayList<PlatformConfig> roverCfgs;
+    private ArrayList<PlatformConfig> satCfgs;
     private SerialBuffers serialBuffers;
 
 	public static void main(String[] args) {
+        LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
+        RegistryManager.checkRegistries();
 		Admin admin = getInstance();
-		LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");
             HI = new HiUi3();
 			boolean go = false;
-			File config = new File("default.cfg");
+			File config = new File("config.json");
 			if (config.exists()) {
 				if ((new PopUp()).showConfirmDialog("A quick run configuration file has been found.  Would you like to run the simulator from the file?", "Quick Run", PopUp.YES_NO_OPTIONS) == PopUp.YES_OPTION) {
 					go = true;
@@ -46,10 +47,11 @@ public class Admin {
 			}
 			if (go) {
 				try {
-					admin.beginSimulation(new RunConfiguration(config));
+					admin.beginSimulation(RunConfiguration.fromFile(config));
 				}
 				catch (Exception e){
 					LOG.log(Level.ERROR, "Simulator failed to start", e);
+					(new PopUp()).showConfirmDialog(e.getMessage(), "Failed to Start", PopUp.DEFAULT_OPTIONS);
 					System.exit(2);
 				}
 			}
@@ -60,15 +62,15 @@ public class Admin {
             File cfgFile = new File(args[0]);
             if (cfgFile.exists() && getFileType(cfgFile).equals("cfg")){
                 try {
-                    admin.beginSimulation(new RunConfiguration(cfgFile));
+                    admin.beginSimulation(RunConfiguration.fromFile(cfgFile));
                 }
                 catch (Exception e){
-                    LOG.log(Level.ERROR, "cfg file failed to initiate", e);
+                    LOG.log(Level.ERROR, "configuration file failed to initiate", e);
 					System.exit(2);
                 }
             }
             else {
-                System.err.println("Expected a valid file path to a .cfg file.  Got: \"" + cfgFile.getAbsolutePath() + "\"");
+                LOG.log(Level.FATAL, "Expected a valid file path to a JSON configuration file.  Got: \"{}\"", cfgFile.getAbsolutePath());
 				System.exit(3);
             }
 		}
@@ -82,7 +84,6 @@ public class Admin {
 	//TODO clean up this interface for OCP
 	private Admin(){
 		GLOBAL = Globals.getInstance();
-        terrainMap = new TerrainMap();
 	}
 
     private static Optional<Admin> singleton_instance = Optional.empty();
@@ -98,44 +99,34 @@ public class Admin {
     }
 
 	public void beginSimulation(RunConfiguration config){
-		if (config.rovers.size() == 0 ||config.satellites.size() == 0){
-			System.err.println("Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
+		this.roverCfgs = config.getPlatforms("Rover");
+		this.satCfgs = config.getPlatforms("Satellite");
+		if (roverCfgs.size() == 0 || satCfgs.size() == 0){
+			LOG.log(Level.WARN, "Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
 			return;
 		}
-        else {
-            this.rovers = config.rovers;
-            this.satellites = config.satellites;
-        }
 
         serialBuffers = new SerialBuffers(config.namesAndTags.getTags(), HI);
         RoverObject.setSerialBuffers(serialBuffers);
         SatelliteObject.setSerialBuffers(serialBuffers);
 
-		if (config.mapFromFile){
-			try {
-				if (!config.mapFile.exists()){
-					throw new Exception();
-				}
-				terrainMap = TerrainMapReader.loadMap(config.mapFile);
-				LOG.log(Level.INFO, "Start Up: Using map file: {}", config.mapFile.getName());
+		try {
+			if (!config.mapFile.exists()){
+				throw new Exception();
 			}
-			catch (Exception e){
-				LOG.log(Level.WARN, "Start Up: Invalid map file", e);
-				return;
-			}
+			environment = EnvironmentIO.loadEnvironment(config.mapFile, TerrainEnvironment.class);
+            LOG.log(Level.INFO, "Start Up: Using map file: {}", config.mapFile.getName());
 		}
-        else {
-            terrainMap.addMapModifier(new PlasmaGeneratorMod(config.mapRough));
-            terrainMap.addMapModifier(new SurfaceSmoothMod());
-            terrainMap.addMapModifier(new NormalizeMapMod());
-            terrainMap.generateLandscape(config.mapSize, config.mapDetail);
-			terrainMap.generateTargets(config.monoTargets, config.targetDensity);
-			terrainMap.generateHazards(config.monoHazards, config.hazardDensity);
-			LOG.log(Level.INFO, "Startup: Using random map");
+		catch (Exception e){
+			LOG.log(Level.WARN, "Start Up: Invalid map file", e);
+			return;
 		}
-        RoverObject.setTerrainMap(terrainMap);
+        RoverObject.setTerrainMap((TerrainEnvironment)environment);
 
-        HI.initialize(config.namesAndTags, serialBuffers, rovers, satellites, terrainMap);
+		ArrayList<RoverObject> rovers = buildRoversFromConfig(roverCfgs);
+		ArrayList<SatelliteObject> satellites = buildSatellitesFromConfig(satCfgs);
+
+        HI.initialize(config.namesAndTags, serialBuffers, rovers, satellites, environment);
 
 		if (config.accelerated){
 			LOG.log(Level.INFO, "Start Up: Accelerating Simulation");
@@ -152,6 +143,22 @@ public class Admin {
 		GLOBAL.startTime(config.accelerated);
 
 		HI.updateSerialBuffers();
+	}
+
+	private ArrayList<RoverObject> buildRoversFromConfig(ArrayList<PlatformConfig> configs){
+		ArrayList<RoverObject> out = new ArrayList<>();
+		for (PlatformConfig config : configs){
+            out.add(Platform.<RoverObject>buildFromConfiguration(config));
+		}
+        return out;
+	}
+
+	private ArrayList<SatelliteObject> buildSatellitesFromConfig(ArrayList<PlatformConfig> configs){
+        ArrayList<SatelliteObject> out = new ArrayList<>();
+        for (PlatformConfig config : configs){
+            out.add(Platform.<SatelliteObject>buildFromConfiguration(config));
+        }
+        return out;
 	}
 
 }

@@ -1,13 +1,16 @@
 package com.csm.rover.simulator.test.objects;
 
-import com.csm.rover.simulator.objects.ArrayGrid;
-import com.csm.rover.simulator.objects.GenericArrayGrid;
+import com.csm.rover.simulator.objects.util.ArrayGrid;
+import com.csm.rover.simulator.objects.util.GenericArrayGrid;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class ArrayGridTest {
 
@@ -54,6 +57,44 @@ public class ArrayGridTest {
         assertEquals(5, grid.getWidth());
         assertEquals(6, grid.getHeight());
         assertEquals("b", grid.get(1, 5));
+    }
+
+    @Test
+    public void jsonSerializationTest(){
+        ArrayGrid<String> grid = new GenericArrayGrid<>();
+        grid.put(0, 0, "a");
+        grid.put(1, 1, "a");
+        grid.put(1, 3, "b");
+        grid.put(0, 2, "c");
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writeValueAsString(grid);
+            assertArrayEquals("[[\"a\",null],[null,\"a\"],[\"c\",null],[null,\"b\"]]".toCharArray(), json.toCharArray());
+        }
+        catch (JsonProcessingException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void jsonDeserializerTest(){
+        ArrayGrid<String> grid = new GenericArrayGrid<>();
+        grid.put(0, 0, "a");
+        grid.put(1, 1, "a");
+        grid.put(1, 3, "b");
+        grid.put(0, 2, "c");
+
+        String json = "[[\"a\",null],[null,\"a\"],[\"c\",null],[null,\"b\"]]";
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            ArrayGrid<String> obj = mapper.readValue(json, ArrayGrid.class);
+            assertEquals(grid, obj);
+        }
+        catch (IOException e) {
+            fail();
+        }
     }
 
 //    @Test
