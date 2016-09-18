@@ -1,22 +1,20 @@
 package com.csm.rover.simulator.wrapper;
 
-import java.awt.Toolkit;
-import java.util.ArrayList;
-
-import javax.swing.UIManager;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import com.csm.rover.simulator.map.TerrainMap;
-import com.csm.rover.simulator.objects.DecimalPoint;
-import com.csm.rover.simulator.rover.RoverObject;
-import com.csm.rover.simulator.satellite.SatelliteObject;
+import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.platforms.rover.RoverObject;
+import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import com.csm.rover.simulator.ui.Form2;
 import com.csm.rover.simulator.ui.events.InternalEventCheckGate;
 import com.csm.rover.simulator.ui.events.InternalEventHandler;
 import com.csm.rover.simulator.ui.events.MenuCommandEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.swing.UIManager;
+import java.awt.Toolkit;
+import java.util.ArrayList;
 
 public class HiUi3 implements HumanInterfaceAbstraction {
 	private static Logger LOG = LogManager.getLogger(HiUi3.class);
@@ -38,9 +36,11 @@ public class HiUi3 implements HumanInterfaceAbstraction {
 	}
 	
 	@Override
-	public void initialize(NamesAndTags namesAndTags, SerialBuffers buffers,
-			ArrayList<RoverObject> rovers,
-			ArrayList<SatelliteObject> satellites, TerrainMap map) {
+	public void initialize(NamesAndTags namesAndTags,
+                           SerialBuffers buffers,
+                           ArrayList<RoverObject> rovers,
+                           ArrayList<SatelliteObject> satellites,
+                           PlatformEnvironment map) {
 		// TODO Auto-generated method stub
 		
 	}
