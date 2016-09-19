@@ -18,9 +18,9 @@ import java.util.TreeMap;
 @com.csm.rover.simulator.platforms.annotations.Platform(type="Satellite")
 public class SatelliteObject extends Platform {
 	private static final Logger LOG = LogManager.getLogger(SatelliteObject.class);
-	
+
     private static SerialBuffers serialBuffers;
-    	
+
 	private double time_step = 0.01; // time step of physics, in seconds
 	
 	private String instructions = ""; // the "file" of instructions

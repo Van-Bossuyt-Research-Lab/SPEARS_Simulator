@@ -1,6 +1,5 @@
 package com.csm.rover.simulator.objects.io;
 
-import com.csm.rover.simulator.control.InterfaceCode;
 import com.csm.rover.simulator.wrapper.NamesAndTags;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,11 +15,11 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
 
 public class RunConfiguration implements Cloneable {
 	@JsonIgnore
-	private static final Logger LOG = LogManager.getLogger(InterfaceCode.class);
+	private static final Logger LOG = LogManager.getLogger(RunConfiguration.class);
 
 	@JsonIgnore
 	private static final ObjectMapper mapper = new ObjectMapper();

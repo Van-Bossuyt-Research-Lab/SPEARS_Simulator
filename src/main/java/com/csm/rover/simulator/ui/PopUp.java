@@ -1,5 +1,6 @@
-package com.csm.rover.simulator.control;
+package com.csm.rover.simulator.ui;
 
+import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -8,9 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import javax.swing.*;
-
 public class PopUp extends JDialog {
+
+    //TODO Work into Factory
 
 	private static final long serialVersionUID = 2647075812202288041L;
 	

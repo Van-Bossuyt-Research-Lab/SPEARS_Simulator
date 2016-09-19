@@ -130,18 +130,8 @@ public class Globals {
 		}
 	}
 	
-	public void setUpAcceleratedRun(final HumanInterfaceAbstraction HI, int runtime){
-		exitTime = runtime;
-        HI.viewAccelerated(exitTime, time_accelerant);
-		new FreeThread(1000, new Runnable(){
-			public void run(){
-				if (timeMillis >= exitTime){
-					//Maybe not working? was an error
-					LOG.log(Level.INFO, "Exiting");
-					HI.exit();
-				}
-			}
-		}, FreeThread.FOREVER, "accel-handler");
+	public void setUpAcceleratedRun(int runtime){
+		//TODO Accelerated view
 	}
 	
 	public void registerNewThread(String name, int delay, SynchronousThread thread){

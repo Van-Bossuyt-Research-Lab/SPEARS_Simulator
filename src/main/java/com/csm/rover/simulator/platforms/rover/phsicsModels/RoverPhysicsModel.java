@@ -10,7 +10,6 @@ import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import com.csm.rover.simulator.platforms.rover.MotorState;
 import com.csm.rover.simulator.platforms.rover.RoverState;
 import com.csm.rover.simulator.platforms.rover.RoverWheels;
-import com.csm.rover.simulator.wrapper.Admin;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -317,9 +316,6 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
         rov_state.set("angular_acceleration", angular_acceleration);
         rov_state.set("slip_acceleration", slip_acceleration);
         rov_state.set("slip_velocity", slip_velocity);
-
-        // report new location to map
-        Admin.getCurrentInterface().updateRover(roverName, location, direction);
 		
 		//Determining the current of the battery and the change in the stored charge
 		if (motor_current[FL]*motor_states[FL] <= 0){

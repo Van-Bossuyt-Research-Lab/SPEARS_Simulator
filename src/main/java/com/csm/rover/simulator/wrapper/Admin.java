@@ -1,9 +1,7 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.control.PopUp;
-import com.csm.rover.simulator.environments.EnvironmentIO;
+import com.csm.rover.simulator.ui.PopUp;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
-import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.platforms.Platform;
@@ -23,13 +21,10 @@ public class Admin {
 //	public static Form GUI;
 	private Globals GLOBAL;
 
-    private static HumanInterfaceAbstraction HI;
-
     //Runtime Variables
     private PlatformEnvironment environment;
     private ArrayList<PlatformConfig> roverCfgs;
     private ArrayList<PlatformConfig> satCfgs;
-    private SerialBuffers serialBuffers;
 
 	public static void main(String[] args) {
         LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
@@ -37,8 +32,7 @@ public class Admin {
 		Admin admin = getInstance();
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");
-            HI = new HiUi3();
-			boolean go = false;
+            boolean go = false;
 			File config = new File("config.json");
 			if (config.exists()) {
 				if ((new PopUp()).showConfirmDialog("A quick run configuration file has been found.  Would you like to run the simulator from the file?", "Quick Run", PopUp.YES_NO_OPTIONS) == PopUp.YES_OPTION) {
@@ -58,8 +52,7 @@ public class Admin {
 		}
 		else {
 			LOG.log(Level.INFO, "Stating simulator in Command Line mode");
-			HI = new HiCmd();
-            File cfgFile = new File(args[0]);
+			File cfgFile = new File(args[0]);
             if (cfgFile.exists() && getFileType(cfgFile).equals("cfg")){
                 try {
                     admin.beginSimulation(RunConfiguration.fromFile(cfgFile));
@@ -94,55 +87,8 @@ public class Admin {
         return singleton_instance.get();
     }
 
-    public static HumanInterfaceAbstraction getCurrentInterface(){
-        return HI;
-    }
-
 	public void beginSimulation(RunConfiguration config){
-		this.roverCfgs = config.getPlatforms("Rover");
-		this.satCfgs = config.getPlatforms("Satellite");
-		if (roverCfgs.size() == 0 || satCfgs.size() == 0){
-			LOG.log(Level.WARN, "Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
-			return;
-		}
-
-        serialBuffers = new SerialBuffers(config.namesAndTags.getTags(), HI);
-        RoverObject.setSerialBuffers(serialBuffers);
-        SatelliteObject.setSerialBuffers(serialBuffers);
-
-		try {
-			if (!config.mapFile.exists()){
-				throw new Exception();
-			}
-			environment = EnvironmentIO.loadEnvironment(config.mapFile, TerrainEnvironment.class);
-            LOG.log(Level.INFO, "Start Up: Using map file: {}", config.mapFile.getName());
-		}
-		catch (Exception e){
-			LOG.log(Level.WARN, "Start Up: Invalid map file", e);
-			return;
-		}
-        RoverObject.setTerrainMap((TerrainEnvironment)environment);
-
-		ArrayList<RoverObject> rovers = buildRoversFromConfig(roverCfgs);
-		ArrayList<SatelliteObject> satellites = buildSatellitesFromConfig(satCfgs);
-
-        HI.initialize(config.namesAndTags, serialBuffers, rovers, satellites, environment);
-
-		if (config.accelerated){
-			LOG.log(Level.INFO, "Start Up: Accelerating Simulation");
-            Globals.getInstance().setUpAcceleratedRun(HI, 3600000 * config.runtime);
-		}
-
-        for (RoverObject rover : rovers){
-            rover.start();
-        }
-        for (SatelliteObject sat : satellites){
-            sat.start();
-        }
-        HI.start();
-		GLOBAL.startTime(config.accelerated);
-
-		HI.updateSerialBuffers();
+        //TODO begin simulation
 	}
 
 	private ArrayList<RoverObject> buildRoversFromConfig(ArrayList<PlatformConfig> configs){
