@@ -1,19 +1,17 @@
-package com.csm.rover.simulator.ui.menu;
-
-import java.awt.event.ActionEvent;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
+package com.csm.rover.simulator.ui.implementation;
 
 import com.csm.rover.simulator.ui.events.InternalEventHandler;
 import com.csm.rover.simulator.ui.events.MenuCommandEvent;
-import com.csm.rover.simulator.ui.frame.FrameRegistry;
 
-public class NewFrameMenu extends JMenu {
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import java.awt.event.ActionEvent;
+
+class NewFrameMenu extends JMenu {
 
 	private static final long serialVersionUID = -6654005507690093494L;
 
-	public NewFrameMenu(){
+	NewFrameMenu(){
 		initialize();
 	}
 

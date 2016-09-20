@@ -1,10 +1,8 @@
-package com.csm.rover.simulator.ui.desktop;
+package com.csm.rover.simulator.ui.implementation;
 
-import com.csm.rover.simulator.ui.ImageFunctions;
 import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
 import com.csm.rover.simulator.ui.events.InternalEventHandler;
 import com.csm.rover.simulator.ui.events.MenuCommandEvent;
-import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
 import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -18,8 +16,8 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EnbeddedDesktop extends JDesktopPane {
-	private static final Logger LOG = LogManager.getLogger(EnbeddedDesktop.class);
+class EmbeddedDesktop extends JDesktopPane {
+	private static final Logger LOG = LogManager.getLogger(EmbeddedDesktop.class);
 
 	private static final long serialVersionUID = 1092626769481787681L;
 	
@@ -35,7 +33,7 @@ public class EnbeddedDesktop extends JDesktopPane {
 	
 	private boolean on_resize = false, resizing = false;
 	
-	public EnbeddedDesktop(){
+	EmbeddedDesktop(){
 		setUpWells();
 		setUpEventListeners();
 	}

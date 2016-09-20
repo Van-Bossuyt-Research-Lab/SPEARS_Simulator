@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.ui;
+package com.csm.rover.simulator.ui.implementation;
 
 import javax.swing.*;
 import java.awt.Dimension;

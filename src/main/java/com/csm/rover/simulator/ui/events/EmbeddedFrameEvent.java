@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.ui.events;
 
-import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
+import com.csm.rover.simulator.ui.implementation.EmbeddedFrame;
 
 public class EmbeddedFrameEvent {
 

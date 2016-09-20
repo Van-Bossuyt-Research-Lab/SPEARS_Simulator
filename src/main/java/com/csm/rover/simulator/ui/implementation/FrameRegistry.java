@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.ui.frame;
+package com.csm.rover.simulator.ui.implementation;
 
 import java.util.ArrayList;
 import java.util.List;

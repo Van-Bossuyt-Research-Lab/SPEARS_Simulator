@@ -1,25 +1,17 @@
-package com.csm.rover.simulator.ui.menu;
+package com.csm.rover.simulator.ui.implementation;
 
+import com.csm.rover.simulator.ui.events.*;
+import com.csm.rover.simulator.ui.sound.SoundPlayer;
+import com.csm.rover.simulator.ui.sound.SpearsSound;
+import com.csm.rover.simulator.ui.visual.MainMenu;
+
+import javax.swing.*;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButtonMenuItem;
+import static com.csm.rover.simulator.ui.implementation.ImageFunctions.getMenuIcon;
 
-import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
-import com.csm.rover.simulator.ui.events.EmbeddedFrameListener;
-import com.csm.rover.simulator.ui.events.InternalEventCheckGate;
-import com.csm.rover.simulator.ui.events.InternalEventHandler;
-import com.csm.rover.simulator.ui.events.MenuCommandEvent;
-import com.csm.rover.simulator.ui.sound.SoundPlayer;
-import com.csm.rover.simulator.ui.sound.SpearsSound;
-
-import static com.csm.rover.simulator.ui.ImageFunctions.getMenuIcon;
-
-public class EmbeddedMenuBar extends JMenuBar {
+class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 
 	private static final long serialVersionUID = 1996909612935260422L;
 
@@ -28,7 +20,7 @@ public class EmbeddedMenuBar extends JMenuBar {
 	private JMenu newMenu;
 	private JMenu showMenu;
 	
-	public EmbeddedMenuBar() {
+	EmbeddedMenuBar() {
 		fileMenu = new JMenu("File");
 		this.add(fileMenu);
 		

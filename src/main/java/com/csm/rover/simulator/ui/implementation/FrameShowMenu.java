@@ -1,24 +1,22 @@
-package com.csm.rover.simulator.ui.menu;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JInternalFrame;
-import javax.swing.JMenuItem;
+package com.csm.rover.simulator.ui.implementation;
 
 import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
 import com.csm.rover.simulator.ui.events.EmbeddedFrameListener;
 import com.csm.rover.simulator.ui.events.InternalEventHandler;
 import com.csm.rover.simulator.ui.events.MenuCommandEvent;
-import com.csm.rover.simulator.ui.frame.EmbeddedFrame;
 
-public class FrameShowMenu extends JMenuItem {
+import javax.swing.JInternalFrame;
+import javax.swing.JMenuItem;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+class FrameShowMenu extends JMenuItem {
 	
 	private static final long serialVersionUID = 2126009229663749152L;
 	
 	public EmbeddedFrame frame;
 	
-	public FrameShowMenu(EmbeddedFrame frm){
+	FrameShowMenu(EmbeddedFrame frm){
 		super(frm.getTitle());
 		this.frame = frm;
 		

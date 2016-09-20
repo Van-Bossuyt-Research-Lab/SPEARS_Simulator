@@ -1,17 +1,15 @@
-package com.csm.rover.simulator.ui.frame;
+package com.csm.rover.simulator.ui.implementation;
 
-import java.awt.Dimension;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.beans.PropertyVetoException;
+import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
+import com.csm.rover.simulator.ui.events.InternalEventHandler;
 
 import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
-
-import com.csm.rover.simulator.ui.ImageFunctions;
-import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
-import com.csm.rover.simulator.ui.events.InternalEventHandler;
+import java.awt.Dimension;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.beans.PropertyVetoException;
 
 public class EmbeddedFrame extends JInternalFrame {
 	
@@ -19,7 +17,7 @@ public class EmbeddedFrame extends JInternalFrame {
 
 	private Dimension openState;
 	
-	public EmbeddedFrame(){
+	EmbeddedFrame(){
 		setResizable(true);
 		setClosable(true);
 		setIconifiable(true);

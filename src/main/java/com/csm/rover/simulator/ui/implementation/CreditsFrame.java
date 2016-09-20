@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.ui.frame;
+package com.csm.rover.simulator.ui.implementation;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -13,7 +13,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 @FrameMarker(name="Credits Info")
-public class CreditsFrame extends EmbeddedFrame implements HyperlinkListener {
+class CreditsFrame extends EmbeddedFrame implements HyperlinkListener {
 
 	private static final long serialVersionUID = 8884625122423593285L;
 	
@@ -24,7 +24,7 @@ public class CreditsFrame extends EmbeddedFrame implements HyperlinkListener {
 	private String externalHeader;
 	private String externalCredits;
 	
-	public CreditsFrame() {
+	CreditsFrame() {
 		setCredits();
 		initialize();
 		setSize(
