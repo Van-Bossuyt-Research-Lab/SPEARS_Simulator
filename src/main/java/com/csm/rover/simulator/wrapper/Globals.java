@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Globals {
 	private static final Logger LOG = LogManager.getFormatterLogger(Globals.class);
 
-	public static String versionNumber = "2.6.0";
+	public static String versionNumber = "2.6.1";
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;
@@ -150,11 +150,17 @@ public class Globals {
 	
 	public void checkOutThread(String name){
 		if (!name.contains("delay")){
-            LOG.log(Level.WARN, name + " out.");
+            LOG.log(Level.DEBUG, name + " out.");
 		}
+        threadCheckIn(name);
 		threads.remove(name);
-		threadCheckIn(name);
 	}
+
+    public void killThread(String name){
+        if (threads.containsKey(name)){
+            threads.get(name).killThread();
+        }
+    }
 	
 	public void threadCheckIn(String name){
         if (!name.equals("milli-clock")){

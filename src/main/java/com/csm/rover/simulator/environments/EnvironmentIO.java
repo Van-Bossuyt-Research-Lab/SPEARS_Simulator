@@ -14,7 +14,7 @@ public class EnvironmentIO {
     public static void saveEnvironment(PlatformEnvironment enviro, File file){
         ObjectMapper mapper = new ObjectMapper();
         try {
-            mapper.writeValue(file, enviro);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, enviro);
         }
         catch (IOException e) {
             LOG.log(Level.ERROR, "Failed to save Environment", e);

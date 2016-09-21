@@ -114,6 +114,11 @@ public class ThreadItem {
 		} catch (NullPointerException e) {}
 	}
 
+    public void killThread(){
+        revokePermission();
+        thread.Stop();
+    }
+
 	@Override
 	public String toString() {
 		return "ThreadItem [name=" + name + ", delay=" + delay + ", next="

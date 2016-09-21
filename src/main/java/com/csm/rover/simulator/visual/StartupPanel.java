@@ -4,7 +4,10 @@ import com.csm.rover.simulator.control.PopUp;
 import com.csm.rover.simulator.environments.EnvironmentIO;
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.environments.rover.modifiers.PlasmaFractalGen;
+import com.csm.rover.simulator.environments.rover.modifiers.ScalingModifier;
 import com.csm.rover.simulator.environments.rover.modifiers.SmoothingModifier;
+import com.csm.rover.simulator.environments.rover.modifiers.TruncateModifier;
+import com.csm.rover.simulator.environments.rover.populators.TerrainHazardsPop;
 import com.csm.rover.simulator.environments.rover.populators.TerrainTargetsPop;
 import com.csm.rover.simulator.objects.io.MapFileFilter;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
@@ -704,8 +707,8 @@ public class StartupPanel extends Panel {
             double mapRough = MapRoughSlider.getValue()/50000.0;
             int mapSize = (Integer) MapSizeSpnr.getValue();
             int mapDetail = (Integer) MapDetailSpnr.getValue();
-            double targetDensity = (Double) TargetDensitySpnr.getValue()/1000.;
-            double hazardDensity = (Double) HazardDensitySpnr.getValue()/1000.;
+            double targetDensity = (Double) TargetDensitySpnr.getValue()/100.;
+            double hazardDensity = (Double) HazardDensitySpnr.getValue()/100.;
             boolean monoTargets = !ValuedTargetsChk.isSelected(); //cause the form says use and the computer reads not using
             boolean monoHazards = !ValuedHazardsChk.isSelected();
             return new RunConfiguration(namesAndTags, platforms, generateTempMap(mapRough,
@@ -727,13 +730,18 @@ public class StartupPanel extends Panel {
                         .addParameter("size", mapSize)
                         .addParameter("detail", mapDetail)
                         .addParameter("rough", 0.003)
-                        .addParameter("range", 10)
                         .build()
                 )
                 .addMapModifier(new SmoothingModifier(), ParamMap.emptyParamMap())
+                .addMapModifier(new ScalingModifier(), ParamMap.newParamMap().addParameter("range", 10).build())
+                .addMapModifier(new TruncateModifier(), ParamMap.newParamMap().addParameter("places", 4).build())
                 .addPopulator("Targets", new TerrainTargetsPop(), ParamMap.newParamMap()
-                        .addParameter("trgt_density", 0.02)
-                        .addParameter("mono", 1)
+                        .addParameter("trgt_density", targetDensity)
+                        .addParameter("mono", monoTargets ? 1 : 0)
+                        .build())
+                .addPopulator("Hazards", new TerrainHazardsPop(), ParamMap.newParamMap()
+                        .addParameter("mono", monoHazards ? 1 : 0)
+                        .addParameter("rough", hazardDensity)
                         .build())
                 .generate();
         Random rnd = new Random();

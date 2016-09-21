@@ -16,7 +16,7 @@ public class RecursiveGridList<T> {
     private int layers;
     private Optional<T> value;
 
-    public static <U> RecursiveGridList newGridList(Class<? extends U> type, int layers){
+    public static <U> RecursiveGridList<U> newGridList(Class<U> type, int layers){
         return new RecursiveGridList<U>(layers);
     }
 
