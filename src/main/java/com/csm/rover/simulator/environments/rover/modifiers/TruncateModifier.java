@@ -19,20 +19,11 @@ public class TruncateModifier extends EnvironmentModifier<TerrainMap> {
     protected TerrainMap doModify(TerrainMap map, Map<String, Double> params) {
         ArrayGrid<Float> values = new FloatArrayArrayGrid();
         double offset = Math.pow(10, params.get("places"));
-<<<<<<< HEAD
-        for (int i = 0; i < map.rawValues().size(); i++){
-            for (int j = 0; j < map.rawValues().size(); j++){
-                values.put(i, j, (float)(Math.round(map.rawValues().get(i, j)*offset)/offset));
-            }
-        }
-        return new TerrainMap(params.get("size").intValue(), params.get("detail").intValue(), values);
-=======
         for (int i = 0; i < map.rawValues().getWidth(); i++){
             for (int j = 0; j < map.rawValues().getHeight(); j++){
                 values.put(i, j, (float)(Math.round(map.rawValues().get(i, j)*offset)/offset));
             }
         }
         return new TerrainMap(map.getSize(), map.getDetail(), values);
->>>>>>> refs/remotes/origin/master
     }
 }
