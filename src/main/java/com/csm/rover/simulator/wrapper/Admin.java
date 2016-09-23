@@ -1,6 +1,5 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.ui.implementation.PopUp;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
@@ -8,6 +7,7 @@ import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import com.csm.rover.simulator.ui.implementation.UiFactory;
+import com.csm.rover.simulator.ui.visual.PopUp;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,13 +36,16 @@ public class Admin {
             UiFactory.getApplication().show();
             File config = new File("config.json");
 			if (config.exists() &&
-                    (new PopUp()).showConfirmDialog("A quick run configuration file has been found.  Would you like to run the simulator from the file?", "Quick Run", PopUp.YES_NO_OPTIONS) == PopUp.YES_OPTION) {
+                    UiFactory.newPopUp()
+                            .setMessage("A quick run configuration file has been found.  Would you like to run the simulator from the file?")
+                            .setSubject("Quick Run")
+                            .showConfirmDialog(PopUp.Buttons.YES_NO_OPTIONS) == PopUp.Options.YES_OPTION) {
 				try {
 					admin.beginSimulation(RunConfiguration.fromFile(config));
 				}
 				catch (Exception e){
 					LOG.log(Level.ERROR, "Simulator failed to start", e);
-					(new PopUp()).showConfirmDialog(e.getMessage(), "Failed to Start", PopUp.DEFAULT_OPTIONS);
+                    UiFactory.newPopUp().setMessage(e.getMessage()).setSubject("Failed to Start").showConfirmDialog(PopUp.Buttons.DEFAULT_OPTIONS);
 					System.exit(2);
 				}
 			}

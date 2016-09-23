@@ -1,59 +1,47 @@
 package com.csm.rover.simulator.ui.implementation;
 
+import com.csm.rover.simulator.ui.visual.PopUp;
+
 import javax.swing.*;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Optional;
 
-public class PopUp extends JDialog {
+import static com.csm.rover.simulator.ui.visual.PopUp.Buttons.OK_CANCEL_OPTIONS;
+import static com.csm.rover.simulator.ui.visual.PopUp.Options.*;
 
-    //TODO Work into Factory
+class PopUpImpl extends JDialog implements PopUp {
 
-	private static final long serialVersionUID = 2647075812202288041L;
-	
-	public static final int OK_OPTION = 0, CANCEL_OPTION = 1, YES_OPTION = 2, NO_OPTION = 3;
-	public static final int DEFAULT_OPTIONS = 0, OK_CANCEL_OPTIONS = 1, YES_NO_OPTIONS = 2, YES_NO_CANCEL_OPTIONS = 3, CUSTOM_OPTIONS = 4;
-	
 	private JLabel defaultText;
 	private JButton[] optionBtns = new JButton[3];
-	
-	private int currentConfig = -1;
-	private int buttonClicked = -1;
-	
-	private String[] customTitles;
-	private int[] customReturns;
-	private boolean customSet = false;
-	
-	public PopUp(){
+
+	private Buttons currentConfig;
+	private Options buttonClicked;
+
+    private Optional<String> text = Optional.empty(), title = Optional.empty();
+
+    PopUpImpl(){
 		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		// this.setAlwaysOnTop(true);
+		this.setAlwaysOnTop(true);
 		this.setResizable(false);
 		this.getContentPane().setLayout(null);
-		initalize();
+		initialize();
 	}
 	
-	private void initalize(){
+	private void initialize(){
 		defaultText = new JLabel();
 		defaultText.setHorizontalAlignment(SwingConstants.CENTER);
 		defaultText.setVerticalAlignment(SwingConstants.CENTER);
-		defaultText.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
-		this.add(defaultText);		
+		this.add(defaultText);
 		int x = 0;
 		while (x < optionBtns.length){
 			optionBtns[x] = new JButton();
-			optionBtns[x].setFont(new Font("Miriam Fixed", Font.PLAIN, 12));
 			optionBtns[x].setSize(80, 23);
 			final int hold = x;
-			optionBtns[x].addActionListener(new ActionListener(){
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					buttonClick(hold);
-				}
-			});
+			optionBtns[x].addActionListener((ActionEvent e) -> buttonClick(hold));
 			optionBtns[x].addKeyListener(new KeyAdapter(){
 				@Override
 				public void keyPressed(KeyEvent arg0) {
@@ -76,18 +64,31 @@ public class PopUp extends JDialog {
 			x++;
 		}
 	}
-	
-	public int showConfirmDialog(String message, String title, int options){
-		buttonClicked = -1;
-		this.setTitle(title);
+
+    @Override
+    public PopUp setMessage(String text){
+        this.text = Optional.of(text);
+        return this;
+    }
+
+    @Override
+    public PopUp setSubject(String title){
+        this.title = Optional.of(title);
+        return this;
+    }
+
+    @Override
+	public Options showConfirmDialog(Buttons options){
+		buttonClicked = null;
+		this.setTitle(title.isPresent() ? title.get() : "");
 		currentConfig = options;
-		defaultText.setText("<html><center>" + message.replaceAll("\n", "<br>") + "</center></html>");
+		defaultText.setText(String.format("<html><center>%s</center></html>",  text.isPresent() ? text.get() : "").replaceAll("\n", "<br>"));
 		this.setSize((int)(defaultText.getPreferredSize().getWidth() + 50), (int)(defaultText.getPreferredSize().getHeight() + 100));
 		defaultText.setVisible(true);
 		defaultText.setBounds(0, 0, this.getWidth(), (this.getHeight() - 30 - 2*optionBtns[0].getHeight()));
-		placeButtons(options);
+		placeButtons();
 		openWindow();
-		while (buttonClicked == -1){
+		while (buttonClicked == null){
 			try{
 				Thread.sleep(300);
 			} catch (Exception e) {
@@ -98,99 +99,21 @@ public class PopUp extends JDialog {
 		return buttonClicked;
 	}
 	
-	public int showPictureDialog(ImageIcon image, String title, int options){
-		buttonClicked = -1;
-		this.setTitle(title);
-		currentConfig = options;
-		defaultText.setText("");
-		defaultText.setIcon(image);
-		this.setSize((int)(defaultText.getPreferredSize().getWidth() + 50), (int)(defaultText.getPreferredSize().getHeight() + 100));
-		defaultText.setVisible(true);
-		defaultText.setBounds(0, 0, this.getWidth(), (this.getHeight() - 30 - 2*optionBtns[0].getHeight()));
-		placeButtons(options);
-		openWindow();
-		while (buttonClicked == -1){
-			try{
-				Thread.sleep(300);
-			} catch (Exception e) {
-				Thread.currentThread().interrupt();
-			}
-		}
-		this.setVisible(false);
-		defaultText.setIcon(null);
-		return buttonClicked;
-	}
-	
-	public String[] showPromptDialog(String prompt1, String inital1, String prompt2, String inital2, String prompt3, String[] options3, String initial3, String formTitle){
-		buttonClicked = -1;
-		this.setTitle(formTitle);
-		this.remove(defaultText);
-		this.setSize(250, 250);
-		JLabel title1 = new JLabel(prompt1 + ":");
-		title1.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
-		title1.setBounds(20, 10, (int)title1.getPreferredSize().getWidth(), (int)title1.getPreferredSize().getHeight());
-		this.add(title1);
-		JTextField input1 = new JTextField();
-		input1.setText(inital1);
-		input1.setFont(new Font("Iskoola Pota", Font.PLAIN, 15));
-		input1.setBounds(20, title1.getY() + title1.getHeight() + 5, this.getWidth() - 40, 25);
-		this.add(input1);
-		JLabel title2 = new JLabel(prompt2 + ":");
-		title2.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
-		title2.setBounds(20, input1.getY() + input1.getHeight() + 10, (int)title2.getPreferredSize().getWidth(), (int)title2.getPreferredSize().getHeight());
-		this.add(title2);
-		JTextField input2 = new JTextField();
-		input2.setText(inital2);
-		input2.setFont(new Font("Iskoola Pota", Font.PLAIN, 15));
-		input2.setBounds(20, title2.getY() + title2.getHeight() + 5, this.getWidth() - 40, 25);
-		this.add(input2);
-		JLabel title3 = new JLabel(prompt3 + ":");
-		title3.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
-		title3.setBounds(20, input2.getY() + input2.getHeight() + 10, (int)title3.getPreferredSize().getWidth(), (int)title3.getPreferredSize().getHeight());
-		this.add(title3);
-		JComboBox<String> input3 = new JComboBox<String>(options3);		
-		input3.setSelectedItem(initial3);
-		input3.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
-		input3.setBounds(20, title3.getY() + title3.getHeight() + 5, this.getWidth() - 40, 25);
-		this.add(input3);
-		currentConfig = OK_CANCEL_OPTIONS;
-		placeButtons(OK_CANCEL_OPTIONS);
-		openWindow();
-		while (buttonClicked == -1){
-			try{
-				Thread.sleep(300);
-			} catch (Exception e) {
-				Thread.currentThread().interrupt();
-			}
-		}
-		this.setVisible(false);
-		this.remove(title1);
-		this.remove(title2);
-		this.remove(title3);
-		this.remove(input1);
-		this.remove(input2);
-		this.remove(input3);
-		this.add(defaultText);
-		return new String[] { buttonClicked + "", input1.getText(), input2.getText(), (String)input3.getSelectedItem() };
-	}
-	
-	public int showOptionDialog(String promptTitle, String formTitle, String[] options){
-		buttonClicked = -1;
-		this.setTitle(formTitle);
+	public int showOptionDialog(String[] options){
+		buttonClicked = null;
+		this.setTitle(title.isPresent() ? title.get() : "");
 		this.remove(defaultText);
 		this.setSize(250, 130);
-		JLabel title1 = new JLabel(promptTitle + ":");
-		title1.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
+		JLabel title1 = new JLabel(text.isPresent() ? text.get() : "Choose" + ":");
 		title1.setBounds(20, 10, (int)title1.getPreferredSize().getWidth(), (int)title1.getPreferredSize().getHeight());
 		this.add(title1);
-		JComboBox<String> input3 = new JComboBox<String>(options);
-		input3.setFont(new Font("Iskoola Pota", Font.PLAIN, 14));
+		JComboBox<String> input3 = new JComboBox<>(options);
 		input3.setBounds(20, title1.getY() + title1.getHeight() + 5, this.getWidth() - 40, 25);
 		this.add(input3);
 		currentConfig = OK_CANCEL_OPTIONS;
-		placeButtons(OK_CANCEL_OPTIONS);
+		placeButtons();
 		openWindow();
-		while (buttonClicked == -1){
+		while (buttonClicked == null){
 			try{
 				Thread.sleep(300);
 			} catch (Exception e) {
@@ -209,11 +132,11 @@ public class PopUp extends JDialog {
 		}
 	}
 	
-	public String showInputDialog(String text, String title, int options){
-		buttonClicked = -1;
-		this.setTitle(title);
-		currentConfig = options;
-		defaultText.setText("<html><center>" + text.replaceAll("\n", "<br>") + "</center></html>");
+	public String showInputDialog(){
+		buttonClicked = null;
+		this.setTitle(title.isPresent() ? title.get() : "");
+		currentConfig = OK_CANCEL_OPTIONS;
+		defaultText.setText(String.format("<html><center>%s</center></html>", text.isPresent() ? text : "").replaceAll("\n", "<br>"));
 		int width = (int)(defaultText.getPreferredSize().getWidth() + 50);
 		if (width < 250){
 			width = 250;
@@ -240,9 +163,9 @@ public class PopUp extends JDialog {
 			}
 		});
 		this.add(input);
-		placeButtons(options);
+		placeButtons();
 		openWindow();
-		while (buttonClicked == -1){
+		while (buttonClicked == null){
 			try{
 				Thread.sleep(300);
 			} catch (Exception e) {
@@ -250,7 +173,7 @@ public class PopUp extends JDialog {
 			}
 		}
 		this.setVisible(false);
-		if (buttonClicked == OK_OPTION || buttonClicked == YES_OPTION){
+		if (buttonClicked == OK_OPTION){
 			return input.getText();
 		}
 		else {
@@ -258,8 +181,8 @@ public class PopUp extends JDialog {
 		}
 	}
 	
-	private void placeButtons(int option){
-		switch (option){
+	private void placeButtons(){
+		switch (currentConfig){
 		case DEFAULT_OPTIONS:
 			optionBtns[0].setVisible(false);
 			optionBtns[1].setVisible(false);
@@ -296,29 +219,6 @@ public class PopUp extends JDialog {
 			optionBtns[2].setLocation(getButtonX(3, 3), getButtonY());
 			optionBtns[2].setVisible(true);
 			break;
-		case CUSTOM_OPTIONS:
-			if (customSet){
-				int x = 0;
-				while (x < customTitles.length){
-					optionBtns[x].setText(customTitles[x]);
-					optionBtns[x].setLocation(getButtonX(customTitles.length, (x + 1)), getButtonY());
-					optionBtns[x].setVisible(true);
-					x++;
-				}
-				while (x < 3){
-					optionBtns[x].setVisible(false);
-					x++;
-				}
-			}
-			else {
-				currentConfig = DEFAULT_OPTIONS;
-				optionBtns[0].setVisible(false);
-				optionBtns[1].setVisible(false);
-				optionBtns[2].setText("OK");
-				optionBtns[2].setLocation(getButtonX(1, 1), getButtonY());
-				optionBtns[2].setVisible(true);
-			}
-			break;
 		}
 	}
 	
@@ -328,9 +228,6 @@ public class PopUp extends JDialog {
 			switch (currentConfig){
 			case YES_NO_CANCEL_OPTIONS:
 				buttonClicked = CANCEL_OPTION;
-				break;
-			case CUSTOM_OPTIONS:
-				buttonClicked = customReturns[0];
 				break;
 			}
 			break;
@@ -344,9 +241,6 @@ public class PopUp extends JDialog {
 				break;
 			case YES_NO_CANCEL_OPTIONS:
 				buttonClicked = NO_OPTION;
-				break;
-			case CUSTOM_OPTIONS:
-				buttonClicked = customReturns[1];
 				break;
 			}
 			break;
@@ -364,19 +258,8 @@ public class PopUp extends JDialog {
 			case YES_NO_CANCEL_OPTIONS:
 				buttonClicked = CANCEL_OPTION;
 				break;
-			case CUSTOM_OPTIONS:
-				buttonClicked = customReturns[2];
-				break;
 			}
 			break;
-		}
-	}
-	
-	public void setCustomButtonOptions(String[] titles, int[] returns){
-		if (titles.length == returns.length && titles.length <= 3 && returns.length > 0){
-			customTitles = titles;
-			customReturns = returns;
-			customSet = true;
 		}
 	}
 	

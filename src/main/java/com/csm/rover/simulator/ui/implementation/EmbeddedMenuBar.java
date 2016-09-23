@@ -35,7 +35,7 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		createInternalFeedback();
 	}
 
-	public void initialize(){
+	private void initialize(){
 		
 		JMenuItem mntmOpen = new JMenuItem("Open Simulation");
 		mntmOpen.setIcon(getMenuIcon("/gui/open_folder.png"));

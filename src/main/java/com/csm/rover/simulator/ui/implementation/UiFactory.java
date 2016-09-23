@@ -2,6 +2,7 @@ package com.csm.rover.simulator.ui.implementation;
 
 import com.csm.rover.simulator.ui.visual.Application;
 import com.csm.rover.simulator.ui.visual.MainMenu;
+import com.csm.rover.simulator.ui.visual.PopUp;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +38,10 @@ public class UiFactory {
 
     public static MainMenu getMainMenu(){
         return menu;
+    }
+
+    public static PopUp newPopUp(){
+        return new PopUpImpl();
     }
 
 }
