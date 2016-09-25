@@ -1,55 +1,40 @@
 package com.csm.rover.simulator.ui.sound;
 
-import java.io.IOException;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.csm.rover.simulator.ui.events.InternalEventHandler;
-import com.csm.rover.simulator.ui.events.MenuCommandEvent;
-import com.csm.rover.simulator.ui.events.MenuCommandListener;
+import javax.sound.sampled.*;
+import java.io.IOException;
 
 public class SoundPlayer {
 	private static final Logger LOG = LogManager.getLogger(SoundPlayer.class);
+
+    public enum Volume { HIGH, LOW, MUTE }
 
 	private final static String soundPackage = "/sounds/";
 	
 	private static float volume = 6;
 	
-	static {
-		InternalEventHandler.registerInternalListener(new MenuCommandListener(){
-			@Override
-			public void menuAction(MenuCommandEvent e) {
-				if (e.getAction().equals(MenuCommandEvent.Action.VOLUME_CHANGE)){
-					switch((String)e.getValue()){
-					case "HIGH":
-						volume = 6;
-						LOG.log(Level.DEBUG, "Volume set to HIGH");
-						break;
-					case "LOW":
-						volume = -2;
-						LOG.log(Level.DEBUG, "Volume set to LOW");
-						break;
-					case "MUTE":
-						volume = 0;
-						LOG.log(Level.DEBUG, "Volume set to MUTE");
-						break;
-					default:
-						LOG.log(Level.WARN, "Unexpected volume change value: \"{}\"", e.getValue());
-						break;
-					}
-				}
-			}
-		});
-	}
+	public static void setVolume(Volume level){
+        switch(level){
+            case HIGH:
+                volume = 6;
+                LOG.log(Level.DEBUG, "Volume set to HIGH");
+                break;
+            case LOW:
+                volume = -2;
+                LOG.log(Level.DEBUG, "Volume set to LOW");
+                break;
+            case MUTE:
+                volume = 0;
+                LOG.log(Level.DEBUG, "Volume set to MUTE");
+                break;
+            default:
+                LOG.log(Level.DEBUG, "null Volume level");
+                break;
+        }
+    }
 	
 	public static void playSound(SpearsSound sound){
 		LOG.log(Level.DEBUG, "Requested to play sound: {}", sound);

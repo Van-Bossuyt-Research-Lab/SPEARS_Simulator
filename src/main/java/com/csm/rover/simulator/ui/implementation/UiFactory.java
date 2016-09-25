@@ -14,8 +14,7 @@ public class UiFactory {
 
     static {
         setupEnv();
-        application = new Form2();
-        menu = new EmbeddedMenuBar();
+        makeApp();
     }
 
     private static Application application;
@@ -30,6 +29,12 @@ public class UiFactory {
         catch (Exception e) {
             LOG.log(Level.WARN, "UI Look and Feel failed to be set to: " + UIManager.getSystemLookAndFeelClassName(), e);
         }
+    }
+
+    private static void makeApp(){
+        EmbeddedMenuBar menuImpl = new EmbeddedMenuBar();
+        application = new Form2(menuImpl);
+        menu = menuImpl;
     }
 
     public static Application getApplication(){

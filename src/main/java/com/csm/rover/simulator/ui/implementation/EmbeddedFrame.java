@@ -1,8 +1,5 @@
 package com.csm.rover.simulator.ui.implementation;
 
-import com.csm.rover.simulator.ui.events.EmbeddedFrameEvent;
-import com.csm.rover.simulator.ui.events.InternalEventHandler;
-
 import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;

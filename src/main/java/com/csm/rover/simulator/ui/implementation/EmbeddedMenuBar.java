@@ -1,13 +1,14 @@
 package com.csm.rover.simulator.ui.implementation;
 
-import com.csm.rover.simulator.ui.events.*;
 import com.csm.rover.simulator.ui.sound.SoundPlayer;
 import com.csm.rover.simulator.ui.sound.SpearsSound;
+import com.csm.rover.simulator.ui.sound.VolumeChangeListener;
 import com.csm.rover.simulator.ui.visual.MainMenu;
 
 import javax.swing.*;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.util.Optional;
 
 import static com.csm.rover.simulator.ui.implementation.ImageFunctions.getMenuIcon;
 
@@ -19,6 +20,9 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 	
 	private JMenu newMenu;
 	private JMenu showMenu;
+
+    private Optional<Runnable> exitOp = Optional.empty();
+    private Optional<VolumeChangeListener> volumeListener = Optional.empty();
 	
 	EmbeddedMenuBar() {
 		fileMenu = new JMenu("File");
@@ -61,7 +65,7 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.setIcon(getMenuIcon("/gui/power.png"));
-		mntmExit.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.EXIT).setOrigin(e).build()));
+		mntmExit.addActionListener((ActionEvent e) -> {if (exitOp.isPresent()) exitOp.get().run(); });
 		fileMenu.add(mntmExit);
 		
 		newMenu = new NewFrameMenu();
@@ -173,20 +177,20 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		
 		JRadioButtonMenuItem mntmHigh = new JRadioButtonMenuItem("High");
 		mntmHigh.setIcon(getMenuIcon("/gui/speaker_loud.png"));
-		mntmHigh.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.VOLUME_CHANGE).setValue("HIGH").setOrigin(e).build()));
+		mntmHigh.addActionListener((ActionEvent e) -> { if (volumeListener.isPresent()) volumeListener.get().changeVolume(SoundPlayer.Volume.HIGH); });
 		mntmHigh.setSelected(true);
 		mnVolume.add(mntmHigh);
 		volumeControls.add(mntmHigh);
 		
 		JRadioButtonMenuItem mntmLow = new JRadioButtonMenuItem("Low");
 		mntmLow.setIcon(getMenuIcon("/gui/speaker_quiet.png"));
-		mntmLow.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.VOLUME_CHANGE).setValue("LOW").setOrigin(e).build()));
+		mntmLow.addActionListener((ActionEvent e) -> { if (volumeListener.isPresent()) volumeListener.get().changeVolume(SoundPlayer.Volume.LOW); });
 		mnVolume.add(mntmLow);
 		volumeControls.add(mntmLow);
 		
 		JRadioButtonMenuItem mntmMute = new JRadioButtonMenuItem("Mute");
 		mntmMute.setIcon(getMenuIcon("/gui/speaker_mute.png"));
-		mntmMute.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.VOLUME_CHANGE).setValue("MUTE").setOrigin(e).build()));
+		mntmMute.addActionListener((ActionEvent e) -> { if (volumeListener.isPresent()) volumeListener.get().changeVolume(SoundPlayer.Volume.MUTE); });
 		mnVolume.add(mntmMute);
 		volumeControls.add(mntmMute);
 		
@@ -197,10 +201,18 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		mntmSettings.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.SETTINGS).setOrigin(e).build()));
 		optionsMenu.add(mntmSettings);
 	}
-	
+
+    @Override
+    public void setCloseOperation(Runnable exit){
+        exitOp = Optional.of(exit);
+    }
+
+    @Override
+    public void setVolumeListener(VolumeChangeListener listen){
+        volumeListener = Optional.of(listen);
+    }
+
 	private void createInternalFeedback() {
-		InternalEventHandler.registerInternalListener(InternalEventCheckGate.responseWith(() -> SoundPlayer.playSound(SpearsSound.RINGING_LONG)).forAction(MenuCommandEvent.Action.VOLUME_CHANGE));
-		
 		Component[] menus = new Component[this.getMenuCount()];
 		for (int i = 0; i < menus.length; i++){
 			menus[i] = this.getMenu(i);

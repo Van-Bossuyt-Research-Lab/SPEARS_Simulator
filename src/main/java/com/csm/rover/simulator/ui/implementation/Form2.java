@@ -13,7 +13,7 @@ class Form2 extends JFrame implements Application {
 
 	private static final long serialVersionUID = -9008675264187922065L;
 
-	Form2() {
+	Form2(EmbeddedMenuBar menuBar) {
 //		SoundPlayer.playSound(SpearsSound.HELLO);  TODO add back later so volume controls work correctly
 		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/SPEARS icon.png")));
@@ -24,7 +24,6 @@ class Form2 extends JFrame implements Application {
 		setTitle("SPEARS Simulator");
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		
-		EmbeddedMenuBar menuBar = new EmbeddedMenuBar();
 		setJMenuBar(menuBar);
 			
 		EmbeddedDesktop desktopPane = new EmbeddedDesktop();

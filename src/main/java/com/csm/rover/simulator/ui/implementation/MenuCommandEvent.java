@@ -1,10 +1,10 @@
-package com.csm.rover.simulator.ui.events;
+package com.csm.rover.simulator.ui.implementation;
 
 import java.awt.event.ActionEvent;
 
-public class MenuCommandEvent {
+class MenuCommandEvent {
 	
-	public static enum Action { OPEN, NEW_SIM, VIEW_LOG, EXIT, NEW_FRAME, GRID_CHANGE, DIVIDER_CHANGE, SHOW_FRAME, VOLUME_CHANGE, SETTINGS }
+	static enum Action { OPEN, NEW_SIM, VIEW_LOG, NEW_FRAME, GRID_CHANGE, DIVIDER_CHANGE, SHOW_FRAME,  SETTINGS }
 	
 	private Action action;
 	private Object value;
@@ -12,11 +12,11 @@ public class MenuCommandEvent {
 	
 	private MenuCommandEvent() {}
 	
-	public static Builder builder(){
+	static Builder builder(){
 		return new Builder();
 	}
 	
-	public static class Builder {
+	static class Builder {
 		
 		private MenuCommandEvent event;
 		

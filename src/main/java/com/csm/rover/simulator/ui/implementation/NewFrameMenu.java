@@ -1,8 +1,5 @@
 package com.csm.rover.simulator.ui.implementation;
 
-import com.csm.rover.simulator.ui.events.InternalEventHandler;
-import com.csm.rover.simulator.ui.events.MenuCommandEvent;
-
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.event.ActionEvent;

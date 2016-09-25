@@ -1,10 +1,8 @@
-package com.csm.rover.simulator.ui.events;
+package com.csm.rover.simulator.ui.implementation;
 
-import com.csm.rover.simulator.ui.implementation.EmbeddedFrame;
+class EmbeddedFrameEvent {
 
-public class EmbeddedFrameEvent {
-
-	public static enum Action { ADDED, MOVED, RESIZED, MAXIMIZED, ICONIFIED, CLOSED }
+	static enum Action { ADDED, MOVED, RESIZED, MAXIMIZED, ICONIFIED, CLOSED }
 	
 	private Action action;
 	private EmbeddedFrame component;
@@ -13,11 +11,11 @@ public class EmbeddedFrameEvent {
 	
 	private EmbeddedFrameEvent() {}
 	
-	public static Builder builder(){
+	static Builder builder(){
 		return new Builder();
 	}
 
-	public static class Builder {
+	static class Builder {
 		
 		private EmbeddedFrameEvent event;
 		

@@ -7,6 +7,8 @@ import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import com.csm.rover.simulator.ui.implementation.UiFactory;
+import com.csm.rover.simulator.ui.sound.SoundPlayer;
+import com.csm.rover.simulator.ui.visual.MainMenu;
 import com.csm.rover.simulator.ui.visual.PopUp;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +35,7 @@ public class Admin {
 		Admin admin = getInstance();
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");
-            UiFactory.getApplication().show();
+            admin.setUpGUI();
             File config = new File("config.json");
 			if (config.exists() &&
                     UiFactory.newPopUp()
@@ -69,6 +71,14 @@ public class Admin {
 		}
 	}
 
+    private void setUpGUI() {
+        MainMenu menu = UiFactory.getMainMenu();
+        menu.setCloseOperation(this::shutDownSimulator);
+        menu.setVolumeListener(SoundPlayer::setVolume);
+
+        UiFactory.getApplication().show();
+    }
+
     private static String getFileType(File file){
         String filename = file.getName();
         return filename.substring(filename.lastIndexOf(".")+1, filename.length());
@@ -87,9 +97,14 @@ public class Admin {
         return singleton_instance.get();
     }
 
-	public void beginSimulation(RunConfiguration config){
+	private void beginSimulation(RunConfiguration config){
         //TODO begin simulation
 	}
+
+    private void shutDownSimulator(){
+        LOG.log(Level.INFO, "Exiting SPEARS");
+        System.exit(0);
+    }
 
 	private ArrayList<RoverObject> buildRoversFromConfig(ArrayList<PlatformConfig> configs){
 		ArrayList<RoverObject> out = new ArrayList<>();

@@ -1,12 +1,12 @@
-package com.csm.rover.simulator.ui.events;
+package com.csm.rover.simulator.ui.implementation;
 
-public class InternalEventCheckGate {
+class InternalEventCheckGate {
 	
-	public static Builder responseWith(Runnable response){
+	static Builder responseWith(Runnable response){
 		return new Builder(response);
 	}
 
-	public static class Builder {
+	static class Builder {
 		
 		private final Runnable response;
 		
