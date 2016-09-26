@@ -19,8 +19,9 @@ class UiConfiguration {
     private static Optional<UiConfiguration> instance = Optional.empty();
 
     static {
-        configFile = new File("ui.config.json");
+        configFile = new File("ui.json");
         load();
+        setupListeners();
     }
 
     private static void load(){
@@ -38,7 +39,10 @@ class UiConfiguration {
         }
         //Load the default values
         instance = Optional.of(new UiConfiguration(
-                "HIGH"
+                "HIGH",
+                1,
+                1,
+                0.5
         ));
     }
 
@@ -58,14 +62,59 @@ class UiConfiguration {
         }
     }
 
+    private static void setupListeners(){
+        InternalEventHandler.registerInternalListener((MenuCommandEvent e) -> {
+            if (e.getAction().equals(MenuCommandEvent.Action.GRID_CHANGE)){
+                char side = ((String)e.getValue()).charAt(0);
+                int numb = Integer.parseInt(((String)e.getValue()).charAt(1)+"");
+                if (side == 'R'){
+                    changeDesktopDivsRight(numb);
+                }
+                else if (side == 'L'){
+                    changeDesktopDivsLeft(numb);
+                }
+            }
+        });
+    }
+
     private String volume;
+    private int desktop_divs_left, desktop_divs_right;
+    private double desktop_center_line;
 
     @JsonCreator
-    public UiConfiguration(@JsonProperty("volume") String volume){
+    public UiConfiguration(
+            @JsonProperty("volume") String volume,
+            @JsonProperty("desktop_divs_left") int desktop_divs_left,
+            @JsonProperty("desktop_divs_right") int desktop_divs_right,
+            @JsonProperty("desktop_center_line") double desktop_center_line
+    ){
         if (instance.isPresent()){
             throw new IllegalStateException("UiConfiguration has already been initialized, cannot make 2 copies");
         }
         this.volume = volume;
+        this.desktop_divs_left = desktop_divs_left;
+        this.desktop_divs_right = desktop_divs_right;
+        this.desktop_center_line = desktop_center_line;
+    }
+
+    @JsonProperty("volume")
+    public String jsonVolume(){
+        return volume;
+    }
+
+    @JsonProperty("desktop_divs_left")
+    public int jsonDesktopDivsLeft(){
+        return desktop_divs_left;
+    }
+
+    @JsonProperty("desktop_divs_right")
+    public int jsonDesktopDivsRight(){
+        return desktop_divs_right;
+    }
+
+    @JsonProperty("desktop_center_line")
+    public double jsonDesktopCetnerLine(){
+        return desktop_center_line;
     }
 
     static SoundPlayer.Volume getVolume(){
@@ -80,11 +129,6 @@ class UiConfiguration {
                 LOG.log(Level.WARN, "Unknown volume value \'{}\' loaded", instance.get().volume);
                 return SoundPlayer.Volume.MUTE;
         }
-    }
-
-    @JsonProperty("volume")
-    public String jsonVolume(){
-        return volume;
     }
 
     static void setVolume(SoundPlayer.Volume level){
@@ -102,6 +146,33 @@ class UiConfiguration {
                 LOG.log(Level.WARN, "null volume set in config");
                 return;
         }
+        updateSave();
+    }
+
+    public static int getDesktopDivsLeft(){
+        return instance.get().desktop_divs_left;
+    }
+
+    public static void changeDesktopDivsLeft(int ddl){
+        instance.get().desktop_divs_left = ddl;
+        updateSave();
+    }
+
+    public static int getDesktopDivsRight(){
+        return instance.get().desktop_divs_right;
+    }
+
+    public static void changeDesktopDivsRight(int ddr){
+        instance.get().desktop_divs_right = ddr;
+        updateSave();
+    }
+
+    public static double getDesktopCenterLine(){
+        return instance.get().desktop_center_line;
+    }
+
+    public static void changeDesktopCenterLine(double dcl){
+        instance.get().desktop_center_line = dcl;
         updateSave();
     }
 

@@ -93,7 +93,6 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		leftDivisionSelection.add(radioButtonMenuItem_5);
 		
 		JRadioButtonMenuItem radioButtonMenuItem_4 = new JRadioButtonMenuItem("1");
-		radioButtonMenuItem_4.setSelected(true);
 		mnLeftSide.add(radioButtonMenuItem_4);
 		radioButtonMenuItem_4.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.GRID_CHANGE).setValue("L1").setOrigin(e).build()));
 		leftDivisionSelection.add(radioButtonMenuItem_4);
@@ -107,6 +106,21 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		mnLeftSide.add(radioButtonMenuItem_7);
 		radioButtonMenuItem_7.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.GRID_CHANGE).setValue("L3").setOrigin(e).build()));
 		leftDivisionSelection.add(radioButtonMenuItem_7);
+
+        switch (UiConfiguration.getDesktopDivsLeft()){
+            case 0:
+                radioButtonMenuItem_5.setSelected(true);
+                break;
+            case 1:
+                radioButtonMenuItem_4.setSelected(true);
+                break;
+            case 2:
+                radioButtonMenuItem_6.setSelected(true);
+                break;
+            case 3:
+                radioButtonMenuItem_7.setSelected(true);
+                break;
+        }
 		
 		JMenu mnRightSide = new JMenu("Right Side");
 		mnDivisions.add(mnRightSide);
@@ -114,15 +128,12 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		ButtonGroup rightDivisionSelection = new ButtonGroup();
 		
 		JRadioButtonMenuItem radioButtonMenuItem = new JRadioButtonMenuItem("0");
-		mnRightSide.add(radioButtonMenuItem);
-
 		radioButtonMenuItem.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.GRID_CHANGE).setValue("R0").setOrigin(e).build()));
-		rightDivisionSelection.add(radioButtonMenuItem);
+        mnRightSide.add(radioButtonMenuItem);
+        rightDivisionSelection.add(radioButtonMenuItem);
 		
 		JRadioButtonMenuItem radioButtonMenuItem_1 = new JRadioButtonMenuItem("1");
-		radioButtonMenuItem_1.setSelected(true);
 		mnRightSide.add(radioButtonMenuItem_1);
-
 		radioButtonMenuItem_1.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.GRID_CHANGE).setValue("R1").setOrigin(e).build()));
 		rightDivisionSelection.add(radioButtonMenuItem_1);
 		
@@ -132,11 +143,26 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		rightDivisionSelection.add(radioButtonMenuItem_2);
 		
 		JRadioButtonMenuItem radioButtonMenuItem_3 = new JRadioButtonMenuItem("3");
-		mnRightSide.add(radioButtonMenuItem_3);
 		radioButtonMenuItem_3.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.GRID_CHANGE).setValue("R3").setOrigin(e).build()));
-		rightDivisionSelection.add(radioButtonMenuItem_3);
+        mnRightSide.add(radioButtonMenuItem_3);
+        rightDivisionSelection.add(radioButtonMenuItem_3);
+
+        switch (UiConfiguration.getDesktopDivsRight()){
+            case 0:
+                radioButtonMenuItem.setSelected(true);
+                break;
+            case 1:
+                radioButtonMenuItem_1.setSelected(true);
+                break;
+            case 2:
+                radioButtonMenuItem_2.setSelected(true);
+                break;
+            case 3:
+                radioButtonMenuItem_3.setSelected(true);
+                break;
+        }
 		
-		JMenuItem mntmCetnerLine = new JMenuItem("Cetner Line");
+		JMenuItem mntmCetnerLine = new JMenuItem("Center Line");
 		mntmCetnerLine.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.DIVIDER_CHANGE).setOrigin(e).build()));
 		mnArrangeGrid.add(mntmCetnerLine);
 		
@@ -178,7 +204,6 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		JRadioButtonMenuItem mntmHigh = new JRadioButtonMenuItem("High");
 		mntmHigh.setIcon(getMenuIcon("/gui/speaker_loud.png"));
 		mntmHigh.addActionListener((ActionEvent e) -> fireVolumeChange(SoundPlayer.Volume.HIGH));
-		mntmHigh.setSelected(true);
 		mnVolume.add(mntmHigh);
 		volumeControls.add(mntmHigh);
 		

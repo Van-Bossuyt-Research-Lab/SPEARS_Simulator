@@ -36,6 +36,10 @@ class EmbeddedDesktop extends JDesktopPane {
 	}
 
 	private void setUpWells(){
+        left_divs = UiConfiguration.getDesktopDivsLeft();
+        right_divs = UiConfiguration.getDesktopDivsRight();
+        dividing_line = UiConfiguration.getDesktopCenterLine();
+
 		comps_in_wells = new ArrayList<>();
 		hasImage = true;
 		background = ImageFunctions.getImage("/images/spears logo.png");
@@ -72,6 +76,7 @@ class EmbeddedDesktop extends JDesktopPane {
 							c.setLocation((int) (getWidth()*dividing_line+1), c.getY());
 						}
 					}
+                    UiConfiguration.changeDesktopCenterLine(dividing_line);
 					repaint();
 				}		
 			}
