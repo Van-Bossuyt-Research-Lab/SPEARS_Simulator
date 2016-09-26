@@ -177,22 +177,34 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		
 		JRadioButtonMenuItem mntmHigh = new JRadioButtonMenuItem("High");
 		mntmHigh.setIcon(getMenuIcon("/gui/speaker_loud.png"));
-		mntmHigh.addActionListener((ActionEvent e) -> { if (volumeListener.isPresent()) volumeListener.get().changeVolume(SoundPlayer.Volume.HIGH); });
+		mntmHigh.addActionListener((ActionEvent e) -> fireVolumeChange(SoundPlayer.Volume.HIGH));
 		mntmHigh.setSelected(true);
 		mnVolume.add(mntmHigh);
 		volumeControls.add(mntmHigh);
 		
 		JRadioButtonMenuItem mntmLow = new JRadioButtonMenuItem("Low");
 		mntmLow.setIcon(getMenuIcon("/gui/speaker_quiet.png"));
-		mntmLow.addActionListener((ActionEvent e) -> { if (volumeListener.isPresent()) volumeListener.get().changeVolume(SoundPlayer.Volume.LOW); });
+		mntmLow.addActionListener((ActionEvent e) -> fireVolumeChange(SoundPlayer.Volume.LOW));
 		mnVolume.add(mntmLow);
 		volumeControls.add(mntmLow);
 		
 		JRadioButtonMenuItem mntmMute = new JRadioButtonMenuItem("Mute");
 		mntmMute.setIcon(getMenuIcon("/gui/speaker_mute.png"));
-		mntmMute.addActionListener((ActionEvent e) -> { if (volumeListener.isPresent()) volumeListener.get().changeVolume(SoundPlayer.Volume.MUTE); });
+		mntmMute.addActionListener((ActionEvent e) -> fireVolumeChange(SoundPlayer.Volume.MUTE));
 		mnVolume.add(mntmMute);
 		volumeControls.add(mntmMute);
+
+        switch (UiConfiguration.getVolume()){
+            case HIGH:
+                mntmHigh.setSelected(true);
+                break;
+            case LOW:
+                mntmLow.setSelected(true);
+                break;
+            case MUTE:
+                mntmMute.setSelected(true);
+                break;
+        }
 		
 		optionsMenu.addSeparator();
 		
@@ -210,6 +222,14 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
     @Override
     public void setVolumeListener(VolumeChangeListener listen){
         volumeListener = Optional.of(listen);
+        listen.changeVolume(UiConfiguration.getVolume());
+    }
+
+    private void fireVolumeChange(SoundPlayer.Volume level){
+        UiConfiguration.setVolume(level);
+        if (volumeListener.isPresent()){
+            volumeListener.get().changeVolume(level);
+        }
     }
 
 	private void createInternalFeedback() {
