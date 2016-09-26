@@ -246,7 +246,13 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 				addButtonClicks(((JMenu)menu).getMenuComponents());
 			}
 			else if (menu instanceof JMenuItem){
-				((JMenuItem)menu).addActionListener((ActionEvent) -> SoundPlayer.playSound(SpearsSound.BEEP_LOW));
+                JMenuItem jmenu = ((JMenuItem)menu);
+				if (!jmenu.getText().equals("Exit")) {
+                    jmenu.addActionListener((ActionEvent) -> SoundPlayer.playSound(SpearsSound.BEEP_LOW));
+                }
+                else {
+                    jmenu.addActionListener((ActionEvent e) -> SoundPlayer.playSound(SpearsSound.GOODBYE));
+                }
 			}
 		}
 	}

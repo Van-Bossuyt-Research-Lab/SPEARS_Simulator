@@ -50,7 +50,7 @@ public class SoundPlayer {
 				gainControl.setValue(volume);
 			clip.start();
 		} 
-		catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
+		catch (LineUnavailableException | UnsupportedAudioFileException | IOException | NullPointerException e) {
 			LOG.log(Level.ERROR, "Sound Failed to Play", e);
 		}
 	}

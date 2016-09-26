@@ -1,5 +1,7 @@
 package com.csm.rover.simulator.ui.implementation;
 
+import com.csm.rover.simulator.ui.sound.SoundPlayer;
+import com.csm.rover.simulator.ui.sound.SpearsSound;
 import com.csm.rover.simulator.ui.visual.PopUp;
 
 import javax.swing.*;
@@ -50,6 +52,7 @@ class PopUpImpl extends JDialog implements PopUp {
 					}
 				}
 			});
+            optionBtns[x].addActionListener((ActionEvent e) -> SoundPlayer.playSound(SpearsSound.BEEP_LOW));
 			this.add(optionBtns[x]);
 			x++;
 		}
@@ -268,6 +271,7 @@ class PopUpImpl extends JDialog implements PopUp {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int)((screenSize.getWidth() - this.getSize().getWidth()) / 2), (int)((screenSize.getHeight() - this.getSize().getHeight()) / 2));
 		this.setVisible(true);
+        SoundPlayer.playSound(SpearsSound.HELLO);
 	}
 	
 	private int getButtonY(){
