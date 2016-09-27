@@ -170,26 +170,21 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		showMenu.setIcon(getMenuIcon("/gui/present.png"));
 		viewMenu.add(showMenu);
 		
-		InternalEventHandler.registerInternalListener(new EmbeddedFrameListener(){
-			@Override
-			public void frameChanged(EmbeddedFrameEvent e) {
-				if (e.getAction().equals(EmbeddedFrameEvent.Action.ADDED)){
-					showMenu.add(new FrameShowMenu(e.getComponent()));
-				}
-				else if (e.getAction().equals(EmbeddedFrameEvent.Action.CLOSED)){
-					for (java.awt.Component menuitem : showMenu.getMenuComponents()){
-						try {
-							FrameShowMenu menu = (FrameShowMenu)menuitem;
-							if (menu.getFrame() == e.getComponent()){
-								showMenu.remove(menuitem);
-							}
-						}
-						catch (ClassCastException ex){
-							continue;
-						}
-					}
-				}
-			}
+		InternalEventHandler.registerInternalListener((EmbeddedFrameEvent e) -> {
+            if (e.getAction().equals(EmbeddedFrameEvent.Action.ADDED)){
+                showMenu.add(new FrameShowMenu(e.getComponent()));
+            }
+            else if (e.getAction().equals(EmbeddedFrameEvent.Action.CLOSED)) {
+                for (java.awt.Component menuitem : showMenu.getMenuComponents()) {
+                    try {
+                        FrameShowMenu menu = (FrameShowMenu) menuitem;
+                        if (menu.getFrame() == e.getComponent()) {
+                            showMenu.remove(menuitem);
+                        }
+                    }
+                    catch (ClassCastException ex) {}
+                }
+            }
 		});
 		
 		JMenu mnTools = new JMenu("Tools");

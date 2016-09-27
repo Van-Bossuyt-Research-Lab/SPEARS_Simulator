@@ -100,8 +100,8 @@ class EmbeddedDesktop extends JDesktopPane {
 	}		
 	
 	private void setUpEventListeners() {
-		InternalEventHandler.registerInternalListener((EmbeddedFrameEvent e) -> frameEventHandler(e));
-		InternalEventHandler.registerInternalListener((MenuCommandEvent e) -> menuEventHandler(e));
+		InternalEventHandler.registerInternalListener(this::frameEventHandler);
+		InternalEventHandler.registerInternalListener(this::menuEventHandler);
 	}
 
 	@Override

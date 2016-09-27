@@ -10,6 +10,7 @@ import com.csm.rover.simulator.ui.implementation.UiFactory;
 import com.csm.rover.simulator.ui.sound.SoundPlayer;
 import com.csm.rover.simulator.ui.visual.MainMenu;
 import com.csm.rover.simulator.ui.visual.PopUp;
+import com.csm.rover.simulator.ui.visual.StartupWindow;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,6 +52,10 @@ public class Admin {
 					System.exit(2);
 				}
 			}
+            else {
+                StartupWindow startup = UiFactory.newStartUpWindow();
+                startup.display();
+            }
 		}
 		else {
 			LOG.log(Level.INFO, "Stating simulator in Command Line mode");

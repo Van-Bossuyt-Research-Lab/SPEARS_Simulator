@@ -13,6 +13,8 @@ class Form2 extends JFrame implements Application {
 
 	private static final long serialVersionUID = -9008675264187922065L;
 
+    final EmbeddedDesktop desktop;
+
 	Form2(EmbeddedMenuBar menuBar) {
 //		SoundPlayer.playSound(SpearsSound.HELLO);  TODO add back later so volume controls work correctly
 		
@@ -26,9 +28,9 @@ class Form2 extends JFrame implements Application {
 		
 		setJMenuBar(menuBar);
 			
-		EmbeddedDesktop desktopPane = new EmbeddedDesktop();
-		desktopPane.setBackground(new Color(250, 255, 255));
-		setContentPane(desktopPane);
+		desktop = new EmbeddedDesktop();
+		desktop.setBackground(new Color(250, 255, 255));
+		setContentPane(desktop);
 	}
 	
 }

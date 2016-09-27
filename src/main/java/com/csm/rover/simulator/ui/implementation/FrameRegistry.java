@@ -1,15 +1,11 @@
 package com.csm.rover.simulator.ui.implementation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
+
+import java.util.*;
 
 public class FrameRegistry {
 	private static final Logger LOG = LogManager.getLogger(FrameRegistry.class);
@@ -27,12 +23,16 @@ public class FrameRegistry {
 		Set<Class<? extends EmbeddedFrame>> frameclasses = reflect.getSubTypesOf(EmbeddedFrame.class);
         for (Class<? extends EmbeddedFrame> frameclass : frameclasses){
         	FrameMarker marker = frameclass.getAnnotation(FrameMarker.class);
-        	String name = marker == null ? getClassName(frameclass) : marker.name();
+            if (marker == null){
+                continue;
+            }
+        	String name = marker.name();
         	try {
 				frameclass.newInstance();
 	        	frameList.put(name, frameclass);
 	        	LOG.log(Level.INFO, "Registered EmbeddedFrame \"{}\" under \"{}\"", frameclass.toString(), name);
-			} catch (InstantiationException | IllegalAccessException e) {
+			}
+            catch (InstantiationException | IllegalAccessException e) {
 				LOG.log(Level.WARN, "Class {} cannot be instantiated, requires default constructor", name);
 			}
         }

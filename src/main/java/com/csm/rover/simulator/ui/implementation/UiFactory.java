@@ -3,6 +3,7 @@ package com.csm.rover.simulator.ui.implementation;
 import com.csm.rover.simulator.ui.visual.Application;
 import com.csm.rover.simulator.ui.visual.MainMenu;
 import com.csm.rover.simulator.ui.visual.PopUp;
+import com.csm.rover.simulator.ui.visual.StartupWindow;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,6 +48,10 @@ public class UiFactory {
 
     public static PopUp newPopUp(){
         return new PopUpImpl();
+    }
+
+    public static StartupWindow newStartUpWindow(){
+        return new StartupWindowImpl();
     }
 
 }
