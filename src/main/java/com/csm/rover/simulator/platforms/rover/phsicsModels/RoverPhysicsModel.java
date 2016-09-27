@@ -86,14 +86,46 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
 	protected double battery_temperature = 30; //*c
 	protected double[] motor_temp = { 30, 30, 30, 30 }; //*c
 
-	protected DecimalPoint location = new DecimalPoint(); //m x m from center of map
-	protected double direction = 0; //rad off of positive X
-	protected double speed = 0; //m/s
-	protected double angular_velocity = 0; //rad/s
-	protected double acceleration = 0; //m/s^2
-	protected double angular_acceleration = 0; //rad/s^2
-	protected double slip_acceleration = 0; //m/s^2
-	protected double slip_velocity = 0; //m/s
+	protected DecimalPoint location = new DecimalPoint(); //m x m from center of map (intermediate value for RK4)
+    protected DecimalPoint location2 = new DecimalPoint(); //m x m from center of map (intermediate value for RK4)
+    protected DecimalPoint location3 = new DecimalPoint(); //m x m from center of map (intermediate value for RK4)
+    protected DecimalPoint location4 = new DecimalPoint(); //m x m from center of map (intermediate value for RK4)
+    protected DecimalPoint locationf = new DecimalPoint(); //m x m from center of map
+	protected double direction = 0; //rad off of positive X(intermediate value for RK4)
+    protected double direction2 = 0; //rad off of positive X (intermediate value for RK4)
+    protected double direction3 = 0; //rad off of positive X(intermediate value for RK4)
+    protected double direction4 = 0; //rad off of positive X(intermediate value for RK4)
+    protected double directionf = 0; //rad off of positive X
+	protected double speed = 0; //m/s(intermediate value for RK4)
+    protected double speed2 = 0; //m/s(intermediate value for RK4)
+    protected double speed3 = 0; //m/s(intermediate value for RK4)
+    protected double speed4 = 0; //m/s(intermediate value for RK4)
+    protected double speedf = 0; //m/s
+	protected double angular_velocity = 0; //rad/s(intermediate value for RK4)
+    protected double angular_velocity2 = 0; //rad/s(intermediate value for RK4)
+    protected double angular_velocity3 = 0; //rad/s(intermediate value for RK4)
+    protected double angular_velocity4 = 0; //rad/s(intermediate value for RK4)
+    protected double angular_velocityf = 0; //rad/s
+	protected double acceleration = 0; //m/s^2(intermediate value for RK4)
+    protected double acceleration2 = 0; //m/s^2(intermediate value for RK4)
+    protected double acceleration3 = 0; //m/s^2(intermediate value for RK4)
+    protected double acceleration4 = 0; //m/s^2(intermediate value for RK4)
+    protected double accelerationf = 0; //m/s^2
+	protected double angular_acceleration = 0; //rad/s^2(intermediate value for RK4)
+    protected double angular_acceleration2 = 0; //rad/s^2(intermediate value for RK4)
+    protected double angular_acceleration3 = 0; //rad/s^2(intermediate value for RK4)
+    protected double angular_acceleration4 = 0; //rad/s^2(intermediate value for RK4)
+    protected double angular_accelerationf = 0; //rad/s^2
+	protected double slip_acceleration = 0; //m/s^2(intermediate value for RK4)
+    protected double slip_acceleration2 = 0; //m/s^2(intermediate value for RK4)
+    protected double slip_acceleration3 = 0; //m/s^2(intermediate value for RK4)
+    protected double slip_acceleration4 = 0; //m/s^2(intermediate value for RK4)
+    protected double slip_accelerationf = 0; //m/s^2
+	protected double slip_velocity = 0; //m/s(intermediate value for RK4)
+    protected double slip_velocity2 = 0; //m/s(intermediate value for RK4)
+    protected double slip_velocity3 = 0; //m/s(intermediate value for RK4)
+    protected double slip_velocity4 = 0; //m/s(intermediate value for RK4)
+    protected double slip_velocityf = 0; //m/s
 
 	public RoverPhysicsModel() {
         super("Rover");
@@ -279,28 +311,57 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
 		slip[BL] = friction_s * (wheel_speed[BL]*wheel_radius - speed);
 		slip[BR] = friction_s * (wheel_speed[BR]*wheel_radius - speed);
 		// Acceleration changes based on forces
-		acceleration = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - MAP.getGravity()*Math.sin(MAP.getSlopeAt(location, direction));
-		angular_acceleration = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
 		// Speed changes based on Acceleration
-		speed += acceleration * time_step;
-		angular_velocity += angular_acceleration * time_step;
-			//System.out.println(round(wheel_speed[FL]) + " rad/s -> " + round(slip[FL]) + " N");
-			//System.out.println(round(wheel_speed[FR]) + " rad/s -> " + round(slip[FR]) + " N -> " + round(acceleration) + " m/s^2 -> " + round(speed) + " m/s");
-			//System.out.println(round(wheel_speed[BL]) + " rad/s -> " + round(slip[BL]) + " N -> " + round(angular_acceleration) + " rad/s^2 -> " + round(angular_velocity) + " rad/s");
-			//System.out.println(round(wheel_speed[BR]) + " rad/s -> " + round(slip[BR]) + " N");
-		// Calculate the amount the rover slips sideways
-		slip_acceleration = (-friction_gr*slip_velocity*4 - rover_mass*MAP.getGravity()*Math.sin(MAP.getCrossSlopeAt(location, direction)) / rover_mass);
-		slip_velocity += slip_acceleration * time_step;
+		speed2 = speed + acceleration * time_step*0.5;
+		angular_velocity2 = angular_velocity+angular_acceleration * time_step*0.5;
+        slip_velocity2 += slip_acceleration * time_step*0.5;;
 		// Calculate new location
-		location.offsetThis(speed*time_step*Math.cos(direction), speed*time_step*(Math.sin(direction)));
-		//TODO													  + here??
-		location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
-		direction = (direction + angular_velocity*time_step + 2*Math.PI) % (2*Math.PI);
+        location2= location;
+        location2.offsetThis(speed*time_step*0.5*Math.cos(direction), speed*time_step*0.5*(Math.sin(direction)));
+		location2.offsetThis(slip_velocity*time_step*0.5*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*0.5*(Math.sin(direction-Math.PI/2.0)));
+		direction2 = (direction + angular_velocity*time_step*0.5 + 2*Math.PI) % (2*Math.PI);
+        acceleration2 = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - MAP.getGravity()*Math.sin(MAP.getSlopeAt(location2, direction2));
+        angular_acceleration2 = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
+        slip_acceleration2 = (-friction_gr*slip_velocity2*4 - rover_mass*MAP.getGravity()*Math.sin(MAP.getCrossSlopeAt(location2, direction2)) / rover_mass);
+
+        // Speed changes based on Acceleration
+        speed3 = speed2 + acceleration2 * time_step*0.5;
+        angular_velocity3 = angular_velocity2+angular_acceleration2 * time_step*0.5;
+        slip_velocity3 = slip_acceleration2 * time_step*0.5;;
+        // Calculate new location
+        location3= location2;
+        location3.offsetThis(speed2*time_step*0.5*Math.cos(direction2), speed2*time_step*0.5*(Math.sin(direction2)));
+        location3.offsetThis(slip_velocity2*time_step*0.5*Math.cos(direction2-Math.PI/2.0), slip_velocity2*time_step*0.5*(Math.sin(direction2-Math.PI/2.0)));
+        direction3 = (direction2 + angular_velocity2*time_step*0.5 + 2*Math.PI) % (2*Math.PI);
+        acceleration3 = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - MAP.getGravity()*Math.sin(MAP.getSlopeAt(location3, direction3));
+        angular_acceleration3 = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
+        slip_acceleration3 = (-friction_gr*slip_velocity3*4 - rover_mass*MAP.getGravity()*Math.sin(MAP.getCrossSlopeAt(location3, direction3)) / rover_mass);
+
+        speed4 = speed3 + acceleration3 * time_step*0.5;
+        angular_velocity4 = angular_velocity3+angular_acceleration3 * time_step*0.5;
+        slip_velocity4 = slip_acceleration3 * time_step*0.5;;
+        // Calculate new location
+        location4= location3;
+        location4.offsetThis(speed3*time_step*0.5*Math.cos(direction3), speed3*time_step*0.5*(Math.sin(direction3)));
+        location4.offsetThis(slip_velocity3*time_step*0.5*Math.cos(direction3-Math.PI/2.0), slip_velocity3*time_step*0.5*(Math.sin(direction3-Math.PI/2.0)));
+        direction4 = (direction3 + angular_velocity3*time_step*0.5 + 2*Math.PI) % (2*Math.PI);
+        acceleration4 = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - MAP.getGravity()*Math.sin(MAP.getSlopeAt(location3, direction4));
+        angular_acceleration4 = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
+        slip_acceleration4 = (-friction_gr*slip_velocity4*4 - rover_mass*MAP.getGravity()*Math.sin(MAP.getCrossSlopeAt(location4, direction4)) / rover_mass);
+
+        speedf = speed +(time_step/6.0)*(acceleration+2*acceleration2+2*acceleration3+acceleration4);
+        angular_velocityf = angular_velocity + (time_step/6.0)*(angular_acceleration+2*angular_acceleration2+2.0*angular_acceleration3+angular_acceleration4);
+        slip_velocityf = slip_velocity + (time_step/6.0)*(slip_acceleration+2*slip_acceleration2+2.0*slip_acceleration3+slip_acceleration4);
+        // Calculate new location
+        locationf= location;
+        location4.offsetThis(speed3*time_step*0.5*Math.cos(direction3), speed3*time_step*0.5*(Math.sin(direction3)));
+        location4.offsetThis(slip_velocity3*time_step*0.5*Math.cos(direction3-Math.PI/2.0), slip_velocity3*time_step*0.5*(Math.sin(direction3-Math.PI/2.0)));
+        direction4 = (direction3 + angular_velocity3*time_step*0.5 + 2*Math.PI) % (2*Math.PI);
 
         // update state
-        rov_state.set("x", location.getX());
-        rov_state.set("y", location.getY());
-        rov_state.set("direction", direction);
+        rov_state.set("x", locationf.getX());
+        rov_state.set("y", locationf.getY());
+        rov_state.set("direction", directionf);
         rov_state.set("motor_power", convertToDoubleArray(motor_power));
         rov_state.set("motor_state", convertToDoubleArray(motor_states));
         rov_state.set("motor_current", convertToDoubleArray(motor_current));
@@ -311,12 +372,12 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
         rov_state.set("battery_voltage", battery_voltage);
         rov_state.set("battery_current", battery_current);
         rov_state.set("battery_temp", battery_temperature);
-        rov_state.set("speed", speed);
-        rov_state.set("angular_velocity", angular_velocity);
-        rov_state.set("acceleration", acceleration);
-        rov_state.set("angular_acceleration", angular_acceleration);
-        rov_state.set("slip_acceleration", slip_acceleration);
-        rov_state.set("slip_velocity", slip_velocity);
+        rov_state.set("speed", speedf);
+        rov_state.set("angular_velocity", angular_velocityf);
+        rov_state.set("acceleration", accelerationf);
+        rov_state.set("angular_acceleration", angular_accelerationf);
+        rov_state.set("slip_acceleration", slip_accelerationf);
+        rov_state.set("slip_velocity", slip_velocityf);
 
         // report new location to map
         Admin.getCurrentInterface().updateRover(roverName, location, direction);
