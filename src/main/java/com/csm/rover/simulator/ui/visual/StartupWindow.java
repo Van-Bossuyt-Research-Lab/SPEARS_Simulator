@@ -14,6 +14,6 @@ public interface StartupWindow {
 
     void display();
 
-    void setStartUpAction(StartupEvent e);
+    void setStartUpAction(StartupListener e);
 
 }

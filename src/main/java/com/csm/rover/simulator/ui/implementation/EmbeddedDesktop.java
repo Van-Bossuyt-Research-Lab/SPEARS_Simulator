@@ -252,10 +252,8 @@ class EmbeddedDesktop extends JDesktopPane {
 	
 	private void setScrollsToTop(Component[] comps){
 		for (Component comp : comps){
-			System.out.println("Checking: "+comp.toString());
 			if (comp instanceof JScrollBar){
 				((JScrollBar)comp).setValue(((JScrollBar)comp).getMinimum());
-				System.out.println("Set: "+((JScrollBar)comp).toString() + String.format("  Min: %d  Max: %d  Val: %d", ((JScrollBar)comp).getMinimum(), ((JScrollBar)comp).getMaximum(), ((JScrollBar)comp).getValue()));
 			}
 //			else if (comp instanceof JScrollPane){
 //				JScrollBar vert = ((JScrollPane)comp).getVerticalScrollBar();

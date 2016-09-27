@@ -242,6 +242,7 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
         minimizeBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                SoundPlayer.playSound(SpearsSound.DROPPING);
                 ((JFrame)UiFactory.getApplication()).setState(JFrame.ICONIFIED);
             }
         });
@@ -252,6 +253,7 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (exitOp.isPresent()){
+                    SoundPlayer.playSound(SpearsSound.GOODBYE);
                     exitOp.get().run();
                 }
             }

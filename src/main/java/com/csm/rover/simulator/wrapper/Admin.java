@@ -4,6 +4,7 @@ import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import com.csm.rover.simulator.ui.implementation.UiFactory;
@@ -53,8 +54,7 @@ public class Admin {
 				}
 			}
             else {
-                StartupWindow startup = UiFactory.newStartUpWindow();
-                startup.display();
+                admin.promptStartup();
             }
 		}
 		else {
@@ -82,6 +82,14 @@ public class Admin {
         menu.setVolumeListener(SoundPlayer::setVolume);
 
         UiFactory.getApplication().show();
+    }
+
+    private void promptStartup(){
+        StartupWindow startup = UiFactory.newStartUpWindow();
+        for (String type : PlatformRegistry.getTypes()) {
+            startup.registerPlatform(type);
+        }
+        startup.display();
     }
 
     private static String getFileType(File file){
