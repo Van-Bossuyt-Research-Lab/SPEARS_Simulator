@@ -8,6 +8,8 @@ import com.csm.rover.simulator.ui.visual.MainMenu;
 import javax.swing.*;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Optional;
 
 import static com.csm.rover.simulator.ui.implementation.ImageFunctions.getMenuIcon;
@@ -232,6 +234,29 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		mntmSettings.setIcon(getMenuIcon("/gui/gear_thick.png"));
 		mntmSettings.addActionListener((ActionEvent e) -> InternalEventHandler.fireInternalEvent(MenuCommandEvent.builder().setAction(MenuCommandEvent.Action.SETTINGS).setOrigin(e).build()));
 		optionsMenu.add(mntmSettings);
+
+        this.add(Box.createHorizontalGlue());
+        this.add(Box.createHorizontalGlue());
+
+        JMenu minimizeBtn = new JMenu("__");
+        minimizeBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                ((JFrame)UiFactory.getApplication()).setState(JFrame.ICONIFIED);
+            }
+        });
+        this.add(minimizeBtn);
+
+        JMenu closeBtn = new JMenu("\u2715");
+        closeBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (exitOp.isPresent()){
+                    exitOp.get().run();
+                }
+            }
+        });
+        this.add(closeBtn);
 	}
 
     @Override
