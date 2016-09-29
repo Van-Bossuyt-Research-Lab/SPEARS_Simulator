@@ -4,10 +4,10 @@ import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.EnvironmentPopulator;
 import com.csm.rover.simulator.environments.annotations.Populator;
 import com.csm.rover.simulator.environments.rover.TerrainMap;
+import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
 import javafx.geometry.Point3D;
 
-import java.awt.Point;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -25,13 +25,13 @@ public class AquaticTargetsPop extends EnvironmentPopulator {
         int size = ((TerrainMap)map).getSize();
         int targetCount = (int)(Math.pow(size, 3) / 100.0 * params.get("trgt_density"));
         Random rnd = new Random();
-        Set<Point3D> points = new HashSet<>();
+        Set<DecimalPoint3D> points = new HashSet<>();
         while (points.size() < targetCount){
-            points.add(new Point3D(rnd.nextInt(size), rnd.nextInt(size), rnd.nextInt(size)));
+            points.add(new DecimalPoint3D(rnd.nextInt(size), rnd.nextInt(size), rnd.nextInt(size)));
         }
         boolean mono = params.get("mono") == 1;
         RecursiveGridList<Double> out = RecursiveGridList.newGridList(Double.class, 3);
-        for (Point3D pnt : points){
+        for (DecimalPoint3D pnt : points){
             double value;
             if (mono){
                 value = 10;
@@ -69,7 +69,7 @@ public class AquaticTargetsPop extends EnvironmentPopulator {
                     value = 10;
                 }
             }
-            out.put(value, pnt.getX(), pnt.getY(), pnt.getZ());
+            out.put(value, pnt.roundX(), pnt.roundY(), pnt.roundZ());
         }
         return out;
     }

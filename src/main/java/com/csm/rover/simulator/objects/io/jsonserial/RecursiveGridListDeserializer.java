@@ -20,7 +20,7 @@ public class RecursiveGridListDeserializer extends JsonDeserializer<RecursiveGri
         for (int i = 0; i < valuesNode.size(); i++){
             JsonNode valueNode = valuesNode.get(i);
             JsonNode coordsNode = valueNode.get("coordinates");
-            double[] coords = new double[layers];
+            int[] coords = new int[layers];
             for (int j = 0; j < layers; j++){
                 coords[j] = coordsNode.get(j).asInt();
             }

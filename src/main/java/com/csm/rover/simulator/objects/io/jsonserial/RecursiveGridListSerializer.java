@@ -15,12 +15,12 @@ public class RecursiveGridListSerializer extends JsonSerializer<RecursiveGridLis
     public void serialize(RecursiveGridList gridList, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeNumberField("layers", gridList.getDimension());
-        Set<double[]> keys = gridList.keySet();
+        Set<int[]> keys = gridList.keySet();
         jsonGenerator.writeArrayFieldStart("values");
-        for (double[] key : keys){
+        for (int[] key : keys){
             jsonGenerator.writeStartObject();
             jsonGenerator.writeArrayFieldStart("coordinates");
-            for (double i : key){
+            for (Integer i : key){
                 jsonGenerator.writeNumber(i);
             }
             jsonGenerator.writeEndArray();
