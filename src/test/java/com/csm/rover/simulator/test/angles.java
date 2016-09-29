@@ -11,7 +11,7 @@ public class angles {
 	private static Globals GLOBAL;
 	
 	@BeforeClass
-	static void beforeSetUp(){
+	public static void beforeSetUp(){
 		GLOBAL = Globals.getInstance();
 	}
 	

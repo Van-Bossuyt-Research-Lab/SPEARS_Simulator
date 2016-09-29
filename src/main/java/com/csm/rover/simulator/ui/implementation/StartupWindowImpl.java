@@ -8,15 +8,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 class StartupWindowImpl extends EmbeddedFrame implements StartupWindow {
 
     private JPanel content, platformsPnl;
+    private Map<String, TypeDisplayPanel> platformDisplays;
 
     private Optional<StartupListener> startupAction = Optional.empty();
 
-    StartupWindowImpl(){
+    public StartupWindowImpl(){
+        platformDisplays = new TreeMap<>();
         initialize();
     }
 
@@ -42,7 +46,9 @@ class StartupWindowImpl extends EmbeddedFrame implements StartupWindow {
 
     @Override
     public void registerPlatform(String platform) {
-        platformsPnl.add(new PlatformDisplayPanel(platform));
+        TypeDisplayPanel display = new TypeDisplayPanel(platform);
+        platformsPnl.add(display);
+        platformDisplays.put(platform, display);
     }
 
     @Override
@@ -74,29 +80,6 @@ class StartupWindowImpl extends EmbeddedFrame implements StartupWindow {
     private PlatformConfig getConfiguration(){
         //TODO
         return null;
-    }
-
-}
-
-class PlatformDisplayPanel extends JPanel {
-
-    PlatformDisplayPanel(String platform){
-
-        this.setOpaque(false);
-        this.setLayout(new GridLayout(10, 1, 2, 0));
-
-        JLabel title = new JLabel(platform.toUpperCase());
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setFont(new Font(title.getFont().getName(), Font.BOLD, title.getFont().getSize()+2));
-        this.add(title, 0, 0);
-
-        JLabel enviroTitle = new JLabel("Environment:");
-        this.add(enviroTitle, 0, 1);
-
-        JLabel enviroSet = new JLabel("<html><u>Set Up Environment...</u></html>");
-        enviroSet.setForeground(Color.BLUE);
-        enviroSet.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.add(enviroSet, 0, 2);
     }
 
 }
