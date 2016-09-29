@@ -3,6 +3,7 @@ import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.annotations.Map;
 import com.csm.rover.simulator.objects.ArrayGrid3D;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -38,8 +39,7 @@ public class AquaticMap extends EnvironmentMap {
 
     @JsonCreator
     public AquaticMap(@JsonProperty("size") int size, @JsonProperty("detail") int detail, @JsonProperty("SubMap") FloatArrayArrayGrid values) {
-        this(size, detail);
-        checkSize();
+        this(size, detail, (ArrayGrid3D)values);
     }
 
     public AquaticMap(int size, int detail, ArrayGrid3D values) {
@@ -95,7 +95,7 @@ public class AquaticMap extends EnvironmentMap {
         return min_val.get();
     }
 
-    private Point3D getMapSquare(DecimalPoint loc) { // says which display square a given coordinate falls in
+    private Point3D getMapSquare(DecimalPoint3D loc) { // says which display square a given coordinate falls in
         int shift = SubMap.getWidth() / (detail * 2);
         double x = loc.getX() + shift;
         double y = shift - loc.getY();
@@ -106,34 +106,11 @@ public class AquaticMap extends EnvironmentMap {
         return new Point3D(outx, outy, outz);
     }
 
-    private Point3D getGridSquare(DecimalPoint loc) {
+    private Point3D getGridSquare(DecimalPoint3D loc) {
         Point3D square = getMapSquare(loc);
         return new Point3D(square.getX() / 3, square.getY() / 3, square.getZ()/3);
     }
-    /*
-        //returns the height of the map at the given point
-        public double getHeightAt(DecimalPoint loc) {
-            Point3D mapSquare = getMapSquare(loc);
-            int x = (int) mapSquare.getX();
-            int y = (int) mapSquare.getY();
-            int z = (int) mapSquare.getZ();
-            DecimalPoint lifePnt = new DecimalPoint(loc.getX() + getSize() / 2.0, getSize() / 2.0 - loc.getY());
-            double locx = ((int) ((lifePnt.getX() - (int) lifePnt.getX()) * 1000) % (1000 / detail)) / 1000.0 * detail;
-            double locy = ((int) ((lifePnt.getY() - (int) lifePnt.getY()) * 1000) % (1000 / detail)) / 1000.0 * detail;
-            double locz = ((int) ((lifePnt.getZ() - (int) lifePnt.getZ()) * 1000) % (1000 / detail)) / 1000.0 * detail;
 
-            return getIntermediateValue(SubMap.get(x, y, z), SubMap.get(x + 1, y, z), SubMap.get(x, y + 1, z), SubMap.get(x + 1, y + 1, z), locx, locy, locz);
-        }
-        private double getIntermediateValue(Object topleft, Object topright, Object bottomleft, Object bottomright, double relativex, double relativey, double relativez) { //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
-            if (relativex > relativey) { //top right triangle
-                return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
-            } else if (relativex < relativey) { //bottom left triangle
-                return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey + topleft;
-            } else { //center line
-                return ((bottomright - topleft) * relativex + topleft);
-            }
-        }
-    */
     public int getSize() {
         return size;
     }

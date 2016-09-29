@@ -4,28 +4,16 @@ import java.awt.Point;
 
 public class DecimalPoint {
 	
-	private double x, y, z;
+	private double x, y;
 	
 	public DecimalPoint(){
 		x = 0;
 		y = 0;
-		z = 0;
 	}
 	
 	public DecimalPoint(double x, double y){
 		this.x = x;
 		this.y = y;
-	}
-	
-	public DecimalPoint(int x, int y, int z){
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-	public DecimalPoint(double x, double y, double z){
-		this.x = x;
-		this.y = y;
-		this.z = z;
 	}
 
 	public DecimalPoint(int x, int y){
@@ -39,9 +27,6 @@ public class DecimalPoint {
 	
 	public double getY(){
 		return y;
-	}
-	public double getZ(){
-		return z;
 	}
 	
 	public int roundX(){

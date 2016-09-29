@@ -747,7 +747,7 @@ public class StartupPanel extends Panel {
         Random rnd = new Random();
         File tempFile;
         do {
-            tempFile = new File("temp.map");
+            tempFile = new File(String.format("Temp/%d.map", (int) (rnd.nextDouble() * 10000)));
         } while (tempFile.exists());
         EnvironmentIO.saveEnvironment(terrainEnvironment, tempFile);
         return tempFile;

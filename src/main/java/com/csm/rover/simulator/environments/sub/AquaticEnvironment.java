@@ -3,7 +3,7 @@ package com.csm.rover.simulator.environments.sub;
 import com.csm.rover.simulator.environments.EnvironmentPopulator;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.annotations.Environment;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.platforms.sub.SubObject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -32,11 +32,11 @@ public class AquaticEnvironment extends PlatformEnvironment<SubObject, AquaticMa
         return 9.81;
     }
 
-    public double getPopulatorValue(String pop, DecimalPoint point){
+    public double getPopulatorValue(String pop, DecimalPoint3D point){
         return super.getPopulatorValue(pop, point.getX(), point.getY(), point.getZ());
     }
 
-    public boolean isPopulatorAt(String pop, DecimalPoint point){
+    public boolean isPopulatorAt(String pop, DecimalPoint3D point){
         return super.isPopulatorAt(pop, point.getX(), point.getY(), point.getZ());
     }
 
