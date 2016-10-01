@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 public class TypeDisplayPanel extends JPanel {
 
 	public TypeDisplayPanel(String platform){
-//		setLayout(new MigLayout("", "[grow,fill][grow,fill][grow,fill]", "[][][][][grow,fill][]"));
+//		setLayout(new MiGLayout("", "[grow,fill][grow,fill][grow,fill]", "[][][][][grow,fill][]"));
 //
 //		JLabel lblNewLabel_3 = new JLabel("Platform");
 //		lblNewLabel_3.setHorizontalAlignment(SwingConstants.CENTER);
