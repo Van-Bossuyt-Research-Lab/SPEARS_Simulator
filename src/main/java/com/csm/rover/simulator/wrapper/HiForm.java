@@ -11,6 +11,7 @@ import com.csm.rover.simulator.platforms.rover.RoverHub;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteHub;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
+import com.csm.rover.simulator.platforms.sub.SubHub;
 import com.csm.rover.simulator.visual.AccelPopUp;
 import com.csm.rover.simulator.visual.Form;
 import com.csm.rover.simulator.visual.Panel;
@@ -32,6 +33,7 @@ public class HiForm implements HumanInterfaceAbstraction {
     private InterfacePanel interfacePnl;
     private RoverHub roverHubPnl;
     private SatelliteHub satelliteHubPnl;
+    private SubHub subHubPnl;
 
     private AccelPopUp informer;
 
@@ -95,12 +97,24 @@ public class HiForm implements HumanInterfaceAbstraction {
     }
 
     @Override
+    public void updateSubs() {
+        if (init){
+            subHubPnl.updateDisplays();
+        }
+    }
+
+    @Override
     public void updateRover(String name, DecimalPoint location, double direction) {
 
     }
 
     @Override
     public void updateSatellite(String name) {
+
+    }
+
+    @Override
+    public void updateSub(String name, double[] location, double[] direction) {
 
     }
 

@@ -28,7 +28,7 @@ public class GridListTest {
 
         try {
             String json = mapper.writeValueAsString(gridList);
-            String expected = "{\"layers\":2,\"values\":[{\"coordinates\":[3,9],\"value\":\"hello\"},{\"coordinates\":[0,2],\"value\":\"bye\"}]}";
+            String expected = "{\"layers\":2,\"values\":[{\"coordinates\":[0,2],\"value\":\"bye\"},{\"coordinates\":[3,9],\"value\":\"hello\"}]}";
 
             assertEquals(expected, json);
         }

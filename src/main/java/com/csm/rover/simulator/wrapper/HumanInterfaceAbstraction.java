@@ -21,9 +21,13 @@ public interface HumanInterfaceAbstraction {
 
     void updateSatellites();
 
+    void updateSubs();
+
     void updateRover(String name, DecimalPoint location, double direction);
 
     void updateSatellite(String name);
+
+    void updateSub(String name, double[] location, double[] direction);
 
     void updateSerialBuffers();
 
