@@ -29,10 +29,10 @@ public class RecursiveGridListDeserializer extends JsonDeserializer<RecursiveGri
             if (actValNode.isInt()){
                 value = actValNode.asInt();
             }
-            if (actValNode.isDouble()){
+            else if (actValNode.isDouble()){
                 value = actValNode.asDouble();
             }
-            if (actValNode.isFloat()){
+            else if (actValNode.isFloat()){
                 value = actValNode.asDouble();
             }
             else {

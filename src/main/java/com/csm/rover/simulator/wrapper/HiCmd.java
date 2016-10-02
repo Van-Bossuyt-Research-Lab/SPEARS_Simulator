@@ -34,7 +34,17 @@ public class HiCmd implements HumanInterfaceAbstraction {
     }
 
     @Override
+    public void updateSubs() {
+
+    }
+
+    @Override
     public void updateRover(String name, DecimalPoint location, double direction) {
+
+    }
+
+    @Override
+    public void updateSub(String name, double[] location, double[] direction) {
 
     }
 

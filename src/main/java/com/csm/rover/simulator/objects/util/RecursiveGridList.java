@@ -61,7 +61,7 @@ public class RecursiveGridList<T> {
     public Set<int[]> keySet(){
         Set<int[]> out = new HashSet<>();
         if (layers == 1){
-            for (Integer key : list.keySet()){
+            for (int key : list.keySet()){
                 out.add(new int[]{ key });
             }
         }
