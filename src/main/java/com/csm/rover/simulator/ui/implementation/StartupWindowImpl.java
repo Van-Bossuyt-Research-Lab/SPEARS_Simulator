@@ -3,9 +3,14 @@ package com.csm.rover.simulator.ui.implementation;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.ui.visual.StartupListener;
 import com.csm.rover.simulator.ui.visual.StartupWindow;
+import net.miginfocom.swing.MigLayout;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +41,7 @@ class StartupWindowImpl extends EmbeddedFrame implements StartupWindow {
 
         platformsPnl = new JPanel();
         platformsPnl.setOpaque(false);
-        platformsPnl.setLayout(new FlowLayout());
+        platformsPnl.setLayout(new MigLayout("", "grow,fill", "[grow,fill]"));
         content.add(platformsPnl, BorderLayout.CENTER);
 
         JButton goBtn = new JButton("START");
@@ -47,8 +52,10 @@ class StartupWindowImpl extends EmbeddedFrame implements StartupWindow {
     @Override
     public void registerPlatform(String platform) {
         TypeDisplayPanel display = new TypeDisplayPanel(platform);
-        platformsPnl.add(display);
+        platformsPnl.add(display, "cell "+platformDisplays.size()+" 0");
         platformDisplays.put(platform, display);
+        setSize((int)platformsPnl.getPreferredSize().getWidth()+15, (int)platformsPnl.getPreferredSize().getHeight());
+        setMinimumSize(new Dimension((int)platformsPnl.getPreferredSize().getWidth()+15, (int)platformsPnl.getPreferredSize().getHeight()));
     }
 
     @Override

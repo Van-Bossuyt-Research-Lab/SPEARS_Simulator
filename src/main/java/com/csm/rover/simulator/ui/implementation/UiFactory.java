@@ -42,6 +42,10 @@ public class UiFactory {
         return application;
     }
 
+    static EmbeddedDesktop getDesktop(){
+        return ((Form2)application).desktop;
+    }
+
     public static MainMenu getMainMenu(){
         return menu;
     }
