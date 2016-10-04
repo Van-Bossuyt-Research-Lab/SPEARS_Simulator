@@ -360,6 +360,17 @@ public class subPhysicsModel extends PlatformPhysicsModel {
         location4[2] = location3[2]+speed_y3*0.5*time_step;
         location4[3] = location3[3]+speed_z3*0.5*time_step;
 
+        angular_velocity_xyf= angular_velocity_xy + (time_step/6.0)*(angular_acceleration_xy+2.0*angular_acceleration_xy2+2.0*angular_acceleration_xy3+angular_acceleration_xy4);
+        thetaf = theta + (time_step/6.0)*(angular_velocity_xy+2.0*angular_velocity_xy2*2.0*angular_acceleration_xy3+angular_acceleration_xy4);
+        phif = phi + (time_step/6.0)*(angular_velocity_z+2.0*angular_velocity_z2*2.0*angular_acceleration_z3+angular_acceleration_z4);
+        speed_xf= speed_x +(time_step/6.0)*(acceleration_xy+2.0*acceleration_xy2+2.0*acceleration_xy3+acceleration_xy4)*(Math.cos(thetaf));
+        speed_yf= speed_y +(time_step/6.0)*(acceleration_xy+2.0*acceleration_xy2+2.0*acceleration_xy3+acceleration_xy4)*(Math.sin(thetaf));
+        speed_zf= speed_z +(time_step/6.0)*(acceleration_z+2.0*acceleration_z2+2.0*acceleration_z3+acceleration_z4)*(Math.sin(thetaf));
+        locationf[1] = location[1] + (time_step/6.0)*(speed_x+2.0*speed_x2+2.0*speed_x3+speed_x4);
+        locationf[2] = location[2] + (time_step/6.0)*(speed_y+2.0*speed_y2+2.0*speed_y3+speed_y4);
+        locationf[3] = location[3] + (time_step/6.0)*(speed_z+2.0*speed_z2+2.0*speed_z3+speed_z4);
+
+
 		//System.out.println(round(prop_speed[FL]) + " rad/s -> " + round(slip[FL]) + " N");
 		//System.out.println(round(prop_speed[FR]) + " rad/s -> " + round(slip[FR]) + " N -> " + round(acceleration) + " m/s^2 -> " + round(speed) + " m/s");
 		//System.out.println(round(prop_speed[BL]) + " rad/s -> " + round(slip[BL]) + " N -> " + round(angular_acceleration) + " rad/s^2 -> " + round(angular_velocity) + " rad/s");
@@ -369,13 +380,24 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		//                       location.offsetThis(speed*time_step*Math.cos(direction), speed*time_step*(Math.sin(direction)));
 		//TODO													  + here??
 		//                           location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
-		theta = (theta + angular_velocity_xy*time_step + 2*Math.PI) % (2*Math.PI);
 		System.out.println(getLocation());
 
+        location= locationf;
+        angular_acceleration_xy = angular_acceleration_xyf;
+        angular_acceleration_z = angular_acceleration_zf;
+        direction[1] =thetaf;
+        direction[2] = phif;
+        theta = thetaf;
+        phi=phif;
+        speed = Math.sqrt(Math.pow(speed_xf,2.0)+Math.pow(speed_yf,2.0)+Math.pow(speed_zf,2.0));
+        angular_velocity_xy = angular_velocity_xyf;
+        angular_velocity_z=angular_velocity_zf;
+
+
 		// update state
-		sub_state.set("x", location[1]);
-		sub_state.set("y", location[2]);
-		sub_state.set("z", location[3]);
+		sub_state.set("x", locationf[1]);
+		sub_state.set("y", locationf[2]);
+		sub_state.set("z", locationf[3]);
 		sub_state.set("direction", direction);
 		sub_state.set("motor_power", convertToDoubleArray(motor_power));
 		sub_state.set("motor_state", convertToDoubleArray(motor_states));
@@ -388,12 +410,12 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		sub_state.set("battery_current", battery_current);
 		sub_state.set("battery_temp", battery_temperature);
 		sub_state.set("speed", speed);
-		sub_state.set("angular_velocity_xy", angular_velocity_xy);
-		sub_state.set("angular_velocity_z", angular_velocity_z);
-		sub_state.set("acceleration_xy", acceleration_xy);
-		sub_state.set("acceleration_z", acceleration_z);
-		sub_state.set("angular_acceleration_xy", angular_acceleration_xy);
-		sub_state.set("angular_acceleration_z", angular_acceleration_z);
+		sub_state.set("angular_velocity_xy", angular_velocity_xyf);
+		sub_state.set("angular_velocity_z", angular_velocity_zf);
+		sub_state.set("acceleration_xy", acceleration_xyf);
+		sub_state.set("acceleration_z", acceleration_zf);
+		sub_state.set("angular_acceleration_xy", angular_acceleration_xyf);
+		sub_state.set("angular_acceleration_z", angular_acceleration_zf);
 
 		// report new location to map
 		Admin.getCurrentInterface().updateSub(subName, location, direction);
