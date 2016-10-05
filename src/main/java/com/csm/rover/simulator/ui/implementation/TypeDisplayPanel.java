@@ -1,9 +1,9 @@
 package com.csm.rover.simulator.ui.implementation;
 
+import com.csm.rover.simulator.objects.io.EnvrioFileFilter;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -12,14 +12,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.Optional;
 
 class TypeDisplayPanel extends JPanel {
 
     private JPanel enviroPnl;
 
-    private String environmentPath;
+    private File environmentFile;
+
+    private final String platform;
 
 	TypeDisplayPanel(String platform){
+        this.platform = platform;
         this.setOpaque(false);
 		setLayout(new MigLayout("", "[grow,fill][grow,fill][grow,fill]", "[][][][][grow,fill][]"));
 
@@ -47,8 +51,10 @@ class TypeDisplayPanel extends JPanel {
         enviroLoad.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                File path = loadFromFile();
-                setEnvironment(path.getAbsolutePath(), path.getName().substring(0, path.getName().lastIndexOf('.')));
+                Optional<File> path = loadFromFile();
+                if (path.isPresent()) {
+                    setEnvironment(path.get(), path.get().getName());
+                }
             }
         });
         enviroPnl.add(enviroLoad, "cell 1 0");
@@ -72,33 +78,29 @@ class TypeDisplayPanel extends JPanel {
 
 	}
 
-    private void setEnvironment(String path, String name){
+    private void setEnvironment(File path, String name){
         enviroPnl.removeAll();
-        environmentPath = path;
+        environmentFile = path;
 
         JLabel enviroLbl = new JLabel(name);
         enviroPnl.add(enviroLbl, "cell 0 0 2 1");
+        repaint();
     }
 
-    private File loadFromFile(){
+    private Optional<File> loadFromFile(){
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Choose An Environment File");
-        //chooser.setCurrentDirectory(create a field in the save file);
+        chooser.setCurrentDirectory(UiConfiguration.getFolder(platform));
         chooser.setMultiSelectionEnabled(false);
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        chooser.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return f.isDirectory() || f.getName().substring(f.getName().indexOf('.')).equals("map");
-            }
-
-            @Override
-            public String getDescription() {
-                return "SPEARS Environment File";
-            }
-        });
-        chooser.showOpenDialog(UiFactory.getDesktop());
-        return chooser.getSelectedFile();
+        chooser.setFileFilter(new EnvrioFileFilter(platform));
+        if (chooser.showOpenDialog(UiFactory.getDesktop()) == JFileChooser.APPROVE_OPTION) {
+            UiConfiguration.changeFolder(platform, chooser.getCurrentDirectory());
+            return Optional.of(chooser.getSelectedFile());
+        }
+        else {
+            return Optional.empty();
+        }
     }
 
 }

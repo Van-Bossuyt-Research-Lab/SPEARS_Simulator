@@ -10,6 +10,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 class UiConfiguration {
@@ -42,7 +45,8 @@ class UiConfiguration {
                 "HIGH",
                 1,
                 1,
-                0.5
+                0.5,
+                new HashMap<>()
         ));
     }
 
@@ -80,13 +84,15 @@ class UiConfiguration {
     private String volume;
     private int desktop_divs_left, desktop_divs_right;
     private double desktop_center_line;
+    private Map<String, String> platform_folders;
 
     @JsonCreator
     public UiConfiguration(
             @JsonProperty("volume") String volume,
             @JsonProperty("desktop_divs_left") int desktop_divs_left,
             @JsonProperty("desktop_divs_right") int desktop_divs_right,
-            @JsonProperty("desktop_center_line") double desktop_center_line
+            @JsonProperty("desktop_center_line") double desktop_center_line,
+            @JsonProperty("platform_folders") Map<String, String> platform_folders
     ){
         if (instance.isPresent()){
             throw new IllegalStateException("UiConfiguration has already been initialized, cannot make 2 copies");
@@ -95,6 +101,7 @@ class UiConfiguration {
         this.desktop_divs_left = desktop_divs_left;
         this.desktop_divs_right = desktop_divs_right;
         this.desktop_center_line = desktop_center_line;
+        this.platform_folders = platform_folders;
     }
 
     @JsonProperty("volume")
@@ -113,8 +120,13 @@ class UiConfiguration {
     }
 
     @JsonProperty("desktop_center_line")
-    public double jsonDesktopCetnerLine(){
+    public double jsonDesktopCenterLine(){
         return desktop_center_line;
+    }
+
+    @JsonProperty("platform_folders")
+    public Map<String, String> getAllFolders(){
+        return Collections.unmodifiableMap(platform_folders);
     }
 
     static SoundPlayer.Volume getVolume(){
@@ -173,6 +185,21 @@ class UiConfiguration {
 
     public static void changeDesktopCenterLine(double dcl){
         instance.get().desktop_center_line = dcl;
+        updateSave();
+    }
+
+    public static File getFolder(String platform){
+        if (instance.get().platform_folders.containsKey(platform)){
+            File file = new File(instance.get().platform_folders.get(platform));
+            if (file.exists() && file.isDirectory()){
+                return file;
+            }
+        }
+        return new File(System.getProperty("user.home"));
+    }
+
+    public static void changeFolder(String platform, File folder){
+        instance.get().platform_folders.put(platform, folder.getAbsolutePath());
         updateSave();
     }
 
