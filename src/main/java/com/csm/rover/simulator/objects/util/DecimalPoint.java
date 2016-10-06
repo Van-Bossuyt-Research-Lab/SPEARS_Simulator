@@ -15,7 +15,7 @@ public class DecimalPoint {
 		this.x = x;
 		this.y = y;
 	}
-	
+
 	public DecimalPoint(int x, int y){
 		this.x = x;
 		this.y = y;

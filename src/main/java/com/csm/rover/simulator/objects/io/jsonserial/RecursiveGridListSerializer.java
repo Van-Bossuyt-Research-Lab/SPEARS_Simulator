@@ -20,7 +20,7 @@ public class RecursiveGridListSerializer extends JsonSerializer<RecursiveGridLis
         for (int[] key : keys){
             jsonGenerator.writeStartObject();
             jsonGenerator.writeArrayFieldStart("coordinates");
-            for (int i : key){
+            for (Integer i : key){
                 jsonGenerator.writeNumber(i);
             }
             jsonGenerator.writeEndArray();
