@@ -95,6 +95,54 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 	protected double acceleration_z = 0; //m/s^2
 	protected double angular_acceleration_xy = 0; //rad/s
 	protected double angular_acceleration_z = 0; //rad/s
+    protected double[] location2 = {0, 0, 0}; //m x m from center of map
+    protected double theta2 = 0; //rad off of positive X
+    protected double phi2 = 0; //rad off xy plane
+    protected double speed_x2 = 0; //m/s
+    protected double speed_y2 = 0; //m/s
+    protected double speed_z2 = 0; //m/s
+    protected double angular_velocity_xy2 = 0; //rad/s
+    protected double angular_velocity_z2 = 0; //rad/s
+    protected double acceleration_xy2 = 0; //m/s^2
+    protected double acceleration_z2 = 0; //m/s^2
+    protected double angular_acceleration_xy2 = 0; //rad/s
+    protected double angular_acceleration_z2 = 0; //rad/s
+    protected double[] location3 = {0, 0, 0}; //m x m from center of map
+    protected double theta3 = 0; //rad off of positive X
+    protected double phi3 = 0; //rad off xy plane
+    protected double speed_x3 = 0; //m/s
+    protected double speed_y3 = 0; //m/s
+    protected double speed_z3 = 0; //m/s
+    protected double angular_velocity_xy3 = 0; //rad/s
+    protected double angular_velocity_z3 = 0; //rad/s
+    protected double acceleration_xy3 = 0; //m/s^2
+    protected double acceleration_z3 = 0; //m/s^2
+    protected double angular_acceleration_xy3 = 0; //rad/s
+    protected double angular_acceleration_z3 = 0; //rad/s
+    protected double[] location4 = {0, 0, 0}; //m x m from center of map
+    protected double theta4 = 0; //rad off of positive X
+    protected double phi4 = 0; //rad off xy plane
+    protected double speed_x4 = 0; //m/s
+    protected double speed_y4 = 0; //m/s
+    protected double speed_z4 = 0; //m/s
+    protected double angular_velocity_xy4 = 0; //rad/s
+    protected double angular_velocity_z4 = 0; //rad/s
+    protected double acceleration_xy4 = 0; //m/s^2
+    protected double acceleration_z4 = 0; //m/s^2
+    protected double angular_acceleration_xy4 = 0; //rad/s
+    protected double angular_acceleration_z4 = 0; //rad/s
+    protected double[] locationf = {0, 0, 0}; //m x m from center of map
+    protected double thetaf = 0; //rad off of positive X
+    protected double phif = 0; //rad off xy plane
+    protected double speed_xf = 0; //m/s
+    protected double speed_yf = 0; //m/s
+    protected double speed_zf = 0; //m/s
+    protected double angular_velocity_xyf = 0; //rad/s
+    protected double angular_velocity_zf = 0; //rad/s
+    protected double acceleration_xyf = 0; //m/s^2
+    protected double acceleration_zf = 0; //m/s^2
+    protected double angular_acceleration_xyf = 0; //rad/s
+    protected double angular_acceleration_zf = 0; //rad/s
 	protected double drag_xy = 0;
 	protected double drag_z = 0;
 
@@ -279,11 +327,50 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		//                acceleration_xy = 1/total_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - planetParams.getgrav_accel()*Math.sin(MAP.getIncline(location, direction));
 		//                angular_acceleration = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
 		// Speed changes based on Acceleration
-		speed_x += acceleration_xy * time_step * Math.cos(theta)* Math.cos(phi);
-		speed_y += acceleration_xy * time_step * Math.sin(theta)* Math.cos(phi);
-		speed_z += acceleration_z * time_step;
-		angular_velocity_xy += angular_acceleration_xy * time_step;
-		angular_velocity_z += angular_acceleration_z * time_step;
+		speed_x2 = speed_x+ acceleration_xy * 0.5*time_step * Math.cos(theta)* Math.cos(phi);
+		speed_y2 = speed_y+ acceleration_xy * 0.5*time_step * Math.sin(theta)* Math.cos(phi);
+		speed_z2 = speed_z+ 0.5*acceleration_z * time_step;
+		angular_velocity_xy2 = angular_velocity_xy+ angular_acceleration_xy * 0.5* time_step;
+		angular_velocity_z2 = angular_velocity_z+ angular_acceleration_z * 0.5* time_step;
+        theta2 = (theta + angular_velocity_xy*0.5*time_step + 2*Math.PI) % (2*Math.PI);
+        phi2 = (phi + angular_velocity_z*0.5*time_step + 2*Math.PI) % (2*Math.PI);
+        location2[1] = location[1]+speed_x*0.5*time_step;
+        location2[2] = location[2]+speed_y*0.5*time_step;
+        location2[3] = location[3]+speed_z*0.5*time_step;
+
+        speed_x3 = speed_x2+ acceleration_xy2 * 0.5*time_step * Math.cos(theta2)* Math.cos(phi2);
+        speed_y3 = speed_y2+ acceleration_xy2 * 0.5*time_step * Math.sin(theta2)* Math.cos(phi2);
+        speed_z3 = speed_z2+ 0.5*acceleration_z2 * time_step;
+        angular_velocity_xy3 = angular_velocity_xy2+ angular_acceleration_xy2 * 0.5* time_step;
+        angular_velocity_z3 = angular_velocity_z2+ angular_acceleration_z2 * 0.5* time_step;
+        theta3 = (theta2 + angular_velocity_xy2*0.5*time_step + 2*Math.PI) % (2*Math.PI);
+        phi3 = (phi2 + angular_velocity_z2*0.5*time_step + 2*Math.PI) % (2*Math.PI);
+        location3[1] = location2[1]+speed_x2*0.5*time_step;
+        location3[2] = location2[2]+speed_y2*0.5*time_step;
+        location3[3] = location2[3]+speed_z2*0.5*time_step;
+
+        speed_x4 = speed_x3+ acceleration_xy3 * 0.5*time_step * Math.cos(theta3)* Math.cos(phi3);
+        speed_y4 = speed_y3+ acceleration_xy3 * 0.5*time_step * Math.sin(theta3)* Math.cos(phi3);
+        speed_z4 = speed_z3+ 0.5*acceleration_z3 * time_step;
+        angular_velocity_xy4 = angular_velocity_xy3+ angular_acceleration_xy3 * 0.5* time_step;
+        angular_velocity_z4 = angular_velocity_z3+ angular_acceleration_z3 * 0.5* time_step;
+        theta4 = (theta3 + angular_velocity_xy3*0.5*time_step + 2*Math.PI) % (2*Math.PI);
+        phi4 = (phi3 + angular_velocity_z3*0.5*time_step + 2*Math.PI) % (2*Math.PI);
+        location4[1] = location3[1]+speed_x3*0.5*time_step;
+        location4[2] = location3[2]+speed_y3*0.5*time_step;
+        location4[3] = location3[3]+speed_z3*0.5*time_step;
+
+        angular_velocity_xyf= angular_velocity_xy + (time_step/6.0)*(angular_acceleration_xy+2.0*angular_acceleration_xy2+2.0*angular_acceleration_xy3+angular_acceleration_xy4);
+        thetaf = theta + (time_step/6.0)*(angular_velocity_xy+2.0*angular_velocity_xy2*2.0*angular_acceleration_xy3+angular_acceleration_xy4);
+        phif = phi + (time_step/6.0)*(angular_velocity_z+2.0*angular_velocity_z2*2.0*angular_acceleration_z3+angular_acceleration_z4);
+        speed_xf= speed_x +(time_step/6.0)*(acceleration_xy+2.0*acceleration_xy2+2.0*acceleration_xy3+acceleration_xy4)*(Math.cos(thetaf));
+        speed_yf= speed_y +(time_step/6.0)*(acceleration_xy+2.0*acceleration_xy2+2.0*acceleration_xy3+acceleration_xy4)*(Math.sin(thetaf));
+        speed_zf= speed_z +(time_step/6.0)*(acceleration_z+2.0*acceleration_z2+2.0*acceleration_z3+acceleration_z4)*(Math.sin(thetaf));
+        locationf[1] = location[1] + (time_step/6.0)*(speed_x+2.0*speed_x2+2.0*speed_x3+speed_x4);
+        locationf[2] = location[2] + (time_step/6.0)*(speed_y+2.0*speed_y2+2.0*speed_y3+speed_y4);
+        locationf[3] = location[3] + (time_step/6.0)*(speed_z+2.0*speed_z2+2.0*speed_z3+speed_z4);
+
+
 		//System.out.println(round(prop_speed[FL]) + " rad/s -> " + round(slip[FL]) + " N");
 		//System.out.println(round(prop_speed[FR]) + " rad/s -> " + round(slip[FR]) + " N -> " + round(acceleration) + " m/s^2 -> " + round(speed) + " m/s");
 		//System.out.println(round(prop_speed[BL]) + " rad/s -> " + round(slip[BL]) + " N -> " + round(angular_acceleration) + " rad/s^2 -> " + round(angular_velocity) + " rad/s");
@@ -293,13 +380,24 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		//                       location.offsetThis(speed*time_step*Math.cos(direction), speed*time_step*(Math.sin(direction)));
 		//TODO													  + here??
 		//                           location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
-		theta = (theta + angular_velocity_xy*time_step + 2*Math.PI) % (2*Math.PI);
 		System.out.println(getLocation());
 
+        location= locationf;
+        angular_acceleration_xy = angular_acceleration_xyf;
+        angular_acceleration_z = angular_acceleration_zf;
+        direction[1] =thetaf;
+        direction[2] = phif;
+        theta = thetaf;
+        phi=phif;
+        speed = Math.sqrt(Math.pow(speed_xf,2.0)+Math.pow(speed_yf,2.0)+Math.pow(speed_zf,2.0));
+        angular_velocity_xy = angular_velocity_xyf;
+        angular_velocity_z=angular_velocity_zf;
+
+
 		// update state
-		sub_state.set("x", location[1]);
-		sub_state.set("y", location[2]);
-		sub_state.set("z", location[3]);
+		sub_state.set("x", locationf[1]);
+		sub_state.set("y", locationf[2]);
+		sub_state.set("z", locationf[3]);
 		sub_state.set("direction", direction);
 		sub_state.set("motor_power", convertToDoubleArray(motor_power));
 		sub_state.set("motor_state", convertToDoubleArray(motor_states));
@@ -312,12 +410,12 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		sub_state.set("battery_current", battery_current);
 		sub_state.set("battery_temp", battery_temperature);
 		sub_state.set("speed", speed);
-		sub_state.set("angular_velocity_xy", angular_velocity_xy);
-		sub_state.set("angular_velocity_z", angular_velocity_z);
-		sub_state.set("acceleration_xy", acceleration_xy);
-		sub_state.set("acceleration_z", acceleration_z);
-		sub_state.set("angular_acceleration_xy", angular_acceleration_xy);
-		sub_state.set("angular_acceleration_z", angular_acceleration_z);
+		sub_state.set("angular_velocity_xy", angular_velocity_xyf);
+		sub_state.set("angular_velocity_z", angular_velocity_zf);
+		sub_state.set("acceleration_xy", acceleration_xyf);
+		sub_state.set("acceleration_z", acceleration_zf);
+		sub_state.set("angular_acceleration_xy", angular_acceleration_xyf);
+		sub_state.set("angular_acceleration_z", angular_acceleration_zf);
 
 		// report new location to map
 		Admin.getCurrentInterface().updateSub(subName, location, direction);
