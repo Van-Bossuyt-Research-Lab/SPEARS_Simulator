@@ -21,6 +21,7 @@ class TypeDisplayPanel extends JPanel {
     private File environmentFile;
 
     private final String platform;
+    private final JPopupMenu enviroEditPopup;
 
 	TypeDisplayPanel(String platform){
         this.platform = platform;
@@ -40,12 +41,12 @@ class TypeDisplayPanel extends JPanel {
         enviroPnl.setLayout(new MigLayout("", "[grow,fill][grow,fill]", "[]"));
         this.add(enviroPnl, "cell 0 2 3 1");
 
-        JLabel enviroSet = new JLabel("<html><u>Set Up...</u></html>");
+        JLabel enviroSet = new JLabel(underline("Set Up..."));
         enviroSet.setForeground(Color.BLUE);
         enviroSet.setCursor(new Cursor(Cursor.HAND_CURSOR));
         enviroPnl.add(enviroSet, "cell 0 0");
 
-        JLabel enviroLoad = new JLabel("<html><u>Load File...</u></html>");
+        JLabel enviroLoad = new JLabel(underline("Load File..."));
         enviroLoad.setForeground(Color.BLUE);
         enviroLoad.setCursor(new Cursor(Cursor.HAND_CURSOR));
         enviroLoad.addMouseListener(new MouseAdapter() {
@@ -76,13 +77,44 @@ class TypeDisplayPanel extends JPanel {
         JButton remove = new JButton("Remove");
         this.add(remove, "cell 2 5");
 
+        enviroEditPopup = new JPopupMenu();
+        enviroEditPopup.setVisible(false);
+        enviroEditPopup.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (!enviroEditPopup.contains(e.getX(), e.getY())){
+                    enviroEditPopup.setVisible(false);
+                }
+            }
+        });
+
+        JMenuItem configure = new JMenuItem("New Configuration");
+        enviroEditPopup.add(configure);
+
+        JMenuItem load = new JMenuItem("Select New File");
+        load.addActionListener((ActionEvent e) -> {
+            Optional<File> file = loadFromFile();
+            if (file.isPresent()) {
+                setEnvironment(file.get(), file.get().getName());
+            }
+        });
+        enviroEditPopup.add(load);
+
 	}
 
     private void setEnvironment(File path, String name){
         enviroPnl.removeAll();
         environmentFile = path;
 
-        JLabel enviroLbl = new JLabel(name);
+        JLabel enviroLbl = new JLabel(underline(name));
+        enviroLbl.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3){
+                    enviroEditPopup.show(enviroLbl, e.getX()-2, e.getY()-2);
+                }
+            }
+        });
         enviroPnl.add(enviroLbl, "cell 0 0 2 1");
         repaint();
     }
@@ -101,6 +133,10 @@ class TypeDisplayPanel extends JPanel {
         else {
             return Optional.empty();
         }
+    }
+
+    private String underline(String s){
+        return String.format("<html><u>%s</u></html>", s);
     }
 
 }
