@@ -25,8 +25,12 @@ class TypeDisplayPanel extends JPanel {
     private final JPopupMenu enviroEditPopup;
     private final ZList<PlatformConfig> platformTable;
 
+    private Map<String, List<String>> codeModelParams, physicsModelParams;
+
 	TypeDisplayPanel(String platform){
         this.platform = platform;
+        codeModelParams = new HashMap<>();
+        physicsModelParams = new HashMap<>();
         this.setOpaque(false);
 		setLayout(new MigLayout("", "[grow,fill][grow,fill][grow,fill]", "[][][][][grow,fill][]"));
 
@@ -69,15 +73,11 @@ class TypeDisplayPanel extends JPanel {
         platformTable.setPreferredSize(new Dimension(0, 200));
         this.add(platformTable, "cell 0 4 3 1,grow");
 
-        Map<String, List<String>> test = new HashMap<>();
-        test.put("first", Arrays.asList("hi", "bye"));
-        test.put("Second", Arrays.asList("cats", "dogs"));
-
         JButton add = new JButton("Add");
         add.addActionListener((ActionEvent e) -> {
             UiFactory.getDesktop().add(PlatformSetupPanel.newSetupPanel(platform)
-                .setCodeModelMap(test)
-                .setPhysicsModelMap(test)
+                .setCodeModelMap(codeModelParams)
+                .setPhysicsModelMap(physicsModelParams)
                 .setReportAction((PlatformConfig config) ->
                         platformTable.addValue(config, config.getScreenName()))
             .build());
@@ -88,10 +88,10 @@ class TypeDisplayPanel extends JPanel {
         edit.addActionListener((ActionEvent e) -> {
             final int currentloc = platformTable.getSelectedIndex();
             UiFactory.getDesktop().add(PlatformSetupPanel.newSetupPanel(platform)
-                    .setCodeModelMap(test)
-                    .setPhysicsModelMap(test)
+                    .setCodeModelMap(codeModelParams)
+                    .setPhysicsModelMap(physicsModelParams)
                     .setReportAction((PlatformConfig config) -> {
-                        platformTable.remove(currentloc);
+                        platformTable.removeValue(currentloc);
                         platformTable.addValue(config, config.getScreenName());
                     })
                     .loadExisting(platformTable.getItemAt(currentloc))
@@ -100,7 +100,7 @@ class TypeDisplayPanel extends JPanel {
         this.add(edit, "cell 1 5");
 
         JButton remove = new JButton("Remove");
-        remove.addActionListener((ActionEvent e) -> platformTable.remove(platformTable.getSelectedIndex()));
+        remove.addActionListener((ActionEvent e) -> platformTable.removeValue(platformTable.getSelectedIndex()));
         this.add(remove, "cell 2 5");
 
         enviroEditPopup = new JPopupMenu();
@@ -127,6 +127,14 @@ class TypeDisplayPanel extends JPanel {
         enviroEditPopup.add(load);
 
 	}
+
+    void addCodeModel(String name, List<String> params){
+        codeModelParams.put(name, params);
+    }
+
+    void addPhysicsModel(String name, List<String> params){
+        physicsModelParams.put(name, params);
+    }
 
     private void setEnvironment(File path, String name){
         enviroPnl.removeAll();

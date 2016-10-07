@@ -4,12 +4,8 @@ import com.csm.rover.simulator.objects.io.PlatformConfig;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +21,7 @@ class PlatformSetupPanel extends EmbeddedFrame {
     private JTextField nameTxt;
     private Map<String, List<String>> codeModels, physicsModels;
     private ReportPlatform reportAction;
+    private boolean manual_name = false;
 
     private PlatformSetupPanel(){}
 
@@ -36,10 +33,42 @@ class PlatformSetupPanel extends EmbeddedFrame {
         contentPane.setLayout(new BorderLayout());
         setContentPane(contentPane);
 
+        JTextField dump = new JTextField();
+        dump.setSize(0, 0);
+        dump.setMaximumSize(dump.getSize());
+        dump.setVisible(false);
+        contentPane.add(dump, BorderLayout.WEST);
+
         nameTxt = new JTextField("[Name]");
         nameTxt.setEditable(false);
+        nameTxt.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         nameTxt.setHorizontalAlignment(SwingConstants.CENTER);
         nameTxt.setFont(new Font(nameTxt.getFont().getName(), Font.BOLD, nameTxt.getFont().getSize()+2));
+        nameTxt.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_ESCAPE
+                        || e.getKeyChar() == KeyEvent.VK_ENTER
+                        || e.getKeyChar() == KeyEvent.VK_TAB){
+                    revokeNameFocus();
+                }
+            }
+        });
+        nameTxt.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                nameTxt.setEditable(true);
+                nameTxt.setSelectionStart(0);
+                nameTxt.setSelectionEnd(nameTxt.getText().length());
+                manual_name = true;
+            }
+        });
+        nameTxt.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                revokeNameFocus();
+            }
+        });
         contentPane.add(nameTxt, BorderLayout.NORTH);
 
         JPanel insertPnl = new JPanel();
@@ -52,7 +81,10 @@ class PlatformSetupPanel extends EmbeddedFrame {
         physicsCombo.setModel(new DefaultComboBoxModel<>(physicsModels.keySet().toArray(new String[physicsModels.size()])));
         physicsCombo.setSelectedIndex(-1);
         physicsCombo.setMaximumSize(new Dimension(9000, (int)physicsCombo.getPreferredSize().getHeight()));
-        physicsCombo.addItemListener((ItemEvent e) -> physicsParams.setOptions(physicsModels.get((String)physicsCombo.getSelectedItem())));
+        physicsCombo.addItemListener((ItemEvent e) -> {
+            physicsParams.setOptions(physicsModels.get((String)physicsCombo.getSelectedItem()));
+            updateIsReady();
+        });
         insertPnl.add(physicsCombo, "cell 0 0");
 
         codeCombo = new JComboBox<>();
@@ -60,21 +92,46 @@ class PlatformSetupPanel extends EmbeddedFrame {
         codeCombo.setModel(new DefaultComboBoxModel<>(codeModels.keySet().toArray(new String[codeModels.size()])));
         codeCombo.setSelectedIndex(-1);
         codeCombo.setMaximumSize(new Dimension(9000, (int)codeCombo.getPreferredSize().getHeight()));
-        codeCombo.addItemListener((ItemEvent e) -> codeParams.setOptions(codeModels.get((String)codeCombo.getSelectedItem())));
+        codeCombo.addItemListener((ItemEvent e) -> {
+            codeParams.setOptions(codeModels.get((String)codeCombo.getSelectedItem()));
+            if (!manual_name){
+                nameTxt.setText((String)codeCombo.getSelectedItem());
+            }
+            updateIsReady();
+        });
         insertPnl.add(codeCombo, "cell 0 1");
 
         physicsParams = new ParameterInput();
+        physicsParams.addInputChangeListener((e) -> updateIsReady());
         insertPnl.add(physicsParams, "cell 1 0");
 
         codeParams = new ParameterInput();
+        codeParams.addInputChangeListener((e) -> updateIsReady());
         insertPnl.add(codeParams, "cell 1 1");
 
         addBtn = new JButton("Add");
+        addBtn.setEnabled(false);
         addBtn.addActionListener((ActionEvent e) -> reportPlatform());
         contentPane.add(addBtn, BorderLayout.SOUTH);
 
-        setSize(getWidth(), 100);
+        setSize(300, 250);
+        setMinimumSize(getSize());
         this.setVisible(true);
+    }
+
+    private void revokeNameFocus(){
+        nameTxt.setEditable(false);
+        nameTxt.setSelectionStart(0);
+        nameTxt.setSelectionEnd(0);
+        nameTxt.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+    }
+
+    private void updateIsReady(){
+        addBtn.setEnabled(
+                physicsCombo.getSelectedIndex() >= 0
+                && codeCombo.getSelectedIndex() >= 0
+                && physicsParams.isComplete()
+                && codeParams.isComplete());
     }
 
     private void loadExistingPlatform(PlatformConfig platform){
@@ -87,11 +144,14 @@ class PlatformSetupPanel extends EmbeddedFrame {
 
     private void reportPlatform(){
         PlatformConfig config = PlatformConfig.builder()
+                .setType(platform)
                 .setAutonomousModel((String)codeCombo.getSelectedItem(), codeParams.getParameters())
                 .setPhysicsModel((String)physicsCombo.getSelectedItem(), physicsParams.getParameters())
                 .setScreenName(nameTxt.getText())
+                .setID(platform.charAt(0) + " #")
                 .build();
         reportAction.registerNewPlatform(config);
+        doDefaultCloseAction();
     }
 
     static Builder newSetupPanel(String platform){

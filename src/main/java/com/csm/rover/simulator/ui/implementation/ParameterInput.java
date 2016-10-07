@@ -8,18 +8,19 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.Color;
 import java.awt.Component;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class ParameterInput extends JScrollPane {
+
+    private Set<InputChangeListener> listeners;
 
     private JPanel panel;
     private List<JTextField> fields;
 
     ParameterInput(){
+        listeners = new HashSet<>();
         textHistory = new HashMap<>();
+        fields = Collections.emptyList();
         setOpaque(false);
         setBackground(Color.LIGHT_GRAY);
 
@@ -27,6 +28,16 @@ class ParameterInput extends JScrollPane {
         panel.setLayout(new MigLayout("", "[fill,grow][fill,grow][fill,grow]", "fill"));
         panel.setOpaque(false);
         this.setViewportView(panel);
+    }
+
+    void addInputChangeListener(InputChangeListener listen){
+        listeners.add(listen);
+    }
+
+    private void fireInputChangeEvent(InputChangeEvent e){
+        for (InputChangeListener listener : listeners){
+            listener.parametersChanged(e);
+        }
     }
 
     void setOptions(List<String> options){
@@ -43,7 +54,9 @@ class ParameterInput extends JScrollPane {
             field.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void changedUpdate(DocumentEvent e) {
-                    SwingUtilities.invokeLater(() -> checkTextChange(field));
+                    if (!correcting){
+                        SwingUtilities.invokeLater(() -> checkTextChange(field));
+                    }
                 }
 
                 @Override
@@ -61,7 +74,7 @@ class ParameterInput extends JScrollPane {
         forceRepaint();
     }
 
-    Map<String, Double> getParameters(){
+    Map<String, Double> getParameters() throws NumberFormatException {
         ParamMap.Builder map = ParamMap.newParamMap();
         for (JTextField field : fields){
             map.addParameter(field.getName(), Double.parseDouble(field.getText()));
@@ -77,23 +90,48 @@ class ParameterInput extends JScrollPane {
         }
     }
 
+    boolean isComplete(){
+        if (this.fields.isEmpty()){
+            return true;
+        }
+        try {
+            getParameters();
+            return true;
+        }
+        catch (NumberFormatException e){
+            return false;
+        }
+    }
+
     private Map<JTextField, String> textHistory;
+    private boolean correcting = false;
     private void checkTextChange(JTextField field){
         String currentText = field.getText();
         String oldText = textHistory.containsKey(field) ? textHistory.get(field) : "";
         if (!currentText.equals("")) {
+            double d;
             try {
-                double d = Double.parseDouble(currentText);
+                d = Double.parseDouble(currentText);
                 if (d < 0) {
                     throw new NumberFormatException("Cannot be negative");
                 }
-                if (currentText.contains("f")){
+                if (currentText.contains("f") || currentText.contains("d")){
                     throw new NumberFormatException("Ignore float notation");
+                }
+                if (currentText.contains(" ")){
+                    throw new NumberFormatException("No Spaces Allowed");
                 }
             }
             catch (NumberFormatException e) {
+                correcting = true;
                 field.setText(oldText);
+                correcting = false;
+                return;
             }
+            fireInputChangeEvent(new InputChangeEvent(this, field.getName(), d));
+        }
+        else {
+            fireInputChangeEvent(new InputChangeEvent(this, field.getName(), -1));
         }
         textHistory.put(field, field.getText());
     }
@@ -108,4 +146,32 @@ class ParameterInput extends JScrollPane {
         repaint();
     }
 
+}
+
+interface InputChangeListener {
+    void parametersChanged(InputChangeEvent e);
+}
+
+class InputChangeEvent {
+    private final ParameterInput origin;
+    private final String fieldChanged;
+    private final double newValue;
+
+    InputChangeEvent(ParameterInput origin, String fieldChanged, double newValue){
+        this.origin = origin;
+        this.fieldChanged = fieldChanged;
+        this.newValue = newValue;
+    }
+
+    ParameterInput getOrigin(){
+        return origin;
+    }
+
+    String getFieldChanged(){
+        return fieldChanged;
+    }
+
+    double getNewValue(){
+        return newValue;
+    }
 }

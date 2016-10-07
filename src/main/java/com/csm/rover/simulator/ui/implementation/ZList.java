@@ -17,7 +17,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 
-public class ZList <T> extends JPanel implements Cloneable{
+class ZList <T> extends JPanel implements Cloneable{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -28,7 +28,7 @@ public class ZList <T> extends JPanel implements Cloneable{
 	
 	private List<ListSelectionListener> ListSelectionListeners = new ArrayList<>();
 	
-	public ZList(){
+	ZList(){
         values = new ArrayList<T>();
 		items = new ArrayList<>();
         initialize();
@@ -148,19 +148,19 @@ public class ZList <T> extends JPanel implements Cloneable{
 		fireListSelectionEvent(new ListSelectionEvent("Stuff", 0, 0, false));
 	}
 
-	public void addValue(T val){
+	void addValue(T val){
 		addValue(val, val.toString(), values.size());
 	}
 
-    public void addValue(T val, String label){
+    void addValue(T val, String label){
         addValue(val, label, values.size());
     }
 
-    public void addValue(T val, int loc){
+    void addValue(T val, int loc){
         addValue(val, val.toString(), values.size());
     }
 
-	public void addValue(T val, String label, int loc){
+	void addValue(T val, String label, int loc){
 		selectItem(-1);
         values.add(loc, val);
         items.add(loc, new JLabel("  " + label));
@@ -176,7 +176,7 @@ public class ZList <T> extends JPanel implements Cloneable{
 		placeComps();
 	}
 
-	public void setValues(T[] values){
+	void setValues(T[] values){
 		selectItem(-1);
 		while (this.values.size() > 0){
 			removeValue(0);
@@ -188,7 +188,7 @@ public class ZList <T> extends JPanel implements Cloneable{
 		}
 	}
 
-	public void removeValue(int which){
+	void removeValue(int which){
 		selectItem(-1);
 		this.remove(items.get(which));
 		items.remove(which);
@@ -210,7 +210,7 @@ public class ZList <T> extends JPanel implements Cloneable{
 		selectItem(-1);
 	}
 	
-	public int getSelectedIndex(){
+	int getSelectedIndex(){
 		return selected;
 	}
 	
@@ -262,7 +262,7 @@ public class ZList <T> extends JPanel implements Cloneable{
 		}
 	}
 	
-	public T getItemAt(int loc){
+	T getItemAt(int loc){
 		try {
 			try {
 				return values.get(loc);
@@ -276,7 +276,7 @@ public class ZList <T> extends JPanel implements Cloneable{
 		}
 	}
 	
-	public int getLocationOfValue(T val){
+	int getLocationOfValue(T val){
 		int x = 0;
 		while (x < values.size()){
 			if (values.get(x).equals(val)){

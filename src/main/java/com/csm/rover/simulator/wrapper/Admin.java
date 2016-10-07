@@ -88,6 +88,12 @@ public class Admin {
         StartupWindow startup = UiFactory.newStartUpWindow();
         for (String type : PlatformRegistry.getTypes()) {
             startup.registerPlatform(type);
+            for (String code : PlatformRegistry.listAutonomousCodeModels(type)){
+                startup.registerAutonomousCodeModel(type, code, PlatformRegistry.getParametersForAutonomousCodeModel(type, code));
+            }
+            for (String physics : PlatformRegistry.listPhysicsModels(type)){
+                startup.registerPhysicsModel(type, physics, PlatformRegistry.getParametersForPhysicsModel(type, physics));
+            }
         }
         startup.display();
     }

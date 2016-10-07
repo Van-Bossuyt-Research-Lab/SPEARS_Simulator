@@ -60,12 +60,12 @@ class StartupWindowImpl extends EmbeddedFrame implements StartupWindow {
 
     @Override
     public void registerAutonomousCodeModel(String platform, String name, List<String> parameters) {
-
+        this.platformDisplays.get(platform).addCodeModel(name, parameters);
     }
 
     @Override
     public void registerPhysicsModel(String platform, String name, List<String> parameters) {
-
+        platformDisplays.get(platform).addPhysicsModel(name, parameters);
     }
 
     @Override
