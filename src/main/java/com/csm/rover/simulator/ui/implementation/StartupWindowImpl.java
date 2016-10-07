@@ -75,7 +75,7 @@ class StartupWindowImpl extends EmbeddedFrame implements StartupWindow {
 
     @Override
     public void display(){
-        ((Form2)UiFactory.getApplication()).desktop.add(this);
+        UiFactory.getDesktop().add(this);
         this.setVisible(true);
     }
 

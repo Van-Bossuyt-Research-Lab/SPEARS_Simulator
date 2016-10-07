@@ -56,11 +56,11 @@ public class ZList <T> extends JPanel implements Cloneable{
         this.add(scroll);
         placeComps();        
     }
-	
+
     private void setLabels(){
         items = new ArrayList<>();
         int x = 0;
-        while (x < items.size()){
+        while (x < values.size()){
             items.add(new JLabel("  " + values.get(x).toString()));
             items.get(x).addMouseListener(new MouseAdapter() {
                 @Override
@@ -71,7 +71,7 @@ public class ZList <T> extends JPanel implements Cloneable{
             items.get(x).setBackground(new Color(180, 200, 250));
             this.add(items.get(x));
             x++;
-        }        
+        }
     }
     
 	private void placeComps(){
@@ -149,13 +149,21 @@ public class ZList <T> extends JPanel implements Cloneable{
 	}
 
 	public void addValue(T val){
-		addValue(val, values.size());
+		addValue(val, val.toString(), values.size());
 	}
 
-	public void addValue(T val, int loc){
+    public void addValue(T val, String label){
+        addValue(val, label, values.size());
+    }
+
+    public void addValue(T val, int loc){
+        addValue(val, val.toString(), values.size());
+    }
+
+	public void addValue(T val, String label, int loc){
 		selectItem(-1);
         values.add(loc, val);
-        items.add(loc, new JLabel("  " + val.toString()));
+        items.add(loc, new JLabel("  " + label));
 		items.get(loc).setFont(getFont());
 		items.get(loc).addMouseListener(new MouseAdapter() {
             @Override

@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.ui.implementation;
 
 import com.csm.rover.simulator.objects.io.EnvrioFileFilter;
+import com.csm.rover.simulator.objects.io.PlatformConfig;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -12,7 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.Optional;
+import java.util.*;
 
 class TypeDisplayPanel extends JPanel {
 
@@ -22,6 +23,7 @@ class TypeDisplayPanel extends JPanel {
 
     private final String platform;
     private final JPopupMenu enviroEditPopup;
+    private final ZList<PlatformConfig> platformTable;
 
 	TypeDisplayPanel(String platform){
         this.platform = platform;
@@ -63,18 +65,42 @@ class TypeDisplayPanel extends JPanel {
         JLabel platformTitle = new JLabel("Platforms:");
         this.add(platformTitle, "cell 0 3 3 1");
 
-        ZList<String> platformTable = new ZList<>();
+        platformTable = new ZList<>();
         platformTable.setPreferredSize(new Dimension(0, 200));
         this.add(platformTable, "cell 0 4 3 1,grow");
 
+        Map<String, List<String>> test = new HashMap<>();
+        test.put("first", Arrays.asList("hi", "bye"));
+        test.put("Second", Arrays.asList("cats", "dogs"));
+
         JButton add = new JButton("Add");
-        add.addActionListener((ActionEvent e) -> platformTable.addValue("hi"));
+        add.addActionListener((ActionEvent e) -> {
+            UiFactory.getDesktop().add(PlatformSetupPanel.newSetupPanel(platform)
+                .setCodeModelMap(test)
+                .setPhysicsModelMap(test)
+                .setReportAction((PlatformConfig config) ->
+                        platformTable.addValue(config, config.getScreenName()))
+            .build());
+        });
         this.add(add, "cell 0 5");
 
         JButton edit = new JButton("Edit");
+        edit.addActionListener((ActionEvent e) -> {
+            final int currentloc = platformTable.getSelectedIndex();
+            UiFactory.getDesktop().add(PlatformSetupPanel.newSetupPanel(platform)
+                    .setCodeModelMap(test)
+                    .setPhysicsModelMap(test)
+                    .setReportAction((PlatformConfig config) -> {
+                        platformTable.remove(currentloc);
+                        platformTable.addValue(config, config.getScreenName());
+                    })
+                    .loadExisting(platformTable.getItemAt(currentloc))
+                    .build());
+        });
         this.add(edit, "cell 1 5");
 
         JButton remove = new JButton("Remove");
+        remove.addActionListener((ActionEvent e) -> platformTable.remove(platformTable.getSelectedIndex()));
         this.add(remove, "cell 2 5");
 
         enviroEditPopup = new JPopupMenu();

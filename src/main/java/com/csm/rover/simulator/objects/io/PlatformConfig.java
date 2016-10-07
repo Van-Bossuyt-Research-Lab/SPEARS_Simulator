@@ -83,8 +83,6 @@ public class PlatformConfig {
         this.autonomousModelParameters = params;
     }
 
-
-
     public static class Builder {
 
         private PlatformConfig config;
