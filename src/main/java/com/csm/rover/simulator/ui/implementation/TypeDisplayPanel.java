@@ -25,12 +25,15 @@ class TypeDisplayPanel extends JPanel {
     private final JPopupMenu enviroEditPopup;
     private final ZList<PlatformConfig> platformTable;
 
-    private Map<String, List<String>> codeModelParams, physicsModelParams;
+    private Map<String, List<String>> codeModelParams, physicsModelParams,
+            mapModifierParams, mapPopulatorParams;
 
 	TypeDisplayPanel(String platform){
         this.platform = platform;
         codeModelParams = new HashMap<>();
         physicsModelParams = new HashMap<>();
+        mapModifierParams = new HashMap<>();
+        mapPopulatorParams = new HashMap<>();
         this.setOpaque(false);
 		setLayout(new MigLayout("", "[grow,fill][grow,fill][grow,fill]", "[][][][][grow,fill][]"));
 
@@ -50,6 +53,12 @@ class TypeDisplayPanel extends JPanel {
         JLabel enviroSet = new JLabel(underline("Set Up..."));
         enviroSet.setForeground(Color.BLUE);
         enviroSet.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        enviroSet.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                createNewEnvironment();
+            }
+        });
         enviroPnl.add(enviroSet, "cell 0 0");
 
         JLabel enviroLoad = new JLabel(underline("Load File..."));
@@ -75,7 +84,7 @@ class TypeDisplayPanel extends JPanel {
 
         JButton add = new JButton("Add");
         add.addActionListener((ActionEvent e) -> {
-            UiFactory.getDesktop().add(PlatformSetupPanel.newSetupPanel(platform)
+            UiFactory.getDesktop().add(PlatformSetupWindow.newSetupPanel(platform)
                 .setCodeModelMap(codeModelParams)
                 .setPhysicsModelMap(physicsModelParams)
                 .setReportAction((PlatformConfig config) ->
@@ -87,7 +96,7 @@ class TypeDisplayPanel extends JPanel {
         JButton edit = new JButton("Edit");
         edit.addActionListener((ActionEvent e) -> {
             final int currentloc = platformTable.getSelectedIndex();
-            UiFactory.getDesktop().add(PlatformSetupPanel.newSetupPanel(platform)
+            UiFactory.getDesktop().add(PlatformSetupWindow.newSetupPanel(platform)
                     .setCodeModelMap(codeModelParams)
                     .setPhysicsModelMap(physicsModelParams)
                     .setReportAction((PlatformConfig config) -> {
@@ -136,6 +145,14 @@ class TypeDisplayPanel extends JPanel {
         physicsModelParams.put(name, params);
     }
 
+    void addMapModifier(String name, List<String> params){
+        mapModifierParams.put(name, params);
+    }
+
+    void addMapPopulator(String name, List<String> params){
+        mapPopulatorParams.put(name, params);
+    }
+
     private void setEnvironment(File path, String name){
         enviroPnl.removeAll();
         environmentFile = path;
@@ -151,6 +168,13 @@ class TypeDisplayPanel extends JPanel {
         });
         enviroPnl.add(enviroLbl, "cell 0 0 2 1");
         repaint();
+    }
+
+    private void createNewEnvironment(){
+        UiFactory.getDesktop().add(EnvironmentSetupWindow.newEnvironmentSetupWindow(platform)
+                .setModifiersMap(mapModifierParams)
+                .setPopulatorMap(mapPopulatorParams)
+                .build());
     }
 
     private Optional<File> loadFromFile(){

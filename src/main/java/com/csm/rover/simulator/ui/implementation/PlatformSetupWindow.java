@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-class PlatformSetupPanel extends EmbeddedFrame {
+class PlatformSetupWindow extends EmbeddedFrame {
 
     private JPanel contentPane;
     private JComboBox<String> physicsCombo, codeCombo;
@@ -23,7 +23,7 @@ class PlatformSetupPanel extends EmbeddedFrame {
     private ReportPlatform reportAction;
     private boolean manual_name = false;
 
-    private PlatformSetupPanel(){}
+    private PlatformSetupWindow(){}
 
     private void initialize(){
         setTitle("New " + platform);
@@ -159,11 +159,11 @@ class PlatformSetupPanel extends EmbeddedFrame {
     }
 
     static class Builder {
-        private PlatformSetupPanel panel;
+        private PlatformSetupWindow panel;
         private Optional<PlatformConfig> existing;
 
         private Builder(String platform){
-            panel = new PlatformSetupPanel();
+            panel = new PlatformSetupWindow();
             panel.platform = platform;
             existing = Optional.empty();
         }
@@ -188,7 +188,7 @@ class PlatformSetupPanel extends EmbeddedFrame {
             return this;
         }
 
-        PlatformSetupPanel build(){
+        PlatformSetupWindow build(){
             if (panel.physicsModels == null || panel.codeModels == null || panel.reportAction == null){
                 throw new IllegalStateException("Builder was not fully initialized");
             }

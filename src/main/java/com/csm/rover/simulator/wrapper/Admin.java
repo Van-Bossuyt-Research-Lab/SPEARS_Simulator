@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.wrapper;
 
+import com.csm.rover.simulator.environments.EnvironmentRegistry;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
@@ -93,6 +94,14 @@ public class Admin {
             }
             for (String physics : PlatformRegistry.listPhysicsModels(type)){
                 startup.registerPhysicsModel(type, physics, PlatformRegistry.getParametersForPhysicsModel(type, physics));
+            }
+            if (EnvironmentRegistry.getTypes().contains(type)) {
+                for (String modifier : EnvironmentRegistry.listModifiers(type)) {
+                    startup.registerEnvironmentModifier(type, modifier, EnvironmentRegistry.getParametersForModifier(type, modifier));
+                }
+                for (String populator : EnvironmentRegistry.listPopulators(type)) {
+                    startup.registerEnvironmentPopulator(type, populator, EnvironmentRegistry.getParametersForPopulator(type, populator));
+                }
             }
         }
         startup.display();

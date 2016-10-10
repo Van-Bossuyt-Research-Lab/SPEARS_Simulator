@@ -69,8 +69,13 @@ class StartupWindowImpl extends EmbeddedFrame implements StartupWindow {
     }
 
     @Override
-    public void registerEnvironment(String platform, List<String> parameters) {
+    public void registerEnvironmentModifier(String platform, String name, List<String> parameters){
+        platformDisplays.get(platform).addMapModifier(name, parameters);
+    }
 
+    @Override
+    public void registerEnvironmentPopulator(String platform, String name, List<String> parameters){
+        platformDisplays.get(platform).addMapPopulator(name, parameters);
     }
 
     @Override
