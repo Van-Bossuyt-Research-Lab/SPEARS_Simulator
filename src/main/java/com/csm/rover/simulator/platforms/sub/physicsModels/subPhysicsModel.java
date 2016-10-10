@@ -152,6 +152,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 	}
 
 	private void establishDriveResponses() {
+        //Set motor states base on drive input from ui/autocode
 		super.addCommandHandler(SubDriveCommands.DRIVE_FORWARD.getCmd(), new DriveCommandHandler() {
 			@Override
 			public void processCommand(double[] params) {
@@ -235,6 +236,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		});
 		super.addCommandHandler(SubDriveCommands.CHANGE_MOTOR_PWR.getCmd(), new DriveCommandHandler() {
 			@Override
+            //handler for input commands for driver
 			public void processCommand(double[] params) {
 				setMotorPower((int) params[0], (int) params[1]);
 			}
@@ -272,12 +274,13 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 
 	@Override
 	public void initializeState(PlatformState state) {
+        //create initial conditions for sub
 		if (state.getType().equals("Sub")){
 			try {
 				this.sub_state = (SubState)state;
 				this.location[1] = state.<Double>get("x");
 				this.location[2] = state.<Double>get("y");
-				//this.location[3] = state.<Double>get("z");
+				this.location[3] = state.<Double>get("z");
 				this.direction = state.get("direction");
 				double temp = -30; //TODO temp
 				battery_charge = battery_max_charge;
@@ -327,6 +330,8 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		//                acceleration_xy = 1/total_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - planetParams.getgrav_accel()*Math.sin(MAP.getIncline(location, direction));
 		//                angular_acceleration = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
 		// Speed changes based on Acceleration
+        // Position and directions based on speed
+        // all numberically integrated using forward rk4 method
 		speed_x2 = speed_x+ acceleration_xy * 0.5*time_step * Math.cos(theta)* Math.cos(phi);
 		speed_y2 = speed_y+ acceleration_xy * 0.5*time_step * Math.sin(theta)* Math.cos(phi);
 		speed_z2 = speed_z+ 0.5*acceleration_z * time_step;
@@ -381,6 +386,8 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		//TODO													  + here??
 		//                           location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
 		System.out.println(getLocation());
+
+        //update all base values for next iteration
 
         location= locationf;
         angular_acceleration_xy = angular_acceleration_xyf;
