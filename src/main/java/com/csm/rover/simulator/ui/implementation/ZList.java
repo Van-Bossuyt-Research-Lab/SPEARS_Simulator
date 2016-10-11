@@ -34,13 +34,13 @@ class ZList <T> extends JPanel implements Cloneable{
         initialize();
 	}
 	
-	public ZList(T[] values){
+	ZList(T[] values){
 		this.values = asList(values);
         setLabels();
         initialize();
 	} 
     
-    public ZList(ArrayList<T> values){
+    ZList(ArrayList<T> values){
         this.values = values;
         setLabels();
         initialize();
@@ -125,7 +125,7 @@ class ZList <T> extends JPanel implements Cloneable{
 		}
 	}
 
-	public void setSelection(int which){
+	void setSelection(int which){
 		if (which >= 0 && which < values.size()){
 			selectItem(which);
 		}
@@ -206,7 +206,7 @@ class ZList <T> extends JPanel implements Cloneable{
 		}
 	}
 	
-	public void clearSelection(){
+	void clearSelection(){
 		selectItem(-1);
 	}
 	
@@ -214,15 +214,19 @@ class ZList <T> extends JPanel implements Cloneable{
 		return selected;
 	}
 	
-	public T getSelectedItem(){
+	T getSelectedItem(){
 		return getItemAt(selected);
 	}
 	
-	public List<T> getItems(){
+	String getLabelAt(int index){
+        return this.items.get(index).getText().substring(2);
+    }
+	
+	List<T> getItems(){
         return values;
 	}
 	
-	public String[] getListItems(){
+	String[] getListItems(){
 		String[] out = new String[values.size()];
 		int x = 0;
 		while (x < out.length){
@@ -232,18 +236,18 @@ class ZList <T> extends JPanel implements Cloneable{
 		return out;
 	}
 	
-	public void removeValue(T val){
+	void removeValue(T val){
 		int hold = getLocationOfValue(val);
 		if (hold != -1){
 			removeValue(hold);
 		}
 	}
 	
-	public void addListSelectionListener(ListSelectionListener listener){
+	void addListSelectionListener(ListSelectionListener listener){
 		ListSelectionListeners.add(listener);
 	}
 	
-	public void removeListSelectionListener(ListSelectionListener listener){
+	void removeListSelectionListener(ListSelectionListener listener){
 		ListSelectionListeners.remove(listener);
 	}
 	
@@ -253,7 +257,7 @@ class ZList <T> extends JPanel implements Cloneable{
 		}
 	}
 	
-	public String getValueAt(int loc){
+	String getValueAt(int loc){
 		try {
 			return values.get(loc).toString();
 		}
@@ -286,5 +290,9 @@ class ZList <T> extends JPanel implements Cloneable{
 		}
 		return -1;
 	}
+
+    int getItemCount(){
+        return items.size();
+    }
 
 }

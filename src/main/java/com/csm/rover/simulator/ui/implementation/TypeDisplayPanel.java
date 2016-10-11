@@ -26,12 +26,13 @@ class TypeDisplayPanel extends JPanel {
     private final ZList<PlatformConfig> platformTable;
 
     private Map<String, List<String>> codeModelParams, physicsModelParams,
-            mapModifierParams, mapPopulatorParams;
+            mapGeneratorParams, mapModifierParams, mapPopulatorParams;
 
 	TypeDisplayPanel(String platform){
         this.platform = platform;
         codeModelParams = new HashMap<>();
         physicsModelParams = new HashMap<>();
+        mapGeneratorParams = new HashMap<>();
         mapModifierParams = new HashMap<>();
         mapPopulatorParams = new HashMap<>();
         this.setOpaque(false);
@@ -145,6 +146,10 @@ class TypeDisplayPanel extends JPanel {
         physicsModelParams.put(name, params);
     }
 
+    void addMapGenerator(String name, List<String> params){
+        mapGeneratorParams.put(name, params);
+    }
+
     void addMapModifier(String name, List<String> params){
         mapModifierParams.put(name, params);
     }
@@ -172,8 +177,10 @@ class TypeDisplayPanel extends JPanel {
 
     private void createNewEnvironment(){
         UiFactory.getDesktop().add(EnvironmentSetupWindow.newEnvironmentSetupWindow(platform)
+                .setGeneratorsMap(mapGeneratorParams)
                 .setModifiersMap(mapModifierParams)
                 .setPopulatorMap(mapPopulatorParams)
+                .setReportAction((a) -> {})
                 .build());
     }
 

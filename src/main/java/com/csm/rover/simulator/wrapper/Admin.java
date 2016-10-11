@@ -2,6 +2,7 @@ package com.csm.rover.simulator.wrapper;
 
 import com.csm.rover.simulator.environments.EnvironmentRegistry;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.environments.annotations.Modifier;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.platforms.Platform;
@@ -97,7 +98,12 @@ public class Admin {
             }
             if (EnvironmentRegistry.getTypes().contains(type)) {
                 for (String modifier : EnvironmentRegistry.listModifiers(type)) {
-                    startup.registerEnvironmentModifier(type, modifier, EnvironmentRegistry.getParametersForModifier(type, modifier));
+                    if (EnvironmentRegistry.getModifier(type, modifier).getAnnotation(Modifier.class).generator()){
+                        startup.registerEnvironmentGenerator(type, modifier, EnvironmentRegistry.getParametersForModifier(type, modifier));
+                    }
+                    else {
+                        startup.registerEnvironmentModifier(type, modifier, EnvironmentRegistry.getParametersForModifier(type, modifier));
+                    }
                 }
                 for (String populator : EnvironmentRegistry.listPopulators(type)) {
                     startup.registerEnvironmentPopulator(type, populator, EnvironmentRegistry.getParametersForPopulator(type, populator));

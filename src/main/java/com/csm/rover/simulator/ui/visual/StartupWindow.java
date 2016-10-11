@@ -10,6 +10,8 @@ public interface StartupWindow {
 
     void registerPhysicsModel(String platform, String name, List<String> parameters);
 
+    void registerEnvironmentGenerator(String platform, String name, List<String> parameters);
+
     void registerEnvironmentModifier(String platform, String name, List<String> parameters);
 
     void registerEnvironmentPopulator(String platform, String name, List<String> parameters);
