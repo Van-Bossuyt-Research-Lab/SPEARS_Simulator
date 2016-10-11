@@ -157,7 +157,7 @@ class ZList <T> extends JPanel implements Cloneable{
     }
 
     void addValue(T val, int loc){
-        addValue(val, val.toString(), values.size());
+        addValue(val, val.toString(), loc);
     }
 
 	void addValue(T val, String label, int loc){

@@ -1,34 +1,53 @@
 package com.csm.rover.simulator.ui.implementation;
 
-import com.csm.rover.simulator.environments.EnvironmentModifier;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import java.awt.*;
 import java.io.File;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 class EnvironmentSetupWindow extends EmbeddedFrame {
 
     private JPanel contentPane;
     private JComboBox<String> generatorCombo;
-    private ZList<EnvironmentModifier> modList;
+    private ZList<ModifierConfig> modList;
     private Map<String, JCheckBox> populatorSelectors;
     private JButton goBtn;
+
+    private Set<EmbeddedFrame> spawnedFrames;
 
     private String platform;
     private ReportEnvironment reportAction;
     private Map<String, List<String>> generatorParams, modifierParams, populatorParams;
+    private Optional<ModifierConfig> generatorConfig = Optional.empty();
+    private Map<String, PopulatorConfig> populatorConfigs;
     private Optional<File> mapFile = Optional.empty();
 
-    private EnvironmentSetupWindow(){}
+    private Map<String, Boolean> isPopEditorOpen;
+
+    private EnvironmentSetupWindow(){
+        spawnedFrames = new HashSet<>();
+        populatorConfigs = new HashMap<>();
+        isPopEditorOpen = new HashMap<>();
+    }
 
     private void initialize(){
         setTitle("New "+platform+" Environment");
         setVisible(true);
+        addInternalFrameListener(new InternalFrameAdapter() {
+            @Override
+            public void internalFrameClosing(InternalFrameEvent e) {
+                for (EmbeddedFrame frame : spawnedFrames){
+                    if (!frame.isClosed()){
+                        frame.doDefaultCloseAction();
+                    }
+                }
+            }
+        });
 
         contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
@@ -51,7 +70,20 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
         generatorCombo.addItemListener((e) -> {
             if (generatorCombo.getSelectedIndex() != -1){
                 String gen = (String)generatorCombo.getSelectedItem();
-                UiFactory.getDesktop().add(new ModifierCreationWindow(gen, generatorParams.get(gen)));
+                ModifierCreationWindow window = ModifierCreationWindow.newModifierCreationWindow(platform)
+                        .setSingleInstance(gen, generatorParams.get(gen))
+                        .setReportAction((config) -> generatorConfig = Optional.of(config))
+                        .build();
+                window.addInternalFrameListener(new InternalFrameAdapter() {
+                    @Override
+                    public void internalFrameClosed(InternalFrameEvent e) {
+                        if (!generatorConfig.isPresent()){
+                            generatorCombo.setSelectedIndex(-1);
+                        }
+                        updateGoEnabled();
+                    }
+                });
+                spawnframe(window);
             }
             updateGoEnabled();
         });
@@ -66,22 +98,24 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
         mainPnl.add(modButtonPnl, "cell 0 3");
 
         JButton modAdd = new JButton("Add");
-        modAdd.addActionListener((a) -> {
-            UiFactory.getDesktop().add(new ModifierCreationWindow(modifierParams));
-        });
+        modAdd.addActionListener((a) ->
+            spawnframe(ModifierCreationWindow.newModifierCreationWindow(platform)
+                .setOptionMap(modifierParams)
+                .setReportAction(modList::addValue)
+                .build()));
         modButtonPnl.add(modAdd, "cell 0 0");
 
         JButton modUp = new JButton();
         modUp.setIcon(ImageFunctions.getImage("/gui/arrow_up.png", 15, 15));
         modUp.addActionListener((a) -> {
             int start = modList.getSelectedIndex();
-            if (start == 0){
+            if (start == -1 || start == 0){
                 return;
             }
-            String label = modList.getLabelAt(start);
-            EnvironmentModifier mod = modList.getSelectedItem();
+            ModifierConfig mod = modList.getSelectedItem();
             modList.removeValue(mod);
-            modList.addValue(mod, label, start-1);
+            modList.addValue(mod, start-1);
+            modList.setSelection(start-1);
         });
         modButtonPnl.add(modUp, "cell 1 0");
 
@@ -89,13 +123,13 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
         modDown.setIcon(ImageFunctions.getImage("/gui/arrow_down.png", 15, 15));
         modDown.addActionListener((a) -> {
             int start = modList.getSelectedIndex();
-            if (start == modList.getItemCount()-1){
+            if (start == -1 || start == modList.getItemCount()-1){
                 return;
             }
-            String label = modList.getLabelAt(start);
-            EnvironmentModifier mod = modList.getSelectedItem();
+            ModifierConfig mod = modList.getSelectedItem();
             modList.removeValue(mod);
-            modList.addValue(mod, label, start+1);
+            modList.addValue(mod, start+1);
+            modList.setSelection(start+1);
         });
         modButtonPnl.add(modDown, "cell 2 0");
 
@@ -125,15 +159,21 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
             JCheckBox check = new JCheckBox(pop);
             check.setOpaque(false);
             check.addActionListener((a) -> {
+                if (isPopEditorOpen.get(pop)){
+                    check.setSelected(false);
+                    return;
+                }
                 if (check.isSelected()){
                     populatorCreation(pop); //might be weird if pop is updating
                 }
                 else {
                     removePopulator(pop);
                 }
+                resetSubmission();
             });
             populatorList.add(check, "cell 0 "+i);
             populatorSelectors.put(pop, check);
+            isPopEditorOpen.put(pop, false);
             i++;
         }
 
@@ -147,19 +187,31 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
     }
 
     private void populatorCreation(String pop){
-        //TODO poulator creation
-
-        //if actually changed
-        resetSubmission();
+        isPopEditorOpen.put(pop, true);
+        populatorSelectors.get(pop).setSelected(false);
+        PopulatorCreationWindow window = PopulatorCreationWindow.newPopulatorCreationWindow(platform)
+                .setName(pop)
+                .setParamterList(populatorParams.get(pop))
+                .setReportAction((config) -> populatorConfigs.put(pop, config))
+                .build();
+        window.addInternalFrameListener(new InternalFrameAdapter() {
+            @Override
+            public void internalFrameClosed(InternalFrameEvent e) {
+                isPopEditorOpen.put(pop, false);
+                populatorSelectors.get(pop).setSelected(populatorConfigs.containsKey(pop));
+            }
+        });
+        spawnframe(window);
     }
 
     private void removePopulator(String pop){
-        //TODO
-        resetSubmission();
+        if (populatorConfigs.containsKey(pop)){
+            populatorConfigs.remove(pop);
+        }
     }
 
     private void updateGoEnabled(){
-        goBtn.setEnabled(generatorCombo.getSelectedIndex() != -1);
+        goBtn.setEnabled(generatorConfig.isPresent());
     }
 
     private void resetSubmission(){
@@ -170,11 +222,10 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
     private void processGo(){
         if (mapFile.isPresent()){
             reportAction.registerEnvironment(mapFile.get());
-            //TODO close preview
             doDefaultCloseAction();
         }
         else {
-            mapFile.of(generateMap());
+            mapFile = Optional.of(generateMap());
             goBtn.setText("Use Environment");
         }
     }
@@ -182,6 +233,11 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
     private File generateMap(){
         //TODO generate and preview map
         return new File("");
+    }
+
+    private void spawnframe(EmbeddedFrame frame){
+        spawnedFrames.add(frame);
+        UiFactory.getDesktop().add(frame);
     }
 
     static Builder newEnvironmentSetupWindow(String platform){

@@ -114,7 +114,7 @@ class PlatformSetupWindow extends EmbeddedFrame {
         addBtn.addActionListener((ActionEvent e) -> reportPlatform());
         contentPane.add(addBtn, BorderLayout.SOUTH);
 
-        setSize(300, 250);
+        setSize(350, 250);
         setMinimumSize(getSize());
         this.setVisible(true);
     }
