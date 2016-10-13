@@ -1,6 +1,11 @@
 package com.csm.rover.simulator.ui.implementation;
 
+import com.csm.rover.simulator.environments.*;
+import com.csm.rover.simulator.objects.util.FreeThread;
 import net.miginfocom.swing.MigLayout;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
@@ -11,6 +16,7 @@ import java.util.*;
 import java.util.List;
 
 class EnvironmentSetupWindow extends EmbeddedFrame {
+    private static final Logger LOG = LogManager.getLogger(EnvironmentSetupWindow.class);
 
     private JPanel contentPane;
     private JComboBox<String> generatorCombo;
@@ -178,7 +184,7 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
         }
 
         goBtn = new JButton("Generate");
-        goBtn.addActionListener((e) -> processGo());
+        goBtn.addActionListener((e) -> new FreeThread(0, this::processGo, 1, "genEnv"));
         goBtn.setEnabled(false);
         contentPane.add(goBtn, BorderLayout.SOUTH);
 
@@ -225,14 +231,38 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
             doDefaultCloseAction();
         }
         else {
-            mapFile = Optional.of(generateMap());
-            goBtn.setText("Use Environment");
+            try {
+                mapFile = Optional.of(generateMap());
+                goBtn.setText("Use Environment");
+            }
+            catch (IllegalAccessException | InstantiationException e) {
+                LOG.log(Level.ERROR, "Failed to create new Environment", e);
+            }
         }
     }
 
-    private File generateMap(){
-        //TODO generate and preview map
-        return new File("");
+    private File generateMap() throws IllegalAccessException, InstantiationException {
+        LOG.log(Level.INFO, "Generating new Environment for " + platform);
+        UiFactory.getDesktop().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        PlatformEnvironment environment = EnvironmentRegistry.getEnvironment(platform).newInstance();
+        PlatformEnvironment.MapBuilder builder = environment.generateNewMap(EnvironmentRegistry.getModifier(platform, generatorConfig.get().name).newInstance(), generatorConfig.get().params);
+        for (ModifierConfig config : modList.getItems()){
+            builder.addMapModifier(EnvironmentRegistry.getModifier(platform, config.name).newInstance(), config.params);
+        }
+        for (String pop : populatorConfigs.keySet()){
+            PopulatorConfig config = populatorConfigs.get(pop);
+            builder.addPopulator(pop, EnvironmentRegistry.getPopulator(platform, pop).newInstance(), config.params);
+        }
+        builder.generate();
+        Random rnd = new Random();
+        File tempFile;
+        do {
+            tempFile = new File("Temp/temp_"+rnd.nextInt(9999));
+        } while (tempFile.exists());
+        tempFile = EnvironmentIO.appendSuffix(platform, tempFile);
+        EnvironmentIO.saveEnvironment(environment, tempFile);
+        UiFactory.getDesktop().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        return tempFile;
     }
 
     private void spawnframe(EmbeddedFrame frame){

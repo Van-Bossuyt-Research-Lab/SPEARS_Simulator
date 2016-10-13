@@ -5,15 +5,13 @@ import com.csm.rover.simulator.objects.io.PlatformConfig;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.*;
+import java.util.List;
 
 class TypeDisplayPanel extends JPanel {
 
@@ -128,12 +126,7 @@ class TypeDisplayPanel extends JPanel {
         enviroEditPopup.add(configure);
 
         JMenuItem load = new JMenuItem("Select New File");
-        load.addActionListener((ActionEvent e) -> {
-            Optional<File> file = loadFromFile();
-            if (file.isPresent()) {
-                setEnvironment(file.get(), file.get().getName());
-            }
-        });
+        load.addActionListener((ActionEvent e) -> setEnvironmentFile(loadFromFile()));
         enviroEditPopup.add(load);
 
 	}
@@ -172,7 +165,13 @@ class TypeDisplayPanel extends JPanel {
             }
         });
         enviroPnl.add(enviroLbl, "cell 0 0 2 1");
-        repaint();
+        forceRepaint();
+    }
+
+    private void setEnvironmentFile(Optional<File> file){
+        if (file.isPresent()) {
+            setEnvironment(file.get(), file.get().getName());
+        }
     }
 
     private void createNewEnvironment(){
@@ -180,7 +179,7 @@ class TypeDisplayPanel extends JPanel {
                 .setGeneratorsMap(mapGeneratorParams)
                 .setModifiersMap(mapModifierParams)
                 .setPopulatorMap(mapPopulatorParams)
-                .setReportAction((a) -> {})
+                .setReportAction((file) -> setEnvironmentFile(Optional.of(file)))
                 .build());
     }
 
@@ -202,6 +201,15 @@ class TypeDisplayPanel extends JPanel {
 
     private String underline(String s){
         return String.format("<html><u>%s</u></html>", s);
+    }
+
+    private void forceRepaint(){
+        Component parent = this;
+        do {
+            parent = parent.getParent();
+        } while (!(parent instanceof EmbeddedFrame));
+        parent.setSize(parent.getWidth()+1, parent.getHeight());
+        parent.setSize(parent.getWidth()-1, parent.getHeight());
     }
 
 }

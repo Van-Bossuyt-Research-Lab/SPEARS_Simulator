@@ -22,12 +22,13 @@ public class EnvironmentIO {
     }
 
     public static void saveEnvironment(PlatformEnvironment enviro, File file){
-        if ((new EnvrioFileFilter(enviro.platform_type)).accept(file)){
+        if (!(new EnvrioFileFilter(enviro.platform_type)).accept(file)){
             throw new IllegalArgumentException("This file has an invalid suffix: "+file.getName());
         }
         ObjectMapper mapper = new ObjectMapper();
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, enviro);
+            LOG.log(Level.INFO, "Environment saved at {}", file.getAbsolutePath());
         }
         catch (IOException e) {
             LOG.log(Level.ERROR, "Failed to save Environment", e);
@@ -37,6 +38,7 @@ public class EnvironmentIO {
     public static <T extends PlatformEnvironment> T loadEnvironment(File file, Class<T> clazz){
         ObjectMapper mapper = new ObjectMapper();
         try {
+            LOG.log(Level.INFO, "Reading environment from {}" + file.getAbsolutePath());
             return mapper.readValue(file, clazz);
         }
         catch (IOException e) {
