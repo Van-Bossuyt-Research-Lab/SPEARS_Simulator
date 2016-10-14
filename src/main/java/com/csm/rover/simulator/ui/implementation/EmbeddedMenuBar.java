@@ -37,8 +37,6 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		this.add(optionsMenu);
 		
 		initialize();
-		
-		createInternalFeedback();
 	}
 
 	private void initialize(){
@@ -66,6 +64,7 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		fileMenu.addSeparator();
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener((ActionEvent e) -> SoundPlayer.playSound(SpearsSound.GOODBYE));
 		mntmExit.setIcon(getMenuIcon("/gui/power.png"));
 		mntmExit.addActionListener((ActionEvent e) -> {if (exitOp.isPresent()) exitOp.get().run(); });
 		fileMenu.add(mntmExit);
@@ -278,30 +277,5 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
             volumeListener.get().changeVolume(level);
         }
     }
-
-	private void createInternalFeedback() {
-		Component[] menus = new Component[this.getMenuCount()];
-		for (int i = 0; i < menus.length; i++){
-			menus[i] = this.getMenu(i);
-		}
-		addButtonClicks(menus);
-	}
-	
-	private void addButtonClicks(Component[] menus){
-		for (Component menu : menus){
-			if (menu instanceof JMenu){
-				addButtonClicks(((JMenu)menu).getMenuComponents());
-			}
-			else if (menu instanceof JMenuItem){
-                JMenuItem jmenu = ((JMenuItem)menu);
-				if (!jmenu.getText().equals("Exit")) {
-                    jmenu.addActionListener((ActionEvent) -> SoundPlayer.playSound(SpearsSound.BEEP_LOW));
-                }
-                else {
-                    jmenu.addActionListener((ActionEvent e) -> SoundPlayer.playSound(SpearsSound.GOODBYE));
-                }
-			}
-		}
-	}
 
 }

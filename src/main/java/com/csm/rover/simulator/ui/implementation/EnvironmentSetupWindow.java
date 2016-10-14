@@ -2,6 +2,8 @@ package com.csm.rover.simulator.ui.implementation;
 
 import com.csm.rover.simulator.environments.*;
 import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.ui.sound.SoundPlayer;
+import com.csm.rover.simulator.ui.sound.SpearsSound;
 import net.miginfocom.swing.MigLayout;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +27,7 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
     private JButton goBtn;
 
     private Set<EmbeddedFrame> spawnedFrames;
+    private FreeThread waitingAnimation;
 
     private String platform;
     private ReportEnvironment reportAction;
@@ -232,12 +235,26 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
         }
         else {
             try {
+                goBtn.setText(".");
+                waitingAnimation = new FreeThread(1000, this::animateWaiting, FreeThread.FOREVER, "env_animate", true);
                 mapFile = Optional.of(generateMap());
+                waitingAnimation.Stop();
+                SoundPlayer.playSound(SpearsSound.NEW);
                 goBtn.setText("Use Environment");
             }
             catch (IllegalAccessException | InstantiationException e) {
                 LOG.log(Level.ERROR, "Failed to create new Environment", e);
             }
+        }
+    }
+
+    private void animateWaiting(){
+        String cur = goBtn.getText();
+        if (cur.length() > 12){
+            goBtn.setText(".");
+        }
+        else {
+            goBtn.setText(cur + "..");
         }
     }
 

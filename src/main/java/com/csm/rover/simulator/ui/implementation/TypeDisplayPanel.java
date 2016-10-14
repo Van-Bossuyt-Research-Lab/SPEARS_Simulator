@@ -95,6 +95,9 @@ class TypeDisplayPanel extends JPanel {
         JButton edit = new JButton("Edit");
         edit.addActionListener((ActionEvent e) -> {
             final int currentloc = platformTable.getSelectedIndex();
+            if (currentloc == -1){
+                return;
+            }
             UiFactory.getDesktop().add(PlatformSetupWindow.newSetupPanel(platform)
                     .setCodeModelMap(codeModelParams)
                     .setPhysicsModelMap(physicsModelParams)
