@@ -229,6 +229,9 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
     }
 
     private void processGo(){
+        if (goBtn.getText().contains(".")){
+            return;
+        }
         if (mapFile.isPresent()){
             reportAction.registerEnvironment(mapFile.get());
             doDefaultCloseAction();
@@ -250,11 +253,11 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
 
     private void animateWaiting(){
         String cur = goBtn.getText();
-        if (cur.length() > 12){
+        if (cur.length() > 18){
             goBtn.setText(".");
         }
         else {
-            goBtn.setText(cur + "..");
+            goBtn.setText(cur + " . .");
         }
     }
 

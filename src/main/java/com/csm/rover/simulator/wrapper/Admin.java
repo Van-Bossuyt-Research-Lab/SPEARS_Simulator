@@ -14,6 +14,8 @@ import com.csm.rover.simulator.ui.sound.SoundPlayer;
 import com.csm.rover.simulator.ui.visual.MainMenu;
 import com.csm.rover.simulator.ui.visual.PopUp;
 import com.csm.rover.simulator.ui.visual.StartupWindow;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -110,6 +112,7 @@ public class Admin {
                 }
             }
         }
+        startup.setStartUpAction(this::beginSimulation);
         startup.display();
     }
 
@@ -133,6 +136,13 @@ public class Admin {
 
 	private void beginSimulation(RunConfiguration config){
         //TODO begin simulation
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(config));
+        }
+        catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
 	}
 
     private void shutDownSimulator(){

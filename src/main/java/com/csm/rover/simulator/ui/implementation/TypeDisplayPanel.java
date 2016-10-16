@@ -2,9 +2,12 @@ package com.csm.rover.simulator.ui.implementation;
 
 import com.csm.rover.simulator.objects.io.EnvrioFileFilter;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
+import com.csm.rover.simulator.objects.io.TypeConfig;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -17,7 +20,7 @@ class TypeDisplayPanel extends JPanel {
 
     private JPanel enviroPnl;
 
-    private File environmentFile;
+    private Optional<File> environmentFile = Optional.empty();
 
     private final String platform;
     private final JPopupMenu enviroEditPopup;
@@ -86,8 +89,10 @@ class TypeDisplayPanel extends JPanel {
             UiFactory.getDesktop().add(PlatformSetupWindow.newSetupPanel(platform)
                 .setCodeModelMap(codeModelParams)
                 .setPhysicsModelMap(physicsModelParams)
-                .setReportAction((PlatformConfig config) ->
-                        platformTable.addValue(config, config.getScreenName()))
+                .setReportAction((PlatformConfig config) -> {
+                    platformTable.addValue(config, config.getScreenName());
+                    updateNames();
+                })
             .build());
         });
         this.add(add, "cell 0 5");
@@ -103,7 +108,8 @@ class TypeDisplayPanel extends JPanel {
                     .setPhysicsModelMap(physicsModelParams)
                     .setReportAction((PlatformConfig config) -> {
                         platformTable.removeValue(currentloc);
-                        platformTable.addValue(config, config.getScreenName());
+                        platformTable.addValue(config, config.getScreenName(), currentloc);
+                        updateNames();
                     })
                     .loadExisting(platformTable.getItemAt(currentloc))
                     .build());
@@ -111,7 +117,10 @@ class TypeDisplayPanel extends JPanel {
         this.add(edit, "cell 1 5");
 
         JButton remove = new JButton("Remove");
-        remove.addActionListener((ActionEvent e) -> platformTable.removeValue(platformTable.getSelectedIndex()));
+        remove.addActionListener((ActionEvent e) -> {
+            platformTable.removeValue(platformTable.getSelectedIndex());
+            updateNames();
+        });
         this.add(remove, "cell 2 5");
 
         enviroEditPopup = new JPopupMenu();
@@ -154,9 +163,59 @@ class TypeDisplayPanel extends JPanel {
         mapPopulatorParams.put(name, params);
     }
 
+    boolean verifyConfig() throws StartUpConfigurationException {
+        if (!environmentFile.isPresent() && platformTable.getItems().isEmpty()){
+            return false;
+        }
+        if (!environmentFile.isPresent()){
+            throw new StartUpConfigurationException("No Environment is set");
+        }
+        if (platformTable.getItems().isEmpty()){
+            throw new StartUpConfigurationException("No Platforms were created");
+        }
+        return true;
+    }
+
+    TypeConfig getConfiguration() throws StartUpConfigurationException {
+        verifyConfig();
+        return new TypeConfig(platform, environmentFile.get(), platformTable.getItems());
+    }
+
+    private boolean updating_names = false;
+    private void updateNames(){
+        if (updating_names){
+            return;
+        }
+        updating_names = true;
+        List<String> newNames = new ArrayList<>();
+        for (PlatformConfig config : platformTable.getItems()){
+            newNames.add(config.getScreenName().substring(0, config.getScreenName().lastIndexOf(' ')));
+        }
+        Map<String, Integer> nameCount = new HashMap<>();
+        char id = platform.toLowerCase().charAt(0);
+        for (int i = 0; i < platformTable.getItems().size(); i++){
+            if (nameCount.containsKey(newNames.get(i))){
+                nameCount.put(newNames.get(i), nameCount.get(newNames.get(i))+1);
+            }
+            else {
+                nameCount.put(newNames.get(i), 1);
+            }
+            PlatformConfig newConfig = PlatformConfig.builder()
+                    .setType(platform)
+                    .setScreenName(newNames.get(i) + " " + nameCount.get(newNames.get(i)))
+                    .setID(id + " " + (i+1))
+                    .setAutonomousModel(platformTable.getItemAt(i).getAutonomousModelName(), platformTable.getItemAt(i).getAutonomousModelParameters())
+                    .setPhysicsModel(platformTable.getItemAt(i).getPhysicsModelName(), platformTable.getItemAt(i).getPhysicsModelParameters())
+                    .build();
+            platformTable.removeValue(i);
+            platformTable.addValue(newConfig, newConfig.getScreenName(), i);
+        }
+        updating_names = false;
+    }
+
     private void setEnvironment(File path, String name){
         enviroPnl.removeAll();
-        environmentFile = path;
+        environmentFile = Optional.of(path);
 
         JLabel enviroLbl = new JLabel(underline(name));
         enviroLbl.addMouseListener(new MouseAdapter() {
@@ -210,6 +269,9 @@ class TypeDisplayPanel extends JPanel {
         Component parent = this;
         do {
             parent = parent.getParent();
+            if (parent == null){
+                return;
+            }
         } while (!(parent instanceof EmbeddedFrame));
         parent.setSize(parent.getWidth()+1, parent.getHeight());
         parent.setSize(parent.getWidth()-1, parent.getHeight());

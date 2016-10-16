@@ -140,6 +140,8 @@ class PlatformSetupWindow extends EmbeddedFrame {
         physicsParams.fillInFields(platform.getPhysicsModelParameters());
         codeParams.fillInFields(platform.getAutonomousModelParameters());
         addBtn.setText("Update");
+        nameTxt.setText(platform.getScreenName().substring(0, platform.getScreenName().lastIndexOf(' ')));
+        manual_name = !nameTxt.getText().equals(codeCombo.getSelectedItem());
     }
 
     private void reportPlatform(){
@@ -147,7 +149,7 @@ class PlatformSetupWindow extends EmbeddedFrame {
                 .setType(platform)
                 .setAutonomousModel((String)codeCombo.getSelectedItem(), codeParams.getParameters())
                 .setPhysicsModel((String)physicsCombo.getSelectedItem(), physicsParams.getParameters())
-                .setScreenName(nameTxt.getText())
+                .setScreenName(nameTxt.getText() + " #")
                 .setID(platform.charAt(0) + " #")
                 .build();
         reportAction.registerNewPlatform(config);
