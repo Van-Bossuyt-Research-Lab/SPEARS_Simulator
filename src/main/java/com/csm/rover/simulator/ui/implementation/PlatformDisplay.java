@@ -2,7 +2,7 @@ package com.csm.rover.simulator.ui.implementation;
 
 import com.csm.rover.simulator.platforms.Platform;
 
-abstract class PlatformDisplay extends EmbeddedFrame {
+abstract class PlatformDisplay extends DisplayWindow {
 
     protected final String platform_type;
 
@@ -13,6 +13,7 @@ abstract class PlatformDisplay extends EmbeddedFrame {
     final void setPlatform(Platform platform){
         if (platform.getType().equals(this.platform_type)){
             doSetPlatform(platform);
+            start();
         }
         else {
             throw new IllegalArgumentException("The provided platform did not match the expected type for this display");
