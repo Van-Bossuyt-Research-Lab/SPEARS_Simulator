@@ -1,5 +1,7 @@
 package com.csm.rover.simulator.ui.implementation;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.ui.sound.SoundPlayer;
 import com.csm.rover.simulator.ui.sound.SpearsSound;
 import com.csm.rover.simulator.ui.sound.VolumeChangeListener;
@@ -10,6 +12,8 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.csm.rover.simulator.ui.implementation.ImageFunctions.getMenuIcon;
@@ -20,7 +24,7 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 
 	private JMenu fileMenu, viewMenu, optionsMenu;
 	
-	private JMenu newMenu;
+	private NewFrameMenu newMenu;
 	private JMenu showMenu;
 
     private Optional<Runnable> exitOp = Optional.empty();
@@ -258,6 +262,10 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
             }
         });
         this.add(closeBtn);
+	}
+
+	void setPlatfroms(Map<String, PlatformEnvironment> enviros, Map<String, List<Platform>> platforms){
+		newMenu.initPlatformViewControls(enviros, platforms);
 	}
 
     @Override

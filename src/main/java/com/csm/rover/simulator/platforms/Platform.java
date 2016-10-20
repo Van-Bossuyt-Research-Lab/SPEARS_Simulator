@@ -55,6 +55,10 @@ public abstract class Platform {
         return null;
     }
 
+    public String getName(){
+        return name;
+    }
+
     public final PlatformState getState(){
         return physicsModel.getState();
     }

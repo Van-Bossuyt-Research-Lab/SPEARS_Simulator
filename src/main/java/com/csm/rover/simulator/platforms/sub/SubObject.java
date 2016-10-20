@@ -753,10 +753,6 @@ public class SubObject extends Platform {
         serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis + "\n";
     }
 
-    public String getName(){
-        return name;
-    }
-
     public String getIDTag(){
         return IDcode;
     }

@@ -37,7 +37,7 @@ class RoverPlatformMonitorImpl extends PlatformDisplay {
     }
 
     @Override
-    public void doSetPlatform(Platform platform) {
+    protected void doSetPlatform(Platform platform) {
         this.rover = (RoverObject)platform;
         setTitle("Rover: " + rover.getName());
         update();

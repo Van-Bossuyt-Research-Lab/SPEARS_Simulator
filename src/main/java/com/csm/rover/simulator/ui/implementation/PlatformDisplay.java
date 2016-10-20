@@ -20,6 +20,6 @@ abstract class PlatformDisplay extends DisplayWindow {
         }
     }
 
-    abstract void doSetPlatform(Platform platform);
+    protected abstract void doSetPlatform(Platform platform);
 
 }

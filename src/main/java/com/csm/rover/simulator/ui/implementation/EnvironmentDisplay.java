@@ -20,6 +20,6 @@ abstract class EnvironmentDisplay extends DisplayWindow {
         }
     }
 
-    abstract void doSetEnvironment(PlatformEnvironment environment);
+    protected abstract void doSetEnvironment(PlatformEnvironment environment);
 
 }

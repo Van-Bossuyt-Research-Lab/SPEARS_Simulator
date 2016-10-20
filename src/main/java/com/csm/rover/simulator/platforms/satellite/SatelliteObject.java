@@ -65,10 +65,6 @@ public class SatelliteObject extends Platform {
 		//SynchronousThread.FOREVER, name+"-physics");
 	}
 	
-	public String getName(){
-		return name;
-	}
-	
 	public String getIDCode(){
 		return ID;
 	}

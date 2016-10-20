@@ -244,8 +244,8 @@ class EmbeddedDesktop extends JDesktopPane {
 	private Point getOpeningLocation(){
 		Point out = new Point(startLocation);
 		startLocation = new Point(
-				startLocation.getX()+100 < this.getWidth()-500 ? (int)startLocation.getX()+100 : 100,
-				startLocation.getY()+100 < this.getHeight()-500 ? (int)startLocation.getY()+100 : 100
+				startLocation.getX()+50 < this.getWidth()-500 ? (int)startLocation.getX()+50 : 100,
+				startLocation.getY()+50 < this.getHeight()-500 ? (int)startLocation.getY()+50 : 100
 				);
 		return out;
 	}
