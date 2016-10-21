@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.platforms.satellite;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
@@ -17,6 +18,9 @@ public class SatelliteParametersList extends PlatformPhysicsModel {
     public void constructParameters(Map<String, Double> params){
 
     }
+
+    @Override
+    public void setEnvironment(PlatformEnvironment environment){}
 
     @Override
     public void start() {

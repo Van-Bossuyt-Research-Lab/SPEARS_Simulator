@@ -46,7 +46,8 @@ class UiConfiguration {
                 1,
                 1,
                 0.5,
-                new HashMap<>()
+                new HashMap<>(),
+                System.getProperty("user.home")
         ));
     }
 
@@ -85,6 +86,7 @@ class UiConfiguration {
     private int desktop_divs_left, desktop_divs_right;
     private double desktop_center_line;
     private Map<String, String> platform_folders;
+    private String config_save_dir;
 
     @JsonCreator
     public UiConfiguration(
@@ -92,7 +94,8 @@ class UiConfiguration {
             @JsonProperty("desktop_divs_left") int desktop_divs_left,
             @JsonProperty("desktop_divs_right") int desktop_divs_right,
             @JsonProperty("desktop_center_line") double desktop_center_line,
-            @JsonProperty("platform_folders") Map<String, String> platform_folders
+            @JsonProperty("platform_folders") Map<String, String> platform_folders,
+            @JsonProperty("config_save_dir") String config_save_dir
     ){
         if (instance.isPresent()){
             throw new IllegalStateException("UiConfiguration has already been initialized, cannot make 2 copies");
@@ -102,6 +105,7 @@ class UiConfiguration {
         this.desktop_divs_right = desktop_divs_right;
         this.desktop_center_line = desktop_center_line;
         this.platform_folders = platform_folders;
+        this.config_save_dir = config_save_dir;
     }
 
     @JsonProperty("volume")
@@ -161,34 +165,34 @@ class UiConfiguration {
         updateSave();
     }
 
-    public static int getDesktopDivsLeft(){
+    static int getDesktopDivsLeft(){
         return instance.get().desktop_divs_left;
     }
 
-    public static void changeDesktopDivsLeft(int ddl){
+    static void changeDesktopDivsLeft(int ddl){
         instance.get().desktop_divs_left = ddl;
         updateSave();
     }
 
-    public static int getDesktopDivsRight(){
+    static int getDesktopDivsRight(){
         return instance.get().desktop_divs_right;
     }
 
-    public static void changeDesktopDivsRight(int ddr){
+    static void changeDesktopDivsRight(int ddr){
         instance.get().desktop_divs_right = ddr;
         updateSave();
     }
 
-    public static double getDesktopCenterLine(){
+    static double getDesktopCenterLine(){
         return instance.get().desktop_center_line;
     }
 
-    public static void changeDesktopCenterLine(double dcl){
+    static void changeDesktopCenterLine(double dcl){
         instance.get().desktop_center_line = dcl;
         updateSave();
     }
 
-    public static File getFolder(String platform){
+    static File getFolder(String platform){
         if (instance.get().platform_folders.containsKey(platform)){
             File file = new File(instance.get().platform_folders.get(platform));
             if (file.exists() && file.isDirectory()){
@@ -198,8 +202,23 @@ class UiConfiguration {
         return new File(System.getProperty("user.home"));
     }
 
-    public static void changeFolder(String platform, File folder){
+    static void changeFolder(String platform, File folder){
         instance.get().platform_folders.put(platform, folder.getAbsolutePath());
+        updateSave();
+    }
+
+    static File getConfigurationFolder(){
+        if (instance.get().config_save_dir != null) {
+            File file = new File(instance.get().config_save_dir);
+            if (file.exists() && file.isDirectory()) {
+                return file;
+            }
+        }
+        return new File(System.getProperty("user.home"));
+    }
+
+    static void changeConfigurationFolder(File folder){
+        instance.get().config_save_dir = folder.getAbsolutePath();
         updateSave();
     }
 

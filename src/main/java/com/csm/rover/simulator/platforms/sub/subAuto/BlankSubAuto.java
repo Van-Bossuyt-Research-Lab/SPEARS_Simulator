@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.platforms.sub.subAuto;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 
@@ -12,6 +13,11 @@ public class BlankSubAuto extends SubAutonomousCode {
 
     public BlankSubAuto() {
         super("NULL", "NULL");
+    }
+
+    @Override
+    public void setEnvironment(PlatformEnvironment environment){
+        //TODO
     }
 
     @Override

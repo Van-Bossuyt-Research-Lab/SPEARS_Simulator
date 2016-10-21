@@ -16,6 +16,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public class RunConfiguration implements Cloneable {
 	@JsonIgnore
@@ -26,39 +29,25 @@ public class RunConfiguration implements Cloneable {
 
 	@JsonIgnore
 	public NamesAndTags namesAndTags;
-	public ArrayList<PlatformConfig> platforms;
-	public File mapFile;
+    @JsonProperty("platforms")
+	public List<TypeConfig> types;
 	public boolean accelerated;
 	public int runtime;
 
-	public RunConfiguration(NamesAndTags namesAndTags,
-							ArrayList<PlatformConfig> platforms,
-							File mapFile,
-							boolean accelerated,
-							int runtime) {
-		this.namesAndTags = namesAndTags;
-		this.platforms = platforms;
-		this.mapFile = mapFile;
-		this.accelerated = accelerated;
-		this.runtime = runtime;
-	}
-
 	@JsonCreator
-	public RunConfiguration(@JsonProperty("platforms") ArrayList<PlatformConfig> platforms,
-							@JsonProperty("mapFile") File mapFile,
+	public RunConfiguration(@JsonProperty("platforms") List<TypeConfig> types,
 							@JsonProperty("accelerated") boolean accelerated,
 							@JsonProperty("runtime") int runtime) {
-		this.platforms = platforms;
-		this.mapFile = mapFile;
+		this.types = Collections.unmodifiableList(types);
 		this.accelerated = accelerated;
 		this.runtime = runtime;
-		this.namesAndTags = NamesAndTags.newFromPlatforms(platforms);
+		this.namesAndTags = NamesAndTags.newFromPlatforms(types);
 	}
+
 
 	private RunConfiguration(RunConfiguration orig){
 		this.namesAndTags = orig.namesAndTags.clone();
-		this.platforms = new ArrayList<>(orig.platforms);
-		this.mapFile = new File(orig.mapFile.getAbsolutePath());
+		this.types = Collections.unmodifiableList(orig.types);
 		this.accelerated = orig.accelerated;
 		this.runtime = orig.runtime;
 	}
@@ -85,7 +74,7 @@ public class RunConfiguration implements Cloneable {
 		}
 	}
 
-	public void Save(File file) throws Exception {
+	public void save(File file) throws Exception {
 		LOG.log(Level.INFO, "Saving run configuration to: {}", file.getAbsolutePath());
 		try {
 			mapper.writerWithDefaultPrettyPrinter().writeValue(file, this);
@@ -96,22 +85,118 @@ public class RunConfiguration implements Cloneable {
 		}
 	}
 
-	public ArrayList<PlatformConfig> getPlatforms(String type){
-		ArrayList<PlatformConfig> out = new ArrayList<>();
-		for (PlatformConfig cnfg : this.platforms){
-			if (cnfg.getType().equals(type)){
-				out.add(cnfg);
-			}
-		}
-		if (out.size() == 0){
-			throw new IndexOutOfBoundsException("No platforms of type \""+type+"\" registered");
-		}
-		return out;
+    @JsonIgnore
+    public List<String> getTypes(){
+        List<String> out = new ArrayList<>();
+        for (TypeConfig config : types){
+            out.add(config.type);
+        }
+        return out;
+    }
+
+    public File getEnvironmentFile(String type){
+        for (TypeConfig config : types){
+            if (config.type.equals(type)){
+                return config.mapFile;
+            }
+        }
+        throw new IllegalArgumentException("No platforms found of type \'" + type + "\'");
+    }
+
+	public List<PlatformConfig> getPlatforms(String type){
+        for (TypeConfig config : types){
+            if (config.type.equals(type)){
+                return config.platformConfigs;
+            }
+        }
+        throw new IllegalArgumentException("No platforms found of type \'" + type + "\'");
 	}
 
 	@Override
 	public RunConfiguration clone(){
 		return new RunConfiguration(this);
 	}
+
+    public static Builder newConfig(){
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private List<TypeConfig> types;
+        private Optional<Boolean> accelerated;
+        private int runtime;
+
+        private Builder(){
+            types = new ArrayList<>();
+            accelerated = Optional.empty();
+            runtime = 0;
+        }
+
+        public Builder setAccelerated(boolean accel){
+            accelerated = Optional.of(accel);
+            return this;
+        }
+
+        public Builder setRuntime(int min){
+            runtime = min;
+            return setAccelerated(true);
+        }
+
+        public Builder addType(TypeConfig config){
+            this.types.add(config);
+            return this;
+        }
+
+        public TypeBuilder newType(String type){
+            return new TypeBuilder(this, type);
+        }
+
+        public RunConfiguration build(){
+            if (types.size() > 0 && accelerated.isPresent() && (!accelerated.get() || runtime > 0)) {
+                return new RunConfiguration(types, accelerated.get(), runtime);
+            }
+            else {
+                throw new IllegalStateException("The builder is not fully initialized");
+            }
+        }
+
+    }
+
+    public static class TypeBuilder {
+
+        private Builder build;
+
+        private String type;
+        private File file;
+        private List<PlatformConfig> platforms;
+
+        private TypeBuilder(Builder build, String type){
+            this.build = build;
+            this.type = type;
+            this.platforms = new ArrayList<>();
+        }
+
+        public TypeBuilder setMapFile(File map){
+            this.file = map;
+            return this;
+        }
+
+        public TypeBuilder addPlatform(PlatformConfig config){
+            platforms.add(config);
+            return this;
+        }
+
+        private Builder build(){
+            if (this.file != null && platforms.size() > 0) {
+                build.types.add(new TypeConfig(type, file, platforms));
+                return build;
+            }
+            else {
+                throw new IllegalStateException("Builder not fully initialized");
+            }
+        }
+
+    }
 	
 }

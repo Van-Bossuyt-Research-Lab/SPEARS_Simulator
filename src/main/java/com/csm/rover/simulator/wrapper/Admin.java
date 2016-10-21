@@ -1,8 +1,10 @@
 package com.csm.rover.simulator.wrapper;
 
+import com.csm.rover.simulator.environments.EnvironmentIO;
 import com.csm.rover.simulator.environments.EnvironmentRegistry;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.annotations.Modifier;
+import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.platforms.Platform;
@@ -11,16 +13,19 @@ import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import com.csm.rover.simulator.ui.implementation.UiFactory;
 import com.csm.rover.simulator.ui.sound.SoundPlayer;
+import com.csm.rover.simulator.ui.sound.SpearsSound;
+import com.csm.rover.simulator.ui.visual.AcceleratedView;
 import com.csm.rover.simulator.ui.visual.MainMenu;
 import com.csm.rover.simulator.ui.visual.PopUp;
 import com.csm.rover.simulator.ui.visual.StartupWindow;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 
 public class Admin {
 	private static final Logger LOG = LogManager.getLogger(Admin.class);
@@ -29,11 +34,11 @@ public class Admin {
 	private Globals GLOBAL;
 
     //Runtime Variables
-    private PlatformEnvironment environment;
-    private ArrayList<PlatformConfig> roverCfgs;
-    private ArrayList<PlatformConfig> satCfgs;
+    private Map<String, PlatformEnvironment> environments;
+    private Map<String, List<Platform>> platforms;
 
-	public static void main(String[] args) {
+
+    public static void main(String[] args) {
         LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
         RegistryManager.checkRegistries();
 		Admin admin = getInstance();
@@ -47,7 +52,7 @@ public class Admin {
                             .setSubject("Quick Run")
                             .showConfirmDialog(PopUp.Buttons.YES_NO_OPTIONS) == PopUp.Options.YES_OPTION) {
 				try {
-					admin.beginSimulation(RunConfiguration.fromFile(config));
+					admin.startWithGUI(RunConfiguration.fromFile(config));
 				}
 				catch (Exception e){
 					LOG.log(Level.ERROR, "Simulator failed to start", e);
@@ -110,7 +115,21 @@ public class Admin {
                 }
             }
         }
+        startup.setStartUpAction(this::startWithGUI);
         startup.display();
+    }
+
+    private void startWithGUI(RunConfiguration config){
+        beginSimulation(config);
+        UiFactory.getApplication().start(environments, platforms);
+        if (GLOBAL.isAccelerated()){
+            UiFactory.getApplication().hide();
+            AcceleratedView viewer = UiFactory.newAcceleratedView();
+            viewer.setDuration(config.runtime);
+            viewer.setAbortAction(this::shutDownSimulator);
+            viewer.show();
+            new SynchronousThread(config.runtime*60*1000-1000, () -> SoundPlayer.playSound(SpearsSound.GOODBYE), 1, "frame_closing");
+        }
     }
 
     private static String getFileType(File file){
@@ -121,6 +140,8 @@ public class Admin {
 	//TODO clean up this interface for OCP
 	private Admin(){
 		GLOBAL = Globals.getInstance();
+        environments = new TreeMap<>();
+        platforms = new TreeMap<>();
 	}
 
     private static Optional<Admin> singleton_instance = Optional.empty();
@@ -132,28 +153,36 @@ public class Admin {
     }
 
 	private void beginSimulation(RunConfiguration config){
-        //TODO begin simulation
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            LOG.log(Level.INFO, "Starting simulation with configuration:\n{}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(config));
+        } catch (JsonProcessingException e) {}
+
+        List<String> ids = new ArrayList<>();
+        for (String type : config.getTypes()){
+            PlatformEnvironment enviro = EnvironmentIO.loadEnvironment(config.getEnvironmentFile(type), EnvironmentRegistry.getEnvironment(type));
+            environments.put(type, enviro);
+
+            platforms.put(type, new ArrayList<>());
+            for (PlatformConfig platformConfig : config.getPlatforms(type)){
+                Platform platform = Platform.buildFromConfiguration(platformConfig);
+                ids.add(platformConfig.getID());
+                platforms.get(type).add(platform);
+                enviro.addPlatform(platform);
+                platform.start();
+            }
+        }
+        RoverObject.setSerialBuffers(new SerialBuffers(ids));
+
+        GLOBAL.startTime(config.accelerated);
+        if (config.accelerated){
+            GLOBAL.setUpAcceleratedRun(config.runtime);
+        }
 	}
 
-    private void shutDownSimulator(){
+    void shutDownSimulator(){
         LOG.log(Level.INFO, "Exiting SPEARS");
         System.exit(0);
     }
-
-	private ArrayList<RoverObject> buildRoversFromConfig(ArrayList<PlatformConfig> configs){
-		ArrayList<RoverObject> out = new ArrayList<>();
-		for (PlatformConfig config : configs){
-            out.add(Platform.<RoverObject>buildFromConfiguration(config));
-		}
-        return out;
-	}
-
-	private ArrayList<SatelliteObject> buildSatellitesFromConfig(ArrayList<PlatformConfig> configs){
-        ArrayList<SatelliteObject> out = new ArrayList<>();
-        for (PlatformConfig config : configs){
-            out.add(Platform.<SatelliteObject>buildFromConfiguration(config));
-        }
-        return out;
-	}
 
 }

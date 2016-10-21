@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.platforms;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +32,8 @@ public abstract class PlatformPhysicsModel {
     public abstract PlatformState getState();
 
     private final Map<String, DriveCommandHandler> command_handlers;
+
+    public abstract void setEnvironment(PlatformEnvironment enviro);
 
     protected final void addCommandHandler(String cmd, DriveCommandHandler process){
         if (command_handlers.containsKey(cmd)){

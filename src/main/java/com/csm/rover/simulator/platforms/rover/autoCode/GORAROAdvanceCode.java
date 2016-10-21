@@ -70,10 +70,10 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 			writeToLog("time\tX\tY\tZ\tscore\tstate\thazard");
 			runyet = true;
 		}
-		writeToLog(milliTime + "\t" + formatDouble(location.getX()) + "\t" + formatDouble(location.getY()) + "\t" + formatDouble(MAP.getHeightAt(location)) + "\t" + score + "\t" + state + "\t" + MAP.<Integer>getPopulatorValue("Hazard", location));
+		writeToLog(milliTime + "\t" + formatDouble(location.getX()) + "\t" + formatDouble(location.getY()) + "\t" + formatDouble(environment.getHeightAt(location)) + "\t" + score + "\t" + state + "\t" + environment.<Integer>getPopulatorValue("Hazard", location));
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
-			score += (int)MAP.getPopulatorValue("Targets", location)/10;
+			score += (int) environment.getPopulatorValue("Targets", location)/10;
 			visitedScience.add(location);
 			for (int x = 0; x < histories; x++){
 				for (int y = 0; y < sampleDirections; y++){
@@ -121,15 +121,15 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 				int science = 0;
 				for (int radius = 0; radius < sampleRadius; radius++){
 					if (hasUnvisitedScience(location.offset(radius*Math.cos(theta), radius*Math.sin(theta)))){
-						science = (int)MAP.getPopulatorValue("Targets", location.offset(radius * Math.cos(theta), radius * Math.sin(theta)));
+						science = (int) environment.getPopulatorValue("Targets", location.offset(radius * Math.cos(theta), radius * Math.sin(theta)));
 						break;
 					}
 				}
 				
 				//if there is a hazard at the point get less excited
 				int hazard = 0;
-				if (MAP.<Integer>getPopulatorValue("Hazard", examine) > 0){
-					hazard = (int)MAP.getPopulatorValue("Hazard", location.offset(sampleRadius * Math.cos(theta), sampleRadius * Math.sin(theta)));
+				if (environment.<Integer>getPopulatorValue("Hazard", examine) > 0){
+					hazard = (int) environment.getPopulatorValue("Hazard", location.offset(sampleRadius * Math.cos(theta), sampleRadius * Math.sin(theta)));
 				}
 				
 				//Calculate the density of science targets in a wedge away from the rover 
@@ -138,7 +138,7 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 					for (double phi = -averagingAngle/2.0; phi <= averagingAngle/2.0; phi += averagingPStep){
 						if (hasUnvisitedScience(location.offset(radius*Math.cos(theta+phi), radius*Math.sin(theta+phi)))){
 							scienceArea += sampleRadius/radius;
-							sciences[i] += (int)MAP.getPopulatorValue("Targets", location.offset(radius * Math.cos(theta + phi), radius * Math.sin(theta + phi)));
+							sciences[i] += (int) environment.getPopulatorValue("Targets", location.offset(radius * Math.cos(theta + phi), radius * Math.sin(theta + phi)));
 						}
 					}
 				}
@@ -148,16 +148,16 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 				double hazardArea = 0;
 				for (double radius = sampleRadius; radius <= averagingRadius; radius += averagingRStep){
 					for (double phi = -averagingAngle/2.0; phi <= averagingAngle/2.0; phi += averagingPStep){
-						if (MAP.isPopulatorAt("Hazard", location.offset(radius * Math.cos(theta + phi), radius * Math.sin(theta + phi)))){
+						if (environment.isPopulatorAt("Hazard", location.offset(radius * Math.cos(theta + phi), radius * Math.sin(theta + phi)))){
 							hazardArea += sampleRadius/radius;
-							hazards[i] += (int)MAP.getPopulatorValue("Hazard", location.offset(radius * Math.cos(theta + phi), radius * Math.sin(theta + phi)));
+							hazards[i] += (int) environment.getPopulatorValue("Hazard", location.offset(radius * Math.cos(theta + phi), radius * Math.sin(theta + phi)));
 						}
 					}
 				}
 				hazardArea /= averagingRadius*averagingAngle;
 				
 				//work required to move the same translational distance increases proportional to the tangent of the slope
-				double heightDif = MAP.getHeightAt(examine)-MAP.getHeightAt(location);
+				double heightDif = environment.getHeightAt(examine)- environment.getHeightAt(location);
 				double energyCost;
 				if (Math.abs(Math.atan(heightDif/sampleRadius)) > 0.104719){
 					energyCost = 100;
@@ -242,7 +242,7 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 	}
 
 	private boolean hasUnvisitedScience(DecimalPoint loc){
-        if (MAP.<Integer>getPopulatorValue("Targets", loc) > 0){
+        if (environment.<Integer>getPopulatorValue("Targets", loc) > 0){
             for (DecimalPoint past : visitedScience){
                 if (Math.sqrt(Math.pow(loc.getX()-past.getX(), 2) + Math.pow(loc.getY()-past.getY(), 2)) < 3){
                     return false;

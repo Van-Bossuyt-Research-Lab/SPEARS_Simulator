@@ -90,23 +90,13 @@ public class SubObject extends Platform {
         LEDs.put("Autonomous", false);
     }
 
-    public static void setSubMap(AquaticMap map){
-        SubAutonomousCode.setSubMap(map);
-        subPhysicsModel.setSubMap(map);
-    }
-
     public static void setSerialBuffers(SerialBuffers buffers){
         serialBuffers = buffers;
     }
 
+    @Override
     public void start(){
-        new SynchronousThread(100, new Runnable(){
-            public void run(){
-                //System.out.println(name + "-CODE\t" + Globals.getInstance().timeMillis);
-                excecuteCode();
-            }
-        },
-                SynchronousThread.FOREVER, name+"-code");
+        new SynchronousThread(100, this::excecuteCode, SynchronousThread.FOREVER, name+"-code");
         physics.start();
         timeOfLastCmd = Globals.getInstance().timeMillis;
     }
@@ -220,8 +210,8 @@ public class SubObject extends Platform {
                                 sendSerial("s1 g %");
                                 /*
                             } else if (strcmp(data, "score") == 0) {
-                                if (MAP.isPointAtTarget(getLocation())) {
-                                    this.visitedScience.add(MAP.getMapSquare(getLocation()));
+                                if (environment.isPointAtTarget(getLocation())) {
+                                    this.visitedScience.add(environment.getMapSquare(getLocation()));
                                     System.out.println("Aquired.  New Score = " + visitedScience.size());
                                 }
                                 */
@@ -713,7 +703,7 @@ public class SubObject extends Platform {
     }
 
     private double getTemperature(){ // read temperature from the "sensor"
-        return Globals.getInstance().addErrorToMeasurement(0, .5);//WrapperMain.MAP.getTemperatureAtLoc(), 0.73);
+        return Globals.getInstance().addErrorToMeasurement(0, .5);//WrapperMain.environment.getTemperatureAtLoc(), 0.73);
     }
 
     private int strcmp(char[] first, String second) { // see if 2 strings are equal
@@ -751,10 +741,6 @@ public class SubObject extends Platform {
 
     public void addToSerialHistory(String out){
         serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis + "\n";
-    }
-
-    public String getName(){
-        return name;
     }
 
     public String getIDTag(){

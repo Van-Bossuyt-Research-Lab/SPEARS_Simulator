@@ -1,5 +1,7 @@
 package com.csm.rover.simulator.ui.implementation;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.ui.sound.SoundPlayer;
 import com.csm.rover.simulator.ui.sound.SpearsSound;
 import com.csm.rover.simulator.ui.sound.VolumeChangeListener;
@@ -10,6 +12,8 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.csm.rover.simulator.ui.implementation.ImageFunctions.getMenuIcon;
@@ -20,7 +24,7 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 
 	private JMenu fileMenu, viewMenu, optionsMenu;
 	
-	private JMenu newMenu;
+	private NewFrameMenu newMenu;
 	private JMenu showMenu;
 
     private Optional<Runnable> exitOp = Optional.empty();
@@ -37,8 +41,6 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		this.add(optionsMenu);
 		
 		initialize();
-		
-		createInternalFeedback();
 	}
 
 	private void initialize(){
@@ -66,6 +68,7 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
 		fileMenu.addSeparator();
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener((ActionEvent e) -> SoundPlayer.playSound(SpearsSound.GOODBYE));
 		mntmExit.setIcon(getMenuIcon("/gui/power.png"));
 		mntmExit.addActionListener((ActionEvent e) -> {if (exitOp.isPresent()) exitOp.get().run(); });
 		fileMenu.add(mntmExit);
@@ -261,6 +264,10 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
         this.add(closeBtn);
 	}
 
+	void setPlatfroms(Map<String, PlatformEnvironment> enviros, Map<String, List<Platform>> platforms){
+		newMenu.initPlatformViewControls(enviros, platforms);
+	}
+
     @Override
     public void setCloseOperation(Runnable exit){
         exitOp = Optional.of(exit);
@@ -278,30 +285,5 @@ class EmbeddedMenuBar extends JMenuBar implements MainMenu {
             volumeListener.get().changeVolume(level);
         }
     }
-
-	private void createInternalFeedback() {
-		Component[] menus = new Component[this.getMenuCount()];
-		for (int i = 0; i < menus.length; i++){
-			menus[i] = this.getMenu(i);
-		}
-		addButtonClicks(menus);
-	}
-	
-	private void addButtonClicks(Component[] menus){
-		for (Component menu : menus){
-			if (menu instanceof JMenu){
-				addButtonClicks(((JMenu)menu).getMenuComponents());
-			}
-			else if (menu instanceof JMenuItem){
-                JMenuItem jmenu = ((JMenuItem)menu);
-				if (!jmenu.getText().equals("Exit")) {
-                    jmenu.addActionListener((ActionEvent) -> SoundPlayer.playSound(SpearsSound.BEEP_LOW));
-                }
-                else {
-                    jmenu.addActionListener((ActionEvent e) -> SoundPlayer.playSound(SpearsSound.GOODBYE));
-                }
-			}
-		}
-	}
 
 }

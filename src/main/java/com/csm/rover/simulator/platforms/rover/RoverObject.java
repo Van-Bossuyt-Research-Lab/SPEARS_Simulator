@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.platforms.rover;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.platforms.Platform;
@@ -23,8 +24,7 @@ import java.util.TreeMap;
 public class RoverObject extends Platform {
 	private static final Logger LOG = LogManager.getLogger(RoverObject.class);
 
-	private static TerrainEnvironment MAP;
-    private static SerialBuffers serialBuffers;
+	private static SerialBuffers serialBuffers;
 
 	@SuppressWarnings("unused")
 	private boolean connected = false; // Can the ground station hear/talk to us
@@ -80,24 +80,13 @@ public class RoverObject extends Platform {
 		LEDs.put("Autonomous", false);
 	}
 
-    public static void setTerrainMap(TerrainEnvironment map){
-        MAP = map;
-        RoverAutonomousCode.setTerrainMap(map);
-        RoverPhysicsModel.setTerrainMap(map);
-    }
-    
-    public static void setSerialBuffers(SerialBuffers buffers){
+	public static void setSerialBuffers(SerialBuffers buffers){
         serialBuffers = buffers;
     }
-	
+
+	@Override
 	public void start(){
-		new SynchronousThread(100, new Runnable(){
-			public void run(){
-				//System.out.println(name + "-CODE\t" + Globals.getInstance().timeMillis);
-				excecuteCode();
-			}
-		},
-		SynchronousThread.FOREVER, name+"-code");
+		new SynchronousThread(100, this::excecuteCode, SynchronousThread.FOREVER, name+"-code");
 		physicsModel.start();
 		timeOfLastCmd = Globals.getInstance().timeMillis;
 	}
@@ -759,7 +748,7 @@ public class RoverObject extends Platform {
 	}
 	
 	private double getTemperature(){ // read temperature from the "sensor"
-		return Globals.getInstance().addErrorToMeasurement(0, .5);//WrapperMain.MAP.getTemperatureAtLoc(), 0.73);
+		return Globals.getInstance().addErrorToMeasurement(0, .5);//WrapperMain.environment.getTemperatureAtLoc(), 0.73);
 	}
 	
 	private int strcmp(char[] first, String second) { // see if 2 strings are equal
@@ -794,10 +783,6 @@ public class RoverObject extends Platform {
 
     public void addToSerialHistory(String out){
 		serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis + "\n";
-	}
-	
-	public String getName(){
-		return name;
 	}
 	
 	public String getIDTag(){
