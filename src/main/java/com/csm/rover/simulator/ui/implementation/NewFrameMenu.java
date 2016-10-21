@@ -44,7 +44,7 @@ class NewFrameMenu extends JMenu {
 			JMenu menu = new JMenu(type);
 			this.add(menu);
 
-			JMenuItem enviroItem = new JMenuItem("Environment vViewer");
+			JMenuItem enviroItem = new JMenuItem("Environment Viewer");
 			enviroItem.addActionListener((a) -> {
 				try {
 					EnvironmentDisplay display = FrameRegistry.getEnvironmentDisplay(type).newInstance();

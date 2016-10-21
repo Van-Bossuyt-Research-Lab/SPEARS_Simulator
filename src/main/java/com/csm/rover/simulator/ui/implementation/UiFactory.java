@@ -55,4 +55,8 @@ public class UiFactory {
         return new StartupWindowImpl();
     }
 
+    public static AcceleratedView newAcceleratedView(){
+        return new AcceleratedViewImpl();
+    }
+
 }

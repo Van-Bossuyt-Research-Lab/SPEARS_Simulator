@@ -38,7 +38,7 @@ public class EnvironmentIO {
     public static <T extends PlatformEnvironment> T loadEnvironment(File file, Class<T> clazz){
         ObjectMapper mapper = new ObjectMapper();
         try {
-            LOG.log(Level.INFO, "Reading environment from {}" + file.getAbsolutePath());
+            LOG.log(Level.INFO, "Reading environment from {}", file.getAbsolutePath());
             return mapper.readValue(file, clazz);
         }
         catch (IOException e) {

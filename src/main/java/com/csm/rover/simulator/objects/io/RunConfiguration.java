@@ -85,6 +85,15 @@ public class RunConfiguration implements Cloneable {
 		}
 	}
 
+    @JsonIgnore
+    public List<String> getTypes(){
+        List<String> out = new ArrayList<>();
+        for (TypeConfig config : types){
+            out.add(config.type);
+        }
+        return out;
+    }
+
     public File getEnvironmentFile(String type){
         for (TypeConfig config : types){
             if (config.type.equals(type)){

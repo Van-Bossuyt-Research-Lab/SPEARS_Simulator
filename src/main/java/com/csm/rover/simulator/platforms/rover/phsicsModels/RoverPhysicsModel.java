@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.platforms.rover.phsicsModels;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
@@ -25,7 +26,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
 
     private RoverState rov_state;
 
-	protected static TerrainEnvironment MAP;
+	protected static TerrainEnvironment environment;
 
 	protected String roverName;
 	public final double time_step = 0.01; // time step of physics, in seconds
@@ -221,8 +222,14 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
         });
     }
 
-    public static void setTerrainMap(TerrainEnvironment map){
-        MAP = map;
+    @Override
+    public void setEnvironment(PlatformEnvironment enviro){
+        if (enviro.getType().equals(platform_type)){
+            environment = (TerrainEnvironment)enviro;
+        }
+        else {
+            throw new IllegalArgumentException("The given environment has the wrong type: " + enviro.getType());
+        }
     }
 
     @Override
@@ -320,9 +327,9 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
         location2.offsetThis(speed*time_step*0.5*Math.cos(direction), speed*time_step*0.5*(Math.sin(direction)));
 		location2.offsetThis(slip_velocity*time_step*0.5*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*0.5*(Math.sin(direction-Math.PI/2.0)));
 		direction2 = (direction + angular_velocity*time_step*0.5 + 2*Math.PI) % (2*Math.PI);
-        acceleration2 = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - MAP.getGravity()*Math.sin(MAP.getSlopeAt(location2, direction2));
+        acceleration2 = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - environment.getGravity()*Math.sin(environment.getSlopeAt(location2, direction2));
         angular_acceleration2 = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
-        slip_acceleration2 = (-friction_gr*slip_velocity2*4 - rover_mass*MAP.getGravity()*Math.sin(MAP.getCrossSlopeAt(location2, direction2)) / rover_mass);
+        slip_acceleration2 = (-friction_gr*slip_velocity2*4 - rover_mass* environment.getGravity()*Math.sin(environment.getCrossSlopeAt(location2, direction2)) / rover_mass);
 
         speed3 = speed2 + acceleration2 * time_step*0.5;
         angular_velocity3 = angular_velocity2+angular_acceleration2 * time_step*0.5;
@@ -331,9 +338,9 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
         location3.offsetThis(speed2*time_step*0.5*Math.cos(direction2), speed2*time_step*0.5*(Math.sin(direction2)));
         location3.offsetThis(slip_velocity2*time_step*0.5*Math.cos(direction2-Math.PI/2.0), slip_velocity2*time_step*0.5*(Math.sin(direction2-Math.PI/2.0)));
         direction3 = (direction2 + angular_velocity2*time_step*0.5 + 2*Math.PI) % (2*Math.PI);
-        acceleration3 = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - MAP.getGravity()*Math.sin(MAP.getSlopeAt(location3, direction3));
+        acceleration3 = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - environment.getGravity()*Math.sin(environment.getSlopeAt(location3, direction3));
         angular_acceleration3 = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
-        slip_acceleration3 = (-friction_gr*slip_velocity3*4 - rover_mass*MAP.getGravity()*Math.sin(MAP.getCrossSlopeAt(location3, direction3)) / rover_mass);
+        slip_acceleration3 = (-friction_gr*slip_velocity3*4 - rover_mass* environment.getGravity()*Math.sin(environment.getCrossSlopeAt(location3, direction3)) / rover_mass);
 
         speed4 = speed3 + acceleration3 * time_step*0.5;
         angular_velocity4 = angular_velocity3+angular_acceleration3 * time_step*0.5;
@@ -342,9 +349,9 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
         location4.offsetThis(speed3*time_step*0.5*Math.cos(direction3), speed3*time_step*0.5*(Math.sin(direction3)));
         location4.offsetThis(slip_velocity3*time_step*0.5*Math.cos(direction3-Math.PI/2.0), slip_velocity3*time_step*0.5*(Math.sin(direction3-Math.PI/2.0)));
         direction4 = (direction3 + angular_velocity3*time_step*0.5 + 2*Math.PI) % (2*Math.PI);
-        acceleration4 = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - MAP.getGravity()*Math.sin(MAP.getSlopeAt(location3, direction4));
+        acceleration4 = 1/rover_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - environment.getGravity()*Math.sin(environment.getSlopeAt(location3, direction4));
         angular_acceleration4 = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
-        slip_acceleration4 = (-friction_gr*slip_velocity4*4 - rover_mass*MAP.getGravity()*Math.sin(MAP.getCrossSlopeAt(location4, direction4)) / rover_mass);
+        slip_acceleration4 = (-friction_gr*slip_velocity4*4 - rover_mass* environment.getGravity()*Math.sin(environment.getCrossSlopeAt(location4, direction4)) / rover_mass);
 
         speedf = speed +(time_step/6.0)*(acceleration+2*acceleration2+2*acceleration3+acceleration4);
         angular_velocityf = angular_velocity + (time_step/6.0)*(angular_acceleration+2.0*angular_acceleration2+2.0*angular_acceleration3+angular_acceleration4);

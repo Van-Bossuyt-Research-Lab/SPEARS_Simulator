@@ -1,5 +1,7 @@
 package com.csm.rover.simulator.platforms.sub.physicsModels;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.environments.sub.AquaticEnvironment;
 import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.platforms.DriveCommandHandler;
@@ -16,7 +18,7 @@ import java.util.Map;
 public class subPhysicsModel extends PlatformPhysicsModel {
 
 	private static final long serialversionUID = 1L;
-	protected static AquaticMap SMAP;
+	protected AquaticEnvironment environment;
 
 	private final int L = 0, R = 1, F = 3, B = 4;
 
@@ -240,8 +242,14 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		});
 	}
 
-	public static void setSubMap(AquaticMap map){
-		SMAP = map;
+	@Override
+	public void setEnvironment(PlatformEnvironment enviro){
+		if (enviro.getType().equals(platform_type)){
+			environment = (AquaticEnvironment)enviro;
+		}
+		else {
+			throw new IllegalArgumentException("The given platform has the wrong type: " + enviro.getType());
+		}
 	}
 
 	@Override
@@ -323,7 +331,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		prop_speed[L] += 1/prop_inertia * motor_energy_transform*motor_current[L] * time_step;
 		prop_speed[B] += 1/prop_inertia * motor_energy_transform*motor_current[B] * time_step;
 		// Acceleration changes based on forces
-		//                acceleration_xy = 1/total_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - planetParams.getgrav_accel()*Math.sin(MAP.getIncline(location, direction));
+		//                acceleration_xy = 1/total_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - planetParams.getgrav_accel()*Math.sin(environment.getIncline(location, direction));
 		//                angular_acceleration = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
 		// Speed changes based on Acceleration
 		speed_x2 = speed_x+ acceleration_xy * 0.5*time_step * Math.cos(theta)* Math.cos(phi);

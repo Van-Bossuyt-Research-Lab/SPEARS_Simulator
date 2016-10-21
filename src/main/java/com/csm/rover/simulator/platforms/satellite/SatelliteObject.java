@@ -48,14 +48,10 @@ public class SatelliteObject extends Platform {
     public static void setSerialBuffers(SerialBuffers buffers){
         serialBuffers = buffers;
     }
-	
+
+	@Override
 	public void start(){
-		new SynchronousThread(100, new Runnable(){
-			public void run(){
-				excecuteCode();
-			}
-		},
-		SynchronousThread.FOREVER, name+"-code");
+		new SynchronousThread(100, this::excecuteCode, SynchronousThread.FOREVER, name+"-code");
 		//TODO Satellite Physics
 		//new SynchronousThread((int) (time_step*1000), new Runnable(){
 		//	public void run(){

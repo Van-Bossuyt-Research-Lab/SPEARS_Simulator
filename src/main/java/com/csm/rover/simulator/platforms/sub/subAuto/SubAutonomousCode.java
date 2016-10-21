@@ -1,5 +1,7 @@
 package com.csm.rover.simulator.platforms.sub.subAuto;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.environments.sub.AquaticEnvironment;
 import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
@@ -25,8 +27,7 @@ import java.util.TreeMap;
 public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
     private static final Logger LOG = LogManager.getLogger(SubAutonomousCode.class);
 
-
-    protected static AquaticMap MAP;
+    protected AquaticEnvironment environment;
 
     private String name;
     private String subName;
@@ -50,8 +51,14 @@ public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
     protected abstract String doNextCommand(long milliTime, DecimalPoint location,
                                             double direction, Map<String, Double> params);
 
-    public static void setSubMap(AquaticMap map){
-        MAP = map;
+    @Override
+    public void setEnvironment(PlatformEnvironment environment){
+        if (environment.getType().equals(platform_type)){
+            this.environment = (AquaticEnvironment)environment;
+        }
+        else {
+            throw new IllegalArgumentException("The given platform has the wrong type: " + environment.getType());
+        }
     }
 
     public void setSubName(String name){

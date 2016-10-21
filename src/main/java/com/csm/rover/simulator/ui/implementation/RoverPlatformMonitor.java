@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.ui.implementation;
 
 import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.platforms.rover.RoverState;
 
@@ -8,20 +9,21 @@ import javax.swing.*;
 import java.awt.*;
 
 @FrameMarker(name = "Rover Monitor", platform = "Rover")
-class RoverPlatformMonitorImpl extends PlatformDisplay {
+class RoverPlatformMonitor extends PlatformDisplay {
 
     private JPanel contentPane;
     private JLabel label;
 
     private RoverObject rover;
 
-    RoverPlatformMonitorImpl(){
+    RoverPlatformMonitor(){
         super("Rover");
         initialize();
     }
 
     private void initialize(){
         setTitle("");
+        setSize(100, 100);
 
         contentPane = new JPanel();
         contentPane.setBackground(Color.WHITE);
@@ -30,6 +32,7 @@ class RoverPlatformMonitorImpl extends PlatformDisplay {
 
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setOpaque(false);
+        scrollPane.setBackground(Color.WHITE);
         contentPane.add(scrollPane, BorderLayout.CENTER);
 
         label = new JLabel();
@@ -45,7 +48,7 @@ class RoverPlatformMonitorImpl extends PlatformDisplay {
 
     @Override
     protected void update(){
-        RoverState state = (RoverState)rover.getState();
+        PlatformState state = rover.getState();
         String out = "";
         for (String param : state.expectedValues()){
             out += param + ": ";
@@ -57,7 +60,7 @@ class RoverPlatformMonitorImpl extends PlatformDisplay {
             }
             out += "\n";
         }
-        label.setText(out);
+        label.setText(String.format("<html>%s</html>", out.replaceAll("\n", "<br>")));
     }
 
 }

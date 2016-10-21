@@ -41,7 +41,7 @@ class Form2 extends JFrame implements Application {
 
 	@Override
 	public void start(Map<String, PlatformEnvironment> enviros, Map<String, List<Platform>> platforms) {
-		//TODO Add menu entries to access all required display windows
+		menuBar.setPlatfroms(enviros, platforms);
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.platforms.satellite;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
@@ -22,6 +23,9 @@ public class SatelliteAutonomousCode extends PlatformAutonomousCodeModel {
 
     @Override
     public void constructParameters(Map<String, Double> params) {}
+
+    @Override
+    public void setEnvironment(PlatformEnvironment environment) {}
 
     @Override
     public String nextCommand(long milliTime, PlatformState state) {

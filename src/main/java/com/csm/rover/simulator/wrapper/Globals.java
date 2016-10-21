@@ -67,17 +67,19 @@ public class Globals {
 		}
         clock.start();
 		ThreadItem.offset = 0;
-		new FreeThread(0, new Runnable(){
-			public void run(){
-				long end = System.nanoTime() + (long)(1000000 / getTimeScale());
-				while (System.nanoTime() < end) {}
-				threadCheckIn("milli-clock");
-			}
+		new FreeThread(0,() -> {
+			long end = System.nanoTime() + (long)(1000000 / getTimeScale());
+			while (System.nanoTime() < end) {}
+			threadCheckIn("milli-clock");
 		}, SynchronousThread.FOREVER, "milli-clock", true);
 	}
 	
 	public double getTimeAccelerant() {
 		return time_accelerant;
+	}
+
+	public boolean isAccelerated(){
+		return timeScale==time_accelerant;
 	}
 
 	public double getTimeScale(){
@@ -130,8 +132,8 @@ public class Globals {
 		}
 	}
 	
-	public void setUpAcceleratedRun(int runtime){
-		//TODO Accelerated view
+	void setUpAcceleratedRun(int runtime){
+		new SynchronousThread(runtime*60*1000, Admin.getInstance()::shutDownSimulator, 1, "AccelBrake");
 	}
 	
 	public void registerNewThread(String name, int delay, SynchronousThread thread){

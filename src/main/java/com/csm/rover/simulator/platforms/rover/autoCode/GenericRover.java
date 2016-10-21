@@ -31,7 +31,7 @@ public class GenericRover extends RoverAutonomousCode {
 			double direction,
             Map<String, Double> params
 	){
-        super.writeToLog(String.format("x:%g\ty:%g\tz:%g\tdir:%g", location.getX(), location.getY(), MAP.getHeightAt(location), direction));
+        super.writeToLog(String.format("x:%g\ty:%g\tz:%g\tdir:%g", location.getX(), location.getY(), environment.getHeightAt(location), direction));
 		if (milliTime-lastActionTime > 1000*seconds){
 			lastActionTime = milliTime;
 			action++;

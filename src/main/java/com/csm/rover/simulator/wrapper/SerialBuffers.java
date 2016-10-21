@@ -11,12 +11,12 @@ public class SerialBuffers {
 
     private Map<String, Queue<Byte>> serialBuffers; // the buffer for messages
 
-    public SerialBuffers(ArrayList<String> IDs){
+    public SerialBuffers(List<String> IDs){
         serialBuffers = new HashMap<String, Queue<Byte>>();
         initializeLists(IDs);
     }
 
-    private void initializeLists(ArrayList<String> IDs){
+    private void initializeLists(List<String> IDs){
         for (String id : IDs){
             serialBuffers.put(id, new LinkedList<Byte>());
         }
