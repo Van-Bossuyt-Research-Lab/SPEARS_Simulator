@@ -69,7 +69,7 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
         contentPane.add(mainPnl, BorderLayout.CENTER);
 
         JLabel modTitle = new JLabel("Modifiers");
-        modTitle.setFont(new Font(modTitle.getFont().getName(), Font.BOLD, modTitle.getFont().getSize()+2));
+        modTitle.setFont(FontFunctions.bold(FontFunctions.bigger(modTitle.getFont())));
         mainPnl.add(modTitle, "cell 0 0");
 
         generatorCombo = new JComboBox<>();
@@ -150,7 +150,7 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
         modButtonPnl.add(modRemove, "cell 3 0");
 
         JLabel popTitle = new JLabel("Populators");
-        popTitle.setFont(new Font(popTitle.getFont().getName(), Font.BOLD, popTitle.getFont().getSize()+2));
+        popTitle.setFont(FontFunctions.bigger(FontFunctions.bold(popTitle.getFont())));
         mainPnl.add(popTitle, "cell 1 0 2 1");
 
         JScrollPane populatorScroll = new JScrollPane();

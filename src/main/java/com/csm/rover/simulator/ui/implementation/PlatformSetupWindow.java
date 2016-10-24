@@ -43,7 +43,7 @@ class PlatformSetupWindow extends EmbeddedFrame {
         nameTxt.setEditable(false);
         nameTxt.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         nameTxt.setHorizontalAlignment(SwingConstants.CENTER);
-        nameTxt.setFont(new Font(nameTxt.getFont().getName(), Font.BOLD, nameTxt.getFont().getSize()+2));
+        nameTxt.setFont(FontFunctions.bigger(FontFunctions.bold(nameTxt.getFont())));
         nameTxt.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {

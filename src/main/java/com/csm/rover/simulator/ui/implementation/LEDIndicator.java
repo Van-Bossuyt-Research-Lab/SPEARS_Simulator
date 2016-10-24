@@ -1,6 +1,9 @@
 package com.csm.rover.simulator.ui.implementation;
 
-import java.awt.Cursor;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 class LEDIndicator extends ImageDisplay {
 
@@ -16,6 +19,16 @@ class LEDIndicator extends ImageDisplay {
 		this.setVerticalAlignment(CENTER);
 		this.setHorizontalAlignment(CENTER);
 		this.setOpaque(false);
+		this.setVisible(true);
+		this.setPreferredSize(new Dimension(25, 25));
+		this.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				if (getWidth() != getHeight()){
+					SwingUtilities.invokeLater(() -> setSize(getHeight(), getHeight()));
+				}
+			}
+		});
 		setMargin(5);
 		setImage(ImageFunctions.getImage("/icons/LED_Off.png"));
 	}
