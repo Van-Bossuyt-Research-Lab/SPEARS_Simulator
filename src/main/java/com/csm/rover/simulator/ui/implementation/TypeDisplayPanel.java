@@ -41,7 +41,7 @@ class TypeDisplayPanel extends JPanel {
 
         JLabel title = new JLabel(platform.toUpperCase());
         title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setFont(new Font(title.getFont().getName(), Font.BOLD, title.getFont().getSize()+2));
+        title.setFont(FontFunctions.bold(FontFunctions.bigger(title.getFont())));
         this.add(title, "cell 0 0 3 1");
 
         JLabel enviroTitle = new JLabel("Environment:");
