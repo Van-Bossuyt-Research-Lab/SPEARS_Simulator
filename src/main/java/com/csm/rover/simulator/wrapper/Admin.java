@@ -5,6 +5,7 @@ import com.csm.rover.simulator.environments.EnvironmentRegistry;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.annotations.Modifier;
 import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.objects.io.ConfigurationFileFilter;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.platforms.Platform;
@@ -24,13 +25,13 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.*;
 
 public class Admin {
 	private static final Logger LOG = LogManager.getLogger(Admin.class);
 
-//	public static Form GUI;
 	private Globals GLOBAL;
 
     //Runtime Variables
@@ -45,14 +46,17 @@ public class Admin {
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");
             admin.setUpGUI();
-            File config = new File("config.json");
-			if (config.exists() &&
-                    UiFactory.newPopUp()
-                            .setMessage("A quick run configuration file has been found.  Would you like to run the simulator from the file?")
-                            .setSubject("Quick Run")
-                            .showConfirmDialog(PopUp.Buttons.YES_NO_OPTIONS) == PopUp.Options.YES_OPTION) {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            chooser.setMultiSelectionEnabled(false);
+            chooser.setFileFilter(new ConfigurationFileFilter());
+			if (UiFactory.newPopUp()
+                            .setMessage("Would you like to open a saved run configuration?")
+                            .setSubject("Load Config")
+                            .showConfirmDialog(PopUp.Buttons.YES_NO_OPTIONS) == PopUp.Options.YES_OPTION &&
+                    chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 				try {
-					admin.startWithGUI(RunConfiguration.fromFile(config));
+					admin.startWithGUI(RunConfiguration.fromFile(chooser.getSelectedFile()));
 				}
 				catch (Exception e){
 					LOG.log(Level.ERROR, "Simulator failed to start", e);
