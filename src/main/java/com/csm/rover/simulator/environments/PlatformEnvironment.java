@@ -169,4 +169,9 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         }
     }
 
+    @JsonIgnore
+    public final List<String> getPopulators(){
+        return Collections.unmodifiableList(new ArrayList<>(populators.keySet()));
+    }
+
 }

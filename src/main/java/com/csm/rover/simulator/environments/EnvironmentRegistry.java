@@ -3,6 +3,7 @@ package com.csm.rover.simulator.environments;
 import com.csm.rover.simulator.environments.annotations.Environment;
 import com.csm.rover.simulator.environments.annotations.Modifier;
 import com.csm.rover.simulator.environments.annotations.Populator;
+import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +22,7 @@ public class EnvironmentRegistry {
         modifierParameters = new TreeMap<>();
         populators = new TreeMap<>();
         populatorParameters = new TreeMap<>();
+        populatorDisplays = new TreeMap<>();
         fillRegistry();
     }
 
@@ -32,6 +34,7 @@ public class EnvironmentRegistry {
 
     private static Map<String, Map<String, String>> populators;
     private static Map<String, Map<String, String[]>> populatorParameters;
+    private static Map<String, Map<String, PopulatorDisplayFunction>> populatorDisplays;
 
     private static void fillRegistry(){
         LOG.log(Level.INFO, "Initializing Environment Registry");
@@ -171,6 +174,7 @@ public class EnvironmentRegistry {
         for (String type : environments.keySet()){
             populators.put(type, new TreeMap<String, String>());
             populatorParameters.put(type, new TreeMap<String, String[]>());
+            populatorDisplays.put(type, new TreeMap<>());
         }
 
         Set<Class<? extends EnvironmentPopulator>> classpops = reflect.getSubTypesOf(EnvironmentPopulator.class);
@@ -197,9 +201,15 @@ public class EnvironmentRegistry {
             String clazz = getClassPath(pop);
             if (populators.keySet().contains(type)){
                 try {
-                    pop.newInstance();
+                    EnvironmentPopulator inst = pop.newInstance();
                     populators.get(type).put(name, clazz);
                     populatorParameters.get(type).put(name, params);
+                    if (inst.getDisplayFunction() == null){
+                        LOG.log(Level.WARN, "Populator {} of type {} has no display function", name, type);
+                    }
+                    else {
+                        populatorDisplays.get(type).put(name, inst.getDisplayFunction());
+                    }
                 }
                 catch (InstantiationException | IllegalAccessException e) {
                     LOG.log(Level.WARN, "{} does not have a default constructor", pop.toString());
@@ -303,6 +313,22 @@ public class EnvironmentRegistry {
             LOG.log(Level.ERROR, "The Environment \"{}\" is not registered and cannot be requested", type);
             return null;
         }
+    }
+
+    public static PopulatorDisplayFunction getPopulatorDisplayFunction(String type, String name){
+        if (environments.containsKey(type)){
+            Map<String, PopulatorDisplayFunction> displays = populatorDisplays.get(type);
+            if (displays.containsKey(name)){
+                return displays.get(name);
+            }
+            else {
+                LOG.log(Level.ERROR, "The Populator \"{}\" has no defined display and cannot be returned", name);
+            }
+        }
+        else {
+            LOG.log(Level.ERROR, "The Environment \"{}\" is not registered and cannot be requested", type);
+        }
+        return null;
     }
 
     public static List<String> listPopulators(String type){

@@ -11,7 +11,9 @@ import com.csm.rover.simulator.objects.util.ArrayGrid;
 import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.csm.rover.simulator.objects.util.ParamMap;
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
+import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 
+import java.awt.*;
 import java.util.Map;
 
 @Populator(type = "Rover", name = "Hazards", coordinates = {"x", "y"}, parameters = {"mono", "rough"})
@@ -44,10 +46,15 @@ public class TerrainHazardsPop extends EnvironmentPopulator {
         for (int x = 0; x < size; x++){
             for (int y = 0; y < size; y++){
                 double value = (double)added.get(x, y);
-                hzrds.put(mono ? (value >=7 ? 10 : 0) : value, x, y);
+                hzrds.put(mono ? (value >=7 ? 10. : 0.) : value, x, y);
             }
         }
         return hzrds;
+    }
+
+    @Override
+    public PopulatorDisplayFunction getDisplayFunction() {
+        return (value) -> new Color((int)((11-value)*20+100), (int)((11-value)*20+100), (int)((11-value)*20+100));
     }
 
     private ArrayGrid<Float> getLayer(int size, double rough, int range){
