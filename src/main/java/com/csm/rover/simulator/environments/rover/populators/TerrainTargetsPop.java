@@ -27,7 +27,7 @@ public class TerrainTargetsPop extends EnvironmentPopulator {
         Random rnd = new Random();
         Set<Point> points = new HashSet<>();
         while (points.size() < targetCount){
-            points.add(new Point(rnd.nextInt(size), rnd.nextInt(size)));
+            points.add(new Point(rnd.nextInt(size)-size/2, rnd.nextInt(size)-size/2));
         }
         boolean mono = params.get("mono") == 1;
         RecursiveGridList<Double> out = RecursiveGridList.newGridList(Double.class, 2);

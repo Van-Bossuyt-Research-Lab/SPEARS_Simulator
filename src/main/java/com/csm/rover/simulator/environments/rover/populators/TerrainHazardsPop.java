@@ -46,7 +46,7 @@ public class TerrainHazardsPop extends EnvironmentPopulator {
         for (int x = 0; x < size; x++){
             for (int y = 0; y < size; y++){
                 double value = (double)added.get(x, y);
-                hzrds.put(mono ? (value >=7 ? 10. : 0.) : value, x, y);
+                hzrds.put(mono ? (value >=7 ? 10. : 0.) : (value > 10 ? 10 : (int)value), x - size/2, y - size/2);
             }
         }
         return hzrds;

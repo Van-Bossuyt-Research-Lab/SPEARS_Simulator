@@ -11,10 +11,10 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @FrameMarker(name = "Terrain Monitor", platform = "Rover")
 class TerrainEnvironmentMonitor extends EnvironmentDisplay {
@@ -23,8 +23,11 @@ class TerrainEnvironmentMonitor extends EnvironmentDisplay {
     private JPanel content;
     private TerrainMapDisplay display;
 
+    private DecimalPoint focus;
+
     protected TerrainEnvironmentMonitor() {
         super("Rover");
+        focus = new DecimalPoint(0, 0);
         initialize();
     }
 
@@ -34,7 +37,40 @@ class TerrainEnvironmentMonitor extends EnvironmentDisplay {
         setLayout(null);
         setContentPane(content);
         setVisible(false);
+        setTitle("Terrain Environment Monitor");
         setSize(500, 500);
+    }
+
+    private void setFocusPoint(DecimalPoint point){
+        focus = point;
+        redraw();
+    }
+
+    void redraw(){
+        display.setLocation((int)Math.round(this.getWidth()/2.0-focus.getX()* display.getResolution()- display.getWidth()/2.0),
+                (int)Math.round(this.getHeight()/2.0+focus.getY()* display.getResolution() - display.getHeight()/2.0));
+    }
+
+    private Optional<Point> last = Optional.empty();
+    private void dragMap(Point p){
+        if (p == null){
+            last = Optional.empty();
+        }
+        else if (last.isPresent()){
+            int dx = last.get().x - p.x;
+            int dy = p.y - last.get().y;
+            double cx = dx / (double)display.getResolution();
+            double cy = dy / (double)display.getResolution();
+            setFocusPoint(new DecimalPoint(this.focus.getX()+cx, this.focus.getY()+cy));
+        }
+        else {
+            last = Optional.of(p);
+        }
+    }
+
+    private void zoomMap(int zoom){
+        display.setResolution(display.getResolution()+zoom);
+        redraw();
     }
 
     @Override
@@ -42,11 +78,46 @@ class TerrainEnvironmentMonitor extends EnvironmentDisplay {
         display = new TerrainMapDisplay((TerrainEnvironment)environment);
         display.setResolution(20);
         content.add(display);
+
+        display.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == 1){
+                    dragMap(e.getPoint());
+                }
+//                if (e.getButton() == 3){
+//                    menu.setLocation(new Point(e.getXOnScreen()-2, e.getYOnScreen()-2));
+//                    menu.setVisible(true);
+//                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                dragMap(null);
+            }
+        });
+        display.addMouseMotionListener(new MouseMotionAdapter(){
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                dragMap(e.getPoint());
+            }
+        });
+        display.addMouseWheelListener((e) -> zoomMap(5 * -e.getWheelRotation()));
+
+        getInputMap().put(KeyStroke.getKeyStroke("LEFT"), "pan left");
+        getActionMap().put("pan left", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(-1, 0))));
+        getInputMap().put(KeyStroke.getKeyStroke("RIGHT"), "pan right");
+        getActionMap().put("pan right", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(1, 0))));
+        getInputMap().put(KeyStroke.getKeyStroke("UP"), "pan up");
+        getActionMap().put("pan up", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(0, 1))));
+        getInputMap().put(KeyStroke.getKeyStroke("DOWN"), "pan down");
+        getActionMap().put("pan down", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(0, -1))));
+        redraw();
     }
 
     @Override
     protected void update() {
-        display.repaint();
+        redraw();
     }
 }
 
@@ -73,13 +144,7 @@ class TerrainMapDisplay extends JPanel {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent arg0) {
-                try {
-                    setSize(terrainMap.getSize() * squareResolution, terrainMap.getSize() * squareResolution);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    setSize(100, 100);
-                }
+                setSize(terrainMap.getSize() * squareResolution + 1, terrainMap.getSize() * squareResolution + 1);
             }
         });
     }
