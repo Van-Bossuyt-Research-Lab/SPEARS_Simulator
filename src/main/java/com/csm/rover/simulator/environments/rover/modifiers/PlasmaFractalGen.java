@@ -20,11 +20,13 @@ public class PlasmaFractalGen extends EnvironmentModifier<TerrainMap> {
     protected TerrainMap doModify(TerrainMap map, Map<String, Double> params) {
         int size = params.get("size").intValue();
         int detail = params.get("detail").intValue();
-        int true_size = size*detail;
+        int true_size = size*detail + 1;
         ArrayGrid<Float> values = new FloatArrayArrayGrid();
 
         Random rnd = new Random();
         double rough = params.get("rough");
+
+        float min = Float.MIN_VALUE;
 
         double seed = rnd.nextInt(30) * rnd.nextDouble();
         values.put(0, 0, (float) Math.abs(seed + rnd.nextDouble()/5.));
@@ -52,6 +54,9 @@ public class PlasmaFractalGen extends EnvironmentModifier<TerrainMap> {
                             continue;
                         }
                     }
+                    if (value < min){
+                        min = value;
+                    }
                     values.put(x, y, value);
                 }
             }
@@ -66,7 +71,7 @@ public class PlasmaFractalGen extends EnvironmentModifier<TerrainMap> {
         int ystart = (values.getHeight() - true_size)/2;
         for (int x = 0; x < true_size; x++) {
             for (int y = 0; y < true_size; y++) {
-                heightmap.put(x, y, values.get(x + xstart, y + ystart));
+                heightmap.put(x, y, values.get(x + xstart, y + ystart)-min);
             }
         }
         return new TerrainMap(size, detail, heightmap);

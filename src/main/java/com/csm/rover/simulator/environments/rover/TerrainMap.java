@@ -51,7 +51,7 @@ public class TerrainMap extends EnvironmentMap {
     }
 
     private void checkSize(){
-        if (heightMap.getWidth() != size*detail || heightMap.getHeight() != size*detail){
+        if (heightMap.getWidth() != size*detail+1 || heightMap.getHeight() != size*detail+1){
             throw new IllegalArgumentException("The map does not match the given sizes");
         }
     }
@@ -96,11 +96,8 @@ public class TerrainMap extends EnvironmentMap {
     }
 
     private Point getMapSquare(DecimalPoint loc){ // says which display square a given coordinate falls in
-        int shift = heightMap.getWidth() / (detail * 2);
-        double x = loc.getX() + shift;
-        double y = shift - loc.getY();
-        int outx = (int)(x*detail);
-        int outy = (int)(y*detail);
+        int outx = (int)(loc.getX()*detail);
+        int outy = (int)(loc.getY()*detail);
         return new Point(outx, outy);
     }
 
@@ -114,9 +111,8 @@ public class TerrainMap extends EnvironmentMap {
         Point mapSquare = getMapSquare(loc);
         int x = (int) mapSquare.getX();
         int y = (int) mapSquare.getY();
-        DecimalPoint lifePnt = new DecimalPoint(loc.getX() + getSize()/2.0, getSize()/2.0 - loc.getY());
-        double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (1000/detail)) / 1000.0 * detail;
-        double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (1000/detail)) / 1000.0 * detail;
+        double locx = (loc.getX()-(int)loc.getX()) * detail;
+        double locy = (loc.getY()-(int)loc.getY()) * detail;
         return getIntermediateValue(heightMap.get(x, y), heightMap.get(x + 1, y), heightMap.get(x, y + 1), heightMap.get(x + 1, y + 1), locx, locy);
     }
 
