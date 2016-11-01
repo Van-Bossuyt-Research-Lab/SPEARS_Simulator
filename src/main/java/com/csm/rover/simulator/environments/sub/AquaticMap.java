@@ -111,6 +111,10 @@ public class AquaticMap extends EnvironmentMap {
         return new Point3D(square.getX() / 3, square.getY() / 3, square.getZ()/3);
     }
 
+    public getValueAt(DecimalPoint loc){
+        return SubMap[loc];
+    }
+
     public int getSize() {
         return size;
     }
