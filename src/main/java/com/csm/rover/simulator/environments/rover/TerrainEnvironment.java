@@ -37,8 +37,14 @@ public class TerrainEnvironment extends PlatformEnvironment<RoverObject, Terrain
         }
         catch (ArrayIndexOutOfBoundsException e){
             String current = Thread.currentThread().getName();
-            LOG.log(Level.WARN, String.format("Rover \'%s\' has reached the end of the map - TERMINATING", current.substring(0, current.indexOf('-'))));
-            Globals.getInstance().killThread(current);
+            String name = current.substring(0, current.indexOf('-'));
+            if (name.equalsIgnoreCase("awt")){
+                throw e;
+            }
+            else {
+                LOG.log(Level.WARN, String.format("Rover \'%s\' has reached the end of the map - TERMINATING", name));
+                Globals.getInstance().killThread(current);
+            }
             return 0;
         }
     }
@@ -67,6 +73,21 @@ public class TerrainEnvironment extends PlatformEnvironment<RoverObject, Terrain
 
     public boolean isPopulatorAt(String pop, DecimalPoint point){
         return super.isPopulatorAt(pop, point.getX(), point.getY());
+    }
+
+    @JsonIgnore
+    public int getSize(){
+        return map.getSize();
+    }
+
+    @JsonIgnore
+    public int getDetail(){
+        return map.getDetail();
+    }
+
+    @JsonIgnore
+    public double getMaxHeight(){
+        return map.getMaxValue();
     }
 
 }

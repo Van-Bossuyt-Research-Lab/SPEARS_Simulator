@@ -6,6 +6,7 @@ import com.csm.rover.simulator.environments.annotations.Populator;
 import com.csm.rover.simulator.environments.rover.TerrainMap;
 import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
+import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 import javafx.geometry.Point3D;
 
 import java.util.HashSet;
@@ -72,6 +73,11 @@ public class AquaticTargetsPop extends EnvironmentPopulator {
             out.put(value, pnt.roundX(), pnt.roundY(), pnt.roundZ());
         }
         return out;
+    }
+
+    @Override
+    public PopulatorDisplayFunction getDisplayFunction() {
+        return null;
     }
 
 }

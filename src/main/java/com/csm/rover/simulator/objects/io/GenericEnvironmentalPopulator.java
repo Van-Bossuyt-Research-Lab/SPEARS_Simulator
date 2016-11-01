@@ -3,6 +3,7 @@ package com.csm.rover.simulator.objects.io;
 import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.EnvironmentPopulator;
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
+import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -19,5 +20,10 @@ public class GenericEnvironmentalPopulator extends EnvironmentPopulator {
     @Override
     protected RecursiveGridList<Double> doBuild(EnvironmentMap map, Map<String, Double> params) {
         throw new IllegalAccessError("This implementation is for loading saved objects only");
+    }
+
+    @Override
+    public PopulatorDisplayFunction getDisplayFunction() {
+        return null;
     }
 }
