@@ -48,7 +48,7 @@ public abstract class EnvironmentPopulator {
             return default_value;
         }
         int[] coords = new int[coordinates.length];
-        for (int i = 0; i > coordinates.length; i++){
+        for (int i = 0; i < coordinates.length; i++){
             coords[i] = (int)Math.floor(coordinates[i]);
         }
         try {

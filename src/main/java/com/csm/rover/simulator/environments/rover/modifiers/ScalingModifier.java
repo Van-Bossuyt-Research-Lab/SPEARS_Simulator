@@ -18,7 +18,7 @@ public class ScalingModifier extends EnvironmentModifier<TerrainMap> {
     @Override
     protected TerrainMap doModify(TerrainMap map, Map<String, Double> params) {
         double range = params.get("range");
-        int true_size = map.getSize()*map.getDetail();
+        int true_size = map.getSize()*map.getDetail()+1;
 
         ArrayGrid<Float> values = map.rawValues();
 

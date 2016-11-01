@@ -27,14 +27,15 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
     private JButton goBtn;
 
     private Set<EmbeddedFrame> spawnedFrames;
+    private Optional<EnvironmentDisplay> display = Optional.empty();
     private FreeThread waitingAnimation;
 
     private String platform;
     private ReportEnvironment reportAction;
     private Map<String, List<String>> generatorParams, modifierParams, populatorParams;
     private Optional<ModifierConfig> generatorConfig = Optional.empty();
+    private Optional<PlatformEnvironment> enviro = Optional.empty();
     private Map<String, PopulatorConfig> populatorConfigs;
-    private Optional<File> mapFile = Optional.empty();
 
     private Map<String, Boolean> isPopEditorOpen;
 
@@ -112,6 +113,7 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
                 .setOptionMap(modifierParams)
                 .setReportAction(modList::addValue)
                 .build()));
+        modAdd.addActionListener((a) -> resetSubmission());
         modButtonPnl.add(modAdd, "cell 0 0");
 
         JButton modUp = new JButton();
@@ -125,6 +127,7 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
             modList.removeValue(mod);
             modList.addValue(mod, start-1);
             modList.setSelection(start-1);
+            resetSubmission();
         });
         modButtonPnl.add(modUp, "cell 1 0");
 
@@ -139,6 +142,7 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
             modList.removeValue(mod);
             modList.addValue(mod, start+1);
             modList.setSelection(start+1);
+            resetSubmission();
         });
         modButtonPnl.add(modDown, "cell 2 0");
 
@@ -224,25 +228,33 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
     }
 
     private void resetSubmission(){
-        mapFile = Optional.empty();
+        enviro = Optional.empty();
         goBtn.setText("Generate");
+        if (display.isPresent()){
+            display.get().doDefaultCloseAction();
+            display = Optional.empty();
+        }
     }
 
     private void processGo(){
         if (goBtn.getText().contains(".")){
             return;
         }
-        if (mapFile.isPresent()){
-            reportAction.registerEnvironment(mapFile.get());
+        if (enviro.isPresent()){
+            reportAction.registerEnvironment(saveTemp(enviro.get()));
             doDefaultCloseAction();
         }
         else {
             try {
                 goBtn.setText(".");
                 waitingAnimation = new FreeThread(1000, this::animateWaiting, FreeThread.FOREVER, "env_animate", true);
-                mapFile = Optional.of(generateMap());
+                enviro = Optional.of(generateMap());
                 waitingAnimation.Stop();
                 SoundPlayer.playSound(SpearsSound.NEW);
+                EnvironmentDisplay display = FrameRegistry.getEnvironmentDisplay(platform).newInstance();
+                display.setEnvironment(enviro.get());
+                this.display = Optional.of(display);
+                spawnframe(display);
                 goBtn.setText("Use Environment");
             }
             catch (IllegalAccessException | InstantiationException e) {
@@ -261,7 +273,7 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
         }
     }
 
-    private File generateMap() throws IllegalAccessException, InstantiationException {
+    private PlatformEnvironment generateMap() throws IllegalAccessException, InstantiationException {
         LOG.log(Level.INFO, "Generating new Environment for " + platform);
         UiFactory.getDesktop().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         PlatformEnvironment environment = EnvironmentRegistry.getEnvironment(platform).newInstance();
@@ -274,6 +286,11 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
             builder.addPopulator(pop, EnvironmentRegistry.getPopulator(platform, pop).newInstance(), config.params);
         }
         builder.generate();
+        UiFactory.getDesktop().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        return environment;
+    }
+
+    private File saveTemp(PlatformEnvironment environment){
         Random rnd = new Random();
         File tempFile;
         do {
@@ -281,7 +298,6 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
         } while (tempFile.exists());
         tempFile = EnvironmentIO.appendSuffix(platform, tempFile);
         EnvironmentIO.saveEnvironment(environment, tempFile);
-        UiFactory.getDesktop().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         return tempFile;
     }
 

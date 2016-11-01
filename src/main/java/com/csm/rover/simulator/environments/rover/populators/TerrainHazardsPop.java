@@ -16,7 +16,7 @@ import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 import java.awt.*;
 import java.util.Map;
 
-@Populator(type = "Rover", name = "Hazards", coordinates = {"x", "y"}, parameters = {"mono", "rough"})
+@Populator(type = "Rover", name = "Hazards", coordinates = {"x", "y"}, parameters = {"hzrd_mono", "rough"})
 public class TerrainHazardsPop extends EnvironmentPopulator {
 
     public TerrainHazardsPop(){
@@ -25,8 +25,8 @@ public class TerrainHazardsPop extends EnvironmentPopulator {
 
     @Override
     protected RecursiveGridList<Double> doBuild(EnvironmentMap map, Map<String, Double> params) {
-        boolean mono = params.get("mono") == 1;
-        int size = ((TerrainMap)map).getSize();
+        boolean mono = params.get("hzrd_mono") == 1;
+        int size = ((TerrainMap)map).getSize()+1;
         double rough = params.get("rough");
         ArrayGrid<Float> plasma1 = getLayer(size, rough, 3);
         ArrayGrid<Float> plasma2 = getLayer(size, rough*20, 8);
@@ -46,7 +46,7 @@ public class TerrainHazardsPop extends EnvironmentPopulator {
         for (int x = 0; x < size; x++){
             for (int y = 0; y < size; y++){
                 double value = (double)added.get(x, y);
-                hzrds.put(mono ? (value >=7 ? 10. : 0.) : value, x, y);
+                hzrds.put(mono ? (value >=7 ? 10 : 0) : (value > 10 ? 10 : value), x, y);
             }
         }
         return hzrds;
@@ -54,7 +54,7 @@ public class TerrainHazardsPop extends EnvironmentPopulator {
 
     @Override
     public PopulatorDisplayFunction getDisplayFunction() {
-        return (value) -> new Color((int)((11-value)*20+100), (int)((11-value)*20+100), (int)((11-value)*20+100));
+        return (value) -> value < 5 ? null : new Color((int)((11-value)*20+100), (int)((11-value)*20+100), (int)((11-value)*20+100));
     }
 
     private ArrayGrid<Float> getLayer(int size, double rough, int range){

@@ -13,12 +13,14 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-@Populator(type="Rover", name="Targets", coordinates={"x", "y"}, parameters={"trgt_density", "mono"})
+@Populator(type="Rover", name="Targets", coordinates={"x", "y"}, parameters={"trgt_density", "trgt_mono"})
 public class TerrainTargetsPop extends EnvironmentPopulator {
 
     public TerrainTargetsPop() {
         super("Rover", "Targets", 0);
     }
+
+    private final static int buffer = 5;
 
     @Override
     protected RecursiveGridList<Double> doBuild(EnvironmentMap map, Map<String, Double> params) {
@@ -27,9 +29,9 @@ public class TerrainTargetsPop extends EnvironmentPopulator {
         Random rnd = new Random();
         Set<Point> points = new HashSet<>();
         while (points.size() < targetCount){
-            points.add(new Point(rnd.nextInt(size), rnd.nextInt(size)));
+            points.add(new Point(rnd.nextInt(size-(2*buffer))+buffer, rnd.nextInt(size-(2*buffer))+buffer));
         }
-        boolean mono = params.get("mono") == 1;
+        boolean mono = params.get("trgt_mono") == 1;
         RecursiveGridList<Double> out = RecursiveGridList.newGridList(Double.class, 2);
         for (Point pnt : points){
             int value;
