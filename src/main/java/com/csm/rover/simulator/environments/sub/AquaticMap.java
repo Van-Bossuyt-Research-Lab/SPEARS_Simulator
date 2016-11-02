@@ -1,8 +1,8 @@
 package com.csm.rover.simulator.environments.sub;
+
 import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.annotations.Map;
 import com.csm.rover.simulator.objects.ArrayGrid3D;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -111,8 +111,27 @@ public class AquaticMap extends EnvironmentMap {
         return new Point3D(square.getX() / 3, square.getY() / 3, square.getZ()/3);
     }
 
-    public getValueAt(DecimalPoint loc){
-        return SubMap[loc];
+    public double getValueAt(DecimalPoint3D loc){
+        Point3D mapSquare = getMapSquare(loc);
+        int x = (int) mapSquare.getX();
+        int y = (int) mapSquare.getY();
+        int z = (int) mapSquare.getZ();
+        double locx = (loc.getX()-(int)loc.getX()) * detail;
+        double locy = (loc.getY()-(int)loc.getY()) * detail;
+        double locz = (loc.getZ()-(int)loc.getZ()) * detail;
+        return getIntermediateValue(SubMap.get(x, y,z), SubMap.get(x + 1, y,z), SubMap.get(x, y + 1,z), SubMap.get(x + 1, y + 1,z), (int) locx, (int) locy, (int) locz);
+    }
+
+    private double getIntermediateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey, double relativez){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
+        if (relativex > relativey){ //top right triangle
+            return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
+        }
+        else if (relativex < relativey){ //bottom left triangle
+            return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey + topleft;
+        }
+        else { //center line
+            return ((bottomright - topleft) * relativex + topleft);
+        }
     }
 
     public int getSize() {

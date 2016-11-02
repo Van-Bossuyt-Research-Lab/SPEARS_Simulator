@@ -3,26 +3,31 @@ package com.csm.rover.simulator.ui.implementation;
 import com.csm.rover.simulator.environments.EnvironmentIO;
 import com.csm.rover.simulator.environments.EnvironmentRegistry;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
-import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.environments.sub.AquaticEnvironment;
 import com.csm.rover.simulator.objects.io.EnvrioFileFilter;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @FrameMarker(name = "Sub Environment Monitor", platform = "Sub")
 class SubEnvironmentMonitor extends EnvironmentDisplay {
     private static final Logger LOG = LogManager.getLogger(SubEnvironmentMonitor.class);
 
     private JPanel content;
-    private TerrainMapDisplay display;
+    private SubMapDisplay display;
 
     private DecimalPoint focus;
 
@@ -169,7 +174,7 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
 }
 
 class SubMapDisplay extends JPanel {
-    private static final Logger LOG = LogManager.getLogger(TerrainMapDisplay.class);
+    private static final Logger LOG = LogManager.getLogger(SubMapDisplay.class);
 
     private final AquaticEnvironment subMap;
 
@@ -191,7 +196,7 @@ class SubMapDisplay extends JPanel {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent arg0) {
-                setSize(subMap. * squareResolution + 1, subMap.getSize() * squareResolution + 1);
+                setSize(subMap.getSize() * squareResolution + 1, subMap.getSize() * squareResolution + 1);
             }
         });
     }
@@ -204,72 +209,76 @@ class SubMapDisplay extends JPanel {
         try {
             int xstart = (-this.getLocation().x / squareResolution - 1);
             int xend = xstart + (this.getParent().getWidth() / squareResolution + 3);
-            if (xstart < 0){
+            if (xstart < 0) {
                 xstart = 0;
             }
-            if (xend > subMap.getSize()){
+            if (xend > subMap.getSize()) {
                 xend = subMap.getSize();
             }
             int ystart = (-this.getLocation().y / squareResolution - 1);
             int yend = ystart + (this.getParent().getHeight() / squareResolution + 4);
-            if (ystart < 0){
+            if (ystart < 0) {
                 ystart = 0;
             }
-            if (yend > subMap.getSize()){
+            if (yend > subMap.getSize()) {
                 yend = subMap.getSize();
             }
+            int zstart = (-this.getLocation().y / squareResolution - 1);
+            int zend = zstart + (this.getParent().getHeight() / squareResolution + 4);
+            if (zstart < 0) {
+                zstart = 0;
+            }
+            if (zend > subMap.getSize()) {
+                zend = subMap.getSize();
+            }
             int fails = 0;
-            for (int y = ystart; y < yend; y++){
-                for (int x = xstart; x < xend; x++){
-                    try {
-                        DecimalPoint loc = new DecimalPoint(x + 0.5, y + 0.5);
-                        Color color = null;
-                        for (String pop : viewPopulators.keySet()) {
-                            if (viewPopulators.get(pop) && color == null) {
-                                double value = subMap.getPopulatorValue(pop, loc);
-                                color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
+            for (int z = zstart; z < zend; z++) {
+                for (int y = ystart; y < yend; y++) {
+                    for (int x = xstart; x < xend; x++) {
+                        try {
+                            DecimalPoint3D loc = new DecimalPoint3D(x + 0.5, y + 0.5, z + 0.5);
+                            Color color = null;
+                            for (String pop : viewPopulators.keySet()) {
+                                if (viewPopulators.get(pop) && color == null) {
+                                    double value = subMap.getPopulatorValue(pop, loc);
+                                    color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
+                                }
                             }
-                        }
-                        if (color == null) {
-                            double scaled = subMap.getDensityAt(loc) / subMap.getMaxDensity() * 100;
-                            int red, green = 0, blue = 0;
-                            if (scaled < 25) {
-                                red = (int) ((scaled) / 25 * 255);
+                            if (color == null) {
+                                double scaled = subMap.getDensityAt(loc) / subMap.getMaxDensity() * 100;
+                                int red, green = 0, blue = 0;
+                                if (scaled < 25) {
+                                    red = (int) ((scaled) / 25 * 255);
+                                } else if (scaled < 50) {
+                                    red = 255;
+                                    green = (int) ((scaled - 25) / 25 * 255);
+                                } else if (scaled < 75) {
+                                    red = (int) ((25 - (scaled - 50)) / 25 * 255);
+                                    green = 255;
+                                } else if (scaled < 100) {
+                                    red = (int) ((scaled - 75) / 25 * 255);
+                                    green = 255;
+                                    blue = red;
+                                } else {
+                                    red = 255;
+                                    green = 255;
+                                    blue = 255;
+                                }
+                                color = new Color(red, green, blue);
                             }
-                            else if (scaled < 50) {
-                                red = 255;
-                                green = (int) ((scaled - 25) / 25 * 255);
-                            }
-                            else if (scaled < 75) {
-                                red = (int) ((25 - (scaled - 50)) / 25 * 255);
-                                green = 255;
-                            }
-                            else if (scaled < 100) {
-                                red = (int) ((scaled - 75) / 25 * 255);
-                                green = 255;
-                                blue = red;
-                            }
-                            else {
-                                red = 255;
-                                green = 255;
-                                blue = 255;
-                            }
-                            color = new Color(red, green, blue);
-                        }
 
-                        g.setColor(color);
-                        g.fillRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
+                            g.setColor(color);
+                            g.fillRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
 
-                        g.setColor(Color.DARK_GRAY);
-                        g.drawRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
-                    }
-                    catch (Exception e){
-                        if (fails > 10){
-                            throw e;
-                        }
-                        else {
-                            LOG.log(Level.WARN, "Failed to draw square [" + x + ", " + y + "]: " + e.getMessage());
-                            fails++;
+                            g.setColor(Color.DARK_GRAY);
+                            g.drawRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
+                        } catch (Exception e) {
+                            if (fails > 10) {
+                                throw e;
+                            } else {
+                                LOG.log(Level.WARN, "Failed to draw square [" + x + ", " + y + "]: " + e.getMessage());
+                                fails++;
+                            }
                         }
                     }
                 }

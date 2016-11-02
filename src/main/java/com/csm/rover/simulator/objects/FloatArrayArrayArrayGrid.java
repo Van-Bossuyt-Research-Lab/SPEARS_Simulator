@@ -1,9 +1,10 @@
 package com.csm.rover.simulator.objects;
+
 import java.util.ArrayList;
 /**
  * Created by PHM-Lab2 on 1/12/2016.
  */
-public class FloatArrayArrayArrayGrid {
+public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
 
     private float[][][] grid3;
 
@@ -14,11 +15,10 @@ public class FloatArrayArrayArrayGrid {
     public FloatArrayArrayArrayGrid(Float[][][] values){
         loadFromArray(values);
     }
-/*
-    public FloatArrayArrayArrayGrid(FloatArrayArrayGrid original){
+
+    public FloatArrayArrayArrayGrid(FloatArrayArrayArrayGrid original){
         grid3 = original.grid3.clone();
     }
-    */
 
     public void loadFromArray(Float[][][] values) {
         grid3 = new float[values.length][values[0].length][values[0][0].length];
@@ -145,16 +145,6 @@ public class FloatArrayArrayArrayGrid {
         }
     }
 
-
-    public Float get(int x, int y, int z){
-        if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()){
-            return grid3[x][y][z];
-        }
-        else {
-            throw new ArrayIndexOutOfBoundsException(String.format("The point (%d, %d) is out of bounds.  Expected a point within {%d, %d}.", x, y, getWidth(), getHeight()));
-        }
-    }
-
     public ArrayList<Float> getColumn(int x, int y){
         if (x >= 0 && x < getWidth()){
             ArrayList<Float> col = new ArrayList<Float>(grid3[x][y].length);
@@ -181,6 +171,9 @@ public class FloatArrayArrayArrayGrid {
         }
     }
 
+    public float get(int x, int y, int z){
+        return grid3[x][y][z];
+    }
 
     public int getWidth() {
         return grid3.length;
@@ -204,6 +197,8 @@ public class FloatArrayArrayArrayGrid {
     public boolean isEmpty() {
         return size() == 0;
     }
+
+    public ArrayGrid3D<Float> clone() { return new FloatArrayArrayArrayGrid(this);}
 /*
     @Override
     public ArrayGrid<Float> clone() {

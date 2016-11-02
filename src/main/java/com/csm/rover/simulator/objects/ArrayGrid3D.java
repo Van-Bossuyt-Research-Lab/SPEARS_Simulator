@@ -15,33 +15,23 @@ public interface ArrayGrid3D<T> extends Cloneable {
 
     void addColumn(ArrayList<T> col);
 
-    void addColumnAt(int x, ArrayList<T> col);
+    void addColumnAt(int x, int y, ArrayList<T> col);
 
     void addRow(ArrayList<T> row);
 
-    void addRowAt(int y, ArrayList<T> row);
+    void addRowAt(int y,int z, ArrayList<T> row);
 
-    void addLayer(ArrayList<T> lay);
+    float get(int x, int y, int z);
 
-    void addLayerAt(int z, ArrayList<T> lay);
+    ArrayList<T> getColumn(int x, int y);
 
-    int get(int x, int y, int z);
-
-    ArrayList<T> getColumn(int x);
-
-    ArrayList<T> getRow(int y);
+    ArrayList<T> getRow(int y, int z);
 
     int getWidth();
 
     int getHeight();
 
     int getLength();
-
-    int getX();
-
-    int getY();
-
-    int getZ();
 
     int size();
 
