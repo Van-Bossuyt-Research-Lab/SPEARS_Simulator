@@ -31,6 +31,7 @@ class EmbeddedDesktop extends JDesktopPane {
 	private boolean on_resize = false, resizing = false;
 	
 	EmbeddedDesktop(){
+		setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 		setUpWells();
 		setUpEventListeners();
 	}

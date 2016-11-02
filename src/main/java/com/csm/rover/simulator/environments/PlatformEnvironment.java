@@ -174,4 +174,9 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         return Collections.unmodifiableList(new ArrayList<>(populators.keySet()));
     }
 
+    @JsonIgnore
+    public List<P> getPlatforms(){
+        return Collections.unmodifiableList(platforms);
+    }
+
 }
