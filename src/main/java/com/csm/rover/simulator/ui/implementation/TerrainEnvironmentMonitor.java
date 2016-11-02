@@ -6,6 +6,9 @@ import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.io.EnvrioFileFilter;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.platforms.PlatformState;
+import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +17,9 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.List;
 
 @FrameMarker(name = "Terrain Monitor", platform = "Rover")
 class TerrainEnvironmentMonitor extends EnvironmentDisplay {
@@ -22,6 +27,7 @@ class TerrainEnvironmentMonitor extends EnvironmentDisplay {
 
     private JPanel content;
     private TerrainMapDisplay display;
+    private List<RoverIcon> roverIcons;
 
     private DecimalPoint focus;
 
@@ -65,12 +71,12 @@ class TerrainEnvironmentMonitor extends EnvironmentDisplay {
             finder.setCurrentDirectory(UiConfiguration.getFolder(platform_type));
             int option = finder.showSaveDialog(getParent());
             menu.setVisible(false);
-            SwingUtilities.invokeLater(() -> {
+            new FreeThread(0, () -> {
                 if (option == JFileChooser.APPROVE_OPTION) {
                     UiConfiguration.changeFolder(platform_type, finder.getCurrentDirectory());
                     EnvironmentIO.saveEnvironment(display.getEnvironment(), EnvironmentIO.appendSuffix(platform_type, finder.getSelectedFile()));
                 }
-            });
+            }, 1, "SaveDialog");
         });
         menu.add(mntmSaveMapFile);
 
@@ -84,7 +90,7 @@ class TerrainEnvironmentMonitor extends EnvironmentDisplay {
             menu.add(item);
         }
 
-        menu.setVisible(true);
+        display.setComponentPopupMenu(menu);
     }
 
     private void setFocusPoint(DecimalPoint point){
@@ -158,11 +164,21 @@ class TerrainEnvironmentMonitor extends EnvironmentDisplay {
         getInputMap().put(KeyStroke.getKeyStroke("DOWN"), "pan down");
         getActionMap().put("pan down", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(0, -1))));
         redraw();
+
+        roverIcons = new ArrayList<>();
+        for (RoverObject rover : ((TerrainEnvironment)environment).getPlatforms()){
+            RoverIcon icon = new RoverIcon(rover);
+            display.add(icon);
+            roverIcons.add(icon);
+        }
     }
 
     @Override
     protected void update() {
         redraw();
+        for (RoverIcon rover : roverIcons){
+            rover.update(display.getResolution());
+        }
     }
 
 }
@@ -179,6 +195,7 @@ class TerrainMapDisplay extends JPanel {
 
     TerrainMapDisplay(TerrainEnvironment environment){
         this.terrainMap = environment;
+        this.setLayout(null);
         viewPopulators = new HashMap<>();
         popDisplays = new HashMap<>();
         for (String pop : terrainMap.getPopulators()){
@@ -312,3 +329,76 @@ class TerrainMapDisplay extends JPanel {
 
 }
 
+class RoverIcon extends JPanel {
+
+    private static final int _size = 80;
+
+    private JLabel nameTitle, iconImage;
+
+    private RoverObject rover;
+
+    RoverIcon(RoverObject rover){
+        super.setOpaque(false);
+        super.setName(rover.getName());
+        this.rover = rover;
+
+        nameTitle = new JLabel(rover.getName());
+        nameTitle.setFont(new Font("Trebuchet MS", Font.BOLD, 17));
+        nameTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        if (nameTitle.getPreferredSize().getWidth() > _size){
+            nameTitle.setSize((int)nameTitle.getPreferredSize().getWidth(), (int)nameTitle.getPreferredSize().getHeight()+5);
+        }
+        else {
+            nameTitle.setSize(_size, (int)nameTitle.getPreferredSize().getHeight()+5);
+        }
+        nameTitle.setLocation(0, 0);
+        this.add(nameTitle);
+
+        iconImage = new JLabel();
+        iconImage.setSize(_size, _size);
+        iconImage.setLocation((nameTitle.getWidth()-iconImage.getWidth())/2, nameTitle.getHeight());
+        updateAngle(rover.getState().get("direction"));
+        this.add(iconImage);
+
+        this.setSize(nameTitle.getWidth(), (nameTitle.getHeight()+iconImage.getHeight()));
+        setLocation(0, 0);
+    }
+
+    void update(int resolution){
+        PlatformState state = rover.getState();
+        updateAngle(state.get("direction"));
+        setLocationOnMap((int)Math.round(state.<Double>get("x")*resolution), (int)Math.round(state.<Double>get("y")*resolution));
+    }
+
+    private void updateAngle(double angle){
+        while (angle < 0){
+            angle += 2*Math.PI;
+        }
+        angle = Math.toDegrees(angle) % 360;
+        try {
+            ImageIcon img = ImageFunctions.getImage("/markers/Rover Marker " + (int)(angle - angle %5) + ".png");
+            img = resize(img, iconImage.getWidth(), iconImage.getHeight());
+            iconImage.setIcon(img);
+        }
+        catch (Exception e){
+            iconImage.setIcon(null);
+        }
+    }
+
+    private void setLocationOnMap(int x, int y){
+        super.setBounds((x - this.getWidth()/2), (y - this.getHeight()/2-nameTitle.getHeight()), this.getWidth(), this.getHeight());
+    }
+
+    private ImageIcon resize(Icon image, int width, int height) throws Exception {
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
+        Graphics2D g = bi.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        Composite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1);
+        g.setComposite(comp);
+        g.drawImage(((ImageIcon) (image)).getImage(), 0, 0, width, height, null);
+        g.dispose();
+        return new ImageIcon(bi);
+    }
+
+}
