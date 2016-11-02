@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.test.objects;
+package com.csm.rover.simulator.objects;
 
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
 import com.fasterxml.jackson.core.JsonProcessingException;

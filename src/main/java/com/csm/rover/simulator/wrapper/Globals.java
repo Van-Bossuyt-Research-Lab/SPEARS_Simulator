@@ -35,23 +35,30 @@ public class Globals {
     private ArrayList<Runnable> clockEvents;
 	
 	private static Globals singleton_instance = null;
+
+	/**
+	 * Returns the singleton instance of the Globals class, initializes Globals if not created
+	 *
+	 * @return	Singleton of Globals
+     */
 	public static Globals getInstance(){
 		if (singleton_instance == null){
 			singleton_instance = new Globals();
-            singleton_instance.clock = new SynchronousThread(1000, new Runnable(){
-                public void run(){
-                    singleton_instance.dateTime.advanceClock();
-                    for (Runnable event : singleton_instance.clockEvents){
-                        event.run();
-                    }
-                }
-            }, SynchronousThread.FOREVER, "clock", false);
+			singleton_instance.clock = new SynchronousThread(1000, () -> {
+				singleton_instance.dateTime.advanceClock();
+				for (Runnable event : singleton_instance.clockEvents){
+					event.run();
+				}
+			}, SynchronousThread.FOREVER, "clock", false);
 		}
 		return singleton_instance;
 	}
 
-    public Globals(){
-        clockEvents = new ArrayList<Runnable>();
+	/**
+	 * Hidden constructor method for Globals.  Use {@link #getInstance()} getInstance} to get singleton instance.
+	 */
+    private Globals(){
+        clockEvents = new ArrayList<>();
         dateTime = new ZDate();
         dateTime.setFormat("[hh:mm:ss]");
     }

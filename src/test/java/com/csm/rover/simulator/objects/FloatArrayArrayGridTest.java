@@ -1,7 +1,7 @@
-package com.csm.rover.simulator.test.objects;
+package com.csm.rover.simulator.objects;
 
 import com.csm.rover.simulator.objects.util.ArrayGrid;
-import com.csm.rover.simulator.objects.util.GenericArrayGrid;
+import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -12,65 +12,65 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class ArrayGridTest {
+public class FloatArrayArrayGridTest {
 
-    private ArrayGrid<String> grid;
+    private ArrayGrid<Float> grid;
 
     @Before
     public void setup(){
-        grid = new GenericArrayGrid<String>();
+        grid = new FloatArrayArrayGrid();
     }
 
     @Test
     public void testAddToBlank(){
-        grid.put(5, 4, "Hi");
+        grid.put(5, 4, 1.2f);
 
         assertEquals(6, grid.getWidth());
         assertEquals(5, grid.getHeight());
-        assertEquals("Hi", grid.get(5, 4));
+        assertEquals(1.2f, grid.get(5, 4), 0.001);
     }
 
     @Test
     public void testAddCol(){
-        ArrayList<String> col = new ArrayList<String>();
-        col.add("a");
-        col.add("b");
-        col.add("e");
-        col.add("f");
+        ArrayList<Float> col = new ArrayList<Float>();
+        col.add(1.4f);
+        col.add(1.5f);
+        col.add(1.6f);
+        col.add(1.7f);
         grid.addColumnAt(2, col);
 
         assertEquals(3, grid.getWidth());
         assertEquals(4, grid.getHeight());
-        assertEquals("e", grid.get(2, 2));
+        assertEquals(1.6f, grid.get(2, 2), 0.001);
     }
 
     @Test
     public void testAddRow(){
-        ArrayList<String> row = new ArrayList<String>();
-        row.add("a");
-        row.add("b");
-        row.add("c");
-        row.add("e");
-        row.add("f");
+        ArrayList<Float> row = new ArrayList<Float>();
+        row.add(1.4f);
+        row.add(1.5f);
+        row.add(1.6f);
+        row.add(1.7f);
+        row.add(1.8f);
         grid.addRowAt(5, row);
         System.out.println(grid);
         assertEquals(5, grid.getWidth());
         assertEquals(6, grid.getHeight());
-        assertEquals("b", grid.get(1, 5));
+        assertEquals(1.5f, grid.get(1, 5), 0.001);
     }
 
     @Test
     public void jsonSerializationTest(){
-        ArrayGrid<String> grid = new GenericArrayGrid<>();
-        grid.put(0, 0, "a");
-        grid.put(1, 1, "a");
-        grid.put(1, 3, "b");
-        grid.put(0, 2, "c");
+        ArrayGrid<Float> grid = new FloatArrayArrayGrid();
+        grid.put(0, 0, 5f);
+        grid.put(1, 1, 5f);
+        grid.put(1, 3, 2f);
+        grid.put(0, 2, 9f);
 
         ObjectMapper mapper = new ObjectMapper();
         try {
             String json = mapper.writeValueAsString(grid);
-            assertArrayEquals("[[\"a\",null],[null,\"a\"],[\"c\",null],[null,\"b\"]]".toCharArray(), json.toCharArray());
+            assertArrayEquals("[[5.0,0.0],[0.0,5.0],[9.0,0.0],[0.0,2.0]]".toCharArray(), json.toCharArray());
         }
         catch (JsonProcessingException e) {
             fail();
@@ -79,17 +79,17 @@ public class ArrayGridTest {
 
     @Test
     public void jsonDeserializerTest(){
-        ArrayGrid<String> grid = new GenericArrayGrid<>();
-        grid.put(0, 0, "a");
-        grid.put(1, 1, "a");
-        grid.put(1, 3, "b");
-        grid.put(0, 2, "c");
+        ArrayGrid<Float> grid = new FloatArrayArrayGrid();
+        grid.put(0, 0, 5f);
+        grid.put(1, 1, 5f);
+        grid.put(1, 3, 2f);
+        grid.put(0, 2, 9f);
 
-        String json = "[[\"a\",null],[null,\"a\"],[\"c\",null],[null,\"b\"]]";
+        String json = "[[5.0,0.0],[0.0,5.0],[9.0,0.0],[0.0,2.0]]";
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            ArrayGrid<String> obj = mapper.readValue(json, ArrayGrid.class);
+            ArrayGrid<Float> obj = mapper.readValue(json, ArrayGrid.class);
             assertEquals(grid, obj);
         }
         catch (IOException e) {

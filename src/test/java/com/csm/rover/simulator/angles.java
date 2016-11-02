@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.test;
+package com.csm.rover.simulator;
 
 import com.csm.rover.simulator.wrapper.Globals;
 import org.junit.BeforeClass;
