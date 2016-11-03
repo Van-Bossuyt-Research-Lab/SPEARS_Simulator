@@ -25,7 +25,7 @@ public class Globals {
 	private Random rnd = new Random();
 	
 	private boolean begun = false;
-	private Map<String, ThreadItem> threads = new ConcurrentHashMap<String, ThreadItem>();
+	private Map<String, ThreadItem> threads = new ConcurrentHashMap<>();
 	private boolean milliDone = false;
 	
 	private int exitTime = -1;
@@ -42,8 +42,8 @@ public class Globals {
 	 * @return	Singleton of Globals
      */
 	public static Globals getInstance(){
-		if (singleton_instance == null){
-			singleton_instance = new Globals();
+		if (singleton_instance == null) {
+            singleton_instance = new Globals();
 			singleton_instance.clock = new SynchronousThread(1000, () -> {
 				singleton_instance.dateTime.advanceClock();
 				for (Runnable event : singleton_instance.clockEvents){
@@ -63,10 +63,20 @@ public class Globals {
         dateTime.setFormat("[hh:mm:ss]");
     }
 
+    /**
+     * Observable pattern that is triggered every time the clock advances a millisecond.
+     *
+     * @param event Runnable action to be called
+     */
     public void addClockIncrementEvent(Runnable event){
         clockEvents.add(event);
     }
-	
+
+    /**
+     * Begins the simulation clock allowing the simulation to run.
+     *
+     * @param accel Whether or not to accelerate the simulation.  False will run in Real-Time
+     */
 	public void startTime(boolean accel){
 		begun = true;
 		if (accel){
@@ -74,12 +84,10 @@ public class Globals {
 		}
         clock.start();
 		ThreadItem.offset = 0;
-		new FreeThread(0, new Runnable(){
-			public void run(){
-				long end = System.nanoTime() + (long)(1000000 / getTimeScale());
-				while (System.nanoTime() < end) {}
-				threadCheckIn("milli-clock");
-			}
+		new FreeThread(0, () -> {
+            long end = System.nanoTime() + (long)(1000000 / getTimeScale());
+            while (System.nanoTime() < end) {}
+            threadCheckIn("milli-clock");
 		}, SynchronousThread.FOREVER, "milli-clock", true);
 	}
 	
@@ -100,11 +108,6 @@ public class Globals {
 			measurement -= deviation;
 		}
 		return Math.round(measurement*1000)/1000;
-	}
-	
-	public double addErrorToMeasurement(double measurement, double lowDeviation, double highDeviation){ // takes in a measurement and varies it within measure-lowDev to measure+highDev
-		double deviation = rnd.nextDouble()*(lowDeviation + highDeviation) - lowDeviation;
-		return Math.round((measurement + deviation)*1000)/1000;
 	}
 	
 	//NOT A TRUE SUBTRACTION: if the second angle is clockwise of the first, returns the negative number of units between, positive if second is to ccw

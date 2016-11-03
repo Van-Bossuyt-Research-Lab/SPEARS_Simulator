@@ -32,6 +32,7 @@ public class SynchronousThread extends Thread {
 		}
 	}
 
+    @Override
 	public void run(){
 		while (actions > 0 || forever){
 			if (delay > 0){
