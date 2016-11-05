@@ -50,6 +50,8 @@ public class AquaticMap extends EnvironmentMap {
 
     private void checkSize() {
         if (SubMap.getWidth() != size * detail || SubMap.getHeight() != size * detail) {
+            System.out.print(size*detail);
+            System.out.print(SubMap.getWidth());
             throw new IllegalArgumentException("The map does not match the given sizes");
         }
     }

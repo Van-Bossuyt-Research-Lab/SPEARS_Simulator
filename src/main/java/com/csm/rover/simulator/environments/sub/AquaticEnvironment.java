@@ -23,7 +23,7 @@ public class AquaticEnvironment extends PlatformEnvironment<SubObject, AquaticMa
     public AquaticEnvironment(@JsonProperty("type") String type, @JsonProperty("map") AquaticMap map, @JsonProperty("populators") Map<String, EnvironmentPopulator> pops){
         super(type, map, pops);
         if (!type.equals("Sub")){
-            throw new IllegalArgumentException("TerrainEnvironment type should be \'Rover\'");
+            throw new IllegalArgumentException("AquaticEnvironment type should be \'Sub\'");
         }
     }
 

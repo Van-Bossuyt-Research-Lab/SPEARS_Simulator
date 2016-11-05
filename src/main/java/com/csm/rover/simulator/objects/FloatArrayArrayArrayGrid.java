@@ -39,7 +39,7 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
         grid3 = new float[width][height][length];
         for (int x = 0; x < width; x++){
             for (int y = 0; y < height; y++){
-                for (int z = 0; y < length; z++) {
+                for (int z = 0; z < length; z++) {
                     grid3[x][y][z] = val;
                 }
             }
