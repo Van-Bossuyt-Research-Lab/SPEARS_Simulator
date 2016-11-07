@@ -3,7 +3,7 @@ package com.csm.rover.simulator.environments.sub.modifiers;
 import com.csm.rover.simulator.environments.EnvironmentModifier;
 import com.csm.rover.simulator.environments.annotations.Modifier;
 import com.csm.rover.simulator.environments.sub.AquaticMap;
-import com.csm.rover.simulator.objects.ArrayGrid3D;
+import com.csm.rover.simulator.objects.util.ArrayGrid3D;
 
 import java.util.Map;
 

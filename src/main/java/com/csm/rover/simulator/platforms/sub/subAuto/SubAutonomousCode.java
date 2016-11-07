@@ -1,7 +1,7 @@
 package com.csm.rover.simulator.platforms.sub.subAuto;
 
 import com.csm.rover.simulator.environments.sub.AquaticMap;
-import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
+import com.csm.rover.simulator.objects.io.DatedFileAppenderImpl;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.platforms.PlatformState;

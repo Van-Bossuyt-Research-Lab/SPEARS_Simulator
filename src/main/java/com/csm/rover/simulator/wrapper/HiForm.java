@@ -5,7 +5,7 @@ import com.csm.rover.simulator.control.InterfacePanel;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
-import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.platforms.rover.RoverHub;
 import com.csm.rover.simulator.platforms.rover.RoverObject;

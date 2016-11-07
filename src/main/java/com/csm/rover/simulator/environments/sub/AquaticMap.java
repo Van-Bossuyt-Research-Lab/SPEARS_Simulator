@@ -1,8 +1,7 @@
 package com.csm.rover.simulator.environments.sub;
 import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.annotations.Map;
-import com.csm.rover.simulator.objects.ArrayGrid3D;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.ArrayGrid3D;
 import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.fasterxml.jackson.annotation.JsonCreator;

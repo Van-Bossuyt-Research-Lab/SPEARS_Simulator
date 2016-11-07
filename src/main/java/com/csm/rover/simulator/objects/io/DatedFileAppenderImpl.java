@@ -1,8 +1,7 @@
-package com.csm.rover.simulator.objects;
+package com.csm.rover.simulator.objects.io;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.HashMap;
 import org.apache.logging.log4j.core.*;
 import org.apache.logging.log4j.core.appender.*;

@@ -12,7 +12,7 @@ import com.csm.rover.simulator.environments.rover.populators.TerrainTargetsPop;
 import com.csm.rover.simulator.objects.io.MapFileFilter;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
-import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.objects.util.ParamMap;
 import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.wrapper.Admin;

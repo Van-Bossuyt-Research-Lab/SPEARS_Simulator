@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.objects.util;
+package com.csm.rover.simulator.objects;
 
 import com.csm.rover.simulator.wrapper.Globals;
 

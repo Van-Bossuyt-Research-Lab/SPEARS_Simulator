@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.ThreadItem;
 import com.csm.rover.simulator.objects.util.ZDate;
