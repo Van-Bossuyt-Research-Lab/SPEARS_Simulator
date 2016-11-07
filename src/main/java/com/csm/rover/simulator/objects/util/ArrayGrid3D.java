@@ -1,8 +1,6 @@
 package com.csm.rover.simulator.objects.util;
 import java.util.ArrayList;
-/**
- * Created by PHM-Lab2 on 1/12/2016.
- */
+
 public interface ArrayGrid3D<T> extends Cloneable {
 
     void loadFromArray(T[][][] values);
