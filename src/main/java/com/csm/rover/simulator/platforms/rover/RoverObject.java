@@ -36,7 +36,7 @@ public class RoverObject extends Platform {
 	private boolean hasInstructions = false; // has a list of instructions on file
 	private String instructions = ""; // the list of instructions
 	private int instructsComplete = 0; // how many items on the list have we done
-	private long timeOfLastCmd = Globals.getInstance().timeMillis; // how long since the ground station talked last
+	private long timeOfLastCmd = Globals.getInstance().timeMillis(); // how long since the ground station talked last
 	private boolean waiting = false; // are we waiting
 	private long cmdWaitTime = 0; // how long to wait
 	private boolean run_auto = false; // are we running autonomously
@@ -99,7 +99,7 @@ public class RoverObject extends Platform {
 		},
 		SynchronousThread.FOREVER, name+"-code");
 		physicsModel.start();
-		timeOfLastCmd = Globals.getInstance().timeMillis;
+		timeOfLastCmd = Globals.getInstance().timeMillis();
 	}
 	
 	private void excecuteCode(){
@@ -112,9 +112,9 @@ public class RoverObject extends Platform {
 				}
 				motorCurrent = physicsModel.getState().get("battery_current"); // measure current draw
 				if (checkCurrent){
-					currentIntegral += motorCurrent * (Globals.getInstance().timeMillis - lastCurrentCheck); // predict life (really simply)
-					lastCurrentCheck = Globals.getInstance().timeMillis;
-					averageCurrent = currentIntegral / (Globals.getInstance().timeMillis - startCurretIntegral);
+					currentIntegral += motorCurrent * (Globals.getInstance().timeMillis() - lastCurrentCheck); // predict life (really simply)
+					lastCurrentCheck = Globals.getInstance().timeMillis();
+					averageCurrent = currentIntegral / (Globals.getInstance().timeMillis() - startCurretIntegral);
 				}
 			} catch (Exception e) {
 				LOG.log(Level.ERROR, name+": Error in voltage check", e);
@@ -265,9 +265,9 @@ public class RoverObject extends Platform {
 					data = new char[data.length]; // reset data array
 					index = 0;
 					tag = '\0';
-					timeOfLastCmd = Globals.getInstance().timeMillis; // reset time since command
+					timeOfLastCmd = Globals.getInstance().timeMillis(); // reset time since command
 					if (moving){
-				        cmdWaitTime += Globals.getInstance().timeMillis + 60000; // reset command wait
+				        cmdWaitTime += Globals.getInstance().timeMillis() + 60000; // reset command wait
 					}
 				} 
 				else { // the message wasn't for us
@@ -284,7 +284,7 @@ public class RoverObject extends Platform {
 			}
 			
 			// Listening for response
-			if (Globals.getInstance().timeMillis - timeSinceMessage > responseWaitTime && waitingForResponse){ // if waiting and appropriate time has passed
+			if (Globals.getInstance().timeMillis() - timeSinceMessage > responseWaitTime && waitingForResponse){ // if waiting and appropriate time has passed
 				waitingForResponse = false; // we're no longer waiting
 				// switch possible responses
 				if (desiredResponse == '*'){
@@ -298,13 +298,13 @@ public class RoverObject extends Platform {
 			}
 
 			// Autonomous and Instruction handling
-            if (Globals.getInstance().timeMillis - timeOfLastCmd > 60000){ // if it has been a minute since we heard from them
+            if (Globals.getInstance().timeMillis() - timeOfLastCmd > 60000){ // if it has been a minute since we heard from them
 				//System.out.println(this.name);
 				if (hasInstructions && !mute) { // if we have instructions, can send things
 					LEDs.put("Instructions", true);
 					LEDs.put("Autonomus", false);
 					run_auto = false; // don't run autonomously
-					if (!waiting || (Globals.getInstance().timeMillis > cmdWaitTime)) { // if we're not waiting or have waiting long enough
+					if (!waiting || (Globals.getInstance().timeMillis() > cmdWaitTime)) { // if we're not waiting or have waiting long enough
 						waiting = false;
 						String cmd = ""; // the command
 						int x = 0;
@@ -380,7 +380,7 @@ public class RoverObject extends Platform {
 								if (temperatureData.equals("")){ // if there is not an existing "file," create one
 						    		temperatureData += "Graph Title,Temperatures," + "Vertical Units,*C," + "Horizontal Units,s," + "Label,\nSys Time,Temperature,";
 						    	}
-						    	temperatureData += Globals.getInstance().timeMillis + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
+						    	temperatureData += Globals.getInstance().timeMillis() + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
 						    }
 						    else if (strcmp(cmd, "sendTemp") == 0){ // report temperature
 						    	sendSerial("s1 g }"); // mute the ground so they can't interrupt
@@ -401,7 +401,7 @@ public class RoverObject extends Platform {
 						    }
 						    else if (strcmp(cmd, "delay1") == 0) { // wait a second
 						    	waiting = true;
-								cmdWaitTime = Globals.getInstance().timeMillis + 1000;
+								cmdWaitTime = Globals.getInstance().timeMillis() + 1000;
 							}
 							else if (strcmp(cmd, "report") == 0) { // report completion of instructions to ground
 								if (sendSerial("s1 g n Rover Instructs Done")) { // if we're not muted
@@ -462,7 +462,7 @@ public class RoverObject extends Platform {
 				LEDs.put("Instructions", false);
 				
 				String cmd = autonomousCodeModel.nextCommand(
-						Globals.getInstance().timeMillis,
+						Globals.getInstance().timeMillis(),
                         physicsModel.getState()
 				);
 				//TODO switch all known commands
@@ -518,7 +518,7 @@ public class RoverObject extends Platform {
 					if (temperatureData.equals("")){ // if there is not an existing "file," create one
 			    		temperatureData += "Graph Title,Temperatures," + "Vertical Units,*C," + "Horizontal Units,s," + "Label,\nSys Time,Temperature,";
 			    	}
-			    	temperatureData += Globals.getInstance().timeMillis + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
+			    	temperatureData += Globals.getInstance().timeMillis() + "," + getTemperature() + ",\n"; // get temperature data and add it to the file
 			    }
 			    else if (strcmp(cmd, "sendTemp") == 0){ // report temperature
 			    	sendSerial("s1 g }"); // mute the ground so they can't interrupt
@@ -539,7 +539,7 @@ public class RoverObject extends Platform {
 			    }
 			    else if (strcmp(cmd.substring(0, 5), "delay") == 0) { // wait a second
 			    	waiting = true;
-					cmdWaitTime = Globals.getInstance().timeMillis + Integer.parseInt(cmd.substring(5, cmd.length()));
+					cmdWaitTime = Globals.getInstance().timeMillis() + Integer.parseInt(cmd.substring(5, cmd.length()));
 				}
 			    else if (strcmp(cmd.substring(0, 7), "chngmtr") == 0){ //to change motor speed "chngmtr*###" where *=motorID and ###=new power
 			    	int motor = cmd.charAt(7);
@@ -706,7 +706,7 @@ public class RoverObject extends Platform {
 	
 	// set up waiting for a response
 	private void setWaitForResponse(char listen, long timeToWait){
-		timeSinceMessage = Globals.getInstance().timeMillis; // when was the out message sent
+		timeSinceMessage = Globals.getInstance().timeMillis(); // when was the out message sent
 		desiredResponse = listen; // what are we listening for
 		responseWaitTime = timeToWait; // how long should we wait for it
 		waitingForResponse = true; // we are waiting
@@ -759,7 +759,7 @@ public class RoverObject extends Platform {
 	}
 	
 	private double getTemperature(){ // read temperature from the "sensor"
-		return Globals.getInstance().addErrorToMeasurement(0, .5);//WrapperMain.MAP.getTemperatureAtLoc(), 0.73);
+		return 0;
 	}
 	
 	private int strcmp(char[] first, String second) { // see if 2 strings are equal
@@ -793,7 +793,7 @@ public class RoverObject extends Platform {
 	}
 
     public void addToSerialHistory(String out){
-		serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis + "\n";
+		serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis() + "\n";
 	}
 	
 	public String getName(){

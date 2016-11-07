@@ -132,7 +132,7 @@ public class HiForm implements HumanInterfaceAbstraction {
             informer = new AccelPopUp(runtime, (int) (runtime/accelerant/60000));
             new FreeThread(1000, new Runnable(){
                 public void run(){
-                    informer.update((int) Globals.getInstance().timeMillis);
+                    informer.update((int) Globals.getInstance().timeMillis());
                 }
             }, FreeThread.FOREVER, "accel-pop-up");
         }

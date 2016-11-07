@@ -20,7 +20,7 @@ public class Globals {
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;
-	public long timeMillis = 0;
+	private long timeMillis = 0;
 	
 	private Random rnd = new Random();
 	
@@ -90,54 +90,72 @@ public class Globals {
             threadCheckIn("milli-clock");
 		}, SynchronousThread.FOREVER, "milli-clock", true);
 	}
-	
+
+	/**
+	 * Returns the multiplication factor for accelerating the simulation time step.
+	 *
+	 * @return The acceleration multiplier
+     */
 	public double getTimeAccelerant() {
 		return time_accelerant;
 	}
 
+	/**
+	 * Returns the multiplication factor currently in use in the simulation.  Will be 1 for real-time
+	 * and equivalent to {@link #getTimeAccelerant() getTimeAccelerant} when accelerated.
+	 *
+	 * @return The current multiplier
+     */
 	public double getTimeScale(){
 		return timeScale;
 	}
 
-	public double addErrorToMeasurement(double measurement, double percentError){ // takes in a measurement an adds error by the given percent
-		double deviation = rnd.nextDouble()*(measurement*percentError);
-		if (rnd.nextBoolean()){
-			measurement += deviation;
-		}
-		else {
-			measurement -= deviation;
-		}
-		return Math.round(measurement*1000)/1000;
+	/**
+	 * Returns the current simulation time in milliseconds
+	 *
+	 * @return time in ms
+     */
+	public long timeMillis(){
+		return timeMillis;
 	}
-	
-	//NOT A TRUE SUBTRACTION: if the second angle is clockwise of the first, returns the negative number of units between, positive if second is to ccw
+
+	/**
+	 * Returns the coordinate difference of the two angles.  If the second angle is clockwise
+	 * of the first returns the negative, if counterclockwise returns positive.  Functions
+	 * around the wrap point.
+	 *
+	 * @param first	The first angle
+	 * @param second The second angle
+	 * @return The coordinate difference between input angles
+     */
+	//NOT A TRUE SUBTRACTION:
 	public double subtractAngles(double first, double second){
-		double one = first - second;
-		double two = ((first+Math.PI)%(2*Math.PI)) - ((second+Math.PI)%(2*Math.PI));
-		if (Math.abs(one-two) < 0.00001){
-			return -1*one;
-		}
-		if (Math.abs(one) > Math.abs(two)){
-			return -1*two;
-		}
-		else {
-			return -1*one;
-		}
+		first = normalize(first, 0, 2*Math.PI);
+		second = normalize(second, -2*Math.PI, 0);
+		double diff = first - second;
+		diff = normalize(diff, -Math.PI, Math.PI);
+		return -diff;
 	}
-	
-	//NOT A TRUE SUBTRACTION: if the second angle is clockwise of the first, returns the negative number of units between, positive if second is to ccw
+
+	/**
+	 * Equivalent to Math.toDegrees({@link #subtractAngles(double, double) subtractAngles}(Math.toRadians(double), Math.toRadians(double))).
+	 *
+	 * @param first	The first angle
+	 * @param second The second angle
+     * @return The coordinate difference between input angles
+     */
 	public double subtractAnglesDeg(double first, double second){
-		double one = first - second;
-		double two = ((first+180)%360) - ((second+180)%360);
-		if (Math.abs(one-two) < 0.00001){
-			return -1*one;
+		return Math.toDegrees(subtractAngles(Math.toRadians(first), Math.toRadians(second)));
+	}
+
+	private double normalize(double angle, double low, double high){
+		while (angle < low){
+			angle += 2*Math.PI;
 		}
-		if (Math.abs(one) > Math.abs(two)){
-			return -1*two;
+		while (angle > high){
+			angle -= 2*Math.PI;
 		}
-		else {
-			return -1*one;
-		}
+		return angle;
 	}
 	
 	public void setUpAcceleratedRun(final HumanInterfaceAbstraction HI, int runtime){

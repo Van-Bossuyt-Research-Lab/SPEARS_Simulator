@@ -34,7 +34,7 @@ public class ThreadItem {
 	}
 
 	public void advance(){
-		next = Globals.getInstance().timeMillis + delay;
+		next = Globals.getInstance().timeMillis() + delay;
 	}
 	
 	public long getNext() {

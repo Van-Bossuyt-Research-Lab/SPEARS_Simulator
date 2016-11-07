@@ -66,7 +66,7 @@ public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
     protected void writeToLog(String message){
         try {
             BufferedWriter write = new BufferedWriter(new FileWriter(logFile, true));
-            write.write(message + "\t\t" + new DateTime().toString(DateTimeFormat.forPattern("[MM/dd/yyyy hh:mm:ss.")) + (Globals.getInstance().timeMillis %1000) + "]\r\n");
+            write.write(message + "\t\t" + new DateTime().toString(DateTimeFormat.forPattern("[MM/dd/yyyy hh:mm:ss.")) + (Globals.getInstance().timeMillis() %1000) + "]\r\n");
             write.flush();
             write.close();
         }

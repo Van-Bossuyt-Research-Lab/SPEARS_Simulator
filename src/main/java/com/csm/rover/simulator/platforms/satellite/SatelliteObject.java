@@ -389,7 +389,7 @@ public class SatelliteObject extends Platform {
 	}
 	
 	public void addToSerialHistory(String out){
-		serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis + "\n";
+		serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis() + "\n";
 	}
 	
 	public String getSerialHistory(){
