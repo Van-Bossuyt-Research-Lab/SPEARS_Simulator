@@ -20,9 +20,10 @@ public class EmptyPoolGen extends EnvironmentModifier<AquaticMap> {
         int size = params.get("size").intValue();
         int detail = params.get("detail").intValue();
         int true_size = size*detail;
+        float val= 1;
 
         ArrayGrid3D<Float> densityMap = new FloatArrayArrayArrayGrid();
-        densityMap.fillToSize(true_size,true_size,true_size);
+        densityMap.fillToSize(true_size,true_size,true_size,val);
         return new AquaticMap(size, detail, densityMap);
     }
 

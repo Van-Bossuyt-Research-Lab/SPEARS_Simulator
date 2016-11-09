@@ -213,7 +213,7 @@ class SubMapDisplay extends JPanel {
                 xstart = 0;
             }
             if (xend > subMap.getSize()) {
-                xend = subMap.getSize();
+                xend = subMap.getSize()-1;
             }
             int ystart = (-this.getLocation().y / squareResolution - 1);
             int yend = ystart + (this.getParent().getHeight() / squareResolution + 4);
@@ -221,7 +221,7 @@ class SubMapDisplay extends JPanel {
                 ystart = 0;
             }
             if (yend > subMap.getSize()) {
-                yend = subMap.getSize();
+                yend = subMap.getSize()-1;
             }
             int zstart = (-this.getLocation().y / squareResolution - 1);
             int zend = zstart + (this.getParent().getHeight() / squareResolution + 4);
@@ -232,10 +232,10 @@ class SubMapDisplay extends JPanel {
                 zend = subMap.getSize();
             }
             int fails = 0;
-            for (int z = zstart; z < zend; z++) {
                 for (int y = ystart; y < yend; y++) {
                     for (int x = xstart; x < xend; x++) {
                         try {
+                            double z = 1.0;
                             DecimalPoint3D loc = new DecimalPoint3D(x + 0.5, y + 0.5, z + 0.5);
                             Color color = null;
                             for (String pop : viewPopulators.keySet()) {
@@ -245,7 +245,7 @@ class SubMapDisplay extends JPanel {
                                 }
                             }
                             if (color == null) {
-                                double scaled = subMap.getDensityAt(loc) / subMap.getMaxDensity() * 100;
+                                double scaled = subMap.getDensityAt(loc);
                                 int red, green = 0, blue = 0;
                                 if (scaled < 25) {
                                     red = (int) ((scaled) / 25 * 255);
@@ -282,7 +282,6 @@ class SubMapDisplay extends JPanel {
                         }
                     }
                 }
-            }
         }
         catch (Exception e) {
             LOG.log(Level.ERROR, "Failed to draw map", e);

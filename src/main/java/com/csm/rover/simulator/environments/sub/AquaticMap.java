@@ -121,7 +121,7 @@ public class AquaticMap extends EnvironmentMap {
         double locx = (loc.getX()-(int)loc.getX()) * detail;
         double locy = (loc.getY()-(int)loc.getY()) * detail;
         double locz = (loc.getZ()-(int)loc.getZ()) * detail;
-        return getIntermediateValue(SubMap.get(x, y,z), SubMap.get(x + 1, y,z), SubMap.get(x, y + 1,z), SubMap.get(x + 1, y + 1,z), (int) locx, (int) locy, (int) locz);
+        return getIntermediateValue(SubMap.get(x, y,z), SubMap.get(x, y,z), SubMap.get(x, y,z), SubMap.get(x, y,z), (int) locx, (int) locy, (int) locz);
     }
 
     private double getIntermediateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey, double relativez){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
