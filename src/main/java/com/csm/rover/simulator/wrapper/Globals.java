@@ -16,13 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Globals {
 	private static final Logger LOG = LogManager.getFormatterLogger(Globals.class);
 
-	public static String versionNumber = "2.7.1";
+	public static final String versionNumber = "2.7.1";
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;
 	private long timeMillis = 0;
-	
-	private Random rnd = new Random();
 	
 	private boolean begun = false;
 	private Map<String, ThreadItem> threads = new ConcurrentHashMap<>();
@@ -128,7 +126,6 @@ public class Globals {
 	 * @param second The second angle
 	 * @return The coordinate difference between input angles
      */
-	//NOT A TRUE SUBTRACTION:
 	public double subtractAngles(double first, double second){
 		first = normalize(first, 0, 2*Math.PI);
 		second = normalize(second, -2*Math.PI, 0);
@@ -138,7 +135,7 @@ public class Globals {
 	}
 
 	/**
-	 * Equivalent to Math.toDegrees({@link #subtractAngles(double, double) subtractAngles}(Math.toRadians(double), Math.toRadians(double))).
+	 * Equivalent to {@link Math#toDegrees Math.toDegrees}({@link #subtractAngles(double, double) subtractAngles}({@link Math#toRadians Math.toRadians}(first), {@link Math#toRadians Math.toRadians}(second))).
 	 *
 	 * @param first	The first angle
 	 * @param second The second angle

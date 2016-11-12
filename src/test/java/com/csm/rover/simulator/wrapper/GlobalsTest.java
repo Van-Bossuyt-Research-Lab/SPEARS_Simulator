@@ -2,6 +2,7 @@ package com.csm.rover.simulator.wrapper;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.laughingpanda.beaninject.Inject;
 import org.reflections.util.FilterBuilder;
@@ -9,6 +10,11 @@ import org.reflections.util.FilterBuilder;
 import static org.junit.Assert.fail;
 
 public class GlobalsTest {
+
+    @BeforeClass
+    public static void cleanInstance(){
+        Inject.field("singleton_instance").of(Globals.getInstance()).with(null);
+    }
 
     @Test
     public void testRecursiveCall(){

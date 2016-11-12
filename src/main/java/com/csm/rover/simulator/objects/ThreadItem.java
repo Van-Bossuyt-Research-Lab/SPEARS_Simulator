@@ -2,6 +2,10 @@ package com.csm.rover.simulator.objects;
 
 import com.csm.rover.simulator.wrapper.Globals;
 
+/**
+ * This object is used as a wrapper for managing synchronous threads.  It tracks whether a thread
+ * is running, complete, or suspended and when it has permission to run.
+ */
 public class ThreadItem {
 	
 	private String name;
@@ -14,9 +18,21 @@ public class ThreadItem {
 	private boolean suspended = false;
 	
 	private SynchronousThread thread;
-	
+
+	/**
+	 * Builds in an offset of when run permission is granted to help improve performance.
+	 */
 	public static int offset = 0;
 
+	/**
+	 * Creates a new tracker for the provided thread.  The other parameters are used to
+	 * identify when the thread should have run permission.
+	 *
+	 * @param name The name of the thread
+	 * @param delay The time the thread should sleep between executions
+	 * @param start The current time, the time the thread should start counting from
+     * @param thread The thread being handled by the ThreadItem
+     */
 	public ThreadItem(String name, int delay, long start, SynchronousThread thread) {
 		this.thread = thread;
 		this.name = name;
@@ -25,54 +41,101 @@ public class ThreadItem {
 		offset++;
 	}
 
+	/**
+	 * Returns the name of the thread.
+	 *
+	 * @return The name of the thread
+     */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Returns the time the thread sleeps.
+	 *
+	 * @return Time between executions
+     */
 	public int getDelay() {
 		return delay;
 	}
 
+	/**
+	 * Increments the time until the next run is approved by the delay.
+	 */
 	public void advance(){
 		next = Globals.getInstance().timeMillis() + delay;
 	}
-	
+
+	/**
+	 * Returns the nearest time the thread has permission to run.
+	 *
+	 * @return Time of next execution
+     */
 	public long getNext() {
 		return next;
 	}
-	
+
+	/**
+	 * Gives the thread permission to run and wakes the thread.
+	 */
 	public void grantPermission(){
 		permission = true;
 		complete = false;
-		try {
-			thread.Shake();
-		} catch (Exception e) {}
+		shakeThread();
 	}
-	
+
+	/**
+	 * Removes the threads permission to execute.
+	 */
 	public void revokePermission(){
 		permission = false;
 	}
-	
+
+	/**
+	 * Marks the thread as having completed its run.
+	 */
 	public void markFinished(){
 		complete = true;
 	}
 
+	/**
+	 * Returns whether the thread has permission.
+	 *
+	 * @return Whether the thread has permission to run
+     */
 	public boolean hasPermission() {
 		return permission;
 	}
-	
+
+	/**
+	 * Force pause the thread.
+	 */
 	public void suspend(){
 		suspended = true;
 	}
-	
+
+	/**
+	 * Un-pause the thread.
+	 */
 	public void unSuspend(){
 		suspended = false;
 	}
-	
+
+	/**
+	 * Set whether the thread is running.
+	 *
+	 * @param b Thread is running
+     */
 	public void setRunning(boolean b){
 		running = b;
 	}
-	
+
+	/**
+	 * Returns whether or not the thread has completed an approved execution.  Returns true
+	 * if the thread is suspended or lacks run permission.
+	 *
+	 * @return Whether the thread's execution is complete
+     */
 	public boolean isFinished(){
 		if (suspended){
 			return true;
@@ -84,41 +147,62 @@ public class ThreadItem {
 			return !permission;
 		}
 	}
-	
+
+	/**
+	 * Reset the thread as incomplete and dormant
+	 */
 	public void reset(){
 		running = false;
 		complete = false;
 	}
-	
-	public char getState(){
+
+	public enum STATES { SUSPENDED, RUNNING, COMPLETE, PERMISSION, WAITING };
+
+	/**
+	 * Returns the current state of the thread
+	 *
+	 * @return State as STATES enum value
+     */
+	public STATES getState(){
 		if (suspended){
-			return 's';
+			return STATES.SUSPENDED;
 		}
 		else if (running){
-			return 'r';
+			return STATES.RUNNING;
 		}
 		else if (complete){
-			return 'c';
+			return STATES.COMPLETE;
 		}
 		else if (permission){
-			return 'p';
+			return STATES.PERMISSION;
 		}
 		else {
-			return 'w';
+			return STATES.WAITING;
 		}
 	}
 
+	/**
+	 * Wakes up the thread
+	 */
 	public void shakeThread() {
 		try {
 			thread.Shake();
 		} catch (NullPointerException e) {}
 	}
 
+	/**
+	 * Stop and destroy the thread
+	 */
     public void killThread(){
         revokePermission();
         thread.Stop();
     }
 
+	/**
+	 * Returns the current state of the object as a string.
+	 *
+	 * @return The object's properties and state as text
+     */
 	@Override
 	public String toString() {
 		return "ThreadItem [name=" + name + ", delay=" + delay + ", next="
