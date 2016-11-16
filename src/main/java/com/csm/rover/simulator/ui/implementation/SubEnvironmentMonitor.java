@@ -7,27 +7,28 @@ import com.csm.rover.simulator.environments.sub.AquaticEnvironment;
 import com.csm.rover.simulator.objects.io.EnvrioFileFilter;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.util.DecimalPoint3D;
+import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.platforms.PlatformState;
+import com.csm.rover.simulator.platforms.sub.SubObject;
 import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.awt.image.BufferedImage;
+import java.util.*;
+import java.util.List;
 
-@FrameMarker(name = "Sub Environment Monitor", platform = "Sub")
+@FrameMarker(name = "Aquatic Map Monitor", platform = "Sub")
 class SubEnvironmentMonitor extends EnvironmentDisplay {
-    private static final Logger LOG = LogManager.getLogger(SubEnvironmentMonitor.class);
+    private static final Logger LOG = LogManager.getLogger(TerrainEnvironmentMonitor.class);
 
     private JPanel content;
-    private SubMapDisplay display;
+    private AquaticMapDisplay display;
+    private List<SubIcon> subIcons;
 
     private DecimalPoint focus;
 
@@ -43,7 +44,7 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
         setLayout(null);
         setContentPane(content);
         setVisible(false);
-        setTitle("Sub Environment Monitor");
+        setTitle("Aquatic Environment Monitor");
         setSize(500, 500);
     }
 
@@ -71,12 +72,12 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
             finder.setCurrentDirectory(UiConfiguration.getFolder(platform_type));
             int option = finder.showSaveDialog(getParent());
             menu.setVisible(false);
-            SwingUtilities.invokeLater(() -> {
+            new FreeThread(0, () -> {
                 if (option == JFileChooser.APPROVE_OPTION) {
                     UiConfiguration.changeFolder(platform_type, finder.getCurrentDirectory());
                     EnvironmentIO.saveEnvironment(display.getEnvironment(), EnvironmentIO.appendSuffix(platform_type, finder.getSelectedFile()));
                 }
-            });
+            }, 1, "SaveDialog");
         });
         menu.add(mntmSaveMapFile);
 
@@ -90,7 +91,7 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
             menu.add(item);
         }
 
-        menu.setVisible(true);
+        display.setComponentPopupMenu(menu);
     }
 
     private void setFocusPoint(DecimalPoint point){
@@ -109,8 +110,8 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
             last = Optional.empty();
         }
         else if (last.isPresent()){
-            int dx = last.get().x - p.x;
-            int dy = p.y - last.get().y;
+            double dx = last.get().getX() - p.x;
+            double dy = p.y - last.get().getY();
             double cx = dx / (double)display.getResolution();
             double cy = dy / (double)display.getResolution();
             setFocusPoint(new DecimalPoint(this.focus.getX()+cx, this.focus.getY()+cy));
@@ -127,7 +128,7 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
 
     @Override
     protected void doSetEnvironment(PlatformEnvironment environment) {
-        display = new SubMapDisplay((AquaticEnvironment)environment);
+        display = new AquaticMapDisplay((AquaticEnvironment) environment);
         display.setResolution(20);
         content.add(display);
 
@@ -164,17 +165,27 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
         getInputMap().put(KeyStroke.getKeyStroke("DOWN"), "pan down");
         getActionMap().put("pan down", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(0, -1))));
         redraw();
+
+        subIcons = new ArrayList<>();
+        for (SubObject sub : ((AquaticEnvironment)environment).getPlatforms()){
+            SubIcon icon = new SubIcon(sub);
+            display.add(icon);
+            subIcons.add(icon);
+        }
     }
 
     @Override
     protected void update() {
         redraw();
+        for (SubIcon sub : subIcons){
+            sub.update(display.getResolution());
+        }
     }
 
 }
 
-class SubMapDisplay extends JPanel {
-    private static final Logger LOG = LogManager.getLogger(SubMapDisplay.class);
+class AquaticMapDisplay extends JPanel {
+    private static final Logger LOG = LogManager.getLogger(TerrainMapDisplay.class);
 
     private final AquaticEnvironment subMap;
 
@@ -183,8 +194,9 @@ class SubMapDisplay extends JPanel {
     private Map<String, Boolean> viewPopulators;
     private Map<String, PopulatorDisplayFunction> popDisplays;
 
-    SubMapDisplay(AquaticEnvironment environment){
+    AquaticMapDisplay(AquaticEnvironment environment){
         this.subMap = environment;
+        this.setLayout(null);
         viewPopulators = new HashMap<>();
         popDisplays = new HashMap<>();
         for (String pop : subMap.getPopulators()){
@@ -209,79 +221,77 @@ class SubMapDisplay extends JPanel {
         try {
             int xstart = (-this.getLocation().x / squareResolution - 1);
             int xend = xstart + (this.getParent().getWidth() / squareResolution + 3);
-            if (xstart < 0) {
+            if (xstart < 0){
                 xstart = 0;
             }
-            if (xend > subMap.getSize()) {
-                xend = subMap.getSize()-1;
+            if (xend > subMap.getSize()){
+                xend = subMap.getSize();
             }
             int ystart = (-this.getLocation().y / squareResolution - 1);
             int yend = ystart + (this.getParent().getHeight() / squareResolution + 4);
-            if (ystart < 0) {
+            if (ystart < 0){
                 ystart = 0;
             }
-            if (yend > subMap.getSize()) {
-                yend = subMap.getSize()-1;
-            }
-            int zstart = (-this.getLocation().y / squareResolution - 1);
-            int zend = zstart + (this.getParent().getHeight() / squareResolution + 4);
-            if (zstart < 0) {
-                zstart = 0;
-            }
-            if (zend > subMap.getSize()) {
-                zend = subMap.getSize();
+            if (yend > subMap.getSize()){
+                yend = subMap.getSize();
             }
             int fails = 0;
-                for (int y = ystart; y < yend; y++) {
-                    for (int x = xstart; x < xend; x++) {
-                        try {
-                            double z = 1.0;
-                            DecimalPoint3D loc = new DecimalPoint3D(x + 0.5, y + 0.5, z + 0.5);
-                            Color color = null;
-                            for (String pop : viewPopulators.keySet()) {
-                                if (viewPopulators.get(pop) && color == null) {
-                                    double value = subMap.getPopulatorValue(pop, loc);
-                                    color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
-                                }
+            for (int y = ystart; y < yend; y++){
+                for (int x = xstart; x < xend; x++){
+                    try {
+                        double z = 1.0;
+                        DecimalPoint3D loc = new DecimalPoint3D(x + 0.5, y + 0.5, z+0.5);
+                        Color color = null;
+                        for (String pop : viewPopulators.keySet()) {
+                            if (viewPopulators.get(pop) && color == null) {
+                                double value = subMap.getPopulatorValue(pop, loc);
+                                color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
                             }
-                            if (color == null) {
-                                double scaled = subMap.getDensityAt(loc);
-                                int red, green = 0, blue = 0;
-                                if (scaled < 25) {
-                                    red = (int) ((scaled) / 25 * 255);
-                                } else if (scaled < 50) {
-                                    red = 255;
-                                    green = (int) ((scaled - 25) / 25 * 255);
-                                } else if (scaled < 75) {
-                                    red = (int) ((25 - (scaled - 50)) / 25 * 255);
-                                    green = 255;
-                                } else if (scaled < 100) {
-                                    red = (int) ((scaled - 75) / 25 * 255);
-                                    green = 255;
-                                    blue = red;
-                                } else {
-                                    red = 255;
-                                    green = 255;
-                                    blue = 255;
-                                }
-                                color = new Color(red, green, blue);
+                        }
+                        if (color == null) {
+                            double scaled = subMap.getDensityAt(loc) / subMap.getMaxDensity() * 100;
+                            int red, green = 0, blue = 0;
+                            if (scaled < 25) {
+                                red = (int) ((scaled) / 25 * 255);
                             }
+                            else if (scaled < 50) {
+                                red = 255;
+                                green = (int) ((scaled - 25) / 25 * 255);
+                            }
+                            else if (scaled < 75) {
+                                red = (int) ((25 - (scaled - 50)) / 25 * 255);
+                                green = 255;
+                            }
+                            else if (scaled < 100) {
+                                red = (int) ((scaled - 75) / 25 * 255);
+                                green = 255;
+                                blue = red;
+                            }
+                            else {
+                                red = 255;
+                                green = 255;
+                                blue = 255;
+                            }
+                            color = new Color(red, green, blue);
+                        }
 
-                            g.setColor(color);
-                            g.fillRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
+                        g.setColor(color);
+                        g.fillRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
 
-                            g.setColor(Color.DARK_GRAY);
-                            g.drawRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
-                        } catch (Exception e) {
-                            if (fails > 10) {
-                                throw e;
-                            } else {
-                                LOG.log(Level.WARN, "Failed to draw square [" + x + ", " + y + "]: " + e.getMessage());
-                                fails++;
-                            }
+                        g.setColor(Color.DARK_GRAY);
+                        g.drawRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
+                    }
+                    catch (Exception e){
+                        if (fails > 10){
+                            throw e;
+                        }
+                        else {
+                            LOG.log(Level.WARN, "Failed to draw square [" + x + ", " + y + "]: " + e.getMessage());
+                            fails++;
                         }
                     }
                 }
+            }
         }
         catch (Exception e) {
             LOG.log(Level.ERROR, "Failed to draw map", e);
@@ -317,6 +327,80 @@ class SubMapDisplay extends JPanel {
 
     int getResolution(){
         return squareResolution;
+    }
+
+}
+
+class SubIcon extends JPanel {
+
+    private static final int _size = 80;
+
+    private JLabel nameTitle, iconImage;
+
+    private SubObject sub;
+
+    SubIcon(SubObject sub){
+        super.setOpaque(false);
+        super.setName(sub.getName());
+        this.sub = sub;
+
+        nameTitle = new JLabel(sub.getName());
+        nameTitle.setFont(new Font("Trebuchet MS", Font.BOLD, 17));
+        nameTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        if (nameTitle.getPreferredSize().getWidth() > _size){
+            nameTitle.setSize((int)nameTitle.getPreferredSize().getWidth(), (int)nameTitle.getPreferredSize().getHeight()+5);
+        }
+        else {
+            nameTitle.setSize(_size, (int)nameTitle.getPreferredSize().getHeight()+5);
+        }
+        nameTitle.setLocation(0, 0);
+        this.add(nameTitle);
+
+        iconImage = new JLabel();
+        iconImage.setSize(_size, _size);
+        iconImage.setLocation((nameTitle.getWidth()-iconImage.getWidth())/2, nameTitle.getHeight());
+        updateAngle(sub.getState().get("direction"));
+        this.add(iconImage);
+
+        this.setSize(nameTitle.getWidth(), (nameTitle.getHeight()+iconImage.getHeight()));
+        setLocation(0, 0);
+    }
+
+    void update(int resolution){
+        PlatformState state = sub.getState();
+        updateAngle(state.get("direction"));
+        setLocationOnMap((int)Math.round(state.<Double>get("x")*resolution), (int)Math.round(state.<Double>get("y")*resolution));
+    }
+
+    private void updateAngle(double angle){
+        while (angle < 0){
+            angle += 2*Math.PI;
+        }
+        angle = Math.toDegrees(angle) % 360;
+        try {
+            ImageIcon img = ImageFunctions.getImage("/markers/Rover Marker " + (int)(angle - angle %5) + ".png");
+            img = resize(img, iconImage.getWidth(), iconImage.getHeight());
+            iconImage.setIcon(img);
+        }
+        catch (Exception e){
+            iconImage.setIcon(null);
+        }
+    }
+
+    private void setLocationOnMap(int x, int y){
+        super.setBounds((x - this.getWidth()/2), (y - this.getHeight()/2-nameTitle.getHeight()), this.getWidth(), this.getHeight());
+    }
+
+    private ImageIcon resize(Icon image, int width, int height) throws Exception {
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
+        Graphics2D g = bi.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        Composite comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1);
+        g.setComposite(comp);
+        g.drawImage(((ImageIcon) (image)).getImage(), 0, 0, width, height, null);
+        g.dispose();
+        return new ImageIcon(bi);
     }
 
 }
