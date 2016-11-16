@@ -42,7 +42,6 @@
             <version>0.9</version>
             <scope>test</scope>
         </dependency>
-
 		<dependency>
 			<groupId>jgoodies</groupId>
 			<artifactId>forms</artifactId>
@@ -118,7 +117,7 @@
                 </executions>
             </plugin>
         </plugins>
-        </build>
+    </build>
     <reporting>
         <plugins>
             <plugin>
@@ -126,6 +125,10 @@
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <version>${cobertura.version}</version>
                 <configuration>
+					<check>
+						<totalLineRate>${cobertura.check.totalLineRate}</totalLineRate>
+						<totalBranchRate>${cobertura.check.totalBranchRate}</totalBranchRate>
+					</check>
                     <formats>
                         <format>html</format>
                     </formats>

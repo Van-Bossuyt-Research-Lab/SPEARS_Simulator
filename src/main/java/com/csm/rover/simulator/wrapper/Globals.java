@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * A singleton class that handles simulation time and some globally required functions.
+ */
 public class Globals {
 	private static final Logger LOG = LogManager.getFormatterLogger(Globals.class);
 
