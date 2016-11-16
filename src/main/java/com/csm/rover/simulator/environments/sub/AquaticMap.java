@@ -105,7 +105,7 @@ public class AquaticMap extends EnvironmentMap {
         int outx = (int) (x * detail);
         int outy = (int) (y * detail);
         int outz = (int) (z * detail);
-        return new Point3D(outx, outy, outz);
+        return new Point3D(x, y, z);
     }
 
     private Point3D getGridSquare(DecimalPoint3D loc) {
@@ -121,7 +121,7 @@ public class AquaticMap extends EnvironmentMap {
         double locx = (loc.getX()-(int)loc.getX()) * detail;
         double locy = (loc.getY()-(int)loc.getY()) * detail;
         double locz = (loc.getZ()-(int)loc.getZ()) * detail;
-        return getIntermediateValue(SubMap.get(x, y,z), SubMap.get(x, y,z), SubMap.get(x, y,z), SubMap.get(x, y,z), (int) locx, (int) locy, (int) locz);
+        return SubMap.get(x,y,z);
     }
 
     private double getIntermediateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey, double relativez){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left

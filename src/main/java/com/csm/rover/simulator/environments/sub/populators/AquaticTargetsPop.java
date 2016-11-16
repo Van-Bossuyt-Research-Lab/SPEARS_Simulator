@@ -3,11 +3,10 @@ package com.csm.rover.simulator.environments.sub.populators;
 import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.EnvironmentPopulator;
 import com.csm.rover.simulator.environments.annotations.Populator;
-import com.csm.rover.simulator.environments.rover.TerrainMap;
+import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
 import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
-import javafx.geometry.Point3D;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class AquaticTargetsPop extends EnvironmentPopulator {
 
     @Override
     protected RecursiveGridList doBuild(EnvironmentMap map, Map<String, Double> params) {
-        int size = ((TerrainMap)map).getSize();
+        int size = ((AquaticMap)map).getSize();
         int targetCount = (int)(Math.pow(size, 3) / 100.0 * params.get("trgt_density"));
         Random rnd = new Random();
         Set<DecimalPoint3D> points = new HashSet<>();
