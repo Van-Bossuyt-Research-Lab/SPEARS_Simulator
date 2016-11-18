@@ -753,9 +753,7 @@ public class RoverObject extends Platform {
 	}
 
 	private void delay(int length) { //put the thread to sleep for a bit
-		String newname = Globals.getInstance().delayThread(Thread.currentThread().getName(), length);
-		while (!Globals.getInstance().getThreadRunPermission(newname)) {}
-		Globals.getInstance().threadDelayComplete(Thread.currentThread().getName());
+		Globals.getInstance().delayThread(Thread.currentThread().getName(), length);
 	}
 	
 	private double getTemperature(){ // read temperature from the "sensor"

@@ -171,11 +171,23 @@ public class Globals {
 			}
 		}, FreeThread.FOREVER, "accel-handler");
 	}
-	
+
+	/**
+	 * Register a thread to the synchronous system
+	 *
+	 * @param name The name of the thread
+	 * @param delay The interval the thread should be given permission on in milliseconds
+	 * @param thread The thread
+     */
 	public void registerNewThread(String name, int delay, SynchronousThread thread){
 		threads.put(name, new ThreadItem(name, delay, timeMillis, thread));
 	}
-	
+
+	/**
+	 * Remove a thread from the synchronous system
+	 *
+	 * @param name Name of the thread
+     */
 	public void checkOutThread(String name){
 		if (!name.contains("delay")){
             LOG.log(Level.DEBUG, name + " out.");
@@ -184,25 +196,39 @@ public class Globals {
 		threads.remove(name);
 	}
 
+	/**
+	 * Kill a thread and remove it from the synchronous system
+	 *
+	 * @param name Name of the thread
+     */
     public void killThread(String name){
         if (threads.containsKey(name)){
             threads.get(name).killThread();
         }
     }
-	
+
+	/**
+	 * Should be called to indicate when a thread has completed an operation.  When all threads
+	 * including the simulation clock are complete, time is advanced and new run permissions
+	 * granted.
+	 *
+	 * @param name The name of the thread
+     */
 	public void threadCheckIn(String name){
         if (!name.equals("milli-clock")){
             try {
                 threads.get(name).markFinished();
                 threads.get(name).advance();
+				if (name.contains("-delay")){
+					killThread(name);
+				}
             }
             catch (NullPointerException e) {
                 LOG.log(Level.WARN, "Null in thread: " + name, e);
             }
         }
 		if (name.equals("milli-clock") || milliDone){
-			for (Object o : threads.keySet()){
-				String key = (String) o;
+			for (String key : threads.keySet()){
 				if (threads.containsKey(key)){
 					if (key.equals("milli-clock")){
 						continue;
@@ -216,51 +242,65 @@ public class Globals {
 			}
 			milliDone = false;
 			timeMillis++;
-			for (Object o : threads.keySet()){
+			for (String key : threads.keySet()){
 				try {
-					String key = (String) o;
 					threads.get(key).reset();
 					if (threads.get(key).getNext() <= timeMillis){
 						threads.get(key).grantPermission();
 					}
 				}
-				catch (NullPointerException e){ e.printStackTrace(); }
+				catch (NullPointerException e){
+					LOG.log(Level.ERROR, "Failed to advance thread: "+key, e);
+				}
 			}
 		}
 	}
-	
-	public String delayThread(String name, int time){
-		try {
-			if (threads.get(name) == null){
-				throw new Exception();
-			}
-			String rtnname = name +"-delay";
+
+	/**
+	 * Suspends a thread from operating for a given period of time.  If the thread is
+	 * not registered in the synchronous system, delays the current thread.
+	 *
+	 * @param name The name of the thread
+	 * @param time Time to delay in milliseconds
+     */
+	public void delayThread(String name, int time){
+		if (threads.get(name) != null){
+			String delayName = name + "-delay";
 			ThreadItem.offset = 0;
-			registerNewThread(rtnname, time, null);
+			registerNewThread(delayName, time,
+					new SynchronousThread(time, () -> threads.get(name).unSuspend(), SynchronousThread.FOREVER, delayName));
 			threads.get(name).suspend();
-			return rtnname;
 		}
-		catch (Exception e){
+		else {
 			try{
 				Thread.sleep((long)(time/getTimeScale()), (int)((time/getTimeScale()-time/getTimeScale())*1000000));
-			} catch (Exception ex) {
+			}
+			catch (Exception ex) {
 				LOG.log(Level.ERROR, "Delay thread failed", ex);
 			}
-			return "pass";
 		}
-	} 
-	
-	public void threadDelayComplete(String name){
-		checkOutThread(name+"-delay");
-		threads.get(name).unSuspend();
 	}
-	
+
+	/**
+	 * Informs the synchronous systems that the thread is running.
+	 *
+	 * @param name The name of the thread
+     */
 	public void threadIsRunning(String name){
 		try {
 			threads.get(name).setRunning(true);
-		} catch (NullPointerException e) { e.printStackTrace(); }
+		}
+		catch (NullPointerException e) {
+			LOG.log(Level.WARN, "Thread \"" + name + "\" not registered", e);
+		}
 	}
-	
+
+	/**
+	 * Checks is the thread has permission to run.  This check will revoke run permission.
+	 *
+	 * @param name The name of the thread
+	 * @return true if the thread has permission
+     */
 	public boolean getThreadRunPermission(String name){
 		try {
 			if (threads.get(name).hasPermission() && begun){
@@ -269,7 +309,7 @@ public class Globals {
 			}
 		}
 		catch (NullPointerException e){
-			e.printStackTrace();
+			LOG.log(Level.WARN, "Asking about unregistered thread \'"+name+"\'", e);
 		}
 		return false;
 	}

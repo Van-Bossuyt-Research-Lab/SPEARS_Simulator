@@ -322,9 +322,7 @@ public class SatelliteObject extends Platform {
 	}
 
 	private void delay(int length) { // sleep thread for a bit
-		String newname = Globals.getInstance().delayThread(Thread.currentThread().getName(), length);
-		while (!Globals.getInstance().getThreadRunPermission(newname)) {}
-		Globals.getInstance().threadDelayComplete(Thread.currentThread().getName());
+		Globals.getInstance().delayThread(Thread.currentThread().getName(), length);
 	}
 
 	boolean sendSerial(String mess){

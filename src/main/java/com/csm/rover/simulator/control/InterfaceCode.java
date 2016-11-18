@@ -1443,11 +1443,6 @@ public class InterfaceCode {
 	}
 	
 	private void delay(int length) {
-		String newname = GLOBAL.delayThread(Thread.currentThread().getName(), length);
-		if (newname.equals("pass")){
-			return;
-		}
-		while (!GLOBAL.getThreadRunPermission(newname)) {}
-		GLOBAL.threadDelayComplete(Thread.currentThread().getName());
+		GLOBAL.delayThread(Thread.currentThread().getName(), length);
 	}
 }
