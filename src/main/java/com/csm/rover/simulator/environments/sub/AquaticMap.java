@@ -99,9 +99,9 @@ public class AquaticMap extends EnvironmentMap {
 
     private Point3D getMapSquare(DecimalPoint3D loc) { // says which display square a given coordinate falls in
         int shift = SubMap.getWidth() / (detail * 2);
-        double x = loc.getX() + shift;
-        double y = shift - loc.getY();
-        double z = shift - loc.getZ();
+        double x = loc.getX();
+        double y = loc.getY();
+        double z = loc.getZ();
         int outx = (int) (x * detail);
         int outy = (int) (y * detail);
         int outz = (int) (z * detail);
