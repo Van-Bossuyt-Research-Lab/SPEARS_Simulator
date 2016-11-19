@@ -185,7 +185,7 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
 }
 
 class AquaticMapDisplay extends JPanel {
-    private static final Logger LOG = LogManager.getLogger(TerrainMapDisplay.class);
+    private static final Logger LOG = LogManager.getLogger(AquaticMapDisplay.class);
 
     private final AquaticEnvironment subMap;
 
@@ -287,6 +287,84 @@ class AquaticMapDisplay extends JPanel {
                         }
                         else {
                             LOG.log(Level.WARN, "Failed to draw square [" + x + ", " + y + "]: " + e.getMessage());
+                            fails++;
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            LOG.log(Level.ERROR, "Failed to draw map", e);
+        }
+        try {
+            int ystart = (-this.getLocation().x / squareResolution - 1);
+            int yend = ystart + (this.getParent().getWidth() / squareResolution + 3);
+            if (ystart < 0){
+                ystart = 0;
+            }
+            if (yend > subMap.getSize()){
+                yend = subMap.getSize();
+            }
+            int zstart = (-this.getLocation().y / squareResolution - 1);
+            int zend = zstart + (this.getParent().getHeight() / squareResolution + 4);
+            if (ystart < 0){
+                ystart = 0;
+            }
+            if (zend > subMap.getSize()){
+                zend = subMap.getSize();
+            }
+            int fails = 0;
+            for (int z = zstart; z < zend; z++){
+                for (int y = ystart; y < yend; y++){
+                    try {
+                        double x = 1.0;
+                        DecimalPoint3D loc = new DecimalPoint3D(x + 0.5, y + 0.5, z+0.5);
+                        Color color = null;
+                        for (String pop : viewPopulators.keySet()) {
+                            if (viewPopulators.get(pop) && color == null) {
+                                double value = subMap.getPopulatorValue(pop, loc);
+                                color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
+                            }
+                        }
+                        if (color == null) {
+                            double scaled = subMap.getDensityAt(loc) / subMap.getMaxDensity() * 100;
+                            int red, green = 0, blue = 0;
+                            if (scaled < 25) {
+                                red = (int) ((scaled) / 25 * 255);
+                            }
+                            else if (scaled < 50) {
+                                red = 255;
+                                green = (int) ((scaled - 25) / 25 * 255);
+                            }
+                            else if (scaled < 75) {
+                                red = (int) ((25 - (scaled - 50)) / 25 * 255);
+                                green = 255;
+                            }
+                            else if (scaled < 100) {
+                                red = (int) ((scaled - 75) / 25 * 255);
+                                green = 255;
+                                blue = red;
+                            }
+                            else {
+                                red = 255;
+                                green = 255;
+                                blue = 255;
+                            }
+                            color = new Color(red, green, blue);
+                        }
+
+                        g.setColor(color);
+                        g.fillRect(y * squareResolution, z * squareResolution, squareResolution, squareResolution);
+
+                        g.setColor(Color.DARK_GRAY);
+                        g.drawRect(y * squareResolution, z * squareResolution, squareResolution, squareResolution);
+                    }
+                    catch (Exception e){
+                        if (fails > 10){
+                            throw e;
+                        }
+                        else {
+                            LOG.log(Level.WARN, "Failed to draw square [" + y + ", " + z + "]: " + e.getMessage());
                             fails++;
                         }
                     }
