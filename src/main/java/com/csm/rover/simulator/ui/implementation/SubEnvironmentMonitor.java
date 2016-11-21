@@ -16,6 +16,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -27,7 +29,7 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
     private static final Logger LOG = LogManager.getLogger(TerrainEnvironmentMonitor.class);
 
     private JPanel content;
-    private AquaticMapDisplay display;
+    private AquaticSliceDisplay display;
     private List<SubIcon> subIcons;
 
     private DecimalPoint focus;
@@ -128,7 +130,7 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
 
     @Override
     protected void doSetEnvironment(PlatformEnvironment environment) {
-        display = new AquaticMapDisplay((AquaticEnvironment) environment);
+        display = new AquaticSliceDisplay((AquaticEnvironment) environment, AquaticSliceDisplay.Slice.Z);
         display.setResolution(20);
         content.add(display);
 
@@ -185,7 +187,43 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
 }
 
 class AquaticMapDisplay extends JPanel {
-    private static final Logger LOG = LogManager.getLogger(AquaticMapDisplay.class);
+
+    enum Slice { X, Y, Z }
+
+    private final AquaticEnvironment subMap;
+
+    AquaticMapDisplay(AquaticEnvironment environment, Slice slice){
+        subMap = environment;
+        this.setOpaque(false);
+        this.setLayout(new BorderLayout());
+
+        JPanel mapHolder = new JPanel();
+        mapHolder.setBackground(Color.BLACK);
+        mapHolder.setLayout(null);
+        this.add(mapHolder, BorderLayout.CENTER);
+
+        AquaticSlicePanel mapSlice = new AquaticSlicePanel(environment, slice);
+        mapHolder.add(mapSlice);
+
+        JSlider slider = new JSlider();
+        slider.setMinimum(0);
+        slider.setMaximum(environment.getSize()-1);
+        slider.setSnapToTicks(true);
+        slider.setMajorTickSpacing(10);
+        slider.setMinorTickSpacing(1);
+        slider.addChangeListener((e) -> {
+            JSlider source = (JSlider)e.getSource();
+            if (!source.getValueIsAdjusting()){
+                mapSlice.setSliceDepth(source.getValue());
+            }
+        });
+        this.add(slider, BorderLayout.SOUTH);
+    }
+
+}
+
+class AquaticSlicePanel extends JPanel {
+    private static final Logger LOG = LogManager.getLogger(AquaticSlicePanel.class);
 
     private final AquaticEnvironment subMap;
 
@@ -194,8 +232,12 @@ class AquaticMapDisplay extends JPanel {
     private Map<String, Boolean> viewPopulators;
     private Map<String, PopulatorDisplayFunction> popDisplays;
 
-    AquaticMapDisplay(AquaticEnvironment environment){
+    private final AquaticMapDisplay.Slice slice;
+    private int slice_depth = 0;
+
+    AquaticSlicePanel(AquaticEnvironment environment, AquaticMapDisplay.Slice slice){
         this.subMap = environment;
+        this.slice = slice;
         this.setLayout(null);
         viewPopulators = new HashMap<>();
         popDisplays = new HashMap<>();
@@ -219,75 +261,85 @@ class AquaticMapDisplay extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         try {
-            int xstart = (-this.getLocation().x / squareResolution - 1);
-            int xend = xstart + (this.getParent().getWidth() / squareResolution + 3);
-            if (xstart < 0){
-                xstart = 0;
+            int horzstart = (-this.getLocation().x / squareResolution - 1);
+            int horzend = horzstart + (this.getParent().getWidth() / squareResolution + 3);
+            if (horzstart < 0){
+                horzstart = 0;
             }
-            if (xend > subMap.getSize()){
-                xend = subMap.getSize();
+            if (horzend > subMap.getSize()){
+                horzend = subMap.getSize();
             }
-            int ystart = (-this.getLocation().y / squareResolution - 1);
-            int yend = ystart + (this.getParent().getHeight() / squareResolution + 4);
-            if (ystart < 0){
-                ystart = 0;
+            int vertstart = (-this.getLocation().y / squareResolution - 1);
+            int vertend = vertstart + (this.getParent().getHeight() / squareResolution + 4);
+            if (vertstart < 0){
+                vertstart = 0;
             }
-            if (yend > subMap.getSize()){
-                yend = subMap.getSize();
+            if (vertend > subMap.getSize()){
+                vertend = subMap.getSize();
+            }
+
+            int xstart, xend, ystart, yend, zstart, zend;
+            switch (slice){
+                case X:
+                    xstart = slice_depth;
+                    xend = slice_depth + 1;
+                    ystart = vertstart;
+                    yend = vertend;
+                    zstart = horzstart;
+                    zend = horzend;
+                    break;
+                case Y:
+                    xstart = vertstart;
+                    xend = vertend;
+                    ystart = slice_depth;
+                    yend = slice_depth + 1;
+                    zstart = horzstart;
+                    zend = horzend;
+                    break;
+                case Z:
+                    xstart = horzstart;
+                    xend = horzend;
+                    ystart = vertstart;
+                    yend = vertend;
+                    zstart = slice_depth;
+                    zend = slice_depth + 1;
+                    break;
+                default:
+                    throw new IllegalStateException("There is no slice");
             }
             int fails = 0;
             for (int y = ystart; y < yend; y++){
-                for (int x = xstart; x < xend; x++){
-                    try {
-                        double z = 1.0;
-                        DecimalPoint3D loc = new DecimalPoint3D(x + 0.5, y + 0.5, z+0.5);
-                        Color color = null;
-                        for (String pop : viewPopulators.keySet()) {
-                            if (viewPopulators.get(pop) && color == null) {
-                                double value = subMap.getPopulatorValue(pop, loc);
-                                color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
+                for (int x = xstart; x < xend; x++) {
+                    for (int z = zstart; z < zend; z++) {
+                        try {
+                            DecimalPoint3D loc = new DecimalPoint3D(x + 0.5, y + 0.5, z + 0.5);
+                            Color color = null;
+                            for (String pop : viewPopulators.keySet()) {
+                                if (viewPopulators.get(pop) && color == null) {
+                                    double value = subMap.getPopulatorValue(pop, loc);
+                                    color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
+                                }
                             }
-                        }
-                        if (color == null) {
-                            double scaled = subMap.getDensityAt(loc) / subMap.getMaxDensity() * 100;
-                            int red, green = 0, blue = 0;
-                            if (scaled < 25) {
-                                red = (int) ((scaled) / 25 * 255);
+                            if (color == null) {
+                                int red_green = (int) ((1 - subMap.getDensityAt(loc) / subMap.getMaxDensity()) * 255);
+                                color = new Color(red_green, red_green, 255);
                             }
-                            else if (scaled < 50) {
-                                red = 255;
-                                green = (int) ((scaled - 25) / 25 * 255);
-                            }
-                            else if (scaled < 75) {
-                                red = (int) ((25 - (scaled - 50)) / 25 * 255);
-                                green = 255;
-                            }
-                            else if (scaled < 100) {
-                                red = (int) ((scaled - 75) / 25 * 255);
-                                green = 255;
-                                blue = red;
-                            }
-                            else {
-                                red = 255;
-                                green = 255;
-                                blue = 255;
-                            }
-                            color = new Color(red, green, blue);
-                        }
 
-                        g.setColor(color);
-                        g.fillRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
+                            int eff_x = getHorizontalAxis(x, y, z);
+                            int eff_y = getVerticalAxis(x, y, z);
+                            g.setColor(color);
+                            g.fillRect(eff_x * squareResolution, eff_y * squareResolution, squareResolution, squareResolution);
 
-                        g.setColor(Color.DARK_GRAY);
-                        g.drawRect(x * squareResolution, y * squareResolution, squareResolution, squareResolution);
-                    }
-                    catch (Exception e){
-                        if (fails > 10){
-                            throw e;
+                            g.setColor(Color.DARK_GRAY);
+                            g.drawRect(eff_x * squareResolution, eff_y * squareResolution, squareResolution, squareResolution);
                         }
-                        else {
-                            LOG.log(Level.WARN, "Failed to draw square [" + x + ", " + y + "]: " + e.getMessage());
-                            fails++;
+                        catch (Exception e) {
+                            if (fails > 10) {
+                                throw e;
+                            } else {
+                                LOG.log(Level.WARN, "Failed to draw square [" + x + ", " + y + "]: " + e.getMessage());
+                                fails++;
+                            }
                         }
                     }
                 }
@@ -296,84 +348,45 @@ class AquaticMapDisplay extends JPanel {
         catch (Exception e) {
             LOG.log(Level.ERROR, "Failed to draw map", e);
         }
-        try {
-            int xstart = (-this.getLocation().x / squareResolution - 1);
-            int xend = xstart + (this.getParent().getWidth() / squareResolution + 3);
-            if (xstart < 0){
-                xstart = 0;
-            }
-            if (xend > subMap.getSize()){
-                xend = subMap.getSize();
-            }
-            int ystart = (-this.getLocation().y / squareResolution - 1);
-            int yend = ystart + (this.getParent().getHeight() / squareResolution + 4);
-            if (ystart < 0){
-                ystart = 0;
-            }
-            if (yend > subMap.getSize()){
-                yend = subMap.getSize();
-            }
-            int fails = 0;
-            for (int y = ystart; y < yend; y++){
-                for (int x = xstart; x < xend; x++){
-                    try {
-                        double z = 1.0;
-                        DecimalPoint3D loc = new DecimalPoint3D(x + 0.5, y + 0.5, z+0.5);
-                        Color color = null;
-                        for (String pop : viewPopulators.keySet()) {
-                            if (viewPopulators.get(pop) && color == null) {
-                                double value = subMap.getPopulatorValue(pop, loc);
-                                color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
-                            }
-                        }
-                        if (color == null) {
-                            double scaled = subMap.getDensityAt(loc) / subMap.getMaxDensity() * 100;
-                            int red, green = 0, blue = 0;
-                            if (scaled < 25) {
-                                red = (int) ((scaled) / 25 * 255);
-                            }
-                            else if (scaled < 50) {
-                                red = 255;
-                                green = (int) ((scaled - 25) / 25 * 255);
-                            }
-                            else if (scaled < 75) {
-                                red = (int) ((25 - (scaled - 50)) / 25 * 255);
-                                green = 255;
-                            }
-                            else if (scaled < 100) {
-                                red = (int) ((scaled - 75) / 25 * 255);
-                                green = 255;
-                                blue = red;
-                            }
-                            else {
-                                red = 255;
-                                green = 255;
-                                blue = 255;
-                            }
-                            color = new Color(red, green, blue);
-                        }
+    }
 
-                        g.setColor(color);
-                        g.fillRect((x+xend+1) * squareResolution, y * squareResolution, squareResolution, squareResolution);
+    private int getHorizontalAxis(int x, int y, int z){
+        switch (slice){
+            case Z:
+                return x;
+            case Y:
+            case X:
+                return z;
+            default:
+                throw new IllegalStateException("There is no slice");
+        }
+    }
 
-                        g.setColor(Color.DARK_GRAY);
-                        g.drawRect( (x+xend+1) * squareResolution, y * squareResolution, squareResolution, squareResolution);
-                    }
-                    catch (Exception e){
-                        if (fails > 10){
-                            throw e;
-                        }
-                        else {
-                            LOG.log(Level.WARN, "Failed to draw square [" + x + ", " + y + "]: " + e.getMessage());
-                            fails++;
-                        }
-                    }
-                }
-            }
+    private int getVerticalAxis(int x, int y, int z){
+        switch (slice){
+            case X:
+            case Z:
+                return y;
+            case Y:
+                return x;
+            default:
+                throw new IllegalStateException("There is no slice");
         }
-        catch (Exception e) {
-            LOG.log(Level.ERROR, "Failed to draw map", e);
+    }
+
+    int getSliceDepth(){
+        return slice_depth;
+    }
+
+    void setSliceDepth(int depth){
+        if (depth < 0){
+            depth = 0;
         }
+        else if (depth > subMap.getSize()){
+            depth = subMap.getSize();
+        }
+        slice_depth = depth;
+        repaint();
     }
 
     PlatformEnvironment getEnvironment(){

@@ -8,6 +8,7 @@ import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
 import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 
+import java.awt.Color;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -76,7 +77,11 @@ public class AquaticTargetsPop extends EnvironmentPopulator {
 
     @Override
     public PopulatorDisplayFunction getDisplayFunction() {
-        return null;
+        return (value) -> new Color(
+                (int)(Color.MAGENTA.getRed()*(value+5)/15.),
+                (int)(Color.MAGENTA.getGreen()*(value+5)/15.),
+                (int)(Color.MAGENTA.getBlue()*(value+5)/15.)
+        );
     }
 
 }

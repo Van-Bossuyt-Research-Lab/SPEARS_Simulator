@@ -7,7 +7,7 @@ import com.csm.rover.simulator.objects.ArrayGrid3D;
 
 import java.util.Map;
 
-@Modifier(name="Smoother", type="Rover", parameters={})
+@Modifier(name="Smoother", type="Sub", parameters={})
 public class Smoothing3D extends EnvironmentModifier<AquaticMap> {
 
     public Smoothing3D() {
