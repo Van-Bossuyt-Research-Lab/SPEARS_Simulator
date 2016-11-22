@@ -5,7 +5,6 @@ import com.csm.rover.simulator.environments.EnvironmentRegistry;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.sub.AquaticEnvironment;
 import com.csm.rover.simulator.objects.io.EnvrioFileFilter;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.platforms.PlatformState;
@@ -16,8 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -26,28 +23,146 @@ import java.util.List;
 
 @FrameMarker(name = "Aquatic Map Monitor", platform = "Sub")
 class SubEnvironmentMonitor extends EnvironmentDisplay {
-    private static final Logger LOG = LogManager.getLogger(TerrainEnvironmentMonitor.class);
 
     private JPanel content;
-    private AquaticSliceDisplay display;
-    private List<SubIcon> subIcons;
+    private List<AquaticMapDisplay> displays;
 
-    private DecimalPoint focus;
-
-    protected SubEnvironmentMonitor() {
+    SubEnvironmentMonitor(){
         super("Sub");
-        focus = new DecimalPoint(0, 0);
-        initialize();
-    }
-
-    private void initialize() {
-        content = new JPanel();
-        setBackground(Color.BLACK);
-        setLayout(null);
-        setContentPane(content);
-        setVisible(false);
         setTitle("Aquatic Environment Monitor");
         setSize(500, 500);
+
+        content = new JPanel();
+        content.setBackground(Color.WHITE);
+        content.setLayout(new BorderLayout());
+        this.setContentPane(content);
+
+        displays = new ArrayList<>();
+    }
+
+
+    @Override
+    protected void update() {
+        for (AquaticMapDisplay display : displays){
+            display.update();
+        }
+    }
+
+    @Override
+    protected void doSetEnvironment(PlatformEnvironment environment) {
+        AquaticMapDisplay display = new AquaticMapDisplay((AquaticEnvironment)environment, AquaticMapDisplay.Slice.Z);
+        content.add(display, BorderLayout.CENTER);
+        displays.add(display);
+    }
+
+}
+
+class AquaticMapDisplay extends JPanel {
+
+    private final String platform_type = "Sub";
+
+    private static Map<Slice, Map<Integer, DecimalPoint3D>> panMovesMap;
+    static {
+        panMovesMap = new HashMap<>();
+        panMovesMap.put(Slice.X, new TreeMap<>());
+        panMovesMap.get(Slice.X).put(SwingConstants.WEST, new DecimalPoint3D(0, -1, 0));
+        panMovesMap.get(Slice.X).put(SwingConstants.EAST, new DecimalPoint3D(0, 1, 0));
+        panMovesMap.get(Slice.X).put(SwingConstants.NORTH, new DecimalPoint3D(0, 0, 1));
+        panMovesMap.get(Slice.X).put(SwingConstants.SOUTH, new DecimalPoint3D(0, 0, -1));
+        panMovesMap.put(Slice.Y, new TreeMap<>());
+        panMovesMap.get(Slice.Y).put(SwingConstants.WEST, new DecimalPoint3D(0, 0, -1));
+        panMovesMap.get(Slice.Y).put(SwingConstants.EAST, new DecimalPoint3D(0, 0, 1));
+        panMovesMap.get(Slice.Y).put(SwingConstants.NORTH, new DecimalPoint3D(1, 0, 0));
+        panMovesMap.get(Slice.Y).put(SwingConstants.SOUTH, new DecimalPoint3D(-1, 0, 0));
+        panMovesMap.put(Slice.Z, new TreeMap<>());
+        panMovesMap.get(Slice.Z).put(SwingConstants.WEST, new DecimalPoint3D(-1, 0, 0));
+        panMovesMap.get(Slice.Z).put(SwingConstants.EAST, new DecimalPoint3D(1, 0, 0));
+        panMovesMap.get(Slice.Z).put(SwingConstants.NORTH, new DecimalPoint3D(0, 1, 0));
+        panMovesMap.get(Slice.Z).put(SwingConstants.SOUTH, new DecimalPoint3D(0, -1, 0));
+    }
+
+    enum Slice { X, Y, Z }
+    private final Slice slice;
+
+    private JPanel mapHolder;
+    private AquaticSlicePanel mapSlice;
+
+    private DecimalPoint3D focus = new DecimalPoint3D(0, 0, 0);
+    private List<SubIcon> subIcons;
+
+    AquaticMapDisplay(AquaticEnvironment environment, Slice slice){
+        this.slice = slice;
+        this.setOpaque(false);
+        this.setLayout(new BorderLayout());
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                redraw();
+            }
+        });
+
+        mapHolder = new JPanel();
+        mapHolder.setLayout(null);
+        mapHolder.setBackground(Color.BLACK);
+        this.add(mapHolder, BorderLayout.CENTER);
+
+        mapSlice = new AquaticSlicePanel(environment, slice);
+        mapSlice.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == 1){
+                    dragMap(e.getPoint());
+                }
+                if (e.getButton() == 3){
+                    showMenu(new Point(e.getXOnScreen()-2, e.getYOnScreen()-2));
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                dragMap(null);
+            }
+        });
+        mapSlice.addMouseMotionListener(new MouseMotionAdapter(){
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                dragMap(e.getPoint());
+            }
+        });
+        mapSlice.addMouseWheelListener((e) -> zoomMap(5 * -e.getWheelRotation()));
+
+        getInputMap().put(KeyStroke.getKeyStroke("LEFT"), "pan left");
+        getActionMap().put("pan left", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(panMovesMap.get(slice).get(SwingConstants.WEST)))));
+        getInputMap().put(KeyStroke.getKeyStroke("RIGHT"), "pan right");
+        getActionMap().put("pan right", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(panMovesMap.get(slice).get(SwingConstants.EAST)))));
+        getInputMap().put(KeyStroke.getKeyStroke("UP"), "pan up");
+        getActionMap().put("pan up", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(panMovesMap.get(slice).get(SwingConstants.NORTH)))));
+        getInputMap().put(KeyStroke.getKeyStroke("DOWN"), "pan down");
+        getActionMap().put("pan down", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(panMovesMap.get(slice).get(SwingConstants.SOUTH)))));
+
+        subIcons = new ArrayList<>();
+        for (SubObject sub : environment.getPlatforms()){
+            SubIcon icon = new SubIcon(sub);
+            mapSlice.add(icon);
+            subIcons.add(icon);
+        }
+        mapHolder.add(mapSlice);
+
+        JSlider slider = new JSlider();
+        slider.setMinimum(0);
+        slider.setMaximum(environment.getSize()-1);
+        slider.setValue(0);
+        slider.setSnapToTicks(true);
+        slider.setMajorTickSpacing(10);
+        slider.setMinorTickSpacing(1);
+        slider.addChangeListener((e) -> {
+            JSlider source = (JSlider)e.getSource();
+            mapSlice.setSliceDepth(source.getValue());
+        });
+        slider.setOpaque(false);
+        this.add(slider, BorderLayout.SOUTH);
+
+        redraw();
     }
 
     private void showMenu(Point p){
@@ -77,33 +192,23 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
             new FreeThread(0, () -> {
                 if (option == JFileChooser.APPROVE_OPTION) {
                     UiConfiguration.changeFolder(platform_type, finder.getCurrentDirectory());
-                    EnvironmentIO.saveEnvironment(display.getEnvironment(), EnvironmentIO.appendSuffix(platform_type, finder.getSelectedFile()));
+                    EnvironmentIO.saveEnvironment(mapSlice.getEnvironment(), EnvironmentIO.appendSuffix(platform_type, finder.getSelectedFile()));
                 }
             }, 1, "SaveDialog");
         });
         menu.add(mntmSaveMapFile);
 
-        for (String pop : display.getPopulators()){
+        for (String pop : mapSlice.getPopulators()){
             JRadioButtonMenuItem item = new JRadioButtonMenuItem("Show " + pop);
-            item.setSelected(display.isPopulatorVisible(pop));
+            item.setSelected(mapSlice.isPopulatorVisible(pop));
             item.addActionListener((a) -> {
-                display.setPopulatorVisible(pop, item.isSelected());
+                mapSlice.setPopulatorVisible(pop, item.isSelected());
                 menu.setVisible(false);
             });
             menu.add(item);
         }
 
-        display.setComponentPopupMenu(menu);
-    }
-
-    private void setFocusPoint(DecimalPoint point){
-        focus = point;
-        redraw();
-    }
-
-    void redraw(){
-        display.setLocation((int)Math.round(this.getWidth()/2.0-focus.getX()* display.getResolution()- display.getWidth()/2.0),
-                (int)Math.round(this.getHeight()/2.0+focus.getY()* display.getResolution() - display.getHeight()/2.0));
+        mapSlice.setComponentPopupMenu(menu);
     }
 
     private Optional<Point> last = Optional.empty();
@@ -114,9 +219,19 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
         else if (last.isPresent()){
             double dx = last.get().getX() - p.x;
             double dy = p.y - last.get().getY();
-            double cx = dx / (double)display.getResolution();
-            double cy = dy / (double)display.getResolution();
-            setFocusPoint(new DecimalPoint(this.focus.getX()+cx, this.focus.getY()+cy));
+            double cx = dx / (double)mapSlice.getResolution();
+            double cy = dy / (double)mapSlice.getResolution();
+            switch (slice){
+                case X:
+                    setFocusPoint(new DecimalPoint3D(focus.getX(), focus.getY()+cx, focus.getZ()+cy));
+                    break;
+                case Y:
+                    setFocusPoint(new DecimalPoint3D(focus.getX()+cy, focus.getY(), focus.getZ()+cx));
+                    break;
+                case Z:
+                    setFocusPoint(new DecimalPoint3D(focus.getX()+cx, focus.getY()+cy, focus.getZ()));
+                    break;
+            }
         }
         else {
             last = Optional.of(p);
@@ -124,100 +239,46 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
     }
 
     private void zoomMap(int zoom){
-        display.setResolution(display.getResolution()+zoom);
+        mapSlice.setResolution(mapSlice.getResolution()+zoom);
         redraw();
     }
 
-    @Override
-    protected void doSetEnvironment(PlatformEnvironment environment) {
-        display = new AquaticSliceDisplay((AquaticEnvironment) environment, AquaticSliceDisplay.Slice.Z);
-        display.setResolution(20);
-        content.add(display);
-
-        display.addMouseListener(new MouseAdapter(){
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.getButton() == 1){
-                    dragMap(e.getPoint());
-                }
-                if (e.getButton() == 3){
-                    showMenu(new Point(e.getXOnScreen()-2, e.getYOnScreen()-2));
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                dragMap(null);
-            }
-        });
-        display.addMouseMotionListener(new MouseMotionAdapter(){
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                dragMap(e.getPoint());
-            }
-        });
-        display.addMouseWheelListener((e) -> zoomMap(5 * -e.getWheelRotation()));
-
-        getInputMap().put(KeyStroke.getKeyStroke("LEFT"), "pan left");
-        getActionMap().put("pan left", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(-1, 0))));
-        getInputMap().put(KeyStroke.getKeyStroke("RIGHT"), "pan right");
-        getActionMap().put("pan right", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(1, 0))));
-        getInputMap().put(KeyStroke.getKeyStroke("UP"), "pan up");
-        getActionMap().put("pan up", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(0, 1))));
-        getInputMap().put(KeyStroke.getKeyStroke("DOWN"), "pan down");
-        getActionMap().put("pan down", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(0, -1))));
-        redraw();
-
-        subIcons = new ArrayList<>();
-        for (SubObject sub : ((AquaticEnvironment)environment).getPlatforms()){
-            SubIcon icon = new SubIcon(sub);
-            display.add(icon);
-            subIcons.add(icon);
+    private void redraw(){
+        double eff_x, eff_y, eff_z;
+        switch (slice){
+            case X:
+                eff_x = focus.getY();
+                eff_y = focus.getZ();
+                eff_z = focus.getX();
+                break;
+            case Y:
+                eff_x = focus.getZ();
+                eff_y = focus.getX();
+                eff_z = focus.getY();
+                break;
+            case Z:
+                eff_x = focus.getX();
+                eff_y = focus.getY();
+                eff_z = focus.getZ();
+                break;
+            default:
+                throw new IllegalStateException("There is no slice");
         }
+        mapSlice.setLocation((int)Math.round(mapHolder.getWidth()/2.0-eff_x* mapSlice.getResolution()- mapSlice.getWidth()/2.0),
+                (int)Math.round(mapHolder.getHeight()/2.0+eff_y* mapSlice.getResolution() - mapSlice.getHeight()/2.0));
+        mapSlice.setSliceDepth((int)Math.round(eff_z));
     }
 
-    @Override
-    protected void update() {
+    void setFocusPoint(DecimalPoint3D point){
+        focus = point;
+        redraw();
+    }
+
+    void update() {
         redraw();
         for (SubIcon sub : subIcons){
-            sub.update(display.getResolution());
+            sub.update(mapSlice.getResolution());
         }
-    }
-
-}
-
-class AquaticMapDisplay extends JPanel {
-
-    enum Slice { X, Y, Z }
-
-    private final AquaticEnvironment subMap;
-
-    AquaticMapDisplay(AquaticEnvironment environment, Slice slice){
-        subMap = environment;
-        this.setOpaque(false);
-        this.setLayout(new BorderLayout());
-
-        JPanel mapHolder = new JPanel();
-        mapHolder.setBackground(Color.BLACK);
-        mapHolder.setLayout(null);
-        this.add(mapHolder, BorderLayout.CENTER);
-
-        AquaticSlicePanel mapSlice = new AquaticSlicePanel(environment, slice);
-        mapHolder.add(mapSlice);
-
-        JSlider slider = new JSlider();
-        slider.setMinimum(0);
-        slider.setMaximum(environment.getSize()-1);
-        slider.setSnapToTicks(true);
-        slider.setMajorTickSpacing(10);
-        slider.setMinorTickSpacing(1);
-        slider.addChangeListener((e) -> {
-            JSlider source = (JSlider)e.getSource();
-            if (!source.getValueIsAdjusting()){
-                mapSlice.setSliceDepth(source.getValue());
-            }
-        });
-        this.add(slider, BorderLayout.SOUTH);
     }
 
 }
@@ -225,27 +286,24 @@ class AquaticMapDisplay extends JPanel {
 class AquaticSlicePanel extends JPanel {
     private static final Logger LOG = LogManager.getLogger(AquaticSlicePanel.class);
 
+    private final AquaticMapDisplay.Slice slice;
     private final AquaticEnvironment subMap;
-
-    private int squareResolution = 50;
 
     private Map<String, Boolean> viewPopulators;
     private Map<String, PopulatorDisplayFunction> popDisplays;
-
-    private final AquaticMapDisplay.Slice slice;
     private int slice_depth = 0;
+    private int squareResolution = 50;
 
     AquaticSlicePanel(AquaticEnvironment environment, AquaticMapDisplay.Slice slice){
-        this.subMap = environment;
         this.slice = slice;
-        this.setLayout(null);
-        viewPopulators = new HashMap<>();
-        popDisplays = new HashMap<>();
+        this.subMap = environment;
+        this.setBackground(Color.GREEN);
+        viewPopulators = new TreeMap<>();
+        popDisplays = new TreeMap<>();
         for (String pop : subMap.getPopulators()){
             viewPopulators.put(pop, true);
             popDisplays.put(pop, EnvironmentRegistry.getPopulatorDisplayFunction(subMap.getType(), pop));
         }
-        this.setBounds(0, 0, 100, 100);
         this.setBackground(Color.BLACK);
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -253,6 +311,7 @@ class AquaticSlicePanel extends JPanel {
                 setSize(subMap.getSize() * squareResolution + 1, subMap.getSize() * squareResolution + 1);
             }
         });
+        this.setBounds(2, 2, 100, 100);
     }
 
     //paint the map
@@ -374,19 +433,13 @@ class AquaticSlicePanel extends JPanel {
         }
     }
 
-    int getSliceDepth(){
-        return slice_depth;
+    void setSliceDepth(int slice){
+        this.slice_depth = slice;
+        repaint();
     }
 
-    void setSliceDepth(int depth){
-        if (depth < 0){
-            depth = 0;
-        }
-        else if (depth > subMap.getSize()){
-            depth = subMap.getSize();
-        }
-        slice_depth = depth;
-        repaint();
+    int getSliceDepth(){
+        return slice_depth;
     }
 
     PlatformEnvironment getEnvironment(){
