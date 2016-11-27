@@ -10,6 +10,7 @@ import com.csm.rover.simulator.objects.util.FreeThread;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.sub.SubObject;
 import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
+import net.miginfocom.swing.MigLayout;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,12 +53,13 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
 
     @Override
     protected void doSetEnvironment(PlatformEnvironment environment) {
+        JPanel globalPnl = new JPanel();
+        globalPnl.setLayout(new MigLayout("", "grow,fill", "[grow,fill]"));
         AquaticMapDisplay display = new AquaticMapDisplay((AquaticEnvironment)environment, AquaticMapDisplay.Slice.Z);
-        content.add(display, BorderLayout.EAST);
-        displays.add(display);
+        globalPnl.add(display, "cell 1 0");
         AquaticMapDisplay display2 = new AquaticMapDisplay((AquaticEnvironment)environment, AquaticMapDisplay.Slice.Y);
-        content.add(display2, BorderLayout.WEST);
-        displays.add(display2);
+        globalPnl.add(display2, "cell 2 0");
+        content.add(globalPnl, BorderLayout.CENTER);
     }
 
 
