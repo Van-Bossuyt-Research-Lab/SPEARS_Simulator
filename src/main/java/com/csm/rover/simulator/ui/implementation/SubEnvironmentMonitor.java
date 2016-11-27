@@ -26,6 +26,7 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
 
     private JPanel content;
     private List<AquaticMapDisplay> displays;
+    private DecimalPoint3D focus;
 
     SubEnvironmentMonitor(){
         super("Sub");
@@ -44,6 +45,7 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
     @Override
     protected void update() {
         for (AquaticMapDisplay display : displays){
+            display.setFocusPoint(focus);
             display.update();
         }
     }
@@ -51,9 +53,13 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
     @Override
     protected void doSetEnvironment(PlatformEnvironment environment) {
         AquaticMapDisplay display = new AquaticMapDisplay((AquaticEnvironment)environment, AquaticMapDisplay.Slice.Z);
-        content.add(display, BorderLayout.CENTER);
+        content.add(display, BorderLayout.EAST);
         displays.add(display);
+        AquaticMapDisplay display2 = new AquaticMapDisplay((AquaticEnvironment)environment, AquaticMapDisplay.Slice.Y);
+        content.add(display2, BorderLayout.WEST);
+        displays.add(display2);
     }
+
 
 }
 
@@ -280,6 +286,7 @@ class AquaticMapDisplay extends JPanel {
             sub.update(mapSlice.getResolution());
         }
     }
+
 
 }
 
