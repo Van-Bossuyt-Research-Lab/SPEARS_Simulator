@@ -19,6 +19,8 @@
 		<mockito.version>1.9.5</mockito.version>
         <cobertura.version>2.7</cobertura.version>
 
+		<cobertura.check.lineRate>80</cobertura.check.lineRate>
+		<cobertura.check.branchRate>80</cobertura.check.branchRate>
         <cobertura.check.totalLineRate>90</cobertura.check.totalLineRate>
         <cobertura.check.totalBranchRate>90</cobertura.check.totalBranchRate>
 	</properties>
@@ -103,9 +105,21 @@
                 <version>${cobertura.version}</version>
                 <configuration>
                     <check>
+						<!--<lineRate>${cobertura.check.lineRate}</lineRate>-->
+						<!--<branchRate>${cobertura.check.branchRate}</branchRate>-->
                         <totalLineRate>${cobertura.check.totalLineRate}</totalLineRate>
                         <totalBranchRate>${cobertura.check.totalBranchRate}</totalBranchRate>
                     </check>
+					<instrumentation>
+						<excludes>
+							<exclude>com/csm/rover/simulator/**/*Test.class</exclude>
+							<exclude>com/csm/rover/simulator/objects/io/DatedFileAppenderImpl</exclude>
+							<exclude>com/csm/rover/simulator/visual/*.class</exclude>
+							<exclude>com/csm/rover/simulator/control/*.class</exclude>
+							<exclude>com/csm/rover/simulator/platforms/rover/autoCode/*.class</exclude>
+							<exclude>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</exclude>
+						</excludes>
+					</instrumentation>
                 </configuration>
                 <executions>
                     <execution>
@@ -132,6 +146,14 @@
                     <formats>
                         <format>html</format>
                     </formats>
+					<instrumentation>
+						<includes>
+							<include>com/csm/rover/simulator/visual/*.class</include>
+							<include>com/csm/rover/simulator/control/*.class</include>
+							<include>com/csm/rover/simulator/platforms/rover/autoCode/*.class</include>
+							<include>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</include>
+						</includes>
+					</instrumentation>
                 </configuration>
             </plugin>
         </plugins>

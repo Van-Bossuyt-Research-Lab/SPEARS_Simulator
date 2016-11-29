@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.platforms.rover.phsicsModels;
+package com.csm.rover.simulator.platforms.rover.physicsModels;
 
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.SynchronousThread;

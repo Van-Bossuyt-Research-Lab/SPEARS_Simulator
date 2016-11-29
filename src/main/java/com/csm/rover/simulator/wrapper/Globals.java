@@ -3,14 +3,13 @@ package com.csm.rover.simulator.wrapper;
 import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.ThreadItem;
-import com.csm.rover.simulator.objects.util.ZDate;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -31,7 +30,7 @@ public class Globals {
 	
 	private int exitTime = -1;
 
-    public ZDate dateTime;
+    public DateTime dateTime;
     public SynchronousThread clock;
     private ArrayList<Runnable> clockEvents;
 	
@@ -46,7 +45,7 @@ public class Globals {
 		if (singleton_instance == null) {
             singleton_instance = new Globals();
 			singleton_instance.clock = new SynchronousThread(1000, () -> {
-				singleton_instance.dateTime.advanceClock();
+				singleton_instance.dateTime = singleton_instance.dateTime.plusSeconds(1);
 				for (Runnable event : singleton_instance.clockEvents){
 					event.run();
 				}
@@ -60,8 +59,7 @@ public class Globals {
 	 */
     private Globals(){
         clockEvents = new ArrayList<>();
-        dateTime = new ZDate();
-        dateTime.setFormat("[hh:mm:ss]");
+        dateTime = new DateTime();
     }
 
     /**

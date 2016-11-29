@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.platforms.rover.phsicsModels;
+package com.csm.rover.simulator.platforms.rover.physicsModels;
 
 public enum RoverDriveCommands {
 
