@@ -1,9 +1,7 @@
-package com.csm.rover.simulator.objects;
+package com.csm.rover.simulator.objects.util;
 
 import java.util.ArrayList;
-/**
- * Created by PHM-Lab2 on 1/12/2016.
- */
+
 public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
 
     private float[][][] grid3;
@@ -49,29 +47,29 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
 
     public void put(int x, int y, int z, Float val){
         while (x >= getWidth()){
-            addColumn(new ArrayList<Float>());
+            addColumn(new ArrayList<>());
         }
         while (y >= getHeight()){
-            addRow(new ArrayList<Float>());
+            addRow(new ArrayList<>());
         }
-        while (z >= getLength()){
-            addRow(new ArrayList<Float>());
+        while (z >= getDepth()){
+            addRow(new ArrayList<>());
         }
         grid3[x][y][z] = val;
     }
 
     public void addColumn(ArrayList<Float> col){
-        addColumnAt(getWidth(), getLength(), col);
+        addColumnAt(getWidth(), getDepth(), col);
     }
 
 
     public void addColumnAt(int x, int y, ArrayList<Float> col){
         while (getWidth() < x){
-            addColumn(new ArrayList<Float>());
+            addColumn(new ArrayList<>());
         }
         normalizeColumn(col);
 
-        float[][][] grid2 = new float[getWidth()+1][getHeight()][getLength()];
+        float[][][] grid2 = new float[getWidth()+1][getHeight()][getDepth()];
         int i = 0;
         int j =0;
         while (i < x){
@@ -101,11 +99,11 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
     public void addRowAt(int z, int y, ArrayList<Float> row){
         normalizeRow(row);
         while (getHeight() < y){
-            addRow(new ArrayList<Float>());
+            addRow(new ArrayList<>());
         }
         normalizeRow(row);
 
-        float[][][] grid2 = new float[getWidth()][getHeight()+1][getLength()];
+        float[][][] grid2 = new float[getWidth()][getHeight()+1][getDepth()];
         int j = 0;
         while (j < y){
             for (int x = 0; x < getWidth(); x++){
@@ -130,7 +128,7 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
             row.add(0f);
         }
         while (getWidth() < row.size()){
-            addColumn(new ArrayList<Float>());
+            addColumn(new ArrayList<>());
         }
     }
 
@@ -140,14 +138,14 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
                 col.add(0f);
             }
             while (col.size() > getHeight()){
-                addRow(new ArrayList<Float>());
+                addRow(new ArrayList<>());
             }
         }
     }
 
     public ArrayList<Float> getColumn(int x, int y){
         if (x >= 0 && x < getWidth()){
-            ArrayList<Float> col = new ArrayList<Float>(grid3[x][y].length);
+            ArrayList<Float> col = new ArrayList<>(grid3[x][y].length);
             for (float val : grid3[x][y]){
                 col.add(val);
             }
@@ -160,7 +158,7 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
 
     public ArrayList<Float> getRow(int y, int z){
         if (y >= 0 && y < getHeight()){
-            ArrayList<Float> row = new ArrayList<Float>();
+            ArrayList<Float> row = new ArrayList<>();
             for (float[][] col : grid3){
                 row.add(col[y][z]);
             }
@@ -184,7 +182,7 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
         return grid3.length == 0 ? 0 : grid3[0].length;
     }
 
-    public int getLength() {
+    public int getDepth() {
         return grid3[0].length == 0 ? 0 : grid3[0][0].length;
     }
 
@@ -198,11 +196,9 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
         return size() == 0;
     }
 
-    public ArrayGrid3D<Float> clone() { return new FloatArrayArrayArrayGrid(this);}
-/*
     @Override
-    public ArrayGrid<Float> clone() {
-        return new FloatArrayArrayGrid(this);
+    public ArrayGrid3D<Float> clone(){
+        return new FloatArrayArrayArrayGrid(this);
     }
-    */
+    
 }

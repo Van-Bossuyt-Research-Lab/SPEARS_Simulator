@@ -15,11 +15,12 @@ public class ArrayGridDeserializer extends JsonDeserializer<ArrayGrid> {
     @Override
     public ArrayGrid deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
         Object[][] values = jsonParser.readValueAs(Object[][].class);
+        values = invert(values);
         try {
-            return new FloatArrayArrayGrid(castToFloatArray(invert(values)));
+            return new FloatArrayArrayGrid(castToFloatArray(values));
         }
         catch (ClassCastException e) {
-            return new GenericArrayGrid<>(invert(values));
+            return new GenericArrayGrid<>(values);
         }
     }
 

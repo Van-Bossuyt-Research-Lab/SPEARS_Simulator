@@ -54,11 +54,20 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
     @Override
     protected void doSetEnvironment(PlatformEnvironment environment) {
         JPanel globalPnl = new JPanel();
-        globalPnl.setLayout(new MigLayout("", "grow,fill", "[grow,fill]"));
+        globalPnl.setBackground(Color.WHITE);
+        globalPnl.setLayout(new MigLayout("", "[grow,fill][grow,fill]", "[fill][grow,fill]"));
+        JLabel label1 = new JLabel("Top Down View");
+        label1.setHorizontalAlignment(SwingConstants.CENTER);
+        label1.setFont(FontFunctions.bigger(FontFunctions.bold(label1.getFont())));
+        globalPnl.add(label1, "cell 0 0");
         AquaticMapDisplay display = new AquaticMapDisplay((AquaticEnvironment)environment, AquaticMapDisplay.Slice.Z);
-        globalPnl.add(display, "cell 1 0");
+        globalPnl.add(display, "cell 0 1");
+        JLabel label2 = new JLabel("Front View");
+        label2.setHorizontalAlignment(SwingConstants.CENTER);
+        label2.setFont(FontFunctions.bigger(FontFunctions.bold(label2.getFont())));
+        globalPnl.add(label2, "cell 1 0");
         AquaticMapDisplay display2 = new AquaticMapDisplay((AquaticEnvironment)environment, AquaticMapDisplay.Slice.Y);
-        globalPnl.add(display2, "cell 2 0");
+        globalPnl.add(display2, "cell 1 1");
         content.add(globalPnl, BorderLayout.CENTER);
     }
 

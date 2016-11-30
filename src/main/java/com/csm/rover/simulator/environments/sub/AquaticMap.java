@@ -2,9 +2,8 @@ package com.csm.rover.simulator.environments.sub;
 
 import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.annotations.Map;
-import com.csm.rover.simulator.objects.ArrayGrid3D;
+import com.csm.rover.simulator.objects.util.ArrayGrid3D;
 import com.csm.rover.simulator.objects.util.DecimalPoint3D;
-import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -19,8 +18,8 @@ import java.util.Optional;
 @JsonIgnoreProperties({"type"})
 public class AquaticMap extends EnvironmentMap {
 
-    @JsonProperty("SubMap")
-    private ArrayGrid3D SubMap;
+    @JsonProperty("valueMap")
+    private ArrayGrid3D<Float> SubMap;
 
     @JsonProperty("size")
     private int size;
@@ -38,11 +37,7 @@ public class AquaticMap extends EnvironmentMap {
     }
 
     @JsonCreator
-    public AquaticMap(@JsonProperty("size") int size, @JsonProperty("detail") int detail, @JsonProperty("SubMap") FloatArrayArrayGrid values) {
-        this(size, detail, (ArrayGrid3D)values);
-    }
-
-    public AquaticMap(int size, int detail, ArrayGrid3D values) {
+    public AquaticMap(@JsonProperty("size") int size, @JsonProperty("detail") int detail, @JsonProperty("valueMap") ArrayGrid3D<Float> values) {
         this(size, detail);
         this.SubMap = values;
         checkSize();
@@ -66,7 +61,7 @@ public class AquaticMap extends EnvironmentMap {
         float min = Float.MAX_VALUE;
         for (int i = 0; i < SubMap.getWidth(); i++) {
             for (int j = 0; j < SubMap.getHeight(); j++) {
-                for (int k = 0; k < SubMap.getLength(); k++) {
+                for (int k = 0; k < SubMap.getDepth(); k++) {
                     float val = SubMap.get(i, j, k);
                     if (val > max) {
                         max = val;
