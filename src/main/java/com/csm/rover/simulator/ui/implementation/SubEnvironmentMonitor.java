@@ -360,18 +360,18 @@ class AquaticSlicePanel extends JPanel {
                 case X:
                     xstart = slice_depth;
                     xend = slice_depth + 1;
-                    ystart = vertstart;
-                    yend = vertend;
-                    zstart = horzstart;
-                    zend = horzend;
+                    ystart = horzstart;
+                    yend = horzend;
+                    zstart = vertstart;
+                    zend = vertend;
                     break;
                 case Y:
-                    xstart = vertstart;
-                    xend = vertend;
+                    xstart = horzstart;
+                    xend = horzend;
                     ystart = slice_depth;
                     yend = slice_depth + 1;
-                    zstart = horzstart;
-                    zend = horzend;
+                    zstart = vertstart;
+                    zend = vertend;
                     break;
                 case Z:
                     xstart = horzstart;
@@ -430,10 +430,10 @@ class AquaticSlicePanel extends JPanel {
     private int getHorizontalAxis(int x, int y, int z){
         switch (slice){
             case Z:
-                return x;
             case Y:
+                return x;
             case X:
-                return z;
+                return y;
             default:
                 throw new IllegalStateException("There is no slice");
         }
@@ -442,10 +442,10 @@ class AquaticSlicePanel extends JPanel {
     private int getVerticalAxis(int x, int y, int z){
         switch (slice){
             case X:
+            case Y:
+                return z;
             case Z:
                 return y;
-            case Y:
-                return x;
             default:
                 throw new IllegalStateException("There is no slice");
         }

@@ -30,7 +30,7 @@ class RoverPlatformMonitor extends PlatformDisplay {
 
     private void initialize(){
         setTitle("");
-        setSize(500, 300);
+        setSize(550, 380);
         setMinimumSize(getSize());
 
         contentPane = new JPanel();
