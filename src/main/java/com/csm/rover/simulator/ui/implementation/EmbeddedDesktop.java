@@ -1,9 +1,12 @@
 package com.csm.rover.simulator.ui.implementation;
 
+import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.objects.util.ZDate;
 import com.csm.rover.simulator.wrapper.Globals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
@@ -34,6 +37,7 @@ class EmbeddedDesktop extends JDesktopPane {
 		setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 		setUpWells();
 		setUpEventListeners();
+		new FreeThread(1000, this::repaint, FreeThread.FOREVER, "desktopClock");
 	}
 
 	private void setUpWells(){
@@ -108,7 +112,8 @@ class EmbeddedDesktop extends JDesktopPane {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-			g.setColor(Color.GRAY);
+		g.setColor(Color.GRAY);
+		final int margin = 10;
 		if (isOpaque()){
 			if (hasImage){
 				try {
@@ -118,11 +123,17 @@ class EmbeddedDesktop extends JDesktopPane {
 					e.printStackTrace();
 				}
 			}
-			Globals.getInstance();
-			g.drawString("Version: "+Globals.versionNumber, 10, getHeight()-60);
-			g.drawString("Developed by:", 10, getHeight()-45);
-			g.drawString("Van Bossuyt Group", 10, getHeight()-30);
-			g.drawString("Colorado School of Mines", 10, getHeight()-15);
+			g.drawString("Version: "+Globals.versionNumber, margin, getHeight()-60);
+			g.drawString("Developed by:", margin, getHeight()-45);
+			g.drawString("Van Bossuyt Group", margin, getHeight()-30);
+			g.drawString("Colorado School of Mines", margin, getHeight()-15);
+
+			DateTime real = DateTime.now();
+			final int space = (int)g.getFontMetrics().getStringBounds("  MM/DD/YYYY  ", g).getWidth();
+			String time = real.toString("hh:mm aa");
+			g.drawString(time, getWidth()-(((int)g.getFontMetrics().getStringBounds(time, g).getWidth()+space)/2+margin), getHeight()-30);
+			String date = real.toString("MM/dd/yyyy");
+			g.drawString(date, getWidth()-(((int)g.getFontMetrics().getStringBounds(date, g).getWidth()+space)/2+margin), getHeight()-15);
 		}
 		if (resizing){
 			g.drawRect((int)(dividing_line*getWidth())-1, 0, 2, getHeight());
