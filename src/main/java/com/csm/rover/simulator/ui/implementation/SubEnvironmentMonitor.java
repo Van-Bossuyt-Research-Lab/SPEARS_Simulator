@@ -47,7 +47,7 @@ class SubEnvironmentMonitor extends EnvironmentDisplay {
     protected void update() {
         for (AquaticMapDisplay display : displays){
             display.setFocusPoint(focus);
-            display.update();
+            display.updateX();
         }
     }
 
@@ -291,10 +291,16 @@ class AquaticMapDisplay extends JPanel {
         redraw();
     }
 
-    void update() {
+    void updateX() {
         redraw();
         for (SubIcon sub : subIcons){
-            sub.update(mapSlice.getResolution());
+            sub.updateX(mapSlice.getResolution());
+        }
+    }
+    void updateZ() {
+        redraw();
+        for (SubIcon sub : subIcons){
+            sub.updateZ(mapSlice.getResolution());
         }
     }
 
@@ -521,17 +527,23 @@ class SubIcon extends JPanel {
         iconImage = new JLabel();
         iconImage.setSize(_size, _size);
         iconImage.setLocation((nameTitle.getWidth()-iconImage.getWidth())/2, nameTitle.getHeight());
-        updateAngle(sub.getState().get("direction"));
+        updateAngle(sub.getState().get("pitch"));
         this.add(iconImage);
 
         this.setSize(nameTitle.getWidth(), (nameTitle.getHeight()+iconImage.getHeight()));
         setLocation(0, 0);
     }
 
-    void update(int resolution){
+    void updateX(int resolution){
         PlatformState state = sub.getState();
-        updateAngle(state.get("direction"));
+        updateAngle(state.get("pitch"));
         setLocationOnMap((int)Math.round(state.<Double>get("x")*resolution), (int)Math.round(state.<Double>get("y")*resolution));
+    }
+
+    void updateZ(int resolution){
+        PlatformState state = sub.getState();
+        updateAngle(state.get("yaw"));
+        setLocationOnMap((int)Math.round(state.<Double>get("y")*resolution), (int)Math.round(state.<Double>get("z")*resolution));
     }
 
     private void updateAngle(double angle){

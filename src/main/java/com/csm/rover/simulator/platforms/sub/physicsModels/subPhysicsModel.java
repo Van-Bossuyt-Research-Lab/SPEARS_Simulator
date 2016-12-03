@@ -2,7 +2,6 @@ package com.csm.rover.simulator.platforms.sub.physicsModels;
 
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.sub.AquaticEnvironment;
-import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.platforms.DriveCommandHandler;
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
@@ -150,6 +149,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 
 	public subPhysicsModel() {
 		super("Sub");
+        establishDriveResponses();
 	}
 
 	private void establishDriveResponses() {
@@ -282,11 +282,12 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		if (state.getType().equals("Sub")){
 			try {
 				this.sub_state = (SubState)state;
-				this.location[1] = state.<Double>get("x");
-				this.location[2] = state.<Double>get("y");
-				//this.location[3] = state.<Double>get("z");
-				this.direction = state.get("direction");
-				double temp = -30; //TODO temp
+				this.location[0] = state.<Double>get("x");
+				this.location[1] = state.<Double>get("y");
+				this.location[2] = state.<Double>get("z");
+				this.direction[0] = state.get("pitch");
+                this.direction[1] = state.get("yaw");
+                double temp = -30; //TODO temp
 				battery_charge = battery_max_charge;
 				battery_temperature = temp;
 				winding_temp = new double[] { temp, temp, temp, temp };

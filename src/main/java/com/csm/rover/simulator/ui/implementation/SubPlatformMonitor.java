@@ -13,15 +13,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.Optional;
 
-@FrameMarker(name = "Rover Monitor", platform = "Sub")
+@FrameMarker(name = "Sub Monitor", platform = "Sub")
 class SubPlatformMonitor extends PlatformDisplay {
 
     private JPanel contentPane;
     private JTabbedPane tabs;
 
-    private JLabel locationLbl, directionLbl, velocityLbl, angularVelLbl, accelLbl, angularAccelLbl;
+    private JLabel locationLbl, directionLbl, velocityLbl, angularVelLbl, accelLbl, angularAccelLbl, directionLb2, angularVelLb2, angularAccelLbl;
     private com.csm.rover.simulator.ui.implementation.SubMotorDisplay[] motorDisplays;
-    private JLabel voltageLbl, socLbl, chargeLbl, currentLbl, tempLbl;
 
     private Optional<SubObject> sub;
 
@@ -76,7 +75,7 @@ class SubPlatformMonitor extends PlatformDisplay {
         accelLbl.setFont(FontFunctions.bold(accelLbl.getFont()));
         drivePnl.add(accelLbl, "cell 5 0");
 
-        JLabel directionTtl = new JLabel("Direction:");
+        JLabel directionTtl = new JLabel("Pitch:");
         directionTtl.setHorizontalAlignment(SwingConstants.RIGHT);
         drivePnl.add(directionTtl, "cell 0 1");
 
@@ -84,7 +83,7 @@ class SubPlatformMonitor extends PlatformDisplay {
         directionLbl.setFont(FontFunctions.bold(directionLbl.getFont()));
         drivePnl.add(directionLbl, "cell 1 1");
 
-        JLabel angularVelTtl = new JLabel("Angular Velocity:");
+        JLabel angularVelTtl = new JLabel("Pitch Velocity:");
         angularVelTtl.setHorizontalAlignment(SwingConstants.RIGHT);
         drivePnl.add(angularVelTtl, "cell 2 1");
 
@@ -92,7 +91,7 @@ class SubPlatformMonitor extends PlatformDisplay {
         angularVelLbl.setFont(FontFunctions.bold(angularVelLbl.getFont()));
         drivePnl.add(angularVelLbl, "cell 3 1");
 
-        JLabel angularAccelTtl = new JLabel("Angular Acceleration:");
+        JLabel angularAccelTtl = new JLabel("Pitch Acceleration:");
         angularAccelTtl.setHorizontalAlignment(SwingConstants.RIGHT);
         drivePnl.add(angularAccelTtl, "cell 4 1");
 
@@ -133,50 +132,6 @@ class SubPlatformMonitor extends PlatformDisplay {
 
         motorDisplays = new com.csm.rover.simulator.ui.implementation.SubMotorDisplay[] { flmotor, frmotor, blmotor, brmotor };
 
-        JPanel batteryPnl = new JPanel();
-        batteryPnl.setBackground(Color.WHITE);
-        batteryPnl.setLayout(new MigLayout("", "[fill][fill]", "fill"));
-        tabs.addTab("Battery", batteryPnl);
-
-        JLabel voltageTtl = new JLabel("Voltage:");
-        voltageTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        batteryPnl.add(voltageTtl, "cell 0 0");
-
-        voltageLbl = new JLabel();
-        voltageLbl.setFont(FontFunctions.bold(voltageLbl.getFont()));
-        batteryPnl.add(voltageLbl, "cell 1 0");
-
-        JLabel socTtl = new JLabel("State of Charge:");
-        socTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        batteryPnl.add(socTtl, "cell 0 1");
-
-        socLbl = new JLabel();
-        socLbl.setFont(FontFunctions.bold(socLbl.getFont()));
-        batteryPnl.add(socLbl, "cell 1 1");
-
-        JLabel chargeTtl = new JLabel("Charge:");
-        chargeTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        batteryPnl.add(chargeTtl, "cell 0 2");
-
-        chargeLbl = new JLabel();
-        chargeLbl.setFont(FontFunctions.bold(chargeLbl.getFont()));
-        batteryPnl.add(chargeLbl, "cell 1 2");
-
-        JLabel currentTtl = new JLabel("Current:");
-        currentTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        batteryPnl.add(currentTtl, "cell 0 3");
-
-        currentLbl = new JLabel();
-        currentLbl.setFont(FontFunctions.bold(currentLbl.getFont()));
-        batteryPnl.add(currentLbl, "cell 1 3");
-
-        JLabel tempTtl = new JLabel("Temperature:");
-        tempTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        batteryPnl.add(tempTtl, "cell 0 4");
-
-        tempLbl = new JLabel();
-        tempLbl.setFont(FontFunctions.bold(tempLbl.getFont()));
-        batteryPnl.add(tempLbl, "cell 1 4");
     }
 
     @Override
@@ -194,18 +149,14 @@ class SubPlatformMonitor extends PlatformDisplay {
         PlatformState state = sub.get().getState();
         switch (tabs.getSelectedIndex()){
             case 0:
-                updateDrive(state.get("x"), state.get("y"), state.get("direction"), state.get("speed"), state.get("acceleration"), state.get("angular_velocity"), state.get("angular_acceleration"));
+                updateDrive(state.get("x"), state.get("y"), state.get("pitch"), state.get("speed"), state.get("acceleration"), state.get("pitch_velocity"), state.get("pitch_acceleration"));
                 break;
             case 1:
-                updateMotors(state.get("motor_state"), state.get("motor_power"), state.get("motor_voltage"), state.get("motor_current"), state.get("wheel_speed"), state.get("motor_temp"));
-                break;
-            case 2:
-                updateBattery(state.get("battery_voltage"), state.get("battery_charge"), state.get("battery_current"), state.get("battery_temp"));
+                updateMotors(state.get("motor_state"), state.get("motor_power"), state.get("motor_voltage"), state.get("motor_current"), state.get("prop_speed"), state.get("motor_temp"));
                 break;
             default:
-                updateDrive(state.get("x"), state.get("y"), state.get("direction"), state.get("speed"), state.get("acceleration"), state.get("angular_velocity"), state.get("angular_acceleration"));
+                updateDrive(state.get("x"), state.get("y"), state.get("pitch"), state.get("speed"), state.get("acceleration"), state.get("pitch_velocity"), state.get("angular_acceleration"));
                 updateMotors(state.get("motor_state"), state.get("motor_power"), state.get("motor_voltage"), state.get("motor_current"), state.get("wheel_speed"), state.get("motor_temp"));
-                updateBattery(state.get("battery_voltage"), state.get("battery_charge"), state.get("battery_current"), state.get("battery_temp"));
                 break;
         }
     }

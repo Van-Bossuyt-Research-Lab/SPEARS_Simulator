@@ -2,7 +2,6 @@ package com.csm.rover.simulator.platforms.sub.subAuto;
 
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.sub.AquaticEnvironment;
-import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
@@ -45,7 +44,7 @@ public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
             throw new IllegalArgumentException("The provided state is not a SubState");
         }
         return doNextCommand(millitime, new DecimalPoint(state.<Double>get("x"), state.<Double>get("y")),
-                state.<Double>get("direction"), getAutonomousParameters(state));
+                state.<Double>get("pitch"), getAutonomousParameters(state));
     }
 
     protected abstract String doNextCommand(long milliTime, DecimalPoint location,
@@ -95,9 +94,8 @@ public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
     }
 
     private Map<String, Double> getAutonomousParameters(PlatformState state){
-        String[] required = new String[] { "acceleration", "angular_acceleration", "battery_voltage", "battery_current",
-                "battery_temp", "battery_charge" };
-        String[] fromLists = new String[] { "wheel_speed", "motor_current", "motor_temp" };
+        String[] required = new String[] { "acceleration", "pitch_acceleration"};
+        String[] fromLists = new String[] { "prop_speed", "motor_current", "motor_temp" };
         Map<String, Double> params = new TreeMap<>();
         for (String param : required){
             params.put(param, state.<Double>get(param));
