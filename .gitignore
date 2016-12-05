@@ -1,0 +1,7 @@
+# stuff to ignore
+.classpath
+.project
+.idea/*
+*.iml
+Logs/*
+target/*
