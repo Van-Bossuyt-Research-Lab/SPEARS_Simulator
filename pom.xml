@@ -111,6 +111,8 @@
                         <totalBranchRate>${cobertura.check.totalBranchRate}</totalBranchRate>
                     </check>
 					<instrumentation>
+						<ignoreTrivial>true</ignoreTrivial>
+						<ignoreMethodAnnotation>com.csm.rover.simulator.objects.CoverageIgnore</ignoreMethodAnnotation>
 						<excludes>
 							<exclude>com/csm/rover/simulator/**/*Test.class</exclude>
 							<exclude>com/csm/rover/simulator/objects/io/DatedFileAppenderImpl</exclude>
