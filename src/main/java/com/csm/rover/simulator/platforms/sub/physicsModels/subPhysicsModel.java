@@ -2,6 +2,7 @@ package com.csm.rover.simulator.platforms.sub.physicsModels;
 
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.sub.AquaticEnvironment;
+import com.csm.rover.simulator.objects.RK4;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.platforms.DriveCommandHandler;
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
@@ -10,28 +11,28 @@ import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import com.csm.rover.simulator.platforms.rover.MotorState;
 import com.csm.rover.simulator.platforms.sub.SubProp;
 import com.csm.rover.simulator.platforms.sub.SubState;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
 @PhysicsModel(type= "Sub", name="Default", parameters = {})
 public class subPhysicsModel extends PlatformPhysicsModel {
+    private static final Logger LOG = LogManager.getLogger(subPhysicsModel.class);
 
-	private static final long serialversionUID = 1L;
 	protected AquaticEnvironment environment;
 
 	private final int L = 0, R = 1, F = 3, B = 4;
-
-	private final double g = 9.81;
 
 	private SubState sub_state;
 
 	protected String subName;
 	public final double time_step = 0.01;
-	// NEED REAL VALUES!
-	protected final double total_mass = 1.0;
-	protected final double total_volume = 1.0;
-	protected final double dist_CMtoP_xy = 1.0;
-	protected final double dist_CMtoP_z = 1.0;
+
+	//TODO NEED REAL VALUES!
+	protected final double total_mass = 1.0; //kg
+	protected final double total_volume = 1.0; //m^3
 	protected final double moment_of_inertia = 1.0;
 	protected final double prop_inertia = 1.0;
 	protected final double prop_radius = 1.0;
@@ -43,10 +44,6 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 	protected final double motor_voltage_transform = 0.571;
 	protected final double motor_resistance = 3; //Ohm
 	protected final double motor_inductance = 0.11455; //H
-	protected final double friction_axle = 0.0002621;
-	protected final double friction_gr = .65;
-	protected final double friction_s = 1.2;
-	protected final double gamma = Math.atan(1 / sub_width);
 
 	protected final double R_cp0 = 0.07; //Ohm
 	protected final double R_cp1 = 0.01; //Ohm
@@ -76,76 +73,13 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 	protected double battery_current = 0; //A
 	protected double SOC = 1;
 
-	protected double battery_temperature = 30; //*c
-	protected double[] winding_temp = {30, 30, 30, 30}; //*c
-	protected double[] motor_temp = {30, 30, 30, 30}; //*c
-	protected double[] prop_thrust = {0, 0, 0, 0};
+	protected double battery_temperature = 7.22; //*c
+	protected double[] winding_temp = {7.22, 7.22, 7.22, 7.22}; //*c
+	protected double[] motor_temp = {7.22, 7.22, 7.22, 7.22}; //*c
 
 	protected double[] location = {0, 0, 0}; //m x m from center of map
-	protected double theta = 0; //rad off of positive X
-	protected double phi = 0; //rad off xy plane
-	protected double[] direction = {theta, phi};
-	protected double speed = 0; //m/s
-	protected double speed_x = 0; //m/s
-	protected double speed_y = 0; //m/s
-	protected double speed_z = 0; //m/s
-	protected double angular_velocity_xy = 0; //rad/s
-	protected double angular_velocity_z = 0; //rad/s
-	protected double acceleration_xy = 0; //m/s^2
-	protected double acceleration_z = 0; //m/s^2
-	protected double angular_acceleration_xy = 0; //rad/s
-	protected double angular_acceleration_z = 0; //rad/s
-    protected double[] location2 = {0, 0, 0}; //m x m from center of map
-    protected double theta2 = 0; //rad off of positive X
-    protected double phi2 = 0; //rad off xy plane
-    protected double speed_x2 = 0; //m/s
-    protected double speed_y2 = 0; //m/s
-    protected double speed_z2 = 0; //m/s
-    protected double angular_velocity_xy2 = 0; //rad/s
-    protected double angular_velocity_z2 = 0; //rad/s
-    protected double acceleration_xy2 = 0; //m/s^2
-    protected double acceleration_z2 = 0; //m/s^2
-    protected double angular_acceleration_xy2 = 0; //rad/s
-    protected double angular_acceleration_z2 = 0; //rad/s
-    protected double[] location3 = {0, 0, 0}; //m x m from center of map
-    protected double theta3 = 0; //rad off of positive X
-    protected double phi3 = 0; //rad off xy plane
-    protected double speed_x3 = 0; //m/s
-    protected double speed_y3 = 0; //m/s
-    protected double speed_z3 = 0; //m/s
-    protected double angular_velocity_xy3 = 0; //rad/s
-    protected double angular_velocity_z3 = 0; //rad/s
-    protected double acceleration_xy3 = 0; //m/s^2
-    protected double acceleration_z3 = 0; //m/s^2
-    protected double angular_acceleration_xy3 = 0; //rad/s
-    protected double angular_acceleration_z3 = 0; //rad/s
-    protected double[] location4 = {0, 0, 0}; //m x m from center of map
-    protected double theta4 = 0; //rad off of positive X
-    protected double phi4 = 0; //rad off xy plane
-    protected double speed_x4 = 0; //m/s
-    protected double speed_y4 = 0; //m/s
-    protected double speed_z4 = 0; //m/s
-    protected double angular_velocity_xy4 = 0; //rad/s
-    protected double angular_velocity_z4 = 0; //rad/s
-    protected double acceleration_xy4 = 0; //m/s^2
-    protected double acceleration_z4 = 0; //m/s^2
-    protected double angular_acceleration_xy4 = 0; //rad/s
-    protected double angular_acceleration_z4 = 0; //rad/s
-    protected double[] locationf = {0, 0, 0}; //m x m from center of map
-    protected double thetaf = 0; //rad off of positive X
-    protected double phif = 0; //rad off xy plane
-    protected double speed_xf = 0; //m/s
-    protected double speed_yf = 0; //m/s
-    protected double speed_zf = 0; //m/s
-    protected double angular_velocity_xyf = 0; //rad/s
-    protected double angular_velocity_zf = 0; //rad/s
-    protected double acceleration_xyf = 0; //m/s^2
-    protected double acceleration_zf = 0; //m/s^2
-    protected double angular_acceleration_xyf = 0; //rad/s
-    protected double angular_acceleration_zf = 0; //rad/s
-	protected double drag_xy = 0;
-	protected double drag_z = 0;
-
+	protected double[] orientation = {0, 0, 0}; //pitch, yaw, roll - pitch is axial off xy, yaw is axial off xz, roll is z off axial-normal
+    protected double[] speed = {0, 0, 0}; //m/s  x, y, z
 
 	public subPhysicsModel() {
 		super("Sub");
@@ -266,15 +200,13 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 			public void run(){
 				try {
 					updatePhysics();
-					//System.out.println(roverName + "-physics\t" + Globals.getInstance.timeMillis);
-					//roverEvents.updateStats();
 				}
 				catch (Exception e){
-					//LOG.log(Level.ERROR, String.format("rover %s failed to execute", subName), e);
+					LOG.log(Level.ERROR, String.format("rover %s failed to execute", subName), e);
 				}
 			}
 		},
-				SynchronousThread.FOREVER, subName+"-physics");
+		SynchronousThread.FOREVER, subName+"-physics");
 	}
 
 	@Override
@@ -285,9 +217,10 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 				this.location[0] = state.<Double>get("x");
 				this.location[1] = state.<Double>get("y");
 				this.location[2] = state.<Double>get("z");
-				this.direction[0] = state.get("pitch");
-                this.direction[1] = state.get("yaw");
-                double temp = -30; //TODO temp
+				this.orientation[0] = state.get("pitch");
+                this.orientation[1] = state.get("yaw");
+                this.orientation[2] = state.get("roll");
+                double temp = 7.22; //TODO temp
 				battery_charge = battery_max_charge;
 				battery_temperature = temp;
 				winding_temp = new double[] { temp, temp, temp, temp };
@@ -295,10 +228,10 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 				return;
 			}
 			catch (ClassCastException e){
-				//Let the error throw
+				throw e;
 			}
 		}
-		//throw new IllegalArgumentException("The given state is not a subState");
+		throw new IllegalArgumentException("The given state is not a subState");
 	}
 
 	@Override
@@ -306,124 +239,29 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		return sub_state.immutableCopy();
 	}
 
+                                                                              //others: motor_power, motor_state, prop_speed
+    private final RK4.RK4Function motorCurrentFn = (double t, double current, double... others) -> (others[0]*others[1]/255.0*battery_voltage - motor_voltage_transform*others[2] - current*motor_resistance) / motor_inductance;
+    private final RK4.RK4Function propSpeedFn = (double t, double speed, double... current) -> 1/prop_inertia * motor_energy_transform*current[0];
+
 	@Override
 	public void updatePhysics() {
 		// Motor Currents, based on voltage
-		motor_current[F] += ( motor_power[F]*motor_states[F]/255.0*battery_voltage - motor_voltage_transform*prop_speed[F] - motor_current[F]*motor_resistance) / motor_inductance * time_step;
-		motor_current[R] += ( motor_power[R]*motor_states[R]/255.0*battery_voltage - motor_voltage_transform*prop_speed[R] - motor_current[R]*motor_resistance) / motor_inductance * time_step;
-		motor_current[L] += ( motor_power[L]*motor_states[L]/255.0*battery_voltage - motor_voltage_transform*prop_speed[L] - motor_current[L]*motor_resistance) / motor_inductance * time_step;
-		motor_current[B] += ( motor_power[B]*motor_states[B]/255.0*battery_voltage - motor_voltage_transform*prop_speed[B] - motor_current[B]*motor_resistance) / motor_inductance * time_step;
-		// min currents at 0, motor cannot generate current
-		/*if (motor_current[FL]*motor_states[FL] <= 0){
-			motor_current[FL] = 0;
-		}
-		if (motor_current[FR]*motor_states[FR] <= 0){
-			motor_current[FR] = 0;
-		}
-		if (motor_current[BL]*motor_states[BL] <= 0){
-			motor_current[BL] = 0;
-		}
-		if (motor_current[BR]*motor_states[BR] <= 0){
-			motor_current[BR] = 0;
-		}*/
+        motor_current[F] = RK4.advance(motorCurrentFn, time_step, 0, motor_current[F], motor_power[F], motor_states[F], prop_speed[F]);
+        motor_current[B] = RK4.advance(motorCurrentFn, time_step, 0, motor_current[B], motor_power[B], motor_states[B], prop_speed[B]);
+        motor_current[R] = RK4.advance(motorCurrentFn, time_step, 0, motor_current[R], motor_power[R], motor_states[R], prop_speed[R]);
+        motor_current[L] = RK4.advance(motorCurrentFn, time_step, 0, motor_current[L], motor_power[L], motor_states[L], prop_speed[L]);
+
 		// angular motor speeds, based on torques
-		prop_speed[F] += 1/prop_inertia * motor_energy_transform*motor_current[F] * time_step;
-		prop_speed[R] += 1/prop_inertia *  motor_energy_transform*motor_current[R]  * time_step;
-		prop_speed[L] += 1/prop_inertia * motor_energy_transform*motor_current[L] * time_step;
-		prop_speed[B] += 1/prop_inertia * motor_energy_transform*motor_current[B] * time_step;
+		prop_speed[F] = RK4.advance(propSpeedFn, time_step, 0, prop_speed[F], motor_current[F]);
+        prop_speed[B] = RK4.advance(propSpeedFn, time_step, 0, prop_speed[B], motor_current[B]);
+        prop_speed[R] = RK4.advance(propSpeedFn, time_step, 0, prop_speed[R], motor_current[R]);
+        prop_speed[L] = RK4.advance(propSpeedFn, time_step, 0, prop_speed[L], motor_current[L]);
+
 		// Acceleration changes based on forces
-		//                acceleration_xy = 1/total_mass*(slip[FL] + slip[BL] + slip[FR] + slip[BR]) - planetParams.getgrav_accel()*Math.sin(environment.getIncline(location, direction));
-		//                angular_acceleration = 1/rover_inertia * ((motor_arm*(slip[FR] + slip[BR] - slip[FL] - slip[BL])*Math.cos(gamma) - motor_arm*(4*fric_gr_all)));
-		// Speed changes based on Acceleration
-		speed_x2 = speed_x+ acceleration_xy * 0.5*time_step * Math.cos(theta)* Math.cos(phi);
-		speed_y2 = speed_y+ acceleration_xy * 0.5*time_step * Math.sin(theta)* Math.cos(phi);
-		speed_z2 = speed_z+ 0.5*acceleration_z * time_step;
-		angular_velocity_xy2 = angular_velocity_xy+ angular_acceleration_xy * 0.5* time_step;
-		angular_velocity_z2 = angular_velocity_z+ angular_acceleration_z * 0.5* time_step;
-        theta2 = (theta + angular_velocity_xy*0.5*time_step + 2*Math.PI) % (2*Math.PI);
-        phi2 = (phi + angular_velocity_z*0.5*time_step + 2*Math.PI) % (2*Math.PI);
-        location2[1] = location[1]+speed_x*0.5*time_step;
-        location2[2] = location[2]+speed_y*0.5*time_step;
-        location2[3] = location[3]+speed_z*0.5*time_step;
+        
 
-        speed_x3 = speed_x2+ acceleration_xy2 * 0.5*time_step * Math.cos(theta2)* Math.cos(phi2);
-        speed_y3 = speed_y2+ acceleration_xy2 * 0.5*time_step * Math.sin(theta2)* Math.cos(phi2);
-        speed_z3 = speed_z2+ 0.5*acceleration_z2 * time_step;
-        angular_velocity_xy3 = angular_velocity_xy2+ angular_acceleration_xy2 * 0.5* time_step;
-        angular_velocity_z3 = angular_velocity_z2+ angular_acceleration_z2 * 0.5* time_step;
-        theta3 = (theta2 + angular_velocity_xy2*0.5*time_step + 2*Math.PI) % (2*Math.PI);
-        phi3 = (phi2 + angular_velocity_z2*0.5*time_step + 2*Math.PI) % (2*Math.PI);
-        location3[1] = location2[1]+speed_x2*0.5*time_step;
-        location3[2] = location2[2]+speed_y2*0.5*time_step;
-        location3[3] = location2[3]+speed_z2*0.5*time_step;
+        // Speed changes based on Acceleration
 
-        speed_x4 = speed_x3+ acceleration_xy3 * 0.5*time_step * Math.cos(theta3)* Math.cos(phi3);
-        speed_y4 = speed_y3+ acceleration_xy3 * 0.5*time_step * Math.sin(theta3)* Math.cos(phi3);
-        speed_z4 = speed_z3+ 0.5*acceleration_z3 * time_step;
-        angular_velocity_xy4 = angular_velocity_xy3+ angular_acceleration_xy3 * 0.5* time_step;
-        angular_velocity_z4 = angular_velocity_z3+ angular_acceleration_z3 * 0.5* time_step;
-        theta4 = (theta3 + angular_velocity_xy3*0.5*time_step + 2*Math.PI) % (2*Math.PI);
-        phi4 = (phi3 + angular_velocity_z3*0.5*time_step + 2*Math.PI) % (2*Math.PI);
-        location4[1] = location3[1]+speed_x3*0.5*time_step;
-        location4[2] = location3[2]+speed_y3*0.5*time_step;
-        location4[3] = location3[3]+speed_z3*0.5*time_step;
-
-        angular_velocity_xyf= angular_velocity_xy + (time_step/6.0)*(angular_acceleration_xy+2.0*angular_acceleration_xy2+2.0*angular_acceleration_xy3+angular_acceleration_xy4);
-        thetaf = theta + (time_step/6.0)*(angular_velocity_xy+2.0*angular_velocity_xy2*2.0*angular_acceleration_xy3+angular_acceleration_xy4);
-        phif = phi + (time_step/6.0)*(angular_velocity_z+2.0*angular_velocity_z2*2.0*angular_acceleration_z3+angular_acceleration_z4);
-        speed_xf= speed_x +(time_step/6.0)*(acceleration_xy+2.0*acceleration_xy2+2.0*acceleration_xy3+acceleration_xy4)*(Math.cos(thetaf));
-        speed_yf= speed_y +(time_step/6.0)*(acceleration_xy+2.0*acceleration_xy2+2.0*acceleration_xy3+acceleration_xy4)*(Math.sin(thetaf));
-        speed_zf= speed_z +(time_step/6.0)*(acceleration_z+2.0*acceleration_z2+2.0*acceleration_z3+acceleration_z4)*(Math.sin(thetaf));
-        locationf[1] = location[1] + (time_step/6.0)*(speed_x+2.0*speed_x2+2.0*speed_x3+speed_x4);
-        locationf[2] = location[2] + (time_step/6.0)*(speed_y+2.0*speed_y2+2.0*speed_y3+speed_y4);
-        locationf[3] = location[3] + (time_step/6.0)*(speed_z+2.0*speed_z2+2.0*speed_z3+speed_z4);
-
-
-		//System.out.println(round(prop_speed[FL]) + " rad/s -> " + round(slip[FL]) + " N");
-		//System.out.println(round(prop_speed[FR]) + " rad/s -> " + round(slip[FR]) + " N -> " + round(acceleration) + " m/s^2 -> " + round(speed) + " m/s");
-		//System.out.println(round(prop_speed[BL]) + " rad/s -> " + round(slip[BL]) + " N -> " + round(angular_acceleration) + " rad/s^2 -> " + round(angular_velocity) + " rad/s");
-		//System.out.println(round(prop_speed[BR]) + " rad/s -> " + round(slip[BR]) + " N");
-		// Calculate the amount the rover slips sideways
-		// Calculate new location
-		//                       location.offsetThis(speed*time_step*Math.cos(direction), speed*time_step*(Math.sin(direction)));
-		//TODO													  + here??
-		//                           location.offsetThis(slip_velocity*time_step*Math.cos(direction-Math.PI/2.0), slip_velocity*time_step*(Math.sin(direction-Math.PI/2.0)));
-		System.out.println(getLocation());
-
-        location= locationf;
-        angular_acceleration_xy = angular_acceleration_xyf;
-        angular_acceleration_z = angular_acceleration_zf;
-        direction[1] =thetaf;
-        direction[2] = phif;
-        theta = thetaf;
-        phi=phif;
-        speed = Math.sqrt(Math.pow(speed_xf,2.0)+Math.pow(speed_yf,2.0)+Math.pow(speed_zf,2.0));
-        angular_velocity_xy = angular_velocity_xyf;
-        angular_velocity_z=angular_velocity_zf;
-
-
-		// update state
-		sub_state.set("x", locationf[1]);
-		sub_state.set("y", locationf[2]);
-		sub_state.set("z", locationf[3]);
-		sub_state.set("direction", direction);
-		sub_state.set("motor_power", convertToDoubleArray(motor_power));
-		sub_state.set("motor_state", convertToDoubleArray(motor_states));
-		sub_state.set("motor_current", convertToDoubleArray(motor_current));
-		sub_state.set("motor_voltage", getMotorVoltage());
-		sub_state.set("motor_temp", convertToDoubleArray(motor_temp));
-		sub_state.set("prop_speed", convertToDoubleArray(prop_speed));
-		sub_state.set("battery_charge", battery_charge);
-		sub_state.set("battery_voltage", battery_voltage);
-		sub_state.set("battery_current", battery_current);
-		sub_state.set("battery_temp", battery_temperature);
-		sub_state.set("speed", speed);
-		sub_state.set("angular_velocity_xy", angular_velocity_xyf);
-		sub_state.set("angular_velocity_z", angular_velocity_zf);
-		sub_state.set("acceleration_xy", acceleration_xyf);
-		sub_state.set("acceleration_z", acceleration_zf);
-		sub_state.set("angular_acceleration_xy", angular_acceleration_xyf);
-		sub_state.set("angular_acceleration_z", angular_acceleration_zf);
 
 		//TODO report new location to map
 
@@ -447,10 +285,8 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		battery_cp_charge += cp_change * time_step;
 		battery_voltage = battery_charge/capacitance_battery - battery_cp_charge/capacitance_cp - resistance_s*battery_current;
 		SOC = 1 - (battery_max_charge - battery_charge) / battery_max_charge;
-		//System.out.println("Vb: " + battery_voltage + "\tVm: " + getMotorVoltage(FR) + "\tQcp: " + battery_cp_charge + "\tIb: " + battery_current + "\tIm: " + motor_current[FR]);
 
-		//TODO temp map stuff here
-		double temperature = -30;
+		double temperature = 7.22;
 
 		//Determining the temperature of the battery
 		battery_temperature += ((resistance_parasite*Math.pow(battery_change-battery_current, 2) + resistance_s*Math.pow(battery_current, 2) + capacitance_cp*Math.pow(battery_current-cp_change, 2)) - battery_heat_transfer*(battery_temperature - temperature) / battery_thermal_cap) * time_step;
@@ -464,6 +300,18 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		motor_temp[R] += ((winding_heat_transfer*(winding_temp[R] - motor_temp[R]) - motor_surface_heat_transfer*(motor_temp[R] - temperature)) / motor_thermal_cap) * time_step;
 		motor_temp[L] += ((winding_heat_transfer*(winding_temp[L] - motor_temp[L]) - motor_surface_heat_transfer*(motor_temp[L] - temperature)) / motor_thermal_cap) * time_step;
 		motor_temp[B] += ((winding_heat_transfer*(winding_temp[B] - motor_temp[B]) - motor_surface_heat_transfer*(motor_temp[B] - temperature)) / motor_thermal_cap) * time_step;
+
+        // update state
+        sub_state.set("motor_power", convertToDoubleArray(motor_power));
+        sub_state.set("motor_state", convertToDoubleArray(motor_states));
+        sub_state.set("motor_current", convertToDoubleArray(motor_current));
+        sub_state.set("motor_voltage", getMotorVoltage());
+        sub_state.set("motor_temp", convertToDoubleArray(motor_temp));
+        sub_state.set("prop_speed", convertToDoubleArray(prop_speed));
+        sub_state.set("battery_charge", battery_charge);
+        sub_state.set("battery_voltage", battery_voltage);
+        sub_state.set("battery_current", battery_current);
+        sub_state.set("battery_temp", battery_temperature);
 	}
 
 	private double resistance_cp(){ // get the resistance of the CP resistor as a function of SOC
@@ -520,12 +368,12 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		this.location = location;
 	}
 
-	public double[] getDirection() {
-		return direction;
+	public double[] getOrientation() {
+		return orientation;
 	}
 
-	public void setDirection(double[] direction) {
-		this.direction = direction;
+	public void setOrientation(double[] orientation) {
+		this.orientation = orientation;
 	}
 
 }

@@ -33,6 +33,11 @@ public class AquaticEnvironment extends PlatformEnvironment<SubObject, AquaticMa
         return 9.81;
     }
 
+    @JsonIgnore
+    public double getFluidDensity(){
+        return 1000;
+    }
+
     public double getPopulatorValue(String pop, DecimalPoint3D point){
         return super.getPopulatorValue(pop, point.getX(), point.getY(), point.getZ());
     }
