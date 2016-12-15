@@ -21,9 +21,6 @@ public class SubState extends PlatformState {
                         .addParameter("yaw", Double.class, 0.)
                         .addParameter("roll", Double.class, 0.)
                         .addParameter("speed", Double.class, 0.)
-                        .addParameter("acceleration", Double.class, 0.)
-                        .addParameter("angular_velocity", Double[].class, new Double[]{0., 0., 0.})
-                        .addParameter("angular_acceleration", Double[].class, new Double[]{0., 0., 0.})
         );
     }
 }
