@@ -179,4 +179,6 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         return Collections.unmodifiableList(platforms);
     }
 
+    public abstract int getSize();
+
 }

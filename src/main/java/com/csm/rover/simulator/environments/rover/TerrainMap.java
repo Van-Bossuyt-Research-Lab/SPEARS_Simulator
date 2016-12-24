@@ -116,16 +116,9 @@ public class TerrainMap extends EnvironmentMap {
         return getIntermediateValue(heightMap.get(x, y), heightMap.get(x + 1, y), heightMap.get(x, y + 1), heightMap.get(x + 1, y + 1), locx, locy);
     }
 
-    private double getIntermediateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
-        if (relativex > relativey){ //top right triangle
-            return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
-        }
-        else if (relativex < relativey){ //bottom left triangle
-            return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey + topleft;
-        }
-        else { //center line
-            return ((bottomright - topleft) * relativex + topleft);
-        }
+    private double getIntermediateValue(double point00, double point01, double point10, double point11,
+                                        double x, double y){
+        return point00*(1-x)*(1-y) + point01*(1-x)*y + point10*x*(1-y) + point11*x*y;
     }
 
     public int getSize(){

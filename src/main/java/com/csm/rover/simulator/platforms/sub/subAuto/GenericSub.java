@@ -1,8 +1,7 @@
 package com.csm.rover.simulator.platforms.sub.subAuto;
 
-import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
-import com.csm.rover.simulator.platforms.sub.subAuto.SubAutonomousCode;
 
 import java.util.Map;
 
@@ -28,8 +27,8 @@ public class GenericSub extends SubAutonomousCode {
     @Override
     public String doNextCommand(
             long milliTime,
-            DecimalPoint location,
-            double direction,
+            DecimalPoint3D location,
+            double[] orientation,
             Map<String, Double> params
     ){
         if (milliTime-lastActionTime > 1000*seconds){
