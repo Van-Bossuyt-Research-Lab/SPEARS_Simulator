@@ -7,10 +7,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
 public abstract class PlatformEnvironment<P extends Platform, M extends EnvironmentMap> {
+    private final static Logger LOG = LogManager.getLogger(PlatformEnvironment.class);
 
     @JsonProperty("type")
     protected final String platform_type;
@@ -93,9 +97,7 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
                 throw new IllegalArgumentException("Base Generator must be a generation modifier");
             }
             gen = mod;
-            for (String key : params.keySet()){
-                this.params.put(key, params.get(key));
-            }
+            addAllParams(params);
             return this;
         }
 
@@ -107,9 +109,7 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
                 throw new IllegalArgumentException("Modifiers cannot be generators");
             }
             mods.add(mod);
-            for (String key : params.keySet()){
-                this.params.put(key, params.get(key));
-            }
+            addAllParams(params);
             return this;
         }
 
@@ -121,19 +121,26 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
                 throw new IllegalArgumentException("A populator of name \"{}\" is already defined");
             }
             pops.put(name, pop);
-            for (String key : params.keySet()){
-                this.params.put(key, params.get(key));
-            }
+            addAllParams(params);
             return this;
         }
 
         public void generate(){
             doBuildMap(gen, mods, pops, params);
         }
+
+        private void addAllParams(Map<String, Double> newParams){
+            for (String key : newParams.keySet()){
+                if (params.containsKey(key)){
+                    LOG.log(Level.WARN, "Parameter \"" + key + "\" is being overwritten");
+                }
+                this.params.put(key, newParams.get(key));
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
-    private final void doBuildMap(EnvironmentModifier<M> baseGen, List<EnvironmentModifier<M>> modifiers, Map<String, EnvironmentPopulator> pops, Map<String, Double> params){
+    private void doBuildMap(EnvironmentModifier<M> baseGen, List<EnvironmentModifier<M>> modifiers, Map<String, EnvironmentPopulator> pops, Map<String, Double> params){
         map = baseGen.modify(null, params);
         for (EnvironmentModifier<M> mod : modifiers){
             map = mod.modify(map, params);

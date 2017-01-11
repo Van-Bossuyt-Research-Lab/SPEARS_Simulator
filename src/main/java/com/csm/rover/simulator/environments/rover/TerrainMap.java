@@ -95,24 +95,32 @@ public class TerrainMap extends EnvironmentMap {
         return min_val.get();
     }
 
-    private Point getMapSquare(DecimalPoint loc){ // says which display square a given coordinate falls in
-        int outx = (int)(loc.getX()*detail);
-        int outy = (int)(loc.getY()*detail);
-        return new Point(outx, outy);
+    /**
+     * returns the point in the 2D array closest to the provided map location.
+     *
+     * @param loc Location on the map from -size/2 to size/2
+     *
+     * @return Location of point in array from 0 to size
+     */
+    private Point getMapSquare(DecimalPoint loc){
+        return new Point(
+                (int)(loc.getX()*detail) + heightMap.getWidth()/2,
+                (int)(loc.getY()*detail) + heightMap.getHeight()/2);
     }
 
-    private Point getGridSquare(DecimalPoint loc){
-        Point square = getMapSquare(loc);
-        return new Point(square.x/3, square.y/3);
-    }
-
-    //returns the height of the map at the given point
+    /**
+     * Returns the height of the surface at the given point, interpolates between discrete height map values.
+     *
+     * @param loc Location on the map from -size/2 to size/2
+     * @return surface elevation
+     */
     public double getHeightAt(DecimalPoint loc){
         Point mapSquare = getMapSquare(loc);
         int x = (int) mapSquare.getX();
         int y = (int) mapSquare.getY();
-        double locx = (loc.getX()-(int)loc.getX()) * detail;
-        double locy = (loc.getY()-(int)loc.getY()) * detail;
+        loc = new DecimalPoint(loc.getX() + getSize()/2.0,  loc.getY() + getSize()/2.0);
+        double locx = loc.getX()*detail - x;
+        double locy = loc.getY()*detail - y;
         return getIntermediateValue(heightMap.get(x, y), heightMap.get(x + 1, y), heightMap.get(x, y + 1), heightMap.get(x + 1, y + 1), locx, locy);
     }
 

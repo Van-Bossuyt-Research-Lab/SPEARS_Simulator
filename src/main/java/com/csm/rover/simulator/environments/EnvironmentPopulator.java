@@ -52,7 +52,7 @@ public abstract class EnvironmentPopulator {
             coords[i] = (int)Math.floor(coordinates[i]);
         }
         try {
-            return new Double(value_map.get(coords) + "");
+            return value_map.get(coords);
         }
         catch (IndexOutOfBoundsException e){
             return default_value;
