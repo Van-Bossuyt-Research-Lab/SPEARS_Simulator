@@ -386,7 +386,7 @@ class RoverIcon extends JPanel {
     }
 
     private void setLocationOnMap(int x, int y){
-        super.setBounds((x - this.getWidth()/2), (y - this.getHeight()/2-nameTitle.getHeight()), this.getWidth(), this.getHeight());
+        super.setBounds((this.getParent().getWidth()/2 + x - this.getWidth()/2), (this.getParent().getHeight()/2 - y - this.getHeight()/2-nameTitle.getHeight()), this.getWidth(), this.getHeight());
     }
 
     private ImageIcon resize(Icon image, int width, int height) throws Exception {
