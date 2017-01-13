@@ -263,23 +263,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
            };
 	private final RK4.RK4Function torqueSumFnR =
 			//others: pitch, yaw, roll, prop_speed[F, B, L, R], speed[X, Y, Z], density
-			(double t, double angular_roll, double... others) -> {
-				double pitch = others[0];
-				double yaw = others[1];
-				double roll = others[2];
-				double[] prop_speed = new double[] { others[3], others[4], others[5], others[6] };
-				double speedX = others[7];
-				double speedY = others[8];
-				double speedZ = others[9];
-				double density = others[10];
-				double axial_speed = speedX*Math.cos(pitch)*Math.cos(yaw) +
-						speedY*Math.cos(pitch)*Math.sin(yaw) +
-						speedZ*Math.sin(pitch);
-				double normal_speed = -speedX*(Math.sin(yaw)*Math.sin(roll) + Math.cos(yaw)*Math.cos(roll)*Math.sin(pitch)) +
-						speedY*(Math.cos(yaw)*Math.sin(roll) - Math.cos(roll)*Math.sin(yaw)*Math.sin(pitch)) +
-						speedZ*Math.cos(pitch)*Math.cos(roll);
-				return 0;
-			};
+			(double t, double angular_roll, double... others) -> 0;
 	private final RK4.RK4Function torqueSumFnP =
 			//others: pitch, yaw, roll, prop_speed[F, B, L, R], speed[X, Y, Z], density
 			(double t, double angular_pitch, double... others) -> {
@@ -291,9 +275,6 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 				double speedY = others[8];
 				double speedZ = others[9];
 				double density = others[10];
-				double axial_speed = speedX*Math.cos(pitch)*Math.cos(yaw) +
-						speedY*Math.cos(pitch)*Math.sin(yaw) +
-						speedZ*Math.sin(pitch);
 				double normal_speed = -speedX*(Math.sin(yaw)*Math.sin(roll) + Math.cos(yaw)*Math.cos(roll)*Math.sin(pitch)) +
 						speedY*(Math.cos(yaw)*Math.sin(roll) - Math.cos(roll)*Math.sin(yaw)*Math.sin(pitch)) +
 						speedZ*Math.cos(pitch)*Math.cos(roll);
@@ -315,9 +296,6 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 				double axial_speed = speedX*Math.cos(pitch)*Math.cos(yaw) +
 						speedY*Math.cos(pitch)*Math.sin(yaw) +
 						speedZ*Math.sin(pitch);
-				double normal_speed = -speedX*(Math.sin(yaw)*Math.sin(roll) + Math.cos(yaw)*Math.cos(roll)*Math.sin(pitch)) +
-						speedY*(Math.cos(yaw)*Math.sin(roll) - Math.cos(roll)*Math.sin(yaw)*Math.sin(pitch)) +
-						speedZ*Math.cos(pitch)*Math.cos(roll);
 				return (density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[R] * (prop_speed_transform * prop_speed[R] - axial_speed) * motor_torque_arms[R] -
 						density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[L] * (prop_speed_transform * prop_speed[L] - axial_speed) * motor_torque_arms[L]) /
 						sub_inertia;
