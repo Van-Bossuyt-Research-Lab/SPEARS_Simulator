@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.objects;
 
 import com.csm.rover.simulator.wrapper.Globals;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.laughingpanda.beaninject.Inject;
@@ -97,6 +98,26 @@ public class ThreadItemTest {
         item.setRunning(true);
         item.reset();
         assert item.getState() == ThreadItem.STATES.WAITING;
+    }
+
+    @Test
+    public void testStates(){
+        ThreadItem item = new ThreadItem("item", 10, 0, threadMock);
+        item.suspend();
+        Assert.assertEquals(ThreadItem.STATES.SUSPENDED, item.getState());
+        item.setRunning(true);
+        Assert.assertEquals(ThreadItem.STATES.SUSPENDED, item.getState());
+        item.unSuspend();
+        Assert.assertEquals(ThreadItem.STATES.RUNNING, item.getState());
+        item.grantPermission();
+        Assert.assertEquals(ThreadItem.STATES.RUNNING, item.getState());
+        item.setRunning(false);
+        Assert.assertEquals(ThreadItem.STATES.PERMISSION, item.getState());
+        item.markFinished();
+        Assert.assertEquals(ThreadItem.STATES.COMPLETE, item.getState());
+        item.revokePermission();
+        item.reset();
+        Assert.assertEquals(ThreadItem.STATES.WAITING, item.getState());
     }
 
 }

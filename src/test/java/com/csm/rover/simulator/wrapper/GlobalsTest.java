@@ -63,7 +63,7 @@ public class GlobalsTest {
             globals.clock.Stop();
         });
         globals.startTime(false);
-        Thread.sleep(1010);
+        Thread.sleep(1500);
         assert !globals.clock.isAlive();
     }
 

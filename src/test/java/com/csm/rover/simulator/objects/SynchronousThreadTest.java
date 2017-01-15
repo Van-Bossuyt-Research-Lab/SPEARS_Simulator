@@ -5,9 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.laughingpanda.beaninject.Inject;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class SynchronousThreadTest {
 
@@ -41,6 +39,18 @@ public class SynchronousThreadTest {
         verify(globalsMock).registerNewThread(name2, delay, thread2);
     }
 
-
+    @Test
+    public void testForever() throws InterruptedException {
+        String name = "thread";
+        int times = 5;
+        when(globalsMock.getThreadRunPermission(name)).thenReturn(true);
+        SynchronousThread thread = new SynchronousThread(5, () -> {}, times, name);
+        for (int i = 0; i < times; i++){
+            Thread.sleep(10);
+            thread.Shake();
+        }
+        verify(globalsMock, times(times)).threadCheckIn(name);
+        verify(globalsMock, atLeastOnce()).checkOutThread(name);
+    }
 
 }

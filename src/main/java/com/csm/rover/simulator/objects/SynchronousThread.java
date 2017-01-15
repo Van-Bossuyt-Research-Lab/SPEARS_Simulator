@@ -60,30 +60,28 @@ public class SynchronousThread extends Thread {
 	 * Run action for the thread.  Should not be called by user.  Use {@link #start()} to
 	 * start the thread.
 	 */
-    @Override
+	@Override
 	public void run(){
 		while (actions > 0 || forever){
-			if (delay > 0){
-				try{
-					Thread.sleep(Integer.MAX_VALUE);
+			try{
+				Thread.sleep(Integer.MAX_VALUE);
+			}
+			catch (InterruptedException e) {
+				running = true;
+				if (stopped){
+					GLOBAL.checkOutThread(getName());
+					return;
 				}
-				catch (InterruptedException e) {
-					running = true;
-					if (stopped){
-						GLOBAL.checkOutThread(getName());
-						return;
+				if (GLOBAL.getThreadRunPermission(getName())){
+					GLOBAL.threadIsRunning(getName());
+					action.run();
+					GLOBAL.threadCheckIn(getName());
+					if (!forever){
+						actions--;
 					}
-					if (GLOBAL.getThreadRunPermission(getName())){
-						GLOBAL.threadIsRunning(getName());
-						action.run();
-						GLOBAL.threadCheckIn(getName());
-						if (!forever){
-							actions--;
-						}
-					}
-					running  = false;
 				}
-			}			
+				running  = false;
+			}
 		}
 		GLOBAL.checkOutThread(getName());
 	}
@@ -107,7 +105,7 @@ public class SynchronousThread extends Thread {
 	
 	@Override
 	public String toString() {
-		return "ThreadTimer [name=" + getName() + ", delay=" + delay + ", forever=" + forever + "]";
+		return "SynchronousThread [name=" + getName() + ", delay=" + delay + ", forever=" + forever + "]";
 	}
 	
 }

@@ -49,7 +49,7 @@ public class GlobalsThreadTest {
                 new SynchronousThread(20, () -> {}, SynchronousThread.FOREVER, "test")));
         threadMap.put("test", itemMock);
         Globals.getInstance().killThread("test");
-        Thread.sleep(2);
+        Thread.sleep(10);
         assert !threadMap.containsKey("test");
         verify(itemMock, atLeastOnce()).killThread();
     }
@@ -147,14 +147,14 @@ public class GlobalsThreadTest {
         ThreadItem itemMock = new ThreadItem("test", 5000, 0, null);
         threadMap.put("test", itemMock);
         int delay = 333;
-        int tolerance = accel ? 12 : 3;
+        int tolerance = accel ? 25 : 5;
         Globals.getInstance().delayThread("test", delay);
         assert threadMap.containsKey("test-delay");
         Assert.assertEquals(ThreadItem.STATES.SUSPENDED, itemMock.getState());
         long start = Globals.getInstance().timeMillis();
         Globals.getInstance().startTime(accel);
         while (ThreadItem.STATES.SUSPENDED == itemMock.getState()) {
-            Thread.sleep(0, 500);
+            Thread.sleep(0, 1);
         }
         Assert.assertEquals(delay, (Globals.getInstance().timeMillis() - start), tolerance);
         Thread.sleep(2);
@@ -164,11 +164,11 @@ public class GlobalsThreadTest {
 
     @Test
     public void testDelayCurrent(){
-        int delay = 1384;
-        int tolerance = 3;
+        int delay = 770;
+        int tolerance = 5;
         long start = System.currentTimeMillis();
         Globals.getInstance().delayThread("notReal", delay);
-        assert Math.abs((System.currentTimeMillis()-start) - delay) <= tolerance;
+        Assert.assertEquals(delay, (int)(System.currentTimeMillis()-start), tolerance);
     }
 
     @Test

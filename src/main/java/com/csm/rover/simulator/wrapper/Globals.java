@@ -6,6 +6,7 @@ import com.csm.rover.simulator.objects.ThreadItem;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.util.SystemClock;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -271,7 +272,8 @@ public class Globals {
 		}
 		else {
 			try{
-				Thread.sleep((long)(time/getTimeScale()), (int)((time/getTimeScale()-time/getTimeScale())*1000000));
+				long start = System.nanoTime();
+				while (System.nanoTime()-start < time*1000000/getTimeScale()) {}
 			}
 			catch (Exception ex) {
 				LOG.log(Level.ERROR, "Delay thread failed", ex);
