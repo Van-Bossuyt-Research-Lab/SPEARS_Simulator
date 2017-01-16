@@ -198,11 +198,7 @@ public class ThreadItem {
         thread.Stop();
     }
 
-	/**
-	 * Returns the current state of the object as a string.
-	 *
-	 * @return The object's properties and state as text
-     */
+	@CoverageIgnore
 	@Override
 	public String toString() {
 		return "ThreadItem [name=" + name + ", delay=" + delay + ", next="

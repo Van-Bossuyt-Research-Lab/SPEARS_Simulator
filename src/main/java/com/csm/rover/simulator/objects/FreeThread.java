@@ -78,7 +78,8 @@ public class FreeThread extends Thread {
 	public void Stop(){
 		this.interrupt();
 	}
-	
+
+	@CoverageIgnore
 	@Override
 	public String toString() {
 		return "ThreadTimer [name=" + getName() + ", delay=" + delay + ", forever=" + forever + "]";

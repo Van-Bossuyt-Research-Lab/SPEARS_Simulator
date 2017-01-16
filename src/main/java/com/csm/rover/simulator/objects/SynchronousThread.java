@@ -102,7 +102,8 @@ public class SynchronousThread extends Thread {
 			this.interrupt();
 		}
 	}
-	
+
+	@CoverageIgnore
 	@Override
 	public String toString() {
 		return "SynchronousThread [name=" + getName() + ", delay=" + delay + ", forever=" + forever + "]";

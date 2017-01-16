@@ -115,7 +115,7 @@
 						<ignoreMethodAnnotation>com.csm.rover.simulator.objects.CoverageIgnore</ignoreMethodAnnotation>
 						<excludes>
 							<exclude>com/csm/rover/simulator/**/*Test.class</exclude>
-							<exclude>com/csm/rover/simulator/objects/io/DatedFileAppenderImpl</exclude>
+							<exclude>com/csm/rover/simulator/objects/io/DatedFileAppenderImpl.class</exclude>
 							<exclude>com/csm/rover/simulator/visual/*.class</exclude>
 							<exclude>com/csm/rover/simulator/control/*.class</exclude>
 							<exclude>com/csm/rover/simulator/platforms/rover/autoCode/*.class</exclude>
