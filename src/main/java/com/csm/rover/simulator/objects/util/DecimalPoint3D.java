@@ -1,9 +1,11 @@
 package com.csm.rover.simulator.objects.util;
 
+import com.csm.rover.simulator.objects.CoverageIgnore;
+
 /**
  * Standard point class for tracking the x, y, and z coordinates.  Supports non-integer values, unlike {@link java.awt.Point java.awt.Point}.
  */
-public class DecimalPoint3D {
+public class DecimalPoint3D implements Cloneable {
 
 	private double x, y, z;
 
@@ -140,7 +142,8 @@ public class DecimalPoint3D {
 	public DecimalPoint3D scale(double factor){
 		return new DecimalPoint3D(x*factor, y*factor, z*factor);
 	}
-	
+
+	@CoverageIgnore
 	@Override
 	public String toString(){
 		return (Math.round(x*1000)/1000.0) + ", " + (Math.round(y*1000)/1000.0 + ", " + (Math.round(z*1000)/1000.0));

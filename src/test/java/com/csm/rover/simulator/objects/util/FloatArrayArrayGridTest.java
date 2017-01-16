@@ -1,7 +1,5 @@
 package com.csm.rover.simulator.objects.util;
 
-import com.csm.rover.simulator.objects.util.ArrayGrid;
-import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -37,7 +35,7 @@ public class FloatArrayArrayGridTest {
         col.add(1.5f);
         col.add(1.6f);
         col.add(1.7f);
-        grid.addColumnAt(2, col);
+        grid.insertColumnAt(2, col);
 
         assertEquals(3, grid.getWidth());
         assertEquals(4, grid.getHeight());
@@ -52,7 +50,7 @@ public class FloatArrayArrayGridTest {
         row.add(1.6f);
         row.add(1.7f);
         row.add(1.8f);
-        grid.addRowAt(5, row);
+        grid.insertRowAt(5, row);
         System.out.println(grid);
         assertEquals(5, grid.getWidth());
         assertEquals(6, grid.getHeight());
@@ -116,7 +114,7 @@ public class FloatArrayArrayGridTest {
 //        row.add("c");
 //        row.add("e");
 //        row.add("f");
-//        grid.addRowAt(0, row);
+//        grid.insertRowAt(0, row);
 //        System.out.println(grid);
 //    }
 

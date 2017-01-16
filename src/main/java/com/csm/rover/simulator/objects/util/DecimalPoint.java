@@ -1,5 +1,7 @@
 package com.csm.rover.simulator.objects.util;
 
+import com.csm.rover.simulator.objects.CoverageIgnore;
+
 import java.awt.Point;
 
 /**
@@ -126,6 +128,7 @@ public class DecimalPoint {
 		return new Point(roundX(), roundY());
 	}
 
+	@CoverageIgnore
 	@Override
 	public String toString(){
 		return (Math.round(x*1000)/1000.0) + ", " + (Math.round(y*1000)/1000.0);

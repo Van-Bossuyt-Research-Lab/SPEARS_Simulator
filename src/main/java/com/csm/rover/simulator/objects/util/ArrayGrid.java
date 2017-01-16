@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @JsonSerialize(using=ArrayGridSerializer.class)
 @JsonDeserialize(using=ArrayGridDeserializer.class)
@@ -19,19 +20,19 @@ public interface ArrayGrid<T> extends Cloneable {
 
     void put(int x, int y, T val);
 
-    void addColumn(ArrayList<T> col);
+    void addColumn(List<T> col);
 
-    void addColumnAt(int x, ArrayList<T> col);
+    void insertColumnAt(int x, List<T> col);
 
-    void addRow(ArrayList<T> row);
+    void addRow(List<T> row);
 
-    void addRowAt(int y, ArrayList<T> row);
+    void insertRowAt(int y, List<T> row);
 
     T get(int x, int y);
 
-    ArrayList<T> getColumn(int x);
+    List<T> getColumn(int x);
 
-    ArrayList<T> getRow(int y);
+    List<T> getRow(int y);
 
     int getWidth();
 
