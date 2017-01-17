@@ -85,6 +85,30 @@ public class GenericArrayGridTest {
         grid.getColumn(3);
     }
 
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBGet_xNeg(){
+        grid.put(2, 4, "z");
+        grid.get(-3, 2);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBGet_yNeg(){
+        grid.put(2, 4, "z");
+        grid.get(1, -5);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBRowNeg(){
+        grid.put(2, 4, "z");
+        grid.getRow(-5);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBColumnNeg(){
+        grid.put(2, 4, "z");
+        grid.getColumn(-3);
+    }
+
     @Test
     public void testEmpty(){
         assert grid.isEmpty();

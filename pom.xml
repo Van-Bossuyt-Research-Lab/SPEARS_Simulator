@@ -120,6 +120,8 @@
 							<exclude>com/csm/rover/simulator/control/*.class</exclude>
 							<exclude>com/csm/rover/simulator/platforms/rover/autoCode/*.class</exclude>
 							<exclude>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</exclude>
+							<exclude>com/csm/rover/simulator/platforms/sub/subAuto/*.class</exclude>
+							<exclude>com/csm/rover/simulator/platforms/sub/physicsModels/*.class</exclude>
 						</excludes>
 					</instrumentation>
                 </configuration>
@@ -154,6 +156,8 @@
 							<include>com/csm/rover/simulator/control/*.class</include>
 							<include>com/csm/rover/simulator/platforms/rover/autoCode/*.class</include>
 							<include>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</include>
+							<include>com/csm/rover/simulator/platforms/sub/subAuto/*.class</include>
+							<include>com/csm/rover/simulator/platforms/sub/physicsModels/*.class</include>
 						</includes>
 					</instrumentation>
                 </configuration>

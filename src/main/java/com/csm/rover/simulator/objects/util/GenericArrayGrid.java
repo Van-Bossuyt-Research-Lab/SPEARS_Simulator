@@ -5,6 +5,11 @@ import com.csm.rover.simulator.objects.CoverageIgnore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An implementation of {@link ArrayGrid} which uses {@link ArrayList}.  Default value  is null.
+ *
+ * @param <T>
+ */
 public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
 
     private ArrayList<List<T>> grid;
@@ -40,11 +45,6 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
-    /**
-     * Turns this ArrayGrid into a copy of the provided data.  Overwrites in existing values and size.
-     *
-     * @param values 2D array of values, get(x, y) == [x][y]
-     */
     @Override
     public void loadFromArray(T[][] values){
         grid = new ArrayList<>();
@@ -55,26 +55,11 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
-    /**
-     * Fills the entire data structure with a null value to the given size.  Overwrites any existing
-     * data or size.
-     *
-     * @param width New width
-     * @param height New height
-     */
     @Override
     public void fillToSize(int width, int height){
         fillToSize(width, height, null);
     }
 
-    /**
-     * Fills the entire data structure with the givin value to the given size.  Overwrites
-     * any existing data or size.
-     *
-     * @param width New width
-     * @param height New height
-     * @param val Default value to use
-     */
     @Override
     public void fillToSize(int width, int height, T val){
         grid = new ArrayList<>();
@@ -85,13 +70,6 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
-    /**
-     * Places the value at the prescribed location.  Will cause the to grow to accommodate the placement.
-     *
-     * @param x First coordinate to use
-     * @param y Second coordinate to use
-     * @param val Value to insert
-     */
     @Override
     public void put(int x, int y, T val){
         while (x >= getWidth()){
@@ -103,23 +81,11 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         grid.get(x).set(y, val);
     }
 
-    /**
-     * Adds a column at the edge of the data.  See {@link #insertColumnAt(int, List) insertColumnAt({@link #getWidth()}, List)}
-     *
-     * @param col List of values to add
-     */
     @Override
     public void addColumn(List<T> col){
         insertColumnAt(getWidth(), col);
     }
 
-    /**
-     * Inserts a column containing the list at the given x coordinate.  Will shift any existing data.  If the
-     * list is taller than the structure the structure will grow.
-     *
-     * @param x Where to add the column
-     * @param col Column of data to add
-     */
     @Override
     public void insertColumnAt(int x, List<T> col){
         while (getWidth() < x){
@@ -129,23 +95,11 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         grid.add(x, col);
     }
 
-    /**
-     * Adds a row at the bottom of the data.  See {@link #insertRowAt(int, List) insertRowAt({@link #getHeight()}, List)}
-     *
-     * @param row List of values to add
-     */
     @Override
     public void addRow(List<T> row){
         insertRowAt(getHeight(), row);
     }
 
-    /**
-     * Inserts a row containing the list at the given y coordinate.  Will shift any existing data.  If the
-     * list is wider than the structure the structure will grow.
-     *
-     * @param y Where to add the row
-     * @param row Row of data to add
-     */
     @Override
     public void insertRowAt(int y, List<T> row){
         normalizeRow(row);
@@ -178,16 +132,6 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
-    /**
-     * Returns the value stored at the given coordinates.
-     *
-     * @param x First coordinate
-     * @param y Second coordinate
-     *
-     * @return The value stored at the point, null if nothing is stored
-     *
-     * @throws ArrayIndexOutOfBoundsException If either coordinate is negative our outside the structure size
-     */
     @Override
     public T get(int x, int y){
         if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()){
@@ -198,15 +142,6 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
-    /**
-     * Returns the column of data at the given x value.
-     *
-     * @param x Which column
-     *
-     * @return A vertical List of values
-     *
-     * @throws ArrayIndexOutOfBoundsException If x is negative or greater than or equal to {@link #getWidth()}
-     */
     @Override
     public List<T> getColumn(int x){
         if (x >= 0 && x < getWidth()){
@@ -217,15 +152,6 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
-    /**
-     * Returns the row of data at the given y value.
-     *
-     * @param y Which row
-     *
-     * @return A horizontal List of values
-     *
-     * @throws ArrayIndexOutOfBoundsException If y is negative or greater than or equal to {@link #getHeight()}
-     */
     @Override
     public List<T> getRow(int y){
         if (y >= 0 && y < getHeight()){
@@ -240,21 +166,11 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
-    /**
-     * The number of columns.
-     *
-     * @return Max x + 1
-     */
     @Override
     public int getWidth(){
         return grid.size();
     }
 
-    /**
-     * The number of rows.
-     *
-     * @return Max y + 1
-     */
     @Override
     public int getHeight() {
         if (getWidth() > 0){
@@ -265,21 +181,11 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
-    /**
-     * The total size of the data.  {@link #getWidth()} * {@link #getHeight()}.
-     *
-     * @return Total size of the 2D structure
-     */
     @Override
     public int size(){
         return getWidth()*getHeight();
     }
 
-    /**
-     * True if there is no data stored at all.
-     *
-     * @return
-     */
     @Override
     public boolean isEmpty(){
         return size() == 0;

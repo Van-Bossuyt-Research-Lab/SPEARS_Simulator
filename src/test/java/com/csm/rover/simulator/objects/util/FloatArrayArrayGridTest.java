@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 public class FloatArrayArrayGridTest {
 
     private ArrayGrid<Float> grid;
+    private static final double TOLERANCE = 0.00001;
 
     @Before
     public void setup(){
@@ -25,12 +26,43 @@ public class FloatArrayArrayGridTest {
 
         assertEquals(6, grid.getWidth());
         assertEquals(5, grid.getHeight());
-        assertEquals(1.2f, grid.get(5, 4), 0.001);
+        assertEquals(1.2f, grid.get(5, 4), TOLERANCE);
+    }
+
+    @Test
+    public void testFill(){
+        grid.fillToSize(3, 9);
+
+        assertEquals(3, grid.getWidth());
+        assertEquals(9, grid.getHeight());
+        assertEquals(0f, grid.get(2, 8), TOLERANCE);
+        assert !grid.isEmpty();
+    }
+
+    @Test
+    public void testGrow(){
+        grid.put(5, 4, 1.2f);
+
+        assertEquals(6, grid.getWidth());
+        assertEquals(5, grid.getHeight());
+        assertEquals(30, grid.size());
+
+        grid.put(7, 5, 2.2f);
+
+        assertEquals(8, grid.getWidth());
+        assertEquals(6, grid.getHeight());
+    }
+
+    @Test
+    public void testEmpty(){
+        assertEquals(0, grid.getWidth());
+        assertEquals(0, grid.getHeight());
+        assert grid.isEmpty();
     }
 
     @Test
     public void testAddCol(){
-        ArrayList<Float> col = new ArrayList<Float>();
+        ArrayList<Float> col = new ArrayList<>();
         col.add(1.4f);
         col.add(1.5f);
         col.add(1.6f);
@@ -39,22 +71,147 @@ public class FloatArrayArrayGridTest {
 
         assertEquals(3, grid.getWidth());
         assertEquals(4, grid.getHeight());
-        assertEquals(1.6f, grid.get(2, 2), 0.001);
+        assertEquals(col, grid.getColumn(2));
     }
 
     @Test
     public void testAddRow(){
-        ArrayList<Float> row = new ArrayList<Float>();
+        ArrayList<Float> row = new ArrayList<>();
         row.add(1.4f);
         row.add(1.5f);
         row.add(1.6f);
         row.add(1.7f);
         row.add(1.8f);
         grid.insertRowAt(5, row);
-        System.out.println(grid);
+
         assertEquals(5, grid.getWidth());
         assertEquals(6, grid.getHeight());
-        assertEquals(1.5f, grid.get(1, 5), 0.001);
+        assertEquals(row, grid.getRow(5));
+    }
+
+    @Test
+    public void testInsertCol(){
+        grid.put(3, 5, 3.2f);
+
+        ArrayList<Float> col = new ArrayList<>();
+        col.add(1.4f);
+        col.add(1.5f);
+        grid.insertColumnAt(1, col);
+
+        assertEquals(1.4f, grid.get(1, 0), TOLERANCE);
+        assertEquals(3.2f, grid.get(4, 5), TOLERANCE);
+        assertEquals(0, grid.get(1, 4), TOLERANCE);
+    }
+
+    @Test
+    public void testInsertRow(){
+        grid.put(6, 2, -1.7f);
+
+        ArrayList<Float> row = new ArrayList<>();
+        row.add(1.4f);
+        row.add(1.5f);
+        grid.insertRowAt(0, row);
+
+        assertEquals(1.5f, grid.get(1, 0), TOLERANCE);
+        assertEquals(-1.7f, grid.get(6, 3), TOLERANCE);
+        assertEquals(0, grid.get(4, 0), TOLERANCE);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBGet_x(){
+        grid.put(2, 4, 3.2f);
+        grid.get(3, 2);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBGet_y(){
+        grid.put(2, 4, 1.6f);
+        grid.get(1, 5);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBRow(){
+        grid.put(2, 4, 9.2f);
+        grid.getRow(5);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBColumn(){
+        grid.put(2, 4, -100f);
+        grid.getColumn(3);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBGet_xNeg(){
+        grid.put(2, 4, 3.2f);
+        grid.get(-3, 2);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBGet_yNeg(){
+        grid.put(2, 4, 1.6f);
+        grid.get(1, -5);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBRowNeg(){
+        grid.put(2, 4, 9.2f);
+        grid.getRow(-5);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOOBColumnNeg(){
+        grid.put(2, 4, -100f);
+        grid.getColumn(-3);
+    }
+
+    @Test
+    public void testEquals(){
+        grid.put(3, 6, 2f);
+        grid.put(1, 2, 0.21f);
+
+        ArrayGrid<Float> other = new FloatArrayArrayGrid();
+        other.put(3, 6, 2f);
+        other.put(1, 2, 0.21f);
+
+        assert grid.equals(other);
+    }
+
+    @Test
+    public void testNotEquals(){
+        grid.put(3, 7, 1f);
+
+        ArrayGrid<Float> other = new FloatArrayArrayGrid();
+        other.put(4, 6, 2f);
+
+        assert !grid.equals(other);
+    }
+
+    @Test
+    public void testTypeNotEquals(){
+        grid.put(1, 5, 2.5f);
+
+        ArrayGrid<String> other = new GenericArrayGrid<>();
+        other.put(1, 5, "2.5");
+
+        assert !grid.equals(other);
+    }
+
+    @Test
+    public void testReallyNotEquals(){
+        assert !grid.equals(1.58f);
+    }
+
+    @Test
+    public void testClone(){
+        grid.put(2, 6, 7f);
+        grid.put(1, 5, 1.2f);
+
+        ArrayGrid<Float> clone = grid.clone();
+        assert grid.equals(clone);
+
+        clone.put(1, 5, 2.1f);
+        assert !grid.equals(clone);
     }
 
     @Test
@@ -94,28 +251,5 @@ public class FloatArrayArrayGridTest {
             fail();
         }
     }
-
-//    @Test
-//    public void VisualTest(){
-//        grid.add(2, 6, "A");
-//        System.out.println(grid);
-//        grid.add(8, 3, "B");
-//        System.out.println(grid);
-//        ArrayList<String> col = new ArrayList<String>();
-//        col.add("a");
-//        col.add("b");
-//        col.add("e");
-//        col.add("f");
-//        grid.addColumn(col);
-//        System.out.println(grid);
-//        ArrayList<String> row = new ArrayList<String>();
-//        row.add("a");
-//        row.add("b");
-//        row.add("c");
-//        row.add("e");
-//        row.add("f");
-//        grid.insertRowAt(0, row);
-//        System.out.println(grid);
-//    }
 
 }

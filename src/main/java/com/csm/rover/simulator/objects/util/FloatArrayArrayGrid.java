@@ -1,32 +1,50 @@
 package com.csm.rover.simulator.objects.util;
 
+import com.csm.rover.simulator.objects.CoverageIgnore;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * An implementation of {@link ArrayGrid} which uses a 2D array.  This implementation only supports float storage.
+ * Default value is 0.
+ */
 public class FloatArrayArrayGrid implements ArrayGrid<Float> {
 
     private Float[][] grid;
 
+    /**
+     * Creates an empty {@link ArrayGrid ArrayGrid<Float>} of size 0, 0.
+     */
     public FloatArrayArrayGrid(){
         grid = new Float[0][0];
     }
 
+    /**
+     * Creates a new {@link ArrayGrid ArrayGrid<Float>} that contains a copy of the values of the supplied array.
+     * [i][j] == get(i, j)
+     *
+     * @param values Initial value to load from.
+     */
     public FloatArrayArrayGrid(Float[][] values){
         loadFromArray(values);
     }
 
+    /**
+     * Creates a clone of the supplied FloatArrayArrayGrid.
+     *
+     * @param original ArrayGrid to copy
+     */
     public FloatArrayArrayGrid(FloatArrayArrayGrid original){
-        grid = original.grid.clone();
+        this(original.grid);
     }
 
     @Override
     public void loadFromArray(Float[][] values) {
         grid = new Float[values.length][values[0].length];
         for (int x = 0; x < values.length; x++){
-            for (int y = 0; y < values[x].length; y++){
-                grid[x][y] = values[x][y];
-            }
+            grid[x] = Arrays.copyOf(values[x], values[x].length);
         }
     }
 
@@ -51,7 +69,7 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
             addColumn(new ArrayList<>());
         }
         while (y >= getHeight()){
-            addRow(new ArrayList<Float>());
+            addRow(new ArrayList<>());
         }
         grid[x][y] = val;
     }
@@ -93,7 +111,7 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
     public void insertRowAt(int y, List<Float> row){
         normalizeRow(row);
         while (getHeight() < y){
-            addRow(new ArrayList<Float>());
+            addRow(new ArrayList<>());
         }
         normalizeRow(row);
 
@@ -132,7 +150,7 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
                 col.add(0f);
             }
             while (col.size() > getHeight()){
-                addRow(new ArrayList<Float>());
+                addRow(new ArrayList<>());
             }
         }
     }
@@ -148,13 +166,9 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
     }
 
     @Override
-    public ArrayList<Float> getColumn(int x){
+    public List<Float> getColumn(int x){
         if (x >= 0 && x < getWidth()){
-            ArrayList<Float> col = new ArrayList<Float>(grid[x].length);
-            for (Float val : grid[x]){
-                col.add(val);
-            }
-            return col;
+            return Arrays.asList(grid[x]);
         }
         else {
             throw new ArrayIndexOutOfBoundsException(String.format("The column (%d) is out of bounds.  Expected a column less than %d", x, getWidth()));
@@ -162,9 +176,9 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
     }
 
     @Override
-    public ArrayList<Float> getRow(int y){
+    public List<Float> getRow(int y){
         if (y >= 0 && y < getHeight()){
-            ArrayList<Float> row = new ArrayList<Float>();
+            ArrayList<Float> row = new ArrayList<>();
             for (Float[] col : grid){
                 row.add(col[y]);
             }
@@ -201,10 +215,29 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
     }
 
     @Override
-    public boolean equals(Object other) {
-        return other instanceof FloatArrayArrayGrid && Arrays.deepEquals(this.grid, ((FloatArrayArrayGrid) other).grid);
+    public boolean equals(Object o) {
+        if (o instanceof ArrayGrid){
+            ArrayGrid other = (ArrayGrid) o;
+            if (other.getWidth() == getWidth() && other.getHeight() == getHeight()){
+                for (int i = 0; i < getWidth(); i++){
+                    for (int j = 0; j < getHeight(); j++){
+                        try {
+                            if (Math.abs(get(i, j) - (Float) other.get(i, j)) > 0.0000001) {
+                                return false;
+                            }
+                        }
+                        catch (ClassCastException | NullPointerException e){
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
+    @CoverageIgnore
     @Override
     public String toString(){
         return String.format("ArrayGrid:[type=Float, width=%d, height=%d]", getWidth(), getHeight());
