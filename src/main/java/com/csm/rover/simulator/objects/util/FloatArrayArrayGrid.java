@@ -15,14 +15,14 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
     private Float[][] grid;
 
     /**
-     * Creates an empty {@link ArrayGrid ArrayGrid<Float>} of size 0, 0.
+     * Creates an empty {@link ArrayGrid ArrayGrid&#60;Float&#62;} of size 0, 0.
      */
     public FloatArrayArrayGrid(){
         grid = new Float[0][0];
     }
 
     /**
-     * Creates a new {@link ArrayGrid ArrayGrid<Float>} that contains a copy of the values of the supplied array.
+     * Creates a new {@link ArrayGrid ArrayGrid&#60;Float&#62;} that contains a copy of the values of the supplied array.
      * [i][j] == get(i, j)
      *
      * @param values Initial value to load from.

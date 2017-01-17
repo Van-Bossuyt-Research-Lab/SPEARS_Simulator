@@ -12,7 +12,7 @@ import java.util.List;
  * A generic 2D data structure that functions very much like {@link ArrayList}.  Used to store large, dense sets
  * of data.  The structure is always rectangular.
  *
- * @param <T>
+ * @param <T> Data type to be stored
  */
 @JsonSerialize(using=ArrayGridSerializer.class)
 @JsonDeserialize(using=ArrayGridDeserializer.class)
@@ -141,9 +141,9 @@ public interface ArrayGrid<T> extends Cloneable {
     int size();
 
     /**
-     * True if there is no data stored at all.
+     * A boolean indicator for whether the size of the structure is 0.
      *
-     * @return
+     * @return True if there is no data stored
      */
     boolean isEmpty();
 
