@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.platforms;
 
+import com.csm.rover.simulator.objects.CoverageIgnore;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import com.csm.rover.simulator.platforms.annotations.State;
@@ -12,11 +13,10 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class PlatformRegistry {
+    @CoverageIgnore
     private static final Logger LOG = LogManager.getLogger(PlatformRegistry.class);
 
-    static {
-        fillRegistry();
-    }
+    private static final Reflections reflect = new Reflections("com.csm.rover.simulator.platforms");
 
     private static Map<String, String> platforms;
 
@@ -28,7 +28,7 @@ public class PlatformRegistry {
     private static Map<String, Map<String, String[]>> autoModelParameters;
     private static Map<String, Map<String, String[]>> physicsModelParameters;
 
-    private static void fillRegistry() {
+    public static void fillRegistry() {
         platforms = new TreeMap<>();
         platformStates = new TreeMap<>();
         autoModels = new TreeMap<>();
@@ -37,7 +37,6 @@ public class PlatformRegistry {
         physicsModelParameters = new TreeMap<>();
 
         LOG.log(Level.INFO, "Initializing Platform Registry");
-        Reflections reflect = new Reflections("com.csm.rover.simulator.platforms");
 
         fillPlatforms(reflect);
         fillStates(reflect);
@@ -114,22 +113,20 @@ public class PlatformRegistry {
                 LOG.log(Level.WARN, "PlatformState {} has type {} which is not a recognized platform", getClassPath(state), type);
             }
         }
-        if (platformStates.size() == 0){
-            LOG.log(Level.WARN, "No PlatformStates were found");
-            return;
-        }
         for (String type : platforms.keySet()){
-            if (!platformStates.containsKey(type)){
+            if (platformStates.containsKey(type)){
+                LOG.log(Level.INFO, "For Platform {} identified state {}", type, platformStates.get(type));
+            }
+            else {
                 LOG.log(Level.WARN, "No PlatformState found for type {}", type);
             }
         }
-        LOG.log(Level.INFO, "Found PlatformStates: {}", platformStates.toString());
     }
 
     private static void fillAutoModels(Reflections reflect){
         for (String type : platforms.keySet()){
-            autoModels.put(type, new TreeMap<String, String>());
-            autoModelParameters.put(type, new TreeMap<String, String[]>());
+            autoModels.put(type, new TreeMap<>());
+            autoModelParameters.put(type, new TreeMap<>());
         }
 
         Set<Class<? extends PlatformAutonomousCodeModel>> classautos = reflect.getSubTypesOf(PlatformAutonomousCodeModel.class);
@@ -184,8 +181,8 @@ public class PlatformRegistry {
 
     private static void fillPhysicsModels(Reflections reflect){
         for (String type : platforms.keySet()){
-            physicsModels.put(type, new TreeMap<String, String>());
-            physicsModelParameters.put(type, new TreeMap<String, String[]>());
+            physicsModels.put(type, new TreeMap<>());
+            physicsModelParameters.put(type, new TreeMap<>());
         }
 
         Set<Class<? extends PlatformPhysicsModel>> classphysics = reflect.getSubTypesOf(PlatformPhysicsModel.class);
@@ -228,7 +225,7 @@ public class PlatformRegistry {
                 LOG.log(Level.WARN, "PhysicsModel {} has type {} which is not a recognized platform", clazz, type);
             }
         }
-        for (String type : autoModels.keySet()){
+        for (String type : physicsModels.keySet()){
             if (physicsModels.get(type).size() == 0){
                 LOG.log(Level.WARN, "Found no PhysicsModels for platform type {}", type);
             }

@@ -1,12 +1,14 @@
 package com.csm.rover.simulator.platforms;
 
 import com.csm.rover.simulator.environments.PlatformEnvironment;
+import com.csm.rover.simulator.objects.CoverageIgnore;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public abstract class Platform {
+    @CoverageIgnore
     private static final Logger LOG = LogManager.getLogger(Platform.class);
 
     protected final String platform_type;
