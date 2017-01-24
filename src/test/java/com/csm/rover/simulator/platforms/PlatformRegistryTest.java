@@ -7,6 +7,7 @@ import com.csm.rover.simulator.test.objects.AutoModels.*;
 import com.csm.rover.simulator.test.objects.PhysicsModels.*;
 import com.csm.rover.simulator.test.objects.platforms.*;
 import com.csm.rover.simulator.test.objects.states.*;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Sets;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,12 +18,11 @@ import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class PlatformRegistryTest {
 
@@ -72,6 +72,31 @@ public class PlatformRegistryTest {
         Inject.field("physicsModelParameters").of(pr).with(physicsModelParameters);
 
         reflectionsMock = mock(Reflections.class);
+    }
+
+    private void setupFill(){
+        Inject.field("reflect").of(new PlatformRegistry()).with(reflectionsMock);
+        doReturn(Sets.newHashSet(RoverPlatform.class)).when(reflectionsMock).getSubTypesOf(Platform.class);
+        doReturn(Sets.newHashSet(RoverPlatform.class)).when(reflectionsMock).getTypesAnnotatedWith(com.csm.rover.simulator.platforms.annotations.Platform.class);
+        doReturn(Sets.newHashSet(RoverState.class)).when(reflectionsMock).getSubTypesOf(PlatformState.class);
+        doReturn(Sets.newHashSet(RoverState.class)).when(reflectionsMock).getTypesAnnotatedWith(State.class);
+        doReturn(Sets.newHashSet(RoverCode.class)).when(reflectionsMock).getSubTypesOf(PlatformAutonomousCodeModel.class);
+        doReturn(Sets.newHashSet(RoverCode.class)).when(reflectionsMock).getTypesAnnotatedWith(AutonomousCodeModel.class);
+        doReturn(Sets.newHashSet(RoverPhysics.class)).when(reflectionsMock).getSubTypesOf(PlatformPhysicsModel.class);
+        doReturn(Sets.newHashSet(RoverPhysics.class)).when(reflectionsMock).getTypesAnnotatedWith(PhysicsModel.class);
+        PlatformRegistry.fillRegistry();
+    }
+
+    @Test
+    public void testFill(){
+        setupFill();
+
+        Assert.assertEquals(RoverPlatform.class, PlatformRegistry.getPlatform("Rover"));
+        Assert.assertEquals(RoverState.class, PlatformRegistry.getPlatformState("Rover"));
+        Assert.assertEquals(RoverCode.class, PlatformRegistry.getAutonomousCodeModel("Rover", "Test Rover"));
+        Assert.assertEquals(Arrays.asList("param1", "param2"), PlatformRegistry.getParametersForAutonomousCodeModel("Rover", "Test Rover"));
+        Assert.assertEquals(RoverPhysics.class, PlatformRegistry.getPhysicsModel("Rover", "Test Rover"));
+        Assert.assertEquals(Arrays.asList("paramA", "paramB"), PlatformRegistry.getParametersForPhysicsModel("Rover", "Test Rover"));
     }
 
 //  PLATFORMS ----------------------------------------------------------------------------------------------------------
@@ -157,9 +182,9 @@ public class PlatformRegistryTest {
         platforms.put("Sub", "SubPlatform");
         platforms.put("UAV", "UAVPlatform");
         platforms.put("Horse", "Why");
-        doReturn(Sets.newHashSet(MissingMoleCode.class, SubCode.class, UnlabeledUAVCode.class, PrivateRoverCode.class, AbstractSubCode.class))
+        doReturn(Sets.newHashSet(MissingMoleCode.class, RoverCode.class, UnlabeledUAVCode.class, PrivateSubCode.class, AbstractRoverCode.class))
                 .when(reflectionsMock).getSubTypesOf(PlatformAutonomousCodeModel.class);
-        doReturn(Sets.newHashSet(MissingMoleCode.class, PrivateRoverCode.class, IncorrectlyLabeledCode.class, SubCode.class, AbstractSubCode.class))
+        doReturn(Sets.newHashSet(MissingMoleCode.class, PrivateSubCode.class, IncorrectlyLabeledCode.class, RoverCode.class, AbstractRoverCode.class))
                 .when(reflectionsMock).getTypesAnnotatedWith(AutonomousCodeModel.class);
         fillAutoModels.invoke(null, reflectionsMock);
     }
@@ -167,7 +192,7 @@ public class PlatformRegistryTest {
     @Test
     public void testCode_addsComplete() throws InvocationTargetException, IllegalAccessException {
         setupFillAutoModels();
-        assert autoModels.get("Sub").containsValue(SubCode.class.getName());
+        assert autoModels.get("Rover").containsValue(RoverCode.class.getName());
     }
 
     @Test
@@ -185,7 +210,7 @@ public class PlatformRegistryTest {
     @Test
     public void testCode_checkCanCreate() throws InvocationTargetException, IllegalAccessException {
         setupFillAutoModels();
-        assert !autoModels.get("Rover").containsValue(PrivateRoverCode.class.getName());
+        assert !autoModels.get("Rover").containsValue(PrivateSubCode.class.getName());
     }
 
     @Test
@@ -197,13 +222,13 @@ public class PlatformRegistryTest {
     @Test
     public void testCode_checkIsAbstract() throws InvocationTargetException, IllegalAccessException {
         setupFillAutoModels();
-        assert !autoModels.get("Sub").containsValue(AbstractSubCode.class.getName());
+        assert !autoModels.get("Sub").containsValue(AbstractRoverCode.class.getName());
     }
 
     @Test
     public void testCode_importsParams() throws InvocationTargetException, IllegalAccessException {
         setupFillAutoModels();
-        Assert.assertArrayEquals(new String[]{ "param1", "param2" }, autoModelParameters.get("Sub").get("Test Sub"));
+        Assert.assertArrayEquals(new String[]{ "param1", "param2" }, autoModelParameters.get("Rover").get("Test Rover"));
     }
 
 //  PHYSICS MODELS -----------------------------------------------------------------------------------------------------
@@ -212,9 +237,9 @@ public class PlatformRegistryTest {
         platforms.put("Sub", "SubPlatform");
         platforms.put("UAV", "UAVPlatform");
         platforms.put("Horse", "Not");
-        doReturn(Sets.newHashSet(AbstractUAVPhysics.class, ProtectedSubPhysics.class, UAVPhysics.class, MissingMolePhysics.class, UnlabeledRoverPhysics.class))
+        doReturn(Sets.newHashSet(AbstractRoverPhysics.class, ProtectedSubPhysics.class, RoverPhysics.class, MissingMolePhysics.class, UnlabeledUAVPhysics.class))
                 .when(reflectionsMock).getSubTypesOf(PlatformPhysicsModel.class);
-        doReturn(Sets.newHashSet(ProtectedSubPhysics.class, UAVPhysics.class, AbstractUAVPhysics.class, IncorrectlyLabeledPhysics.class, MissingMolePhysics.class))
+        doReturn(Sets.newHashSet(ProtectedSubPhysics.class, RoverPhysics.class, AbstractRoverPhysics.class, IncorrectlyLabeledPhysics.class, MissingMolePhysics.class))
                 .when(reflectionsMock).getTypesAnnotatedWith(PhysicsModel.class);
         fillPhysicsModels.invoke(null, reflectionsMock);
     }
@@ -222,13 +247,13 @@ public class PlatformRegistryTest {
     @Test
     public void testPhysics_addsComplete() throws InvocationTargetException, IllegalAccessException {
         setupFillPhysicsModels();
-        assert physicsModels.get("UAV").containsValue(UAVPhysics.class.getName());
+        assert physicsModels.get("Rover").containsValue(RoverPhysics.class.getName());
     }
 
     @Test
     public void testPhysics_checkHasLabel() throws InvocationTargetException, IllegalAccessException {
         setupFillPhysicsModels();
-        assert !physicsModels.get("Rover").containsValue(UnlabeledRoverPhysics.class.getName());
+        assert !physicsModels.get("Rover").containsValue(UnlabeledUAVPhysics.class.getName());
     }
 
     @Test
@@ -252,13 +277,93 @@ public class PlatformRegistryTest {
     @Test
     public void testPhysics_checkIsAbstract() throws InvocationTargetException, IllegalAccessException {
         setupFillPhysicsModels();
-        assert !physicsModels.get("UAV").containsValue(AbstractUAVPhysics.class.getName());
+        assert !physicsModels.get("UAV").containsValue(AbstractRoverPhysics.class.getName());
     }
 
     @Test
     public void testPhysics_importsParams() throws InvocationTargetException, IllegalAccessException {
         setupFillPhysicsModels();
-        Assert.assertArrayEquals(new String[] {"paramA", "paramB"}, physicsModelParameters.get("UAV").get("Test UAV"));
+        Assert.assertArrayEquals(new String[] {"paramA", "paramB"}, physicsModelParameters.get("Rover").get("Test Rover"));
+    }
+
+//  GETTERS ------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void testListPlatforms(){
+        setupFill();
+        Assert.assertEquals(Arrays.asList("Rover"), PlatformRegistry.getTypes());
+    }
+
+    @Test
+    public void testListCode(){
+        setupFill();
+        Assert.assertEquals(Arrays.asList("Test Rover"), PlatformRegistry.listAutonomousCodeModels("Rover"));
+    }
+
+    @Test
+    public void testListPhysics(){
+        setupFill();
+        Assert.assertEquals(Arrays.asList("Test Rover"), PlatformRegistry.listPhysicsModels("Rover"));
+    }
+
+    @Test
+    public void testUnknownType(){
+        setupFill();
+        Assert.assertEquals(null, PlatformRegistry.getPlatform("Sub"));
+    }
+
+    @Test
+    public void testUnknownState(){
+        setupFill();
+        Assert.assertEquals(null, PlatformRegistry.getPlatformState("Sub"));
+    }
+
+    @Test
+    public void testUnknownCodeType(){
+        setupFill();
+        Assert.assertEquals(null, PlatformRegistry.getAutonomousCodeModel("Sub", "Test Sub"));
+    }
+
+    @Test
+    public void testUnknownCodeName(){
+        setupFill();
+        Assert.assertEquals(null, PlatformRegistry.getAutonomousCodeModel("Rover", "GORADRO"));
+    }
+
+    @Test
+    public void testUnknownPhysicsType(){
+        setupFill();
+        Assert.assertEquals(null, PlatformRegistry.getPhysicsModel("Sub", "Test Sub"));
+    }
+
+    @Test
+    public void testUnknwonPhysicsName(){
+        setupFill();
+        Assert.assertEquals(null, PlatformRegistry.getPhysicsModel("Rover", "RAIR"));
+    }
+
+    @Test
+    public void testUnknownCodeParamType(){
+        setupFill();
+        Assert.assertEquals(null, PlatformRegistry.getParametersForAutonomousCodeModel("Sub", "Test Sub"));
+    }
+
+    @Test
+    public void testUnknownCodeParamsName(){
+        setupFill();
+        Assert.assertEquals(null, PlatformRegistry.getParametersForAutonomousCodeModel("Rover", "GORADRO"));
+    }
+
+    @Test
+    public void testUnknownPhysicsParamsType(){
+        setupFill();
+        Assert.assertEquals(null, PlatformRegistry.getParametersForPhysicsModel("Sub", "Test Sub"));
+    }
+
+    @Test
+    public void testUnknwonPhysicsParamName(){
+        setupFill();
+        Assert.assertEquals(null, PlatformRegistry.getParametersForPhysicsModel("Rover", "RAIR"));
     }
 
 }

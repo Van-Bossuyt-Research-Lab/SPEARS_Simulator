@@ -6,10 +6,10 @@ import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 
 import java.util.Map;
 
-@AutonomousCodeModel(type = "Rover", name = "Test Rov", parameters = {"param1"})
-public class PrivateRoverCode extends PlatformAutonomousCodeModel {
+@AutonomousCodeModel(type = "Rover", name = "Generic", parameters = {})
+public abstract class AbstractRoverCode extends PlatformAutonomousCodeModel {
 
-    protected PrivateRoverCode() {
+    protected AbstractRoverCode() {
         super("Rover");
     }
 
@@ -22,5 +22,4 @@ public class PrivateRoverCode extends PlatformAutonomousCodeModel {
     public String nextCommand(long milliTime, PlatformState state) {
         return null;
     }
-
 }

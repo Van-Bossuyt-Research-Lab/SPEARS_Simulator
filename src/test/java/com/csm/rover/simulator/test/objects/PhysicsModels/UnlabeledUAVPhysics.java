@@ -5,9 +5,9 @@ import com.csm.rover.simulator.platforms.PlatformState;
 
 import java.util.Map;
 
-public class UnlabeledRoverPhysics extends PlatformPhysicsModel {
-    public UnlabeledRoverPhysics() {
-        super("Rover");
+public class UnlabeledUAVPhysics extends PlatformPhysicsModel {
+    public UnlabeledUAVPhysics() {
+        super("UAV");
     }
 
     @Override

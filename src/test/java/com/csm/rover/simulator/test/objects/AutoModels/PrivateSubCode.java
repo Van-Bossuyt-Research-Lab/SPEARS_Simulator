@@ -1,15 +1,16 @@
 package com.csm.rover.simulator.test.objects.AutoModels;
 
+import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 
 import java.util.Map;
 
-@AutonomousCodeModel(type = "Sub", name = "Test Sub", parameters = {"param1", "param2"})
-public class SubCode extends AbstractSubCode {
+@AutonomousCodeModel(type = "Sub", name = "Test Sub", parameters = {"param1"})
+public class PrivateSubCode extends PlatformAutonomousCodeModel {
 
-    public SubCode(){
-
+    protected PrivateSubCode() {
+        super("Sub");
     }
 
     @Override

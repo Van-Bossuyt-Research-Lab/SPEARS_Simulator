@@ -6,10 +6,10 @@ import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 
 import java.util.Map;
 
-@PhysicsModel(type = "UAV", name = "Generic", parameters = {})
-public abstract class AbstractUAVPhysics extends PlatformPhysicsModel {
+@PhysicsModel(type = "Rover", name = "Generic", parameters = {})
+public abstract class AbstractRoverPhysics extends PlatformPhysicsModel {
 
-    protected AbstractUAVPhysics() {
+    protected AbstractRoverPhysics() {
         super("UAV");
     }
 
