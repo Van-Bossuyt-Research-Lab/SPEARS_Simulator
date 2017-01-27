@@ -299,6 +299,25 @@ public class subPhysicsModel extends PlatformPhysicsModel {
                         density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[B] * (prop_speed_transform * prop_speed[B] - normal_speed);
                 return (axial_force*Math.sin(pitch) + normal_force*Math.cos(pitch)*Math.cos(roll) + environment.getGravity()*total_volume*density - environment.getGravity()*total_mass) / total_mass;
            };
+    private final RK4.RK4Function torqueSumFnP =
+            //others: speed[Y, Z], density, prop_speed[F, B, L, R], orientation[P, W, R]
+            (double t, double speedX, double... others) -> {
+                double speedY = others[0], speedZ = others[1];
+                double density = others[2];
+                double[] prop_speed = new double[] { others[3], others[4], others[5], others[6] };
+                double pitch = others[7], yaw = others[8], roll = others[9];
+                double axial_speed = speedX*Math.cos(pitch)*Math.cos(yaw) +
+                        speedY*Math.cos(pitch)*Math.sin(yaw) +
+                        speedZ*Math.sin(pitch);
+                double normal_speed = -speedX*(Math.sin(yaw)*Math.sin(roll) + Math.cos(yaw)*Math.cos(roll)*Math.sin(pitch)) +
+                        speedY*(Math.cos(yaw)*Math.sin(roll) - Math.cos(roll)*Math.sin(yaw)*Math.sin(pitch)) +
+                        speedZ*Math.cos(pitch)*Math.cos(roll);
+                double axial_force = density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[L] * (prop_speed_transform * prop_speed[L] - axial_speed) +
+                        density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[R] * (prop_speed_transform * prop_speed[R] - axial_speed);
+                double normal_force =  density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[F] * (prop_speed_transform * prop_speed[F] - normal_speed) +
+                        density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[B] * (prop_speed_transform * prop_speed[B] - normal_speed);
+                return (axial_force*Math.cos(pitch)*Math.cos(yaw) + normal_force*(-Math.sin(yaw)*Math.sin(roll) - Math.cos(yaw)*Math.cos(roll)*Math.sin(pitch))) / total_mass;
+            };
 
 	@Override
 	public void updatePhysics() {
@@ -328,7 +347,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
                 orientation[0], orientation[1], orientation[2]);
 
         // Orientation changes based on Torques
-        double wP = ;
+        double wP = RK4.advance() ;
         double wW = ;
         double wR = ;
 
