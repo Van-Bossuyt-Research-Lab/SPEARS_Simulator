@@ -87,7 +87,12 @@ public class PlatformState {
     public final <T> void set(String param, T val){
         checkReadOnly();
         Class<?> type = val.getClass();
-        checkParam(param, type);
+        try {
+            checkParam(param, type);
+        }
+        catch (ClassCastException e){
+            throw new IllegalArgumentException("Unexpected value \'" + val + "\' for parameter " + param, e);
+        }
         if (type == Double.class){
             double_values.put(param, (Double)val);
         }
@@ -186,7 +191,7 @@ public class PlatformState {
     private void checkParam(String param, Class<?> type){
         checkParam(param);
         if (parameters.get(param) != type){
-            throw new IllegalArgumentException(String.format("The parameter %s of type %s not %s", param, parameters.get(param).toString(), type.toString()));
+            throw new ClassCastException("The parameter " + param + " is of type " + parameters.get(param).toString() + " not " + type.toString());
         }
     }
 

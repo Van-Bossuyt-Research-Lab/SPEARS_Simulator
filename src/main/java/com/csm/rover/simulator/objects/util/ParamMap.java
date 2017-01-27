@@ -28,7 +28,7 @@ public class ParamMap {
         }
 
         public Map<String, Double> build(){
-            return Collections.unmodifiableMap(map);
+            return map;
         }
 
     }

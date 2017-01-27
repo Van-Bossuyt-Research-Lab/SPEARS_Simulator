@@ -8,6 +8,8 @@ import com.csm.rover.simulator.platforms.sub.physicsModels.subPhysicsModel;
 import com.csm.rover.simulator.platforms.sub.subAuto.SubAutonomousCode;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
+import javax.xml.bind.annotation.XmlElementDecl;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -99,8 +101,6 @@ public class SubObject extends Platform {
     private void excecuteCode() {
         try {
             //Globals.getInstance().writeToLogFile(this.name, Globals.getInstance().timeMillis + "\t" + physics.getLocation().getX() + "\t" + physics.getLocation().getY() + "\t" + Access.getMapHeightatPoint(physics.getLocation()) + "\t" + visitedScience.size()*10 + "\t" + physics.getBatteryCharge());
-            try {
-
 //                if (serialBuffers.RFAvailable(IDcode) > 1) { // if there is a message
 //                    delay(500);
 //                    char[] id = strcat((char) serialBuffers.ReadSerial(IDcode), (char) serialBuffers.ReadSerial(IDcode));
@@ -561,15 +561,10 @@ public class SubObject extends Platform {
 			 * motor1->run(RELEASE); motor2->run(RELEASE);
 			 * motor3->run(RELEASE); motor4->run(RELEASE); delay(1000); }
 			 */
-            } catch (Exception e) {
-                // something went wrong
-                System.out.println("Error in Sub Run Code");
-                e.printStackTrace();
-                //Globals.getInstance().reportError("SubCode", "runCode - code", e);
-            }
-        } catch (Exception f){
-            System.out.println("Something's bad");
-           // Globals.getInstance().reportError("SubCode", "runCode - code", f);
+        }
+        catch (Exception e){
+            LOG.log(Level.ERROR, "Problem in SubCode for " + name, e);
+            Globals.getInstance().killThread(Thread.currentThread().getName());
         }
     }
 

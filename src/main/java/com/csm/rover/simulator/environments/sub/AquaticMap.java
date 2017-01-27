@@ -93,19 +93,10 @@ public class AquaticMap extends EnvironmentMap {
     }
 
     private Point3D getMapSquare(DecimalPoint3D loc) { // says which display square a given coordinate falls in
-        int shift = SubMap.getWidth() / (detail * 2);
-        double x = loc.getX();
-        double y = loc.getY();
-        double z = loc.getZ();
-        int outx = (int) (x * detail);
-        int outy = (int) (y * detail);
-        int outz = (int) (z * detail);
-        return new Point3D(x, y, z);
-    }
-
-    private Point3D getGridSquare(DecimalPoint3D loc) {
-        Point3D square = getMapSquare(loc);
-        return new Point3D(square.getX() / 3, square.getY() / 3, square.getZ()/3);
+        int outx = (int) (loc.getX() * detail);
+        int outy = (int) (loc.getY() * detail);
+        int outz = (int) (loc.getZ() * detail);
+        return new Point3D(outx, outy, outz);
     }
 
     public double getValueAt(DecimalPoint3D loc){
@@ -116,19 +107,20 @@ public class AquaticMap extends EnvironmentMap {
         double locx = (loc.getX()-(int)loc.getX()) * detail;
         double locy = (loc.getY()-(int)loc.getY()) * detail;
         double locz = (loc.getZ()-(int)loc.getZ()) * detail;
-        return SubMap.get(x,y,z);
+        return getIntermediateValue(SubMap.get(x, y, z), SubMap.get(x, y, z+1), SubMap.get(x, y+1, z), SubMap.get(x+1, y, z),
+                SubMap.get(x, y+1, z+1), SubMap.get(x+1, y+1, z), SubMap.get(x+1, y, z+1), SubMap.get(x+1, y+1, z+1),
+                locx, locy, locz);
     }
 
-    private double getIntermediateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey, double relativez){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
-        if (relativex > relativey){ //top right triangle
-            return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
-        }
-        else if (relativex < relativey){ //bottom left triangle
-            return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey + topleft;
-        }
-        else { //center line
-            return ((bottomright - topleft) * relativex + topleft);
-        }
+    private double getIntermediateValue(double point000, double point001, double point010, double point100,
+                                        double point011, double point110, double point101, double point111,
+                                        double x, double y, double z){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
+        return point000*(1-x)*(1-y)*(1-z) + point001*(1-x)*(1-y)*z + point010*(1-x)*y*(1-z) + point100*x*(1-y)*(1-z) +
+                point011*(1-x)*y*z + point110*x*y*(1-z) + point101*x*(1-y)*z + point111*x*y*z;
+    }
+
+    private double calcArm(double x, double y, double z){
+        return Math.sqrt(x*x + y*y + z*z);
     }
 
     public int getSize() {

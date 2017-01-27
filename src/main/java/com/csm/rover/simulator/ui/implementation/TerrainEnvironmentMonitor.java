@@ -218,17 +218,17 @@ class TerrainMapDisplay extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         try {
-            int xstart = (-this.getLocation().x / squareResolution - 1);
-            int xend = xstart + (this.getParent().getWidth() / squareResolution + 3);
+            int xstart = (-this.getLocation().x / squareResolution - 2);
+            int xend = xstart + (this.getParent().getWidth() / squareResolution + 4);
             if (xstart < 0){
                 xstart = 0;
             }
             if (xend > terrainMap.getSize()){
                 xend = terrainMap.getSize();
             }
-            int ystart = (-this.getLocation().y / squareResolution - 1);
+            int ystart = (-this.getLocation().y / squareResolution - 2);
             int yend = ystart + (this.getParent().getHeight() / squareResolution + 4);
-            if (ystart < 0){
+            if (ystart <= 0){
                 ystart = 0;
             }
             if (yend > terrainMap.getSize()){
@@ -238,7 +238,7 @@ class TerrainMapDisplay extends JPanel {
             for (int y = ystart; y < yend; y++){
                 for (int x = xstart; x < xend; x++){
                     try {
-                        DecimalPoint loc = new DecimalPoint(x + 0.5, y + 0.5);
+                        DecimalPoint loc = new DecimalPoint(x - terrainMap.getSize()/2 + 0.5, terrainMap.getSize()/2 - (y+1) + 0.5);
                         Color color = null;
                         for (String pop : viewPopulators.keySet()) {
                             if (viewPopulators.get(pop) && color == null) {
@@ -386,7 +386,7 @@ class RoverIcon extends JPanel {
     }
 
     private void setLocationOnMap(int x, int y){
-        super.setBounds((x - this.getWidth()/2), (y - this.getHeight()/2-nameTitle.getHeight()), this.getWidth(), this.getHeight());
+        super.setBounds((this.getParent().getWidth()/2 + x - this.getWidth()/2), (this.getParent().getHeight()/2 - y - this.getHeight()/2-nameTitle.getHeight()), this.getWidth(), this.getHeight());
     }
 
     private ImageIcon resize(Icon image, int width, int height) throws Exception {
