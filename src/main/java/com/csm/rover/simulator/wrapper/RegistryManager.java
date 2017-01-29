@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.wrapper;
 
 import com.csm.rover.simulator.environments.EnvironmentRegistry;
+import com.csm.rover.simulator.objects.CoverageIgnore;
 import com.csm.rover.simulator.platforms.PlatformRegistry;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -8,15 +9,24 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
+/**
+ * A class that initiates both the {@link com.csm.rover.simulator.platforms.PlatformRegistry Platform} and
+ * {@link com.csm.rover.simulator.environments.EnvironmentRegistry Environment} registries to load and checks them
+ * for consistency.  Reports findings to log.
+ */
 public class RegistryManager {
     private static final Logger LOG = LogManager.getLogger(RegistryManager.class);
 
+    /**
+     * Initiates both registries to load and prints comparison to log.
+     */
     static void checkRegistries(){
         PlatformRegistry.fillRegistry();
         EnvironmentRegistry.fillRegistry();
         compareRegistries();
     }
 
+    @CoverageIgnore //just prints things
     private static void compareRegistries() {
         List<String> platformTypes = PlatformRegistry.getTypes();
         List<String> environmentTypes = EnvironmentRegistry.getTypes();
