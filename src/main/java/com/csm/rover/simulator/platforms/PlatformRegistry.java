@@ -12,6 +12,10 @@ import org.reflections.Reflections;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+/**
+ * Registry pattern class that uses class structure and annotations to identify critical classes and dynamically makes
+ * them available to the user.
+ */
 public class PlatformRegistry {
     @CoverageIgnore
     private static final Logger LOG = LogManager.getLogger(PlatformRegistry.class);
@@ -231,10 +235,10 @@ public class PlatformRegistry {
         }
         for (String type : physicsModels.keySet()){
             if (physicsModels.get(type).size() == 0){
-                LOG.log(Level.WARN, "Found no PhysicsModels for platform type {}", type);
+                LOG.log(Level.WARN, "Found no physicsModels for platform type {}", type);
             }
             else {
-                LOG.log(Level.INFO, "For platform type {} found PhysicsModels: {}", type, physicsModels.get(type).toString());
+                LOG.log(Level.INFO, "For platform type {} found physicsModels: {}", type, physicsModels.get(type).toString());
             }
         }
     }

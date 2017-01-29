@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.test.objects.PhysicsModels;
+package com.csm.rover.simulator.test.objects.physicsModels;
 
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 

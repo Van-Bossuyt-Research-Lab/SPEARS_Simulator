@@ -10,19 +10,15 @@ import org.reflections.Reflections;
 
 import java.util.*;
 
+/**
+ * Registry pattern class that uses class structure and annotations to identify critical classes and dynamically makes
+ * them available to the user.
+ */
 public class EnvironmentRegistry {
 
     private static final Logger LOG = LogManager.getLogger(EnvironmentRegistry.class);
 
-    static {
-        environments = new TreeMap<>();
-        maps = new TreeMap<>();
-        modifiers = new TreeMap<>();
-        modifierParameters = new TreeMap<>();
-        populators = new TreeMap<>();
-        populatorParameters = new TreeMap<>();
-        fillRegistry();
-    }
+    private static Reflections reflect = new Reflections("com.csm.rover.simulator.environments");
 
     private static Map<String, String> environments;
     private static Map<String, String> maps;
@@ -33,9 +29,19 @@ public class EnvironmentRegistry {
     private static Map<String, Map<String, String>> populators;
     private static Map<String, Map<String, String[]>> populatorParameters;
 
-    private static void fillRegistry(){
+    /**
+     * Initiates a reflection-based scan of the package com.csm.rover.simulator.platforms to look for implementations
+     * of Environments and their supporting classes.
+     */
+    public static void fillRegistry(){
+        environments = new TreeMap<>();
+        maps = new TreeMap<>();
+        modifiers = new TreeMap<>();
+        modifierParameters = new TreeMap<>();
+        populators = new TreeMap<>();
+        populatorParameters = new TreeMap<>();
+
         LOG.log(Level.INFO, "Initializing Environment Registry");
-        Reflections reflect = new Reflections("com.csm.rover.simulator.environments");
 
         fillEnvironments(reflect);
         fillMaps(reflect);
@@ -99,12 +105,16 @@ public class EnvironmentRegistry {
         Set<Class<? extends EnvironmentMap>> realmaps = (Set<Class<? extends EnvironmentMap>>)sortedSets.get(1);
         for (Class<? extends EnvironmentMap> map : realmaps){
             String type = map.getAnnotation(com.csm.rover.simulator.environments.annotations.Map.class).type();
-            try {
-                map.newInstance();
-                maps.put(type, getClassPath(map));
+            if (environments.containsKey(type)) {
+                try {
+                    map.newInstance();
+                    maps.put(type, getClassPath(map));
+                } catch (InstantiationException | IllegalAccessException e) {
+                    LOG.log(Level.WARN, "{} does not have a default constructor", map.toString());
+                }
             }
-            catch (InstantiationException | IllegalAccessException e) {
-                LOG.log(Level.WARN, "{} does not have a default constructor", map.toString());
+            else {
+                LOG.log(Level.WARN, "Map {} has type {} which is not a recognized platform", map.getName(), type);
             }
         }
         if (maps.size() == 0){
@@ -117,8 +127,8 @@ public class EnvironmentRegistry {
 
     private static void fillModifiers(Reflections reflect){
         for (String type : environments.keySet()){
-            modifiers.put(type, new TreeMap<String, String>());
-            modifierParameters.put(type, new TreeMap<String, String[]>());
+            modifiers.put(type, new TreeMap<>());
+            modifierParameters.put(type, new TreeMap<>());
         }
 
         Set<Class<? extends EnvironmentModifier>> classmods = reflect.getSubTypesOf(EnvironmentModifier.class);
@@ -169,8 +179,8 @@ public class EnvironmentRegistry {
 
     private static void fillPopulators(Reflections reflect){
         for (String type : environments.keySet()){
-            populators.put(type, new TreeMap<String, String>());
-            populatorParameters.put(type, new TreeMap<String, String[]>());
+            populators.put(type, new TreeMap<>());
+            populatorParameters.put(type, new TreeMap<>());
         }
 
         Set<Class<? extends EnvironmentPopulator>> classpops = reflect.getSubTypesOf(EnvironmentPopulator.class);
@@ -219,10 +229,21 @@ public class EnvironmentRegistry {
         }
     }
 
+    /**
+     * Returns a list of all Environment types.
+     *
+     * @return {@link java.util.List} of type names
+     */
     public static List<String> getTypes(){
         return new ArrayList<>(environments.keySet());
     }
 
+    /**
+     * Returns the class of the environment type requested or null if the type is unknown.
+     *
+     * @param type The type name
+     * @return {@link java.lang.Class} extends {@link com.csm.rover.simulator.environments.PlatformEnvironment PlatformEnvironment}
+     */
     @SuppressWarnings("unchecked")
     public static Class<? extends PlatformEnvironment> getEnvironment(String type){
         if (environments.keySet().contains(type)){
@@ -240,6 +261,12 @@ public class EnvironmentRegistry {
         }
     }
 
+    /**
+     * Returns the class of the Map corresponding to the type requested or null if the type is unknown.
+     *
+     * @param type The desired type name
+     * @return {@link java.lang.Class} extends {@link com.csm.rover.simulator.environments.EnvironmentMap EnvironmentMap}
+     */
     @SuppressWarnings("unchecked")
     public static Class<? extends EnvironmentMap> getMap(String type){
         if (maps.keySet().contains(type)){
@@ -257,6 +284,14 @@ public class EnvironmentRegistry {
         }
     }
 
+    /**
+     * Returns the class of the Modifier corresponding to the provided type and name.  If the type is unknown, or there
+     * isn't a modifier of the given name for the given type, returns null.
+     *
+     * @param type The type name
+     * @param name The modifier name
+     * @return {@link java.lang.Class} extends {@link com.csm.rover.simulator.environments.EnvironmentModifier EnvironmentModifier}
+     */
     @SuppressWarnings("unchecked")
     public static Class<? extends EnvironmentModifier> getModifier(String type, String name){
         if (environments.keySet().contains(type)){
@@ -281,6 +316,14 @@ public class EnvironmentRegistry {
         }
     }
 
+    /**
+     * Returns the class of the Populator corresponding to the provided type and name.  If the type is unknown, or there
+     * isn't a populator of the given name for the given type, returns null.
+     *
+     * @param type The type name
+     * @param name The populator name
+     * @return {@link java.lang.Class} extends {@link com.csm.rover.simulator.environments.EnvironmentPopulator EnvironmentPopulator}
+     */
     @SuppressWarnings("unchecked")
     public static Class<? extends EnvironmentPopulator> getPopulator(String type, String name){
         if (environments.keySet().contains(type)){
@@ -305,6 +348,13 @@ public class EnvironmentRegistry {
         }
     }
 
+    /**
+     * Returns a list of names for all known populators registered to the given type.  If the type name is unknown
+     * returns null.
+     *
+     * @param type The type name
+     * @return {@link java.util.List} of model names
+     */
     public static List<String> listPopulators(String type){
         if (populators.keySet().contains(type)){
             return new ArrayList<>(populators.get(type).keySet());
@@ -315,6 +365,13 @@ public class EnvironmentRegistry {
         }
     }
 
+    /**
+     * Returns a list of names for all known modifiers registered to the given type.  If the type name is unknown
+     * returns null.
+     *
+     * @param type The type name
+     * @return {@link java.util.List} of model names
+     */
     public static List<String> listModifiers(String type){
         if (modifiers.keySet().contains(type)){
             return new ArrayList<>(modifiers.get(type).keySet());
@@ -325,6 +382,15 @@ public class EnvironmentRegistry {
         }
     }
 
+    /**
+     * Returns of list of the parameters the requested modifier expects when
+     * {@link com.csm.rover.simulator.environments.EnvironmentModifier#modify(EnvironmentMap, Map) modify(map, params)}
+     * is called.  If either the platform type name or the model name are unknown returns null.
+     *
+     * @param type The type name
+     * @param name The name of the modifier
+     * @return {@link java.util.List} of parameter names
+     */
     public static List<String> getParametersForModifier(String type, String name){
         if (modifierParameters.keySet().contains(type)){
             if (modifierParameters.get(type).keySet().contains(name)){
@@ -341,6 +407,15 @@ public class EnvironmentRegistry {
         }
     }
 
+    /**
+     * Returns of list of the parameters the requested populator expects when
+     * {@link com.csm.rover.simulator.environments.EnvironmentPopulator#build(EnvironmentMap, Map)}  build(map, params)}
+     * is called.  If either the platform type name or the model name are unknown returns null.
+     *
+     * @param type The type name
+     * @param name The name of the populator
+     * @return {@link java.util.List} of parameter names
+     */
     public static List<String> getParametersForPopulator(String type, String name){
         if (populatorParameters.keySet().contains(type)){
             if (populatorParameters.get(type).keySet().contains(name)){

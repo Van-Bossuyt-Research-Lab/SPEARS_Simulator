@@ -11,8 +11,9 @@ import java.util.List;
 public class RegistryManager {
     private static final Logger LOG = LogManager.getLogger(RegistryManager.class);
 
-    public static void checkRegistries(){
+    static void checkRegistries(){
         PlatformRegistry.fillRegistry();
+        EnvironmentRegistry.fillRegistry();
         compareRegistries();
     }
 

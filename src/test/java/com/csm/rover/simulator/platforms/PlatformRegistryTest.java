@@ -3,11 +3,10 @@ package com.csm.rover.simulator.platforms;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import com.csm.rover.simulator.platforms.annotations.State;
-import com.csm.rover.simulator.test.objects.AutoModels.*;
-import com.csm.rover.simulator.test.objects.PhysicsModels.*;
+import com.csm.rover.simulator.test.objects.autoModels.*;
+import com.csm.rover.simulator.test.objects.physicsModels.*;
 import com.csm.rover.simulator.test.objects.platforms.*;
 import com.csm.rover.simulator.test.objects.states.*;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Sets;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,7 +36,7 @@ public class PlatformRegistryTest {
             fillStates.setAccessible(true);
             fillAutoModels = PlatformRegistry.class.getDeclaredMethod("fillAutoModels", Reflections.class);
             fillAutoModels.setAccessible(true);
-            fillPhysicsModels= PlatformRegistry.class.getDeclaredMethod("fillPhysicsModels", Reflections.class);
+            fillPhysicsModels = PlatformRegistry.class.getDeclaredMethod("fillPhysicsModels", Reflections.class);
             fillPhysicsModels.setAccessible(true);
         }
         catch (NoSuchMethodException e) {
@@ -337,7 +336,7 @@ public class PlatformRegistryTest {
     }
 
     @Test
-    public void testUnknwonPhysicsName(){
+    public void testUnknownPhysicsName(){
         setupFill();
         Assert.assertEquals(null, PlatformRegistry.getPhysicsModel("Rover", "RAIR"));
     }
@@ -361,7 +360,7 @@ public class PlatformRegistryTest {
     }
 
     @Test
-    public void testUnknwonPhysicsParamName(){
+    public void testUnknownPhysicsParamName(){
         setupFill();
         Assert.assertEquals(null, PlatformRegistry.getParametersForPhysicsModel("Rover", "RAIR"));
     }
