@@ -41,12 +41,82 @@ public class RecursiveGridListTest {
     }
 
     @Test
-    public void gridListDeserializationTest(){
+    public void gridListFloatSerialization(){
+        RecursiveGridList<Float> gridList = RecursiveGridList.newGridList(Float.class, 2);
+        gridList.put(5f, 3, 9);
+        gridList.put(3.21f, 0, 2);
+
+        try {
+            String json = mapper.writeValueAsString(gridList);
+            System.out.println(json);
+            RecursiveGridList<Object> gridList2 = mapper.readValue(json, RecursiveGridList.class);
+
+            assertEquals(gridList, gridList2);
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+            fail();
+        }
+    }
+
+    @Test
+    public void gridListDeserializationTest_String(){
         RecursiveGridList<String> expected = RecursiveGridList.newGridList(String.class, 2);
         expected.put("hello", 3, 9);
         expected.put("bye", 0, 2);
 
         String json = "{\"layers\":2,\"values\":[{\"coordinates\":[3,9],\"value\":\"hello\"},{\"coordinates\":[0,2],\"value\":\"bye\"}]}";
+        try {
+            RecursiveGridList<Object> gridList = mapper.readValue(json, RecursiveGridList.class);
+            assertEquals(expected, gridList);
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+            fail();
+        }
+    }
+
+    @Test
+    public void gridListDeserializationTest_Int(){
+        RecursiveGridList<Integer> expected = RecursiveGridList.newGridList(Integer.class, 2);
+        expected.put(6, 3, 9);
+        expected.put(-12, 0, 2);
+
+        String json = "{\"layers\":2,\"values\":[{\"coordinates\":[3,9],\"value\":6},{\"coordinates\":[0,2],\"value\":-12}]}";
+        try {
+            RecursiveGridList<Object> gridList = mapper.readValue(json, RecursiveGridList.class);
+            assertEquals(expected, gridList);
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+            fail();
+        }
+    }
+
+    @Test
+    public void gridListDeserializationTest_Double(){
+        RecursiveGridList<Double> expected = RecursiveGridList.newGridList(Double.class, 2);
+        expected.put(5.36, 3, 9);
+        expected.put(8., 0, 2);
+
+        String json = "{\"layers\":2,\"values\":[{\"coordinates\":[3,9],\"value\":5.36},{\"coordinates\":[0,2],\"value\":8.00}]}";
+        try {
+            RecursiveGridList<Object> gridList = mapper.readValue(json, RecursiveGridList.class);
+            assertEquals(expected, gridList);
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+            fail();
+        }
+    }
+
+    @Test
+    public void gridListDeserializationTest_Float(){
+        RecursiveGridList<Float> expected = RecursiveGridList.newGridList(Float.class, 2);
+        expected.put(-21f, 3, 9);
+        expected.put(4.09f, 0, 2);
+
+        String json = "{\"layers\":2,\"values\":[{\"coordinates\":[3,9],\"value\":-21.00},{\"coordinates\":[0,2],\"value\":4.09}]}";
         try {
             RecursiveGridList<Object> gridList = mapper.readValue(json, RecursiveGridList.class);
             assertEquals(expected, gridList);
