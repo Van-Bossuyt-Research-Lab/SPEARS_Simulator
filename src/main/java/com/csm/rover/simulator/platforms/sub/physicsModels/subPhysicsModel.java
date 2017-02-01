@@ -5,7 +5,6 @@ import com.csm.rover.simulator.environments.sub.AquaticEnvironment;
 import com.csm.rover.simulator.objects.RK4;
 import com.csm.rover.simulator.objects.SynchronousThread;
 import com.csm.rover.simulator.objects.util.DecimalPoint3D;
-import com.csm.rover.simulator.platforms.DriveCommandHandler;
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
@@ -66,7 +65,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 	protected double[] winding_temp = {7.22, 7.22, 7.22, 7.22}; //*c
 	protected double[] motor_temp = {7.22, 7.22, 7.22, 7.22}; //*c
 
-	protected DecimalPoint3D location = new DecimalPoint3D(0, 0, 0); //m x m from center of map
+	protected DecimalPoint3D location = new DecimalPoint3D(); //m x m from center of map
 	protected double[] orientation = {0, 0, 0}; //pitch, yaw, roll
     protected Double[] speed = {0., 0., 0.}; //m/s  x, y, z
 	protected Double[] angular_speed = {0., 0., 0.}; //rads/s  pitch, yaw, roll
@@ -172,7 +171,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 					updatePhysics();
 				}
 				catch (Exception e){
-					LOG.log(Level.ERROR, String.format("rover %s failed to execute", subName), e);
+					LOG.log(Level.ERROR, String.format("sub %s failed to execute", subName), e);
 					Globals.getInstance().killThread(Thread.currentThread().getName());
 				}
 			},
@@ -261,11 +260,11 @@ public class subPhysicsModel extends PlatformPhysicsModel {
                         density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[B] * (prop_speed_transform * prop_speed[B] - normal_speed);
                 return (axial_force*Math.sin(pitch) + normal_force*Math.cos(pitch)*Math.cos(roll) + environment.getGravity()*total_volume*density - environment.getGravity()*total_mass) / total_mass - Math.signum(speedZ)*sub_drag_coefficient*Math.pow(speedZ, 2)/2./total_mass;
            };
-<<<<<<< HEAD
+
     private final RK4.RK4Function torqueSumFnP =
-            //others: speed[Y, Z], density, prop_speed[F, B, L, R], orientation[P, W, R]
-            (double t, double speedX, double... others) -> {
-                double speedY = others[0], speedZ = others[1];
+            //others: speed[X, Y], density, prop_speed[F, B, L, R], orientation[P, W, R]
+            (double t, double speedZ, double... others) -> {
+                double speedX = others[0], speedY = others[1];
                 double density = others[2];
                 double[] prop_speed = new double[] { others[3], others[4], others[5], others[6] };
                 double pitch = others[7], yaw = others[8], roll = others[9];
@@ -277,51 +276,51 @@ public class subPhysicsModel extends PlatformPhysicsModel {
                         speedZ*Math.cos(pitch)*Math.cos(roll);
                 double axial_force = density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[L] * (prop_speed_transform * prop_speed[L] - axial_speed) +
                         density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[R] * (prop_speed_transform * prop_speed[R] - axial_speed);
-                double normal_force =  density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[F] * (prop_speed_transform * prop_speed[F] - normal_speed) +
+                double normal_force = density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[F] * (prop_speed_transform * prop_speed[F] - normal_speed) +
                         density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[B] * (prop_speed_transform * prop_speed[B] - normal_speed);
-                return (axial_force*Math.cos(pitch)*Math.cos(yaw) + normal_force*(-Math.sin(yaw)*Math.sin(roll) - Math.cos(yaw)*Math.cos(roll)*Math.sin(pitch))) / total_mass;
+                return (axial_force*Math.sin(pitch) + normal_force*Math.cos(pitch)*Math.cos(roll) + environment.getGravity()*total_volume*density - environment.getGravity()*total_mass) / total_mass - Math.signum(speedZ)*sub_drag_coefficient*Math.pow(speedZ, 2)/2./total_mass;
             };
-=======
-	private final RK4.RK4Function torqueSumFnR =
-			//others: pitch, yaw, roll, prop_speed[F, B, L, R], speed[X, Y, Z], density
-			(double t, double angular_roll, double... others) -> 0;
-	private final RK4.RK4Function torqueSumFnP =
-			//others: pitch, yaw, roll, prop_speed[F, B, L, R], speed[X, Y, Z], density
-			(double t, double angular_pitch, double... others) -> {
-				double pitch = others[0];
-				double yaw = others[1];
-				double roll = others[2];
-				double[] prop_speed = new double[] { others[3], others[4], others[5], others[6] };
-				double speedX = others[7];
-				double speedY = others[8];
-				double speedZ = others[9];
-				double density = others[10];
-				double normal_speed = -speedX*(Math.sin(yaw)*Math.sin(roll) + Math.cos(yaw)*Math.cos(roll)*Math.sin(pitch)) +
-						speedY*(Math.cos(yaw)*Math.sin(roll) - Math.cos(roll)*Math.sin(yaw)*Math.sin(pitch)) +
-						speedZ*Math.cos(pitch)*Math.cos(roll);
-				return (density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[F] * (prop_speed_transform * prop_speed[F] - normal_speed * motor_torque_arms[F]) -
-						density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[B] * (prop_speed_transform * prop_speed[B] - normal_speed * motor_torque_arms[B])) /
-						sub_inertia;
-			};
-	private final RK4.RK4Function torqueSumFnW =
-			//others: pitch, yaw, roll, prop_speed[F, B, L, R], speed[X, Y, Z], density
-			(double t, double angular_yaw, double... others) -> {
-				double pitch = others[0];
-				double yaw = others[1];
-				double roll = others[2];
-				double[] prop_speed = new double[] { others[3], others[4], others[5], others[6] };
-				double speedX = others[7];
-				double speedY = others[8];
-				double speedZ = others[9];
-				double density = others[10];
-				double axial_speed = speedX*Math.cos(pitch)*Math.cos(yaw) +
-						speedY*Math.cos(pitch)*Math.sin(yaw) +
-						speedZ*Math.sin(pitch);
-				return (density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[R] * (prop_speed_transform * prop_speed[R] - axial_speed) * motor_torque_arms[R] -
-						density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[L] * (prop_speed_transform * prop_speed[L] - axial_speed) * motor_torque_arms[L]) /
-						sub_inertia;
-			};
->>>>>>> origin/Sub_GUI
+
+    private final RK4.RK4Function torqueSumFnW =
+            //others: speed[X, Y], density, prop_speed[F, B, L, R], orientation[P, W, R]
+            (double t, double speedZ, double... others) -> {
+                double speedX = others[0], speedY = others[1];
+                double density = others[2];
+                double[] prop_speed = new double[] { others[3], others[4], others[5], others[6] };
+                double pitch = others[7], yaw = others[8], roll = others[9];
+                double axial_speed = speedX*Math.cos(pitch)*Math.cos(yaw) +
+                        speedY*Math.cos(pitch)*Math.sin(yaw) +
+                        speedZ*Math.sin(pitch);
+                double normal_speed = -speedX*(Math.sin(yaw)*Math.sin(roll) + Math.cos(yaw)*Math.cos(roll)*Math.sin(pitch)) +
+                        speedY*(Math.cos(yaw)*Math.sin(roll) - Math.cos(roll)*Math.sin(yaw)*Math.sin(pitch)) +
+                        speedZ*Math.cos(pitch)*Math.cos(roll);
+                double axial_force = density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[L] * (prop_speed_transform * prop_speed[L] - axial_speed) +
+                        density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[R] * (prop_speed_transform * prop_speed[R] - axial_speed);
+                double normal_force = density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[F] * (prop_speed_transform * prop_speed[F] - normal_speed) +
+                        density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[B] * (prop_speed_transform * prop_speed[B] - normal_speed);
+                return (axial_force*Math.sin(pitch) + normal_force*Math.cos(pitch)*Math.cos(roll) + environment.getGravity()*total_volume*density - environment.getGravity()*total_mass) / total_mass - Math.signum(speedZ)*sub_drag_coefficient*Math.pow(speedZ, 2)/2./total_mass;
+            };
+
+    private final RK4.RK4Function torqueSumFnR =
+            //others: speed[X, Y], density, prop_speed[F, B, L, R], orientation[P, W, R]
+            (double t, double speedZ, double... others) -> {
+                double speedX = others[0], speedY = others[1];
+                double density = others[2];
+                double[] prop_speed = new double[] { others[3], others[4], others[5], others[6] };
+                double pitch = others[7], yaw = others[8], roll = others[9];
+                double axial_speed = speedX*Math.cos(pitch)*Math.cos(yaw) +
+                        speedY*Math.cos(pitch)*Math.sin(yaw) +
+                        speedZ*Math.sin(pitch);
+                double normal_speed = -speedX*(Math.sin(yaw)*Math.sin(roll) + Math.cos(yaw)*Math.cos(roll)*Math.sin(pitch)) +
+                        speedY*(Math.cos(yaw)*Math.sin(roll) - Math.cos(roll)*Math.sin(yaw)*Math.sin(pitch)) +
+                        speedZ*Math.cos(pitch)*Math.cos(roll);
+                double axial_force = density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[L] * (prop_speed_transform * prop_speed[L] - axial_speed) +
+                        density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[R] * (prop_speed_transform * prop_speed[R] - axial_speed);
+                double normal_force = density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[F] * (prop_speed_transform * prop_speed[F] - normal_speed) +
+                        density * Math.PI * Math.pow(prop_radius, 2) * prop_speed_transform * prop_speed[B] * (prop_speed_transform * prop_speed[B] - normal_speed);
+                return (axial_force*Math.sin(pitch) + normal_force*Math.cos(pitch)*Math.cos(roll) + environment.getGravity()*total_volume*density - environment.getGravity()*total_mass) / total_mass - Math.signum(speedZ)*sub_drag_coefficient*Math.pow(speedZ, 2)/2./total_mass;
+            };
+
 
 	@Override
 	public void updatePhysics() {
@@ -350,12 +349,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
                 density, prop_speed[F], prop_speed[B], prop_speed[L], prop_speed[R],
                 orientation[0], orientation[1], orientation[2]);
 
-<<<<<<< HEAD
-        // Orientation changes based on Torques
-        double wP = RK4.advance() ;
-        double wW = ;
-        double wR = ;
-=======
+
         // Angular speed changes based on Torques
         double wP = RK4.advance(torqueSumFnP, time_step, 0, angular_speed[0], orientation[0], orientation[1], orientation[2], prop_speed[F],
 				prop_speed[B], prop_speed[L], prop_speed[R], speed[0], speed[1], speed[2], density);
@@ -363,7 +357,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 				prop_speed[B], prop_speed[L], prop_speed[R], speed[0], speed[1], speed[2], density);
         double wR = RK4.advance(torqueSumFnR, time_step, 0, angular_speed[0], orientation[0], orientation[1], orientation[2], prop_speed[F],
 				prop_speed[B], prop_speed[L], prop_speed[R], speed[0], speed[1], speed[2], density);
->>>>>>> origin/Sub_GUI
+
 
 		// Updating state variables
         speed = new Double[]{ vx, vy, vz };

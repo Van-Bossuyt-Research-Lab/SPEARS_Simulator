@@ -344,15 +344,15 @@ class AquaticSlicePanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         try {
-            int horzstart = (-this.getLocation().x / squareResolution - 1);
-            int horzend = horzstart + (this.getParent().getWidth() / squareResolution + 3);
+            int horzstart = (-this.getLocation().x / squareResolution - 2);
+            int horzend = horzstart + (this.getParent().getWidth() / squareResolution + 4);
             if (horzstart < 0){
                 horzstart = 0;
             }
             if (horzend > subMap.getSize()){
                 horzend = subMap.getSize();
             }
-            int vertstart = (-this.getLocation().y / squareResolution - 1);
+            int vertstart = (-this.getLocation().y / squareResolution - 2);
             int vertend = vertstart + (this.getParent().getHeight() / squareResolution + 4);
             if (vertstart < 0){
                 vertstart = 0;
@@ -395,7 +395,7 @@ class AquaticSlicePanel extends JPanel {
                 for (int x = xstart; x < xend; x++) {
                     for (int z = zstart; z < zend; z++) {
                         try {
-                            DecimalPoint3D loc = new DecimalPoint3D(x + 0.5, y + 0.5, z + 0.5);
+                            DecimalPoint3D loc = new DecimalPoint3D(x - subMap.getSize()/2 + 0.5, subMap.getSize()/2 -(y+1) + 0.5, subMap.getSize()/2 - (z+1) + 0.5);
                             Color color = null;
                             for (String pop : viewPopulators.keySet()) {
                                 if (viewPopulators.get(pop) && color == null) {

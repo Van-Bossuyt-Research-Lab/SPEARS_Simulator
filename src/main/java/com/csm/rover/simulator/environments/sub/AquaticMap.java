@@ -93,9 +93,9 @@ public class AquaticMap extends EnvironmentMap {
     }
 
     private Point3D getMapSquare(DecimalPoint3D loc) { // says which display square a given coordinate falls in
-        int outx = (int) (loc.getX() * detail);
-        int outy = (int) (loc.getY() * detail);
-        int outz = (int) (loc.getZ() * detail);
+        int outx = (int) (loc.getX() * detail) + SubMap.getWidth()/2;
+        int outy = (int) (loc.getY() * detail) + SubMap.getHeight()/2;
+        int outz = (int) (loc.getZ() * detail) + SubMap.getDepth()/2;
         return new Point3D(outx, outy, outz);
     }
 
@@ -104,9 +104,10 @@ public class AquaticMap extends EnvironmentMap {
         int x = (int) mapSquare.getX();
         int y = (int) mapSquare.getY();
         int z = (int) mapSquare.getZ();
-        double locx = (loc.getX()-(int)loc.getX()) * detail;
-        double locy = (loc.getY()-(int)loc.getY()) * detail;
-        double locz = (loc.getZ()-(int)loc.getZ()) * detail;
+        loc = new DecimalPoint3D(loc.getX()+getSize()/2.0,loc.getY()+getSize()/2.0,loc.getZ()+getSize()/2.0);
+        double locx = loc.getX()* detail-x;
+        double locy = loc.getY()* detail-y;
+        double locz = loc.getZ()* detail-z;
         return getIntermediateValue(SubMap.get(x, y, z), SubMap.get(x, y, z+1), SubMap.get(x, y+1, z), SubMap.get(x+1, y, z),
                 SubMap.get(x, y+1, z+1), SubMap.get(x+1, y+1, z), SubMap.get(x+1, y, z+1), SubMap.get(x+1, y+1, z+1),
                 locx, locy, locz);
