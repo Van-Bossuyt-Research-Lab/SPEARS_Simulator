@@ -8,7 +8,7 @@ import java.util.Map;
 public class UnlabeledWindMod extends EnvironmentModifier<UnlabeledSkyMap> {
 
     public UnlabeledWindMod() {
-        super("UAV");
+        super("UAV", true);
     }
 
     @Override
