@@ -168,16 +168,28 @@ class AquaticMapDisplay extends JPanel {
         JSlider slider = new JSlider();
         slider.setMinimum(0);
         slider.setMaximum(environment.getSize()-1);
-        slider.setValue(0);
         slider.setSnapToTicks(true);
         slider.setMajorTickSpacing(10);
         slider.setMinorTickSpacing(1);
         slider.addChangeListener((e) -> {
             JSlider source = (JSlider)e.getSource();
-            mapSlice.setSliceDepth(source.getValue());
+            setFocusPoint(new DecimalPoint3D(
+                    slice == Slice.X ? source.getValue() : focus.getX(),
+                    slice == Slice.Y ? source.getValue() : focus.getY(),
+                    slice == Slice.Z ? source.getValue() : focus.getZ()
+            ));
         });
         slider.setOpaque(false);
+        slider.getInputMap().put(KeyStroke.getKeyStroke("LEFT"), "pan left");
+        slider.getActionMap().put("pan left", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(panMovesMap.get(slice).get(SwingConstants.WEST)))));
+        slider.getInputMap().put(KeyStroke.getKeyStroke("RIGHT"), "pan right");
+        slider.getActionMap().put("pan right", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(panMovesMap.get(slice).get(SwingConstants.EAST)))));
+        slider.getInputMap().put(KeyStroke.getKeyStroke("UP"), "pan up");
+        slider.getActionMap().put("pan up", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(panMovesMap.get(slice).get(SwingConstants.NORTH)))));
+        slider.getInputMap().put(KeyStroke.getKeyStroke("DOWN"), "pan down");
+        slider.getActionMap().put("pan down", ActionBuilder.newAction(() -> setFocusPoint(focus.offset(panMovesMap.get(slice).get(SwingConstants.SOUTH)))));
         this.add(slider, BorderLayout.SOUTH);
+        slider.setValue(environment.getSize()/2);
 
         redraw();
     }
@@ -303,8 +315,6 @@ class AquaticMapDisplay extends JPanel {
             sub.updateZ(mapSlice.getResolution());
         }
     }
-
-
 }
 
 class AquaticSlicePanel extends JPanel {
@@ -400,7 +410,13 @@ class AquaticSlicePanel extends JPanel {
                             for (String pop : viewPopulators.keySet()) {
                                 if (viewPopulators.get(pop) && color == null) {
                                     double value = subMap.getPopulatorValue(pop, loc);
-                                    color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
+                                    if (value == 0){
+                                        color = null;
+                                    }
+                                    else {
+                                        color = popDisplays.get(pop).displayFunction(value);
+                                    }
+//                                    color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
                                 }
                             }
                             if (color == null) {
@@ -420,7 +436,7 @@ class AquaticSlicePanel extends JPanel {
                             if (fails > 10) {
                                 throw e;
                             } else {
-                                LOG.log(Level.WARN, "Failed to draw square [" + x + ", " + y + "]: " + e.getMessage());
+                                LOG.log(Level.WARN, "Failed to draw square [" + x + ", " + y + ", " + z +"]: " + e.getMessage());
                                 fails++;
                             }
                         }

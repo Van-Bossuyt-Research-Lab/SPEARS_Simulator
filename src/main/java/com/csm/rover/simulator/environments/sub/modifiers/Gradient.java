@@ -19,11 +19,11 @@ public class Gradient extends EnvironmentModifier<AquaticMap> {
     protected AquaticMap doModify(AquaticMap map, Map<String, Double> params) {
         int size = params.get("size").intValue();
         int detail = params.get("detail").intValue();
-        int true_size = size*detail;
-        float val= 1;
+        int true_size = size*detail + 1;
+        float val = 1;
 
         ArrayGrid3D<Float> densityMap = new FloatArrayArrayArrayGrid();
-        densityMap.fillToSize(true_size,true_size,true_size,val);
+        densityMap.fillToSize(true_size, true_size, true_size, val);
         for(int i=0; i<true_size; i++){
             for(int j=0; j<true_size; j++){
                 for(int k=0; k<true_size; k++){

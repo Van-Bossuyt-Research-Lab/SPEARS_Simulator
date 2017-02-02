@@ -44,9 +44,7 @@ public class AquaticMap extends EnvironmentMap {
     }
 
     private void checkSize() {
-        if (SubMap.getWidth() != size * detail || SubMap.getHeight() != size * detail) {
-            System.out.print(size*detail);
-            System.out.print(SubMap.getWidth());
+        if (SubMap.getWidth() != size*detail+1 || SubMap.getHeight() != size*detail+1) {
             throw new IllegalArgumentException("The map does not match the given sizes");
         }
     }
@@ -104,7 +102,7 @@ public class AquaticMap extends EnvironmentMap {
         int x = (int) mapSquare.getX();
         int y = (int) mapSquare.getY();
         int z = (int) mapSquare.getZ();
-        loc = new DecimalPoint3D(loc.getX()+getSize()/2.0,loc.getY()+getSize()/2.0,loc.getZ()+getSize()/2.0);
+        loc = new DecimalPoint3D(loc.getX()+getSize()/2.0, loc.getY()+getSize()/2.0, loc.getZ()+getSize()/2.0);
         double locx = loc.getX()* detail-x;
         double locy = loc.getY()* detail-y;
         double locz = loc.getZ()* detail-z;

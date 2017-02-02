@@ -21,6 +21,8 @@ public class AquaticTargetsPop extends EnvironmentPopulator {
         super("Sub", "Targets", 0);
     }
 
+    private final static int buffer = 5;
+
     @Override
     protected RecursiveGridList doBuild(EnvironmentMap map, Map<String, Double> params) {
         int size = ((AquaticMap)map).getSize();
@@ -28,9 +30,11 @@ public class AquaticTargetsPop extends EnvironmentPopulator {
         Random rnd = new Random();
         Set<DecimalPoint3D> points = new HashSet<>();
         while (points.size() < targetCount){
-            points.add(new DecimalPoint3D(rnd.nextInt(size), rnd.nextInt(size), rnd.nextInt(size)));
+            points.add(new DecimalPoint3D(rnd.nextInt(size-(2*buffer))+buffer-size/2,
+                    rnd.nextInt(size-(2*buffer))+buffer-size/2,
+                    rnd.nextInt(size-(2*buffer))+buffer-size/2));
         }
-        boolean mono = params.get("mono") == 1;
+        boolean mono = params.get("mono") != 0;
         RecursiveGridList<Double> out = RecursiveGridList.newGridList(Double.class, 3);
         for (DecimalPoint3D pnt : points){
             double value;
