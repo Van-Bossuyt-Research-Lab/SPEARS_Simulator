@@ -410,13 +410,7 @@ class AquaticSlicePanel extends JPanel {
                             for (String pop : viewPopulators.keySet()) {
                                 if (viewPopulators.get(pop) && color == null) {
                                     double value = subMap.getPopulatorValue(pop, loc);
-                                    if (value == 0){
-                                        color = null;
-                                    }
-                                    else {
-                                        color = popDisplays.get(pop).displayFunction(value);
-                                    }
-//                                    color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
+                                    color = value == 0 ? null : popDisplays.get(pop).displayFunction(value);
                                 }
                             }
                             if (color == null) {
