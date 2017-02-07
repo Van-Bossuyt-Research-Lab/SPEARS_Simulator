@@ -8,6 +8,8 @@ import com.csm.rover.simulator.platforms.sub.physicsModels.subPhysicsModel;
 import com.csm.rover.simulator.platforms.sub.subAuto.SubAutonomousCode;
 import com.csm.rover.simulator.wrapper.Globals;
 import com.csm.rover.simulator.wrapper.SerialBuffers;
+import javax.xml.bind.annotation.XmlElementDecl;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,13 +28,8 @@ public class SubObject extends Platform {
 
     private static final long serialVersionUID = 1L;
 
-    private static AquaticMap MAP;
     private static SerialBuffers serialBuffers;
-
-    private String name;
-    private String IDcode;
-    private subPhysicsModel physics = new subPhysicsModel();
-    private SubAutonomousCode autoCode;
+    private String IDcode = "s";
 
     @SuppressWarnings("unused")
     private boolean connected = false; // Can the ground station hear/talk to us
@@ -90,183 +87,171 @@ public class SubObject extends Platform {
         LEDs.put("Autonomous", false);
     }
 
-    public static void setSubMap(AquaticMap map){
-        SubAutonomousCode.setSubMap(map);
-        subPhysicsModel.setSubMap(map);
-    }
-
     public static void setSerialBuffers(SerialBuffers buffers){
         serialBuffers = buffers;
     }
 
+    @Override
     public void start(){
-        new SynchronousThread(100, new Runnable(){
-            public void run(){
-                //System.out.println(name + "-CODE\t" + Globals.getInstance().timeMillis);
-                excecuteCode();
-            }
-        },
-                SynchronousThread.FOREVER, name+"-code");
-        physics.start();
+        new SynchronousThread(100, this::excecuteCode, SynchronousThread.FOREVER, name+"-code");
+        physicsModel.start();
         timeOfLastCmd = Globals.getInstance().timeMillis();
     }
 
     private void excecuteCode() {
         try {
             //Globals.getInstance().writeToLogFile(this.name, Globals.getInstance().timeMillis + "\t" + physics.getLocation().getX() + "\t" + physics.getLocation().getY() + "\t" + Access.getMapHeightatPoint(physics.getLocation()) + "\t" + visitedScience.size()*10 + "\t" + physics.getBatteryCharge());
-            try {
-
-                if (serialBuffers.RFAvailable(IDcode) > 1) { // if there is a message
-                    delay(500);
-                    char[] id = strcat((char) serialBuffers.ReadSerial(IDcode), (char) serialBuffers.ReadSerial(IDcode));
-                    if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
-                        // go is set to false if the first read is not IDcode
-                        // to prevent starting a message not intended for the rover
-                        // from within the body of another message
-                        serialBuffers.ReadSerial(IDcode); // white space
-                        tag = (char) serialBuffers.ReadSerial(IDcode); // get type tag
-                        if (serialBuffers.RFAvailable(IDcode) > 0) { // if there is more to the message
-                            run_auto = false; // stop running autonomously
-                            data[0] = tag; // tag is not actually import, just read the entire body of the message
-                            index++;
-                            while (serialBuffers.RFAvailable(IDcode) > 0 && index < data.length - 1) { //read in message body
-                                data[index] = (char) serialBuffers.ReadSerial(IDcode);
-                                index++;
-                            }
-                            data[index] = '\0'; // end of string
-                            // switch through commands
-                            if (strcmp(data, "move") == 0) {
-                                sendSerial("s1 g %"); // confirm message reciet
-                                driveForward();
-                                moving = true;
-                            } else if (strcmp(data, "stop") == 0) {
-                                sendSerial("s1 g %");
-                                driveStop();
-                                moving = true;
-                            } else if (strcmp(data, "spin_ccw") == 0) {
-                                sendSerial("s1 g %");
-                                driveSpinCCW();
-                                moving = true;
-                            } else if (strcmp(data, "spin_cw") == 0) {
-                                sendSerial("s1 g %");
-                                driveSpinCW();
-                                moving = true;
-                            } else if (strcmp(data, "backward") == 0) {
-                                sendSerial("s1 g %");
-                                driveBackward();
-                                moving = true;
-                            } else if (strcmp(data, "turnFL") == 0) {
-                                sendSerial("s1 g %");
-                                driveTurnFL();
-                                moving = true;
-                            } else if (strcmp(data, "turnFR") == 0) {
-                                sendSerial("s1 g %");
-                                driveTurnFR();
-                                moving = true;
-                            } else if (strcmp(data, "turnBL") == 0) {
-                                sendSerial("s1 g %");
-                                driveTurnBL();
-                                moving = true;
-                            } else if (strcmp(data, "turnBR") == 0) {
-                                sendSerial("s1 g %");
-                                driveTurnBR();
-                                moving = true;
-                            } else if (strcmp(data, "getvolts") == 0) {
-                                sendSerial("s1 g %");
-                                delay(2000);
-                                sendSerial("s1 g Vrov=");
-                                sendSerial(boardVoltage);
-                                setWaitForResponse('#', 2000);
-                                delay(2500);
-                                sendSerial("s1 g Vmtr=");
-                                sendSerial(motorVoltage);
-                                setWaitForResponse('#', 2000);
-                                delay(2500);
-                                sendSerial("s1 g Varm=");
-                                sendSerial(armVoltage);
-                                setWaitForResponse('#', 2000);
-                            } else if (strcmp(data, "photo") == 0) {
-                                sendSerial("s1 g %");
-                                delay(2000);
-                                takePicture();
-                            } else if (strcmp(data, "instructions") == 0) { // if we are recieving instructions
-                                instructions = ""; // clear existing "file"
-                                while (serialBuffers.RFAvailable(IDcode) == 0) { // wait for transmission to start
-                                    delay(5);
-                                }
-                                delay(1000); // begin syncopation of read/write
-                                while (serialBuffers.RFAvailable(IDcode) > 0) {
-                                    while (serialBuffers.RFAvailable(IDcode) > 0) {
-                                        instructions += (char) serialBuffers.ReadSerial(IDcode); // read in character, add to list
-                                    }
-                                    delay(2000); // continue syncopation, we want to avoid the incoming message running out of room in the buffer
-                                }
-                                sendSerial("s1 g {"); // unmute the ground station
-                                delay(1500); // allow unmute to arrive
-                                sendSerial("s1 g n Instructions Transfered"); // confirm received of instructions
-                                hasInstructions = true; // we now have instructions
-                                instructsComplete = 0; // we haven't started them
-                                System.out.print(instructions); // show console what they are so I can figure out why they don't work
-                            } else if (strcmp(data, "!instruct") == 0) { // if we want to delete existing instructions / abort
-                                hasInstructions = false; // we don't have instructions
-                                instructions = ""; // delete "file"
-                                if (moving) {
-                                    driveStop(); // stop the rover
-                                }
-                                delay(1000);
-                                sendSerial("s1 g KillDone"); // confirm abort
-                            } else if (strcmp(data, "auto") == 0) { // force into autonomous mode
-                                run_auto = true;
-                                sendSerial("s1 g %");
-                                /*
-                            } else if (strcmp(data, "score") == 0) {
-                                if (MAP.isPointAtTarget(getLocation())) {
-                                    this.visitedScience.add(MAP.getMapSquare(getLocation()));
-                                    System.out.println("Aquired.  New Score = " + visitedScience.size());
-                                }
-                                */
-                            }
-
-                        }
-                        // if there isn't more to the message interpret the tag
-                        else if (tag == '#') { // message confirmation from ground
-                            if (waitingForResponse && tag == desiredResponse) {
-                                responseRecieved = true;
-                            }
-                        } else if (tag == '^') { // the ground pinged us
-                            connected = true;
-                            sendSerial("s1 g ^");
-                            delay(2000);
-                            pingGround(); // test the connection
-                        } else if (tag == '*') { // our ping of the ground station returned
-                            if (waitingForResponse && tag == desiredResponse) {
-                                responseRecieved = true;
-                            }
-                        } else if (tag == '}') { // we have been muted
-                            mute = true;
-                            LEDs.put("Mute", mute);
-                        } else if (tag == '{') { // we have been unmuted
-                            mute = false;
-                            LEDs.put("Mute", mute);
-                        }
-                        data = new char[data.length]; // reset data array
-                        index = 0;
-                        tag = '\0';
-                        timeOfLastCmd = Globals.getInstance().timeMillis(); // reset time since command
-                        if (moving) {
-                            cmdWaitTime += Globals.getInstance().timeMillis() + 60000; // reset command wait
-                        }
-                    } else { // the message wasn't for us
-                        go = false; // ignore it
-                        int waiting = serialBuffers.RFAvailable(IDcode);
-                        while (waiting > 0) { // delete it
-                            serialBuffers.ReadSerial(IDcode);
-                            waiting--;
-                        }
-                    }
-                } else { // there isn't a message waiting
-                    go = true; // allowed to read the next message
-                }
+//                if (serialBuffers.RFAvailable(IDcode) > 1) { // if there is a message
+//                    delay(500);
+//                    char[] id = strcat((char) serialBuffers.ReadSerial(IDcode), (char) serialBuffers.ReadSerial(IDcode));
+//                    if (strcmp(id, IDcode) == 0 && go) { // if the message is for us and are we allowed to read it
+//                        // go is set to false if the first read is not IDcode
+//                        // to prevent starting a message not intended for the rover
+//                        // from within the body of another message
+//                        serialBuffers.ReadSerial(IDcode); // white space
+//                        tag = (char) serialBuffers.ReadSerial(IDcode); // get type tag
+//                        if (serialBuffers.RFAvailable(IDcode) > 0) { // if there is more to the message
+//                            run_auto = false; // stop running autonomously
+//                            data[0] = tag; // tag is not actually import, just read the entire body of the message
+//                            index++;
+//                            while (serialBuffers.RFAvailable(IDcode) > 0 && index < data.length - 1) { //read in message body
+//                                data[index] = (char) serialBuffers.ReadSerial(IDcode);
+//                                index++;
+//                            }
+//                            data[index] = '\0'; // end of string
+//                            // switch through commands
+//                            if (strcmp(data, "move") == 0) {
+//                                sendSerial("s1 g %"); // confirm message reciet
+//                                driveForward();
+//                                moving = true;
+//                            } else if (strcmp(data, "stop") == 0) {
+//                                sendSerial("s1 g %");
+//                                driveStop();
+//                                moving = true;
+//                            } else if (strcmp(data, "spin_ccw") == 0) {
+//                                sendSerial("s1 g %");
+//                                driveSpinCCW();
+//                                moving = true;
+//                            } else if (strcmp(data, "spin_cw") == 0) {
+//                                sendSerial("s1 g %");
+//                                driveSpinCW();
+//                                moving = true;
+//                            } else if (strcmp(data, "backward") == 0) {
+//                                sendSerial("s1 g %");
+//                                driveBackward();
+//                                moving = true;
+//                            } else if (strcmp(data, "turnFL") == 0) {
+//                                sendSerial("s1 g %");
+//                                driveTurnFL();
+//                                moving = true;
+//                            } else if (strcmp(data, "turnFR") == 0) {
+//                                sendSerial("s1 g %");
+//                                driveTurnFR();
+//                                moving = true;
+//                            } else if (strcmp(data, "turnBL") == 0) {
+//                                sendSerial("s1 g %");
+//                                driveTurnBL();
+//                                moving = true;
+//                            } else if (strcmp(data, "turnBR") == 0) {
+//                                sendSerial("s1 g %");
+//                                driveTurnBR();
+//                                moving = true;
+//                            } else if (strcmp(data, "getvolts") == 0) {
+//                                sendSerial("s1 g %");
+//                                delay(2000);
+//                                sendSerial("s1 g Vrov=");
+//                                sendSerial(boardVoltage);
+//                                setWaitForResponse('#', 2000);
+//                                delay(2500);
+//                                sendSerial("s1 g Vmtr=");
+//                                sendSerial(motorVoltage);
+//                                setWaitForResponse('#', 2000);
+//                                delay(2500);
+//                                sendSerial("s1 g Varm=");
+//                                sendSerial(armVoltage);
+//                                setWaitForResponse('#', 2000);
+//                            } else if (strcmp(data, "photo") == 0) {
+//                                sendSerial("s1 g %");
+//                                delay(2000);
+//                                takePicture();
+//                            } else if (strcmp(data, "instructions") == 0) { // if we are recieving instructions
+//                                instructions = ""; // clear existing "file"
+//                                while (serialBuffers.RFAvailable(IDcode) == 0) { // wait for transmission to start
+//                                    delay(5);
+//                                }
+//                                delay(1000); // begin syncopation of read/write
+//                                while (serialBuffers.RFAvailable(IDcode) > 0) {
+//                                    while (serialBuffers.RFAvailable(IDcode) > 0) {
+//                                        instructions += (char) serialBuffers.ReadSerial(IDcode); // read in character, add to list
+//                                    }
+//                                    delay(2000); // continue syncopation, we want to avoid the incoming message running out of room in the buffer
+//                                }
+//                                sendSerial("s1 g {"); // unmute the ground station
+//                                delay(1500); // allow unmute to arrive
+//                                sendSerial("s1 g n Instructions Transfered"); // confirm received of instructions
+//                                hasInstructions = true; // we now have instructions
+//                                instructsComplete = 0; // we haven't started them
+//                                System.out.print(instructions); // show console what they are so I can figure out why they don't work
+//                            } else if (strcmp(data, "!instruct") == 0) { // if we want to delete existing instructions / abort
+//                                hasInstructions = false; // we don't have instructions
+//                                instructions = ""; // delete "file"
+//                                if (moving) {
+//                                    driveStop(); // stop the rover
+//                                }
+//                                delay(1000);
+//                                sendSerial("s1 g KillDone"); // confirm abort
+//                            } else if (strcmp(data, "auto") == 0) { // force into autonomous mode
+//                                run_auto = true;
+//                                sendSerial("s1 g %");
+//                                /*
+//                            } else if (strcmp(data, "score") == 0) {
+//                                if (environment.isPointAtTarget(getLocation())) {
+//                                    this.visitedScience.add(environment.getMapSquare(getLocation()));
+//                                    System.out.println("Aquired.  New Score = " + visitedScience.size());
+//                                }
+//                                */
+//                            }
+//
+//                        }
+//                        // if there isn't more to the message interpret the tag
+//                        else if (tag == '#') { // message confirmation from ground
+//                            if (waitingForResponse && tag == desiredResponse) {
+//                                responseRecieved = true;
+//                            }
+//                        } else if (tag == '^') { // the ground pinged us
+//                            connected = true;
+//                            sendSerial("s1 g ^");
+//                            delay(2000);
+//                            pingGround(); // test the connection
+//                        } else if (tag == '*') { // our ping of the ground station returned
+//                            if (waitingForResponse && tag == desiredResponse) {
+//                                responseRecieved = true;
+//                            }
+//                        } else if (tag == '}') { // we have been muted
+//                            mute = true;
+//                            LEDs.put("Mute", mute);
+//                        } else if (tag == '{') { // we have been unmuted
+//                            mute = false;
+//                            LEDs.put("Mute", mute);
+//                        }
+//                        data = new char[data.length]; // reset data array
+//                        index = 0;
+//                        tag = '\0';
+//                        timeOfLastCmd = Globals.getInstance().timeMillis; // reset time since command
+//                        if (moving) {
+//                            cmdWaitTime += Globals.getInstance().timeMillis + 60000; // reset command wait
+//                        }
+//                    } else { // the message wasn't for us
+//                        go = false; // ignore it
+//                        int waiting = serialBuffers.RFAvailable(IDcode);
+//                        while (waiting > 0) { // delete it
+//                            serialBuffers.ReadSerial(IDcode);
+//                            waiting--;
+//                        }
+//                    }
+//                } else { // there isn't a message waiting
+//                    go = true; // allowed to read the next message
+//                }
 
                 // Listening for response
                 if (Globals.getInstance().timeMillis() - timeSinceMessage > responseWaitTime && waitingForResponse) { // if waiting and appropriate time has passed
@@ -429,7 +414,8 @@ public class SubObject extends Platform {
                     LEDs.put("Autonomus", true);
                     LEDs.put("Instructions", false);
 
-                    String cmd = autoCode.nextCommand(Globals.getInstance().timeMillis(), physicsModel.getState());
+                    String cmd = autonomousCodeModel.nextCommand(Globals.getInstance().timeMillis(), physicsModel.getState());
+
                     //TODO switch all known commands
                     if (strcmp(cmd, "") == 0) { /*Do Nothing*/ } else if (strcmp(cmd, "move") == 0) {
                         driveForward();
@@ -576,14 +562,10 @@ public class SubObject extends Platform {
 			 * motor1->run(RELEASE); motor2->run(RELEASE);
 			 * motor3->run(RELEASE); motor4->run(RELEASE); delay(1000); }
 			 */
-            } catch (Exception e) {
-                // something went wrong
-                System.out.println("Error in Sub Run Code");
-                //Globals.getInstance().reportError("SubCode", "runCode - code", e);
-            }
-        } catch (Exception f){
-            System.out.println("Something's bad");
-           // Globals.getInstance().reportError("SubCode", "runCode - code", f);
+        }
+        catch (Exception e){
+            LOG.log(Level.ERROR, "Problem in SubCode for " + name, e);
+            Globals.getInstance().killThread(Thread.currentThread().getName());
         }
     }
 
@@ -749,10 +731,6 @@ public class SubObject extends Platform {
 
     public void addToSerialHistory(String out){
         serialHistory += out + "\t\t\t" + Globals.getInstance().timeMillis() + "\n";
-    }
-
-    public String getName(){
-        return name;
     }
 
     public String getIDTag(){

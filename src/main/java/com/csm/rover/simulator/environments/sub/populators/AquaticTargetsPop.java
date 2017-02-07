@@ -3,11 +3,12 @@ package com.csm.rover.simulator.environments.sub.populators;
 import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.EnvironmentPopulator;
 import com.csm.rover.simulator.environments.annotations.Populator;
-import com.csm.rover.simulator.environments.rover.TerrainMap;
+import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
-import javafx.geometry.Point3D;
+import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 
+import java.awt.Color;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -20,16 +21,20 @@ public class AquaticTargetsPop extends EnvironmentPopulator {
         super("Sub", "Targets", 0);
     }
 
+    private final static int buffer = 5;
+
     @Override
     protected RecursiveGridList doBuild(EnvironmentMap map, Map<String, Double> params) {
-        int size = ((TerrainMap)map).getSize();
+        int size = ((AquaticMap)map).getSize();
         int targetCount = (int)(Math.pow(size, 3) / 100.0 * params.get("trgt_density"));
         Random rnd = new Random();
         Set<DecimalPoint3D> points = new HashSet<>();
         while (points.size() < targetCount){
-            points.add(new DecimalPoint3D(rnd.nextInt(size), rnd.nextInt(size), rnd.nextInt(size)));
+            points.add(new DecimalPoint3D(rnd.nextInt(size-(2*buffer))+buffer-size/2,
+                    rnd.nextInt(size-(2*buffer))+buffer-size/2,
+                    rnd.nextInt(size-(2*buffer))+buffer-size/2));
         }
-        boolean mono = params.get("mono") == 1;
+        boolean mono = params.get("mono") != 0;
         RecursiveGridList<Double> out = RecursiveGridList.newGridList(Double.class, 3);
         for (DecimalPoint3D pnt : points){
             double value;
@@ -72,6 +77,15 @@ public class AquaticTargetsPop extends EnvironmentPopulator {
             out.put(value, pnt.roundX(), pnt.roundY(), pnt.roundZ());
         }
         return out;
+    }
+
+    @Override
+    public PopulatorDisplayFunction getDisplayFunction() {
+        return (value) -> new Color(
+                (int)(Color.MAGENTA.getRed()*(value+5)/15.),
+                (int)(Color.MAGENTA.getGreen()*(value+5)/15.),
+                (int)(Color.MAGENTA.getBlue()*(value+5)/15.)
+        );
     }
 
 }

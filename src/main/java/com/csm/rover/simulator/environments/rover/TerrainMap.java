@@ -51,7 +51,7 @@ public class TerrainMap extends EnvironmentMap {
     }
 
     private void checkSize(){
-        if (heightMap.getWidth() != size*detail || heightMap.getHeight() != size*detail){
+        if (heightMap.getWidth() != size*detail+1 || heightMap.getHeight() != size*detail+1){
             throw new IllegalArgumentException("The map does not match the given sizes");
         }
     }
@@ -95,41 +95,38 @@ public class TerrainMap extends EnvironmentMap {
         return min_val.get();
     }
 
-    private Point getMapSquare(DecimalPoint loc){ // says which display square a given coordinate falls in
-        int shift = heightMap.getWidth() / (detail * 2);
-        double x = loc.getX() + shift;
-        double y = shift - loc.getY();
-        int outx = (int)(x*detail);
-        int outy = (int)(y*detail);
-        return new Point(outx, outy);
+    /**
+     * returns the point in the 2D array closest to the provided map location.
+     *
+     * @param loc Location on the map from -size/2 to size/2
+     *
+     * @return Location of point in array from 0 to size
+     */
+    private Point getMapSquare(DecimalPoint loc){
+        return new Point(
+                (int)(loc.getX()*detail) + heightMap.getWidth()/2,
+                (int)(loc.getY()*detail) + heightMap.getHeight()/2);
     }
 
-    private Point getGridSquare(DecimalPoint loc){
-        Point square = getMapSquare(loc);
-        return new Point(square.x/3, square.y/3);
-    }
-
-    //returns the height of the map at the given point
+    /**
+     * Returns the height of the surface at the given point, interpolates between discrete height map values.
+     *
+     * @param loc Location on the map from -size/2 to size/2
+     * @return surface elevation
+     */
     public double getHeightAt(DecimalPoint loc){
         Point mapSquare = getMapSquare(loc);
         int x = (int) mapSquare.getX();
         int y = (int) mapSquare.getY();
-        DecimalPoint lifePnt = new DecimalPoint(loc.getX() + getSize()/2.0, getSize()/2.0 - loc.getY());
-        double locx = ((int)((lifePnt.getX() - (int)lifePnt.getX())*1000) % (1000/detail)) / 1000.0 * detail;
-        double locy = ((int)((lifePnt.getY() - (int)lifePnt.getY())*1000) % (1000/detail)) / 1000.0 * detail;
+        loc = new DecimalPoint(loc.getX() + getSize()/2.0,  loc.getY() + getSize()/2.0);
+        double locx = loc.getX()*detail - x;
+        double locy = loc.getY()*detail - y;
         return getIntermediateValue(heightMap.get(x, y), heightMap.get(x + 1, y), heightMap.get(x, y + 1), heightMap.get(x + 1, y + 1), locx, locy);
     }
 
-    private double getIntermediateValue(double topleft, double topright, double bottomleft, double bottomright, double relativex, double relativey){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
-        if (relativex > relativey){ //top right triangle
-            return (topright - topleft) * relativex - (topright - bottomright) * relativey + topleft;
-        }
-        else if (relativex < relativey){ //bottom left triangle
-            return (bottomright - bottomleft) * relativex + (bottomleft - topleft) * relativey + topleft;
-        }
-        else { //center line
-            return ((bottomright - topleft) * relativex + topleft);
-        }
+    private double getIntermediateValue(double point00, double point01, double point10, double point11,
+                                        double x, double y){
+        return point00*(1-x)*(1-y) + point01*(1-x)*y + point10*x*(1-y) + point11*x*y;
     }
 
     public int getSize(){

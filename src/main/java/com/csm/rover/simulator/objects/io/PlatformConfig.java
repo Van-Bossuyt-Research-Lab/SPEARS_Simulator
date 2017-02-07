@@ -69,22 +69,6 @@ public class PlatformConfig {
         return Collections.unmodifiableMap(stateParameters);
     }
 
-    public void setPhysicsModelParameters( Map<String,Double> params) {
-            if (params == null){
-                throw new NullPointerException("Parameters cannot be null");
-            }
-            this.physicsModelParameters = params;
-    }
-
-    public void setAutonomousModelParameters(Map<String,Double> params) {
-        if (params == null){
-            throw new NullPointerException("Parameters cannot be null");
-        }
-        this.autonomousModelParameters = params;
-    }
-
-
-
     public static class Builder {
 
         private PlatformConfig config;

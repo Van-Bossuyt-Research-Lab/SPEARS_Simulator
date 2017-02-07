@@ -11,10 +11,12 @@ import com.csm.rover.simulator.objects.util.ArrayGrid;
 import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
 import com.csm.rover.simulator.objects.util.ParamMap;
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
+import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 
+import java.awt.*;
 import java.util.Map;
 
-@Populator(type = "Rover", name = "Hazards", coordinates = {"x", "y"}, parameters = {"mono", "rough"})
+@Populator(type = "Rover", name = "Hazards", coordinates = {"x", "y"}, parameters = {"hzrd_mono", "hzrd_rough"})
 public class TerrainHazardsPop extends EnvironmentPopulator {
 
     public TerrainHazardsPop(){
@@ -23,11 +25,11 @@ public class TerrainHazardsPop extends EnvironmentPopulator {
 
     @Override
     protected RecursiveGridList<Double> doBuild(EnvironmentMap map, Map<String, Double> params) {
-        boolean mono = params.get("mono") == 1;
-        int size = ((TerrainMap)map).getSize();
-        double rough = params.get("rough");
-        ArrayGrid<Float> plasma1 = getLayer(size, rough, 3);
-        ArrayGrid<Float> plasma2 = getLayer(size, rough*20, 8);
+        boolean mono = params.get("hzrd_mono") == 1;
+        int size = ((TerrainMap)map).getSize()+1;
+        double rough = params.get("hzrd_rough");
+        ArrayGrid<Float> plasma1 = getLayer(size+size%2, rough, 3);
+        ArrayGrid<Float> plasma2 = getLayer(size+size%2, rough*20, 8);
         ArrayGrid<Float> added = new FloatArrayArrayGrid();
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
@@ -41,13 +43,18 @@ public class TerrainHazardsPop extends EnvironmentPopulator {
                 ParamMap.newParamMap().addParameter("places", 0).build()
         ).rawValues();
         RecursiveGridList<Double> hzrds = RecursiveGridList.newGridList(Double.class, 2);
-        for (int x = 0; x < size; x++){
-            for (int y = 0; y < size; y++){
+        for (int x = 0; x < size-1; x++){
+            for (int y = 0; y < size-1; y++){
                 double value = (double)added.get(x, y);
-                hzrds.put(mono ? (value >=7 ? 10 : 0) : value, x, y);
+                hzrds.put(mono ? (value >=7 ? 10 : 0) : (value > 10 ? 10 : value), x-size/2, y-size/2);
             }
         }
         return hzrds;
+    }
+
+    @Override
+    public PopulatorDisplayFunction getDisplayFunction() {
+        return (value) -> value < 5 ? null : new Color((int)((11-value)*20+100), (int)((11-value)*20+100), (int)((11-value)*20+100));
     }
 
     private ArrayGrid<Float> getLayer(int size, double rough, int range){

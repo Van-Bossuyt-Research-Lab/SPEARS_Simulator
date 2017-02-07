@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.platforms.sub.subAuto;
 
-import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 
 import java.util.Map;
@@ -14,14 +14,15 @@ public class BlankSubAuto extends SubAutonomousCode {
         super("NULL", "NULL");
     }
 
+
     @Override
     public void constructParameters(Map<String, Double> params) {
 
     }
 
     @Override
-    public String doNextCommand(long milliTime, DecimalPoint location,
-                                double direction, Map<String, Double> params) {
+    public String doNextCommand(long milliTime, DecimalPoint3D location,
+                                double[] orientation, Map<String, Double> params) {
         // TODO Auto-generated method stub
         return "";
     }

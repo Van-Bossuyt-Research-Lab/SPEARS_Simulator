@@ -31,6 +31,18 @@ public abstract class Platform {
 
     public void setEnvironment(PlatformEnvironment enviro){
         this.environment = enviro;
+        if (autonomousCodeModel != null){
+            autonomousCodeModel.setEnvironment(enviro);
+        }
+        else {
+            LOG.log(Level.WARN, "Platform has no autonomousCodeModel: environment will not be set");
+        }
+        if (physicsModel != null){
+            physicsModel.setEnvironment(enviro);
+        }
+        else {
+            LOG.log(Level.WARN, "Platform has no physicsModel: environment will not be set");
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -55,6 +67,12 @@ public abstract class Platform {
             LOG.log(Level.ERROR, "Incorrect type request, the final cast failed", e);
         }
         return null;
+    }
+
+    public abstract void start();
+
+    public String getName(){
+        return name;
     }
 
     public final PlatformState getState(){

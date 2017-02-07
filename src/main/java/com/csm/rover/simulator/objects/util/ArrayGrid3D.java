@@ -23,7 +23,7 @@ public interface ArrayGrid3D<T> extends Cloneable {
 
     void addLayerAt(int z, ArrayList<T> lay);
 
-    int get(int x, int y, int z);
+    T get(int x, int y, int z);
 
     ArrayList<T> getColumn(int x);
 

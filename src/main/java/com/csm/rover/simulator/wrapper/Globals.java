@@ -100,12 +100,16 @@ public class Globals {
 		return time_accelerant;
 	}
 
+	public boolean isAccelerated(){
+		return timeScale==time_accelerant;
+	}
+
 	/**
 	 * Returns the multiplication factor currently in use in the simulation.  Will be 1 for real-time
 	 * and equivalent to {@link #getTimeAccelerant() getTimeAccelerant} when accelerated.
 	 *
 	 * @return The current multiplier
-     */
+	 */
 	public double getTimeScale(){
 		return timeScale;
 	}
@@ -157,18 +161,8 @@ public class Globals {
 		return angle;
 	}
 	
-	public void setUpAcceleratedRun(final HumanInterfaceAbstraction HI, int runtime){
-		exitTime = runtime;
-        HI.viewAccelerated(exitTime, time_accelerant);
-		new FreeThread(1000, new Runnable(){
-			public void run(){
-				if (timeMillis >= exitTime){
-					//Maybe not working? was an error
-					LOG.log(Level.INFO, "Exiting");
-					HI.exit();
-				}
-			}
-		}, FreeThread.FOREVER, "accel-handler");
+	void setUpAcceleratedRun(int runtime){
+		new SynchronousThread(runtime*60*1000, Admin.getInstance()::shutDownSimulator, 1, "AccelBrake");
 	}
 
 	/**

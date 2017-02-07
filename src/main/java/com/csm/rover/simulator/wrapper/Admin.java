@@ -1,65 +1,76 @@
 package com.csm.rover.simulator.wrapper;
 
-import com.csm.rover.simulator.control.PopUp;
 import com.csm.rover.simulator.environments.EnvironmentIO;
+import com.csm.rover.simulator.environments.EnvironmentRegistry;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
-import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
+import com.csm.rover.simulator.environments.annotations.Modifier;
+import com.csm.rover.simulator.objects.SynchronousThread;
+import com.csm.rover.simulator.objects.io.ConfigurationFileFilter;
 import com.csm.rover.simulator.objects.io.PlatformConfig;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.platforms.Platform;
+import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
-import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
+import com.csm.rover.simulator.ui.implementation.UiFactory;
+import com.csm.rover.simulator.ui.sound.SoundPlayer;
+import com.csm.rover.simulator.ui.sound.SpearsSound;
+import com.csm.rover.simulator.ui.visual.AcceleratedView;
+import com.csm.rover.simulator.ui.visual.MainMenu;
+import com.csm.rover.simulator.ui.visual.PopUp;
+import com.csm.rover.simulator.ui.visual.StartupWindow;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 
 public class Admin {
 	private static final Logger LOG = LogManager.getLogger(Admin.class);
 
-//	public static Form GUI;
 	private Globals GLOBAL;
 
-    private static HumanInterfaceAbstraction HI;
-
     //Runtime Variables
-    private PlatformEnvironment environment;
-    private ArrayList<PlatformConfig> roverCfgs;
-    private ArrayList<PlatformConfig> satCfgs;
-    private SerialBuffers serialBuffers;
+    private Map<String, PlatformEnvironment> environments;
+    private Map<String, List<Platform>> platforms;
 
-	public static void main(String[] args) {
+
+    public static void main(String[] args) {
         LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
         RegistryManager.checkRegistries();
 		Admin admin = getInstance();
+        checkFolders();
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");
-            HI = new HiForm();
-			boolean go = false;
-			File config = new File("config.json");
-			if (config.exists()) {
-				if ((new PopUp()).showConfirmDialog("A quick run configuration file has been found.  Would you like to run the simulator from the file?", "Quick Run", PopUp.YES_NO_OPTIONS) == PopUp.YES_OPTION) {
-					go = true;
-				}
-			}
-			if (go) {
+            admin.setUpGUI();
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            chooser.setMultiSelectionEnabled(false);
+            chooser.setFileFilter(new ConfigurationFileFilter());
+			if (UiFactory.newPopUp()
+                            .setMessage("Would you like to open a saved run configuration?")
+                            .setSubject("Load Config")
+                            .showConfirmDialog(PopUp.Buttons.YES_NO_OPTIONS) == PopUp.Options.YES_OPTION &&
+                    chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 				try {
-					admin.beginSimulation(RunConfiguration.fromFile(config));
+					admin.startWithGUI(RunConfiguration.fromFile(chooser.getSelectedFile()));
 				}
 				catch (Exception e){
 					LOG.log(Level.ERROR, "Simulator failed to start", e);
-					(new PopUp()).showConfirmDialog(e.getMessage(), "Failed to Start", PopUp.DEFAULT_OPTIONS);
+                    UiFactory.newPopUp().setMessage(e.getMessage()).setSubject("Failed to Start").showConfirmDialog(PopUp.Buttons.DEFAULT_OPTIONS);
 					System.exit(2);
 				}
 			}
+            else {
+                admin.promptStartup();
+            }
 		}
 		else {
 			LOG.log(Level.INFO, "Stating simulator in Command Line mode");
-			HI = new HiCmd();
-            File cfgFile = new File(args[0]);
+			File cfgFile = new File(args[0]);
             if (cfgFile.exists() && getFileType(cfgFile).equals("cfg")){
                 try {
                     admin.beginSimulation(RunConfiguration.fromFile(cfgFile));
@@ -76,6 +87,67 @@ public class Admin {
 		}
 	}
 
+    private static void checkFolders(){
+        String[] requiredFolders = { "Temp", "Logs" };
+        for (String folder : requiredFolders){
+            File f = new File(folder);
+            if (!f.exists()){
+                if (!f.mkdirs()){
+                    LOG.log(Level.WARN, "Failed to create directory " + folder);
+                }
+            }
+        }
+    }
+
+    private void setUpGUI() {
+        MainMenu menu = UiFactory.getMainMenu();
+        menu.setCloseOperation(this::shutDownSimulator);
+        menu.setVolumeListener(SoundPlayer::setVolume);
+
+        UiFactory.getApplication().show();
+    }
+
+    private void promptStartup(){
+        StartupWindow startup = UiFactory.newStartUpWindow();
+        for (String type : PlatformRegistry.getTypes()) {
+            startup.registerPlatform(type);
+            for (String code : PlatformRegistry.listAutonomousCodeModels(type)){
+                startup.registerAutonomousCodeModel(type, code, PlatformRegistry.getParametersForAutonomousCodeModel(type, code));
+            }
+            for (String physics : PlatformRegistry.listPhysicsModels(type)){
+                startup.registerPhysicsModel(type, physics, PlatformRegistry.getParametersForPhysicsModel(type, physics));
+            }
+            if (EnvironmentRegistry.getTypes().contains(type)) {
+                for (String modifier : EnvironmentRegistry.listModifiers(type)) {
+                    if (EnvironmentRegistry.getModifier(type, modifier).getAnnotation(Modifier.class).generator()){
+                        startup.registerEnvironmentGenerator(type, modifier, EnvironmentRegistry.getParametersForModifier(type, modifier));
+                    }
+                    else {
+                        startup.registerEnvironmentModifier(type, modifier, EnvironmentRegistry.getParametersForModifier(type, modifier));
+                    }
+                }
+                for (String populator : EnvironmentRegistry.listPopulators(type)) {
+                    startup.registerEnvironmentPopulator(type, populator, EnvironmentRegistry.getParametersForPopulator(type, populator));
+                }
+            }
+        }
+        startup.setStartUpAction(this::startWithGUI);
+        startup.display();
+    }
+
+    private void startWithGUI(RunConfiguration config){
+        beginSimulation(config);
+        UiFactory.getApplication().start(environments, platforms);
+        if (GLOBAL.isAccelerated()){
+            UiFactory.getApplication().hide();
+            AcceleratedView viewer = UiFactory.newAcceleratedView();
+            viewer.setDuration(config.runtime);
+            viewer.setAbortAction(this::shutDownSimulator);
+            viewer.show();
+            new SynchronousThread(config.runtime*60*1000-1000, () -> SoundPlayer.playSound(SpearsSound.GOODBYE), 1, "frame_closing");
+        }
+    }
+
     private static String getFileType(File file){
         String filename = file.getName();
         return filename.substring(filename.lastIndexOf(".")+1, filename.length());
@@ -84,6 +156,8 @@ public class Admin {
 	//TODO clean up this interface for OCP
 	private Admin(){
 		GLOBAL = Globals.getInstance();
+        environments = new TreeMap<>();
+        platforms = new TreeMap<>();
 	}
 
     private static Optional<Admin> singleton_instance = Optional.empty();
@@ -94,71 +168,37 @@ public class Admin {
         return singleton_instance.get();
     }
 
-    public static HumanInterfaceAbstraction getCurrentInterface(){
-        return HI;
+	private void beginSimulation(RunConfiguration config){
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            LOG.log(Level.INFO, "Starting simulation with configuration:\n{}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(config));
+        } catch (JsonProcessingException e) {}
+
+        List<String> ids = new ArrayList<>();
+        for (String type : config.getTypes()){
+            PlatformEnvironment enviro = EnvironmentIO.loadEnvironment(config.getEnvironmentFile(type), EnvironmentRegistry.getEnvironment(type));
+            environments.put(type, enviro);
+
+            platforms.put(type, new ArrayList<>());
+            for (PlatformConfig platformConfig : config.getPlatforms(type)){
+                Platform platform = Platform.buildFromConfiguration(platformConfig);
+                ids.add(platformConfig.getID());
+                platforms.get(type).add(platform);
+                enviro.addPlatform(platform);
+                platform.start();
+            }
+        }
+        RoverObject.setSerialBuffers(new SerialBuffers(ids));
+
+        GLOBAL.startTime(config.accelerated);
+        if (config.accelerated){
+            GLOBAL.setUpAcceleratedRun(config.runtime);
+        }
+	}
+
+    void shutDownSimulator(){
+        LOG.log(Level.INFO, "Exiting SPEARS");
+        System.exit(0);
     }
-
-	public void beginSimulation(RunConfiguration config){
-		this.roverCfgs = config.getPlatforms("Rover");
-		this.satCfgs = config.getPlatforms("Satellite");
-		if (roverCfgs.size() == 0 || satCfgs.size() == 0){
-			LOG.log(Level.WARN, "Invalid Configuration.  Requires at least 1 rover and 1 satellite.");
-			return;
-		}
-
-        serialBuffers = new SerialBuffers(config.namesAndTags.getTags(), HI);
-        RoverObject.setSerialBuffers(serialBuffers);
-        SatelliteObject.setSerialBuffers(serialBuffers);
-
-		try {
-			if (!config.mapFile.exists()){
-				throw new Exception();
-			}
-			environment = EnvironmentIO.loadEnvironment(config.mapFile, TerrainEnvironment.class);
-            LOG.log(Level.INFO, "Start Up: Using map file: {}", config.mapFile.getName());
-		}
-		catch (Exception e){
-			LOG.log(Level.WARN, "Start Up: Invalid map file", e);
-			return;
-		}
-        RoverObject.setTerrainMap((TerrainEnvironment)environment);
-
-		ArrayList<RoverObject> rovers = buildRoversFromConfig(roverCfgs);
-		ArrayList<SatelliteObject> satellites = buildSatellitesFromConfig(satCfgs);
-
-        HI.initialize(config.namesAndTags, serialBuffers, rovers, satellites, environment);
-
-		if (config.accelerated){
-			LOG.log(Level.INFO, "Start Up: Accelerating Simulation");
-            Globals.getInstance().setUpAcceleratedRun(HI, 3600000 * config.runtime);
-		}
-
-        for (RoverObject rover : rovers){
-            rover.start();
-        }
-        for (SatelliteObject sat : satellites){
-            sat.start();
-        }
-        HI.start();
-		GLOBAL.startTime(config.accelerated);
-
-		HI.updateSerialBuffers();
-	}
-
-	private ArrayList<RoverObject> buildRoversFromConfig(ArrayList<PlatformConfig> configs){
-		ArrayList<RoverObject> out = new ArrayList<>();
-		for (PlatformConfig config : configs){
-            out.add(Platform.<RoverObject>buildFromConfiguration(config));
-		}
-        return out;
-	}
-
-	private ArrayList<SatelliteObject> buildSatellitesFromConfig(ArrayList<PlatformConfig> configs){
-        ArrayList<SatelliteObject> out = new ArrayList<>();
-        for (PlatformConfig config : configs){
-            out.add(Platform.<SatelliteObject>buildFromConfiguration(config));
-        }
-        return out;
-	}
 
 }
