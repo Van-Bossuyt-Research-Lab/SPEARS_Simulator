@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 import java.io.File;
 import java.util.*;
 import java.util.List;
@@ -77,7 +78,7 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
         generatorCombo.setModel(new DefaultComboBoxModel<>(generatorParams.keySet().toArray(new String[generatorParams.size()])));
         generatorCombo.setSelectedIndex(-1);
         generatorCombo.setEditable(false);
-        generatorCombo.addItemListener((e) -> {
+        generatorCombo.addActionListener((e) -> {
             if (generatorCombo.getSelectedIndex() != -1){
                 String gen = (String)generatorCombo.getSelectedItem();
                 ModifierCreationWindow window = ModifierCreationWindow.newModifierCreationWindow(platform)
@@ -241,16 +242,17 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
             return;
         }
         if (enviro.isPresent()){
-            reportAction.registerEnvironment(saveTemp(enviro.get()));
+            startAnimation();
+            File tempFile = saveTemp(enviro.get());
+            stopAnimation();
+            reportAction.registerEnvironment(tempFile);
             doDefaultCloseAction();
         }
         else {
             try {
-                goBtn.setText(".");
-                waitingAnimation = new FreeThread(1000, this::animateWaiting, FreeThread.FOREVER, "env_animate", true);
+                startAnimation();
                 enviro = Optional.of(generateMap());
-                waitingAnimation.Stop();
-                SoundPlayer.playSound(SpearsSound.NEW);
+                stopAnimation();
                 EnvironmentDisplay display = FrameRegistry.getEnvironmentDisplay(platform).newInstance();
                 display.setEnvironment(enviro.get());
                 this.display = Optional.of(display);
@@ -261,6 +263,16 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
                 LOG.log(Level.ERROR, "Failed to create new Environment", e);
             }
         }
+    }
+
+    private void startAnimation(){
+        goBtn.setText(".");
+        waitingAnimation = new FreeThread(1000, this::animateWaiting, FreeThread.FOREVER, "env_animate", true);
+    }
+
+    private void stopAnimation(){
+        waitingAnimation.Stop();
+        SoundPlayer.playSound(SpearsSound.NEW);
     }
 
     private void animateWaiting(){
@@ -353,6 +365,3 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
 
 }
 
-interface ReportEnvironment {
-    void registerEnvironment(File environmentFile);
-}

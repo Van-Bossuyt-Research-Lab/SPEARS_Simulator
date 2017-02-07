@@ -2,35 +2,38 @@ package com.csm.rover.simulator.ui.implementation;
 
 import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.PlatformState;
-import com.csm.rover.simulator.platforms.rover.RoverObject;
+import com.csm.rover.simulator.platforms.sub.SubObject;
 import net.miginfocom.swing.MigLayout;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.util.Optional;
 
-@FrameMarker(name = "Rover Monitor", platform = "Rover")
-class RoverPlatformMonitor extends PlatformDisplay {
+@FrameMarker(name = "Sub Monitor", platform = "Sub")
+class SubPlatformMonitor extends PlatformDisplay {
 
     private JPanel contentPane;
     private JTabbedPane tabs;
 
-    private JLabel locationLbl, directionLbl, velocityLbl, angularVelLbl, accelLbl, angularAccelLbl;
-    private RoverMotorDisplay[] motorDisplays;
-    private JLabel voltageLbl, socLbl, chargeLbl, currentLbl, tempLbl;
+    private JLabel locationLbl, directionLbl, velocityLbl, angularVelLbl, accelLbl, angularAccelLbl, directionLb2, angularVelLb2, angularAccelLb2;
+    private com.csm.rover.simulator.ui.implementation.SubMotorDisplay[] motorDisplays;
 
-    private Optional<RoverObject> rover;
+    private Optional<SubObject> sub;
 
-    RoverPlatformMonitor(){
-        super("Rover");
+    SubPlatformMonitor(){
+        super("Sub");
         super.setInterval(500);
-        rover = Optional.empty();
+        sub = Optional.empty();
         initialize();
     }
 
     private void initialize(){
         setTitle("");
-        setSize(550, 380);
+        setSize(500, 300);
         setMinimumSize(getSize());
 
         contentPane = new JPanel();
@@ -72,7 +75,7 @@ class RoverPlatformMonitor extends PlatformDisplay {
         accelLbl.setFont(FontFunctions.bold(accelLbl.getFont()));
         drivePnl.add(accelLbl, "cell 5 0");
 
-        JLabel directionTtl = new JLabel("Direction:");
+        JLabel directionTtl = new JLabel("Pitch:");
         directionTtl.setHorizontalAlignment(SwingConstants.RIGHT);
         drivePnl.add(directionTtl, "cell 0 1");
 
@@ -80,7 +83,7 @@ class RoverPlatformMonitor extends PlatformDisplay {
         directionLbl.setFont(FontFunctions.bold(directionLbl.getFont()));
         drivePnl.add(directionLbl, "cell 1 1");
 
-        JLabel angularVelTtl = new JLabel("Angular Velocity:");
+        JLabel angularVelTtl = new JLabel("Pitch Velocity:");
         angularVelTtl.setHorizontalAlignment(SwingConstants.RIGHT);
         drivePnl.add(angularVelTtl, "cell 2 1");
 
@@ -88,7 +91,7 @@ class RoverPlatformMonitor extends PlatformDisplay {
         angularVelLbl.setFont(FontFunctions.bold(angularVelLbl.getFont()));
         drivePnl.add(angularVelLbl, "cell 3 1");
 
-        JLabel angularAccelTtl = new JLabel("Angular Acceleration:");
+        JLabel angularAccelTtl = new JLabel("Pitch Acceleration:");
         angularAccelTtl.setHorizontalAlignment(SwingConstants.RIGHT);
         drivePnl.add(angularAccelTtl, "cell 4 1");
 
@@ -96,123 +99,102 @@ class RoverPlatformMonitor extends PlatformDisplay {
         angularAccelLbl.setFont(FontFunctions.bold(angularAccelLbl.getFont()));
         drivePnl.add(angularAccelLbl, "cell 5 1");
 
+        JLabel directionTt2 = new JLabel("Yaw:");
+        directionTt2.setHorizontalAlignment(SwingConstants.RIGHT);
+        drivePnl.add(directionTt2, "cell 0 2");
+
+        directionLb2 = new JLabel();
+        directionLb2.setFont(FontFunctions.bold(directionLb2.getFont()));
+        drivePnl.add(directionLb2, "cell 1 2");
+
+        JLabel angularVelTt2 = new JLabel("Yaw Velocity:");
+        angularVelTt2.setHorizontalAlignment(SwingConstants.RIGHT);
+        drivePnl.add(angularVelTt2, "cell 2 2");
+
+        angularVelLb2 = new JLabel();
+        angularVelLb2.setFont(FontFunctions.bold(angularVelLb2.getFont()));
+        drivePnl.add(angularVelLb2, "cell 3 2");
+
+        JLabel angularAccelTt2 = new JLabel("Yaw Acceleration:");
+        angularAccelTt2.setHorizontalAlignment(SwingConstants.RIGHT);
+        drivePnl.add(angularAccelTt2, "cell 4 2");
+
+        angularAccelLb2 = new JLabel();
+        angularAccelLb2.setFont(FontFunctions.bold(angularAccelLb2.getFont()));
+        drivePnl.add(angularAccelLb2, "cell 5 2");
+
         JPanel motorPnl = new JPanel();
         motorPnl.setBackground(Color.WHITE);
         motorPnl.setLayout(new BorderLayout());
         tabs.addTab("Motors", motorPnl);
 
         ImageDisplay wheels = new ImageDisplay();
-        wheels.setImage(ImageFunctions.getImage("/images/wheel_base.png"));
+        wheels.setImage(ImageFunctions.getImage("/images/sub_base2.png"));
         motorPnl.add(wheels, BorderLayout.CENTER);
 
-        JPanel leftWheels = new JPanel();
-        leftWheels.setOpaque(false);
-        leftWheels.setLayout(new MigLayout("", "[fill,grow]", "[fill][fill,grow][fill]"));
-        motorPnl.add(leftWheels, BorderLayout.WEST);
+        JPanel vertProp = new JPanel();
+        vertProp.setOpaque(false);
+        vertProp.setLayout(new MigLayout("", "[fill,grow]", "[fill][fill,grow][fill]"));
+        motorPnl.add(vertProp, BorderLayout.WEST);
 
-        RoverMotorDisplay flmotor = new RoverMotorDisplay();
-        leftWheels.add(flmotor, "cell 0 0");
+        com.csm.rover.simulator.ui.implementation.SubMotorDisplay fmotor = new com.csm.rover.simulator.ui.implementation.SubMotorDisplay();
+        vertProp.add(fmotor, "cell 0 0");
 
-        RoverMotorDisplay blmotor = new RoverMotorDisplay();
-        leftWheels.add(blmotor, "cell 0 2");
+        com.csm.rover.simulator.ui.implementation.SubMotorDisplay bmotor = new com.csm.rover.simulator.ui.implementation.SubMotorDisplay();
+        vertProp.add(bmotor, "cell 0 2");
 
-        JPanel rightWheels = new JPanel();
-        rightWheels.setOpaque(false);
-        rightWheels.setLayout(new MigLayout("", "[fill,grow]", "[fill][fill,grow][fill]"));
-        motorPnl.add(rightWheels, BorderLayout.EAST);
+        JPanel horizProp = new JPanel();
+        horizProp.setOpaque(false);
+        horizProp.setLayout(new MigLayout("", "[fill,grow]", "[fill][fill,grow][fill]"));
+        motorPnl.add(horizProp, BorderLayout.EAST);
 
-        RoverMotorDisplay frmotor = new RoverMotorDisplay();
-        rightWheels.add(frmotor, "cell 0 0");
+        com.csm.rover.simulator.ui.implementation.SubMotorDisplay lmotor = new com.csm.rover.simulator.ui.implementation.SubMotorDisplay();
+        horizProp.add(lmotor, "cell 0 0");
 
-        RoverMotorDisplay brmotor = new RoverMotorDisplay();
-        rightWheels.add(brmotor, "cell 0 2");
+        com.csm.rover.simulator.ui.implementation.SubMotorDisplay rmotor = new com.csm.rover.simulator.ui.implementation.SubMotorDisplay();
+        horizProp.add(rmotor, "cell 0 2");
 
-        motorDisplays = new RoverMotorDisplay[] { flmotor, frmotor, blmotor, brmotor };
+        motorDisplays = new com.csm.rover.simulator.ui.implementation.SubMotorDisplay[] { fmotor, bmotor, lmotor, rmotor };
 
-        JPanel batteryPnl = new JPanel();
-        batteryPnl.setBackground(Color.WHITE);
-        batteryPnl.setLayout(new MigLayout("", "[fill][fill]", "fill"));
-        tabs.addTab("Battery", batteryPnl);
-
-        JLabel voltageTtl = new JLabel("Voltage:");
-        voltageTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        batteryPnl.add(voltageTtl, "cell 0 0");
-
-        voltageLbl = new JLabel();
-        voltageLbl.setFont(FontFunctions.bold(voltageLbl.getFont()));
-        batteryPnl.add(voltageLbl, "cell 1 0");
-
-        JLabel socTtl = new JLabel("State of Charge:");
-        socTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        batteryPnl.add(socTtl, "cell 0 1");
-
-        socLbl = new JLabel();
-        socLbl.setFont(FontFunctions.bold(socLbl.getFont()));
-        batteryPnl.add(socLbl, "cell 1 1");
-
-        JLabel chargeTtl = new JLabel("Charge:");
-        chargeTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        batteryPnl.add(chargeTtl, "cell 0 2");
-
-        chargeLbl = new JLabel();
-        chargeLbl.setFont(FontFunctions.bold(chargeLbl.getFont()));
-        batteryPnl.add(chargeLbl, "cell 1 2");
-
-        JLabel currentTtl = new JLabel("Current:");
-        currentTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        batteryPnl.add(currentTtl, "cell 0 3");
-
-        currentLbl = new JLabel();
-        currentLbl.setFont(FontFunctions.bold(currentLbl.getFont()));
-        batteryPnl.add(currentLbl, "cell 1 3");
-
-        JLabel tempTtl = new JLabel("Temperature:");
-        tempTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        batteryPnl.add(tempTtl, "cell 0 4");
-
-        tempLbl = new JLabel();
-        tempLbl.setFont(FontFunctions.bold(tempLbl.getFont()));
-        batteryPnl.add(tempLbl, "cell 1 4");
     }
 
     @Override
     protected void doSetPlatform(Platform platform) {
-        this.rover = Optional.of((RoverObject)platform);
-        setTitle("Rover: " + platform.getName());
+        this.sub = Optional.of((SubObject)platform);
+        setTitle("Sub: " + platform.getName());
         update();
     }
 
     @Override
     protected void update(){
-        if (!rover.isPresent()){
+        if (!sub.isPresent()){
             return;
         }
-        PlatformState state = rover.get().getState();
+        PlatformState state = sub.get().getState();
         switch (tabs.getSelectedIndex()){
             case 0:
-                updateDrive(state.get("x"), state.get("y"), state.get("direction"), state.get("speed"), state.get("acceleration"), state.get("angular_velocity"), state.get("angular_acceleration"));
+                updateDrive(state.get("x"), state.get("y"), state.get("pitch"), state.get("yaw"), state.get("speed"), state.get("acceleration"), state.get("pitch_velocity"), state.get("yaw_velocity"), state.get("pitch_acceleration"), state.get("yaw_acceleration"));
                 break;
             case 1:
-                updateMotors(state.get("motor_state"), state.get("motor_power"), state.get("motor_voltage"), state.get("motor_current"), state.get("wheel_speed"), state.get("motor_temp"));
-                break;
-            case 2:
-                updateBattery(state.get("battery_voltage"), state.get("battery_charge"), state.get("battery_current"), state.get("battery_temp"));
+                updateMotors(state.get("motor_state"), state.get("motor_power"), state.get("motor_voltage"), state.get("motor_current"), state.get("prop_speed"), state.get("motor_temp"));
                 break;
             default:
-                updateDrive(state.get("x"), state.get("y"), state.get("direction"), state.get("speed"), state.get("acceleration"), state.get("angular_velocity"), state.get("angular_acceleration"));
+                updateDrive(state.get("x"), state.get("y"), state.get("pitch"), state.get("yaw"), state.get("speed"), state.get("acceleration"), state.get("pitch_velocity"), state.get("yaw_velocity"), state.get("pitch_acceleration"), state.get("yaw_acceleration"));
                 updateMotors(state.get("motor_state"), state.get("motor_power"), state.get("motor_voltage"), state.get("motor_current"), state.get("wheel_speed"), state.get("motor_temp"));
-                updateBattery(state.get("battery_voltage"), state.get("battery_charge"), state.get("battery_current"), state.get("battery_temp"));
                 break;
         }
     }
 
-    private void updateDrive(double x, double y, double dir, double vel, double accel, double avel, double aaccel){
+    private void updateDrive(double x, double y, double dir, double dir2, double vel, double accel, double avel, double avel2, double aaccel, double aaccel2){
         locationLbl.setText(round(x) + ", " + round(y));
         directionLbl.setText(round(dir*180./Math.PI) + "\u00B0");
+        directionLb2.setText(round(dir*180./Math.PI) + "\u00B0");
         velocityLbl.setText(round(vel) + " m/s");
         accelLbl.setText(round(accel) + " m/s\u00B2");
         angularVelLbl.setText(round(avel*180./Math.PI) + " \u00B0/s");
         angularAccelLbl.setText(round(aaccel*180./Math.PI) + " \u00B0/s\u00B2");
+        angularVelLb2.setText(round(avel*180./Math.PI) + " \u00B0/s");
+        angularAccelLb2.setText(round(aaccel*180./Math.PI) + " \u00B0/s\u00B2");
     }
 
     private void updateMotors(Double[] states, Double[] powers, Double[] voltages, Double[] currents, Double[] speeds, Double[] temps){
@@ -221,13 +203,6 @@ class RoverPlatformMonitor extends PlatformDisplay {
         }
     }
 
-    private void updateBattery(double voltage, double charge, double current, double temp){
-        voltageLbl.setText(round(voltage) + " V");
-        socLbl.setText(round(charge) + "%");
-        chargeLbl.setText(round(charge/1000.) + " kC");
-        currentLbl.setText(round(current*1000.) + " mA");
-        tempLbl.setText(round(temp) + "\u00B0C");
-    }
 
     private String round(double in){
         int a = (int)in;
@@ -242,12 +217,12 @@ class RoverPlatformMonitor extends PlatformDisplay {
 
 }
 
-class RoverMotorDisplay extends JPanel {
+class SubMotorDisplay extends JPanel {
 
     private LEDIndicator onLed;
     private JLabel stateLbl, currentLbl, powerLbl, voltageLbl, tempLbl, speedLbl;
 
-    RoverMotorDisplay(){
+    SubMotorDisplay(){
         setOpaque(false);
         setLayout(new MigLayout("", "[grow][fill,grow]", "fill"));
 

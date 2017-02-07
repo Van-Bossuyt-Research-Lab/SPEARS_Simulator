@@ -11,7 +11,6 @@ import com.csm.rover.simulator.objects.io.RunConfiguration;
 import com.csm.rover.simulator.platforms.Platform;
 import com.csm.rover.simulator.platforms.PlatformRegistry;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
-import com.csm.rover.simulator.platforms.satellite.SatelliteObject;
 import com.csm.rover.simulator.ui.implementation.UiFactory;
 import com.csm.rover.simulator.ui.sound.SoundPlayer;
 import com.csm.rover.simulator.ui.sound.SpearsSound;
@@ -43,6 +42,7 @@ public class Admin {
         LOG.log(Level.INFO, "Program runtime log for SPEARS simulation software");
         RegistryManager.checkRegistries();
 		Admin admin = getInstance();
+        checkFolders();
 		if (args.length == 0) {
 			LOG.log(Level.INFO, "Starting simulator in GUI mode");
             admin.setUpGUI();
@@ -86,6 +86,18 @@ public class Admin {
             }
 		}
 	}
+
+    private static void checkFolders(){
+        String[] requiredFolders = { "Temp", "Logs" };
+        for (String folder : requiredFolders){
+            File f = new File(folder);
+            if (!f.exists()){
+                if (!f.mkdirs()){
+                    LOG.log(Level.WARN, "Failed to create directory " + folder);
+                }
+            }
+        }
+    }
 
     private void setUpGUI() {
         MainMenu menu = UiFactory.getMainMenu();

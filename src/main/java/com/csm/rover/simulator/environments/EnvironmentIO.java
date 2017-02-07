@@ -8,9 +8,13 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class EnvironmentIO {
     private static final Logger LOG = LogManager.getLogger(EnvironmentIO.class);
+
+    private static Map<String, PlatformEnvironment> environmentHolder = new TreeMap<>();
 
     public static File appendSuffix(String platform, File file){
         if ((new EnvrioFileFilter(platform)).accept(file)){
@@ -27,6 +31,7 @@ public class EnvironmentIO {
         }
         ObjectMapper mapper = new ObjectMapper();
         try {
+            environmentHolder.put(file.getAbsolutePath(), enviro);
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, enviro);
             LOG.log(Level.INFO, "Environment saved at {}", file.getAbsolutePath());
         }
@@ -38,6 +43,15 @@ public class EnvironmentIO {
     public static <T extends PlatformEnvironment> T loadEnvironment(File file, Class<T> clazz){
         ObjectMapper mapper = new ObjectMapper();
         try {
+            try {
+                if (environmentHolder.containsKey(file.getAbsolutePath())) {
+                    LOG.log(Level.INFO, "Pulling environment at {} from RAM archive", file.getAbsolutePath());
+                    return (T) environmentHolder.get(file.getAbsolutePath());
+                }
+            }
+            catch (ClassCastException ex){
+                LOG.log(Level.WARN, "Pull from archive failed");
+            }
             LOG.log(Level.INFO, "Reading environment from {}", file.getAbsolutePath());
             return mapper.readValue(file, clazz);
         }

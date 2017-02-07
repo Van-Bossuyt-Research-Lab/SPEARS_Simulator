@@ -5,6 +5,8 @@ import com.csm.rover.simulator.environments.annotations.Modifier;
 import com.csm.rover.simulator.environments.rover.TerrainMap;
 import com.csm.rover.simulator.objects.util.ArrayGrid;
 import com.csm.rover.simulator.objects.util.FloatArrayArrayGrid;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.Map;
 import java.util.Random;
@@ -19,6 +21,11 @@ public class PlasmaFractalGen extends EnvironmentModifier<TerrainMap> {
     @Override
     protected TerrainMap doModify(TerrainMap map, Map<String, Double> params) {
         int size = params.get("size").intValue();
+        if (size%2 == 1){
+            size++;
+            params.put("size", (double)size);
+            LogManager.getLogger(PlasmaFractalGen.class).log(Level.WARN, "Terrain map cannot have an odd size - increasing size to " + size);
+        }
         int detail = params.get("detail").intValue();
         int true_size = size*detail + 1;
         ArrayGrid<Float> values = new FloatArrayArrayGrid();

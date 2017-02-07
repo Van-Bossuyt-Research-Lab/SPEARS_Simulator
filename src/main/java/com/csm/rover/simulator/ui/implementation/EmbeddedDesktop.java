@@ -148,6 +148,9 @@ class EmbeddedDesktop extends JDesktopPane {
 		frame.addComponentListener(new ComponentAdapter(){
 			@Override
 			public void componentMoved(ComponentEvent e) {
+				if (e.getComponent().getY() < 0){
+					e.getComponent().setLocation(e.getComponent().getX(), 0);
+				}
 				if (e.getComponent() != being_moved){
 					being_moved = e.getComponent();
 					placeInDivision(e.getComponent());

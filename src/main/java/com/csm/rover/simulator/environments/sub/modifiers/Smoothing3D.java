@@ -3,11 +3,11 @@ package com.csm.rover.simulator.environments.sub.modifiers;
 import com.csm.rover.simulator.environments.EnvironmentModifier;
 import com.csm.rover.simulator.environments.annotations.Modifier;
 import com.csm.rover.simulator.environments.sub.AquaticMap;
-import com.csm.rover.simulator.objects.ArrayGrid3D;
+import com.csm.rover.simulator.objects.util.ArrayGrid3D;
 
 import java.util.Map;
 
-@Modifier(name="Smoother", type="Rover", parameters={})
+@Modifier(name="Smoother", type="Sub", parameters={})
 public class Smoothing3D extends EnvironmentModifier<AquaticMap> {
 
     public Smoothing3D() {
@@ -21,7 +21,7 @@ public class Smoothing3D extends EnvironmentModifier<AquaticMap> {
         int count = 9;
         for (int x = 0; x < values.getWidth(); x++){
             for (int y = 0; y < values.getHeight(); y++) {
-                for (int z = 0; z < values.getLength(); z++) {
+                for (int z = 0; z < values.getDepth(); z++) {
                     if (x > 2 && y > 2 && x < values.getWidth() - 2 && y < values.getHeight() - 2) {
                         if (count % 4 == 0) {
                             values.put(x, y, z, (values2.get(x, y, z) + values2.get(x - 1, y - 2, z-3) + values2.get(x + 1, y + 2, z +3)) / 3.f);

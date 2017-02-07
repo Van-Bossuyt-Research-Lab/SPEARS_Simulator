@@ -2,9 +2,8 @@ package com.csm.rover.simulator.platforms.sub.subAuto;
 
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.sub.AquaticEnvironment;
-import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.objects.DatedFileAppenderImpl;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
+import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
@@ -44,12 +43,13 @@ public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
         if (!state.getType().equals("Sub")){
             throw new IllegalArgumentException("The provided state is not a SubState");
         }
-        return doNextCommand(millitime, new DecimalPoint(state.<Double>get("x"), state.<Double>get("y")),
-                state.<Double>get("direction"), getAutonomousParameters(state));
+        return doNextCommand(millitime, new DecimalPoint3D(state.<Double>get("x"), state.<Double>get("y"), state.<Double>get("z")),
+                new double[]{ state.<Double>get("pitch"), state.<Double>get("yaw"), state.<Double>get("roll") },
+                getAutonomousParameters(state));
     }
 
-    protected abstract String doNextCommand(long milliTime, DecimalPoint location,
-                                            double direction, Map<String, Double> params);
+    protected abstract String doNextCommand(long milliTime, DecimalPoint3D location,
+                                            double[] orientation, Map<String, Double> params);
 
     @Override
     public void setEnvironment(PlatformEnvironment environment){
@@ -95,13 +95,14 @@ public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
     }
 
     private Map<String, Double> getAutonomousParameters(PlatformState state){
-        String[] required = new String[] { "acceleration", "angular_acceleration", "battery_voltage", "battery_current",
-                "battery_temp", "battery_charge" };
-        String[] fromLists = new String[] { "wheel_speed", "motor_current", "motor_temp" };
+        String[] fromLists = new String[] { "prop_speed", "motor_current", "motor_power" };
         Map<String, Double> params = new TreeMap<>();
-        for (String param : required){
-            params.put(param, state.<Double>get(param));
-        }
+        params.put("speed_x", state.<Double[]>get("speed")[0]);
+        params.put("speed_y", state.<Double[]>get("speed")[1]);
+        params.put("speed_z", state.<Double[]>get("speed")[2]);
+        params.put("angular_speed_p", state.<Double[]>get("angular_speed")[0]);
+        params.put("angular_speed_w", state.<Double[]>get("angular_speed")[1]);
+        params.put("angular_speed_r", state.<Double[]>get("angular_speed")[2]);
         for (String param : fromLists){
             Double[] list = state.get(param);
             for (int i = 0; i < list.length; i++){
