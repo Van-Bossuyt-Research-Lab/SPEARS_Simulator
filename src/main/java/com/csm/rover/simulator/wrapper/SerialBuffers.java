@@ -11,15 +11,12 @@ public class SerialBuffers {
 
     private Map<String, Queue<Byte>> serialBuffers; // the buffer for messages
 
-    private HumanInterfaceAbstraction hi;
-
-    public SerialBuffers(ArrayList<String> IDs, HumanInterfaceAbstraction hi){
+    public SerialBuffers(List<String> IDs){
         serialBuffers = new HashMap<String, Queue<Byte>>();
         initializeLists(IDs);
-        this.hi = hi;
     }
 
-    private void initializeLists(ArrayList<String> IDs){
+    private void initializeLists(List<String> IDs){
         for (String id : IDs){
             serialBuffers.put(id, new LinkedList<Byte>());
         }
@@ -36,7 +33,6 @@ public class SerialBuffers {
                 }
             }
         }
-        hi.updateSerialBuffers();
     }
 
     public void writeToSerial(char write, String from){
@@ -60,7 +56,6 @@ public class SerialBuffers {
                 break;
             }
         }
-        hi.updateSerialBuffers();
         return out;
     }
 

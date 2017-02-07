@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Globals {
 	private static final Logger LOG = LogManager.getFormatterLogger(Globals.class);
 
-	public static String versionNumber = "2.7.1";
+	public final static String versionNumber = "2.7.1";
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;
@@ -67,17 +67,19 @@ public class Globals {
 		}
         clock.start();
 		ThreadItem.offset = 0;
-		new FreeThread(0, new Runnable(){
-			public void run(){
-				long end = System.nanoTime() + (long)(1000000 / getTimeScale());
-				while (System.nanoTime() < end) {}
-				threadCheckIn("milli-clock");
-			}
+		new FreeThread(0,() -> {
+			long end = System.nanoTime() + (long)(1000000 / getTimeScale());
+			while (System.nanoTime() < end) {}
+			threadCheckIn("milli-clock");
 		}, SynchronousThread.FOREVER, "milli-clock", true);
 	}
 	
 	public double getTimeAccelerant() {
 		return time_accelerant;
+	}
+
+	public boolean isAccelerated(){
+		return timeScale==time_accelerant;
 	}
 
 	public double getTimeScale(){
@@ -130,18 +132,8 @@ public class Globals {
 		}
 	}
 	
-	public void setUpAcceleratedRun(final HumanInterfaceAbstraction HI, int runtime){
-		exitTime = runtime;
-        HI.viewAccelerated(exitTime, time_accelerant);
-		new FreeThread(1000, new Runnable(){
-			public void run(){
-				if (timeMillis >= exitTime){
-					//Maybe not working? was an error
-					LOG.log(Level.INFO, "Exiting");
-					HI.exit();
-				}
-			}
-		}, FreeThread.FOREVER, "accel-handler");
+	void setUpAcceleratedRun(int runtime){
+		new SynchronousThread(runtime*60*1000, Admin.getInstance()::shutDownSimulator, 1, "AccelBrake");
 	}
 	
 	public void registerNewThread(String name, int delay, SynchronousThread thread){

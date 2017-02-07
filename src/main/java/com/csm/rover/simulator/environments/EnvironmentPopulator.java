@@ -1,8 +1,11 @@
 package com.csm.rover.simulator.environments;
 
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
+import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.awt.*;
 import java.util.Map;
 
 public abstract class EnvironmentPopulator {
@@ -45,7 +48,7 @@ public abstract class EnvironmentPopulator {
             return default_value;
         }
         int[] coords = new int[coordinates.length];
-        for (int i = 0; i > coordinates.length; i++){
+        for (int i = 0; i < coordinates.length; i++){
             coords[i] = (int)Math.floor(coordinates[i]);
         }
         try {
@@ -55,5 +58,8 @@ public abstract class EnvironmentPopulator {
             return default_value;
         }
     }
+
+    @JsonIgnore
+    public abstract PopulatorDisplayFunction getDisplayFunction();
 
 }

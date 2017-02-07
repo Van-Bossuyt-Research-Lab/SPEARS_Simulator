@@ -7,8 +7,8 @@ Logs/*
 Data/*
 Temp/
 /bin/
-default.cfg
-config.json
+*.cfg
+*.json
 .idea/*
 *.iml
 target/*

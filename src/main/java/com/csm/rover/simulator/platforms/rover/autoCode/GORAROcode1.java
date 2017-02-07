@@ -62,10 +62,10 @@ public class GORAROcode1 extends RoverAutonomousCode {
     @Override
 	public String doNextCommand(long milliTime, DecimalPoint location, double direction, Map<String, Double> params)
 	{
-		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + MAP.getHeightAt(location) + "\t" + score + "\t" + state);
+		super.writeToLog(milliTime + "\t" + location.getX() + "\t" + location.getY() + "\t" + environment.getHeightAt(location) + "\t" + score + "\t" + state);
 		direction = (direction + 2*Math.PI) % (2*Math.PI);
 		if (hasUnvisitedScience(location)){
-			score += MAP.<Integer>getPopulatorValue("Targets", location)/10;
+			score += environment.<Integer>getPopulatorValue("Targets", location)/10;
 			visitedScience.add(location.clone());
 			for (int x = 0; x < histories; x++){
 				for (int y = 0; y < sampleDirections; y++){
@@ -118,7 +118,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
 				
 				//if there is a hazard at the point get less excited
 				int hazard = 0;
-				if (MAP.<Integer>getPopulatorValue("Hazards", examine) > 0){
+				if (environment.<Integer>getPopulatorValue("Hazards", examine) > 0){
 					hazard = 1;
 				}
 				
@@ -138,7 +138,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
 				double hazardArea = 0;
 				for (double radius = sampleRadius; radius <= averagingRadius; radius += averagingRStep){
 					for (double phi = -averagingAngle/2.0; phi <= averagingAngle/2.0; phi += averagingPStep){
-						if (MAP.<Integer>getPopulatorValue("Hazard", location.offset(radius * Math.cos(theta + phi), radius * Math.sin(theta + phi))) > 0){
+						if (environment.<Integer>getPopulatorValue("Hazard", location.offset(radius * Math.cos(theta + phi), radius * Math.sin(theta + phi))) > 0){
 							hazardArea += sampleRadius/radius;
 							hazards[i] += 1;
 						}
@@ -147,7 +147,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
 				hazardArea /= averagingRadius*averagingAngle;
 				
 				//work required to move the same translational distance increases proportional to the tangent of the slope
-				double energyCost = Math.tan((MAP.getHeightAt(examine)-MAP.getHeightAt(location)) / sampleRadius);
+				double energyCost = Math.tan((environment.getHeightAt(examine)- environment.getHeightAt(location)) / sampleRadius);
 				
 				//calculate the potential of the point
 				potentials[histories-1][i] = mentality[0]*science - mentality[1]*hazard + mentality[2]*scienceArea - mentality[3]*hazardArea - mentality[4]*energyCost;
@@ -202,7 +202,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
 	}
 
 	private boolean hasUnvisitedScience(DecimalPoint loc){
-		if (MAP.<Integer>getPopulatorValue("Targets", loc) > 0){
+		if (environment.<Integer>getPopulatorValue("Targets", loc) > 0){
 			for (DecimalPoint past : visitedScience){
 				if (Math.sqrt(Math.pow(loc.getX()-past.getX(), 2) + Math.pow(loc.getY()-past.getY(), 2)) < 3){
 					return false;

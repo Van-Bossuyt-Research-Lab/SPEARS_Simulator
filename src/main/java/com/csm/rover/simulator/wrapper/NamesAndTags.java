@@ -1,6 +1,7 @@
 package com.csm.rover.simulator.wrapper;
 
 import com.csm.rover.simulator.objects.io.PlatformConfig;
+import com.csm.rover.simulator.objects.io.TypeConfig;
 import com.csm.rover.simulator.platforms.Platform;
 import com.google.common.collect.Lists;
 
@@ -16,14 +17,16 @@ public class NamesAndTags implements Cloneable {
         this.correlation = new TreeMap<>();
     }
 
-    public static NamesAndTags newFromPlatforms(List<PlatformConfig> platforms){
+    public static NamesAndTags newFromPlatforms(List<TypeConfig> platforms){
         NamesAndTags nat = new NamesAndTags();
-        for (PlatformConfig platform : platforms){
-            String type = platform.getType();
+        for (TypeConfig typeConfig : platforms){
+            String type = typeConfig.type;
             if (!nat.correlation.containsKey(type)){
-                nat.correlation.put(type, new TreeMap<String, String>());
+                nat.correlation.put(type, new TreeMap<>());
             }
-            nat.correlation.get(type).put(platform.getScreenName(), platform.getID());
+            for (PlatformConfig platformConfig : typeConfig.platformConfigs) {
+                nat.correlation.get(type).put(platformConfig.getScreenName(), platformConfig.getID());
+            }
         }
         Map<String, String> groundMap = new TreeMap<>();
         groundMap.put("Ground", "g");
