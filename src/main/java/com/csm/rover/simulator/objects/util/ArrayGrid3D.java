@@ -33,7 +33,7 @@ public interface ArrayGrid3D<T> extends Cloneable {
 
     int getHeight();
 
-    int getLength();
+    int getDepth();
 
     int getX();
 

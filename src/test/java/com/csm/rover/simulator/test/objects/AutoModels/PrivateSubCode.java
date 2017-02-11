@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.test.objects.autoModels;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
@@ -11,6 +12,11 @@ public class PrivateSubCode extends PlatformAutonomousCodeModel {
 
     protected PrivateSubCode() {
         super("Sub");
+    }
+
+    @Override
+    public void setEnvironment(PlatformEnvironment enviro) {
+
     }
 
     @Override

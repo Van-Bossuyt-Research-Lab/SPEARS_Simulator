@@ -130,7 +130,7 @@ public class AquaticMap extends EnvironmentMap {
         return detail;
     }
 
-    public ArrayGrid3D rawValues() {
+    public ArrayGrid3D<Float> rawValues() {
         return SubMap;
     }
 }

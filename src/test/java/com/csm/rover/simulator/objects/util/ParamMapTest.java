@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class ParamMapTest {
 
-    private static final double TOLERANCE = .0001;
+    private static final double TOLERANCE = 0.00001;
 
     @Test
     public void testEmpty(){

@@ -8,4 +8,8 @@ public class UnlabeledSeaEnv extends PlatformEnvironment {
         super("Sub");
     }
 
+    @Override
+    public int getSize() {
+        return 0;
+    }
 }

@@ -8,4 +8,8 @@ public class UnlabeledPlatform extends Platform {
         super("Bike");
     }
 
+    @Override
+    public void start() {
+
+    }
 }

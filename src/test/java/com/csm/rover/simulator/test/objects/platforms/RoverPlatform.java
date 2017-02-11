@@ -9,4 +9,8 @@ public class RoverPlatform extends Platform {
         super("Rover");
     }
 
+    @Override
+    public void start() {
+
+    }
 }

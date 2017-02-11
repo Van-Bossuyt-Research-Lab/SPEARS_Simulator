@@ -6,7 +6,7 @@ import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
 import com.csm.rover.simulator.objects.io.EnvrioFileFilter;
 import com.csm.rover.simulator.objects.util.DecimalPoint;
-import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.rover.RoverObject;
 import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
