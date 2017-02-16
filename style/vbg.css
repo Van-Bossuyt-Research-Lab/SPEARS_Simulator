@@ -1,0 +1,176 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	vertical-align: baseline;
+	background: transparent;
+}
+
+/* Header */
+
+header, footer, aside, nav, article, section {
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+
+header {
+	background: url(../images/header.png) repeat-x;
+	min-height: 188px;
+	max-height: 188px;
+	color: WHITE;
+}
+
+header h1, header h3 {
+	padding: 0;
+	margin: 0;
+	margin-left: 20px;
+	padding-bottom: 10px;
+}
+
+header .title {
+	padding-top: 70px;
+	position: relative;
+	float: left;
+	font-family: 'Times';
+}
+
+header img {
+	max-height: 150px;
+	margin: 19px;
+	padding: 0;
+	float: right;
+	position: relative;
+}
+
+
+/*  Page  */
+
+body, content, html, .container {
+	background: rgb(238, 241, 247);
+	min-height: 100%;
+}
+
+div[class^="col-"], div[class*=" col-"] {
+    padding: 0;
+}
+
+hr {
+	border: 1px solid rgb(186, 186, 189);
+    display: line;
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#pageContent a, a:link, a:visited, a:active {
+	color: rgb(176, 53, 20);
+	outline: none;
+	text-decoration: underline;
+}
+
+#pageContent a:hover, a:focus {
+	color: rgb(176, 53, 20);
+	outline: none;
+	text-decoration: none;
+}
+
+body ul {
+	text-decoration: none;
+}
+
+.container #pageContent {
+	background: WHITE;
+	min-height: 90%;
+	margin: 0;
+	padding: 20px;
+}
+
+#pageContent .page-title {
+	font-weight: Bold;
+	margin-bottom: 15px;
+}
+
+ul {
+	margin-left: 3em;
+}
+
+li {
+	line-height: 1.5em;
+}
+
+p {
+	font-family: Lucida Sans, Arial, sans-serif;
+	line-height: 1.2em;
+	text-align: justify;
+	margin-bottom: 1em;
+}
+
+#copyRight {
+	font-family: "Times";
+	font-weight: Bold;
+	text-align: center;
+	font-variant: small-caps;
+	color: rgb(177, 177, 191);
+	padding-top: 10px;
+}
+
+.tab {
+	display: inline-block;
+	width: 10px;
+}
+
+/* nave well */
+
+.container #navWell {
+	background: rgb(203, 203, 213);
+	margin: 0;
+	padding: 20px;
+}
+
+.container #navCol {
+	min-width: 250px;
+}
+
+#navWell a, a:link, a:visited, a:active, a:hover, a:focus {
+	color: BLACK;
+	outline: none;
+	text-decoration: none;
+	margin: 0;
+	padding: 0;
+}
+
+#navWell a .well-sm {
+	background: transparent;
+	margin: 0;
+	padding: 5px;
+}
+
+#navWell a .well-sm:hover {
+	background: rgb(177, 177, 191);
+}
+
+#navWell #selected {
+	padding: 5px;
+	font-weight: Bold;
+	background: transparent;
+}
+
+/* Mobile */
+
+@media (max-width: 640px) 
+{
+    header img {
+        display: none;
+    }
+}
