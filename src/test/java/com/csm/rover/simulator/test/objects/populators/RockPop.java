@@ -6,6 +6,8 @@ import com.csm.rover.simulator.environments.annotations.Populator;
 import com.csm.rover.simulator.objects.util.RecursiveGridList;
 
 import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
+
+import java.awt.*;
 import java.util.Map;
 
 @Populator(type = "Rover", name = "Rock Pop", parameters = { "paramA", "paramB" }, coordinates = { "x", "y" })
@@ -22,6 +24,6 @@ public class RockPop  extends EnvironmentPopulator {
 
     @Override
     public PopulatorDisplayFunction getDisplayFunction() {
-        return null;
+        return (d) -> Color.GREEN;
     }
 }

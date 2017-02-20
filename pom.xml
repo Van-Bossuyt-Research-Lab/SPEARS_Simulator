@@ -121,12 +121,11 @@
 						<excludes>
 							<exclude>com/csm/rover/simulator/**/*Test.class</exclude>
 							<exclude>com/csm/rover/simulator/objects/io/DatedFileAppenderImpl.class</exclude>
-							<exclude>com/csm/rover/simulator/visual/*.class</exclude>
-							<exclude>com/csm/rover/simulator/control/*.class</exclude>
 							<exclude>com/csm/rover/simulator/platforms/rover/autoCode/*.class</exclude>
 							<exclude>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</exclude>
 							<exclude>com/csm/rover/simulator/platforms/sub/subAuto/*.class</exclude>
 							<exclude>com/csm/rover/simulator/platforms/sub/physicsModels/*.class</exclude>
+							<exculde>com/csm/rover/simulator/ui/**/*.class</exculde>
 						</excludes>
 					</instrumentation>
                 </configuration>
@@ -157,12 +156,11 @@
                     </formats>
 					<instrumentation>
 						<includes>
-							<include>com/csm/rover/simulator/visual/*.class</include>
-							<include>com/csm/rover/simulator/control/*.class</include>
 							<include>com/csm/rover/simulator/platforms/rover/autoCode/*.class</include>
 							<include>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</include>
 							<include>com/csm/rover/simulator/platforms/sub/subAuto/*.class</include>
 							<include>com/csm/rover/simulator/platforms/sub/physicsModels/*.class</include>
+							<inculde>com/csm/rover/simulator/ui/**/*.class</inculde>
 						</includes>
 					</instrumentation>
                 </configuration>
