@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.test.objects.physicsModels;
 
+import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
@@ -40,5 +41,10 @@ public class ProtectedSubPhysics extends PlatformPhysicsModel {
     @Override
     public PlatformState getState() {
         return null;
+    }
+
+    @Override
+    public void setEnvironment(PlatformEnvironment enviro) {
+
     }
 }

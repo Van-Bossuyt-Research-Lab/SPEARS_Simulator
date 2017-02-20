@@ -9,4 +9,8 @@ public class NoncreatableSub extends Platform {
         super("Sub");
     }
 
+    @Override
+    public void start() {
+
+    }
 }

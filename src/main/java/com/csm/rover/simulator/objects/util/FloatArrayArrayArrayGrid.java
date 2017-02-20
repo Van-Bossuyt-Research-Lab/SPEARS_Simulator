@@ -214,9 +214,10 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid3D<Float> {
     }
 
     @Override
-    public int getLength() {
-        return 0;
+    public int getDepth() {
+        return grid3[0].length == 0 ? 0 : grid3[0][0].length;
     }
+
 
     @Override
     public int getX() {
@@ -232,11 +233,6 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid3D<Float> {
     public int getZ() {
         return 0;
     }
-
-    public int getDepth() {
-        return grid3[0].length == 0 ? 0 : grid3[0][0].length;
-    }
-
 
     public int size() {
         return getWidth()*getHeight();

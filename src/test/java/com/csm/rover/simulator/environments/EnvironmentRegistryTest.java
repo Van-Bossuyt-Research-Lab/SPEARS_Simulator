@@ -11,6 +11,7 @@ import com.csm.rover.simulator.test.objects.environments.UnlabeledSeaEnv;
 import com.csm.rover.simulator.test.objects.maps.*;
 import com.csm.rover.simulator.test.objects.modifiers.*;
 import com.csm.rover.simulator.test.objects.populators.*;
+import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 import com.google.common.collect.Sets;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import org.laughingpanda.beaninject.Inject;
 import org.reflections.Reflections;
 
+import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -57,6 +59,7 @@ public class EnvironmentRegistryTest {
     private static Map<String, Map<String, String[]>> modifierParameters;
     private static Map<String, Map<String, String>> populators;
     private static Map<String, Map<String, String[]>> populatorParameters;
+    private static Map<String, Map<String, PopulatorDisplayFunction>> populatorDisplays;
 
     @Before
     public void clearRegistry(){
@@ -66,6 +69,7 @@ public class EnvironmentRegistryTest {
         populators = new TreeMap<>();
         modifierParameters = new TreeMap<>();
         populatorParameters = new TreeMap<>();
+        populatorDisplays = new TreeMap<>();
 
         EnvironmentRegistry er = new EnvironmentRegistry();
         Inject.field("environments").of(er).with(environments);
@@ -74,6 +78,7 @@ public class EnvironmentRegistryTest {
         Inject.field("populators").of(er).with(populators);
         Inject.field("modifierParameters").of(er).with(modifierParameters);
         Inject.field("populatorParameters").of(er).with(populatorParameters);
+        Inject.field("populatorDisplays").of(er).with(populatorDisplays);
 
         reflectionsMock = mock(Reflections.class);
     }
@@ -263,6 +268,12 @@ public class EnvironmentRegistryTest {
         assert !populators.get("UAV").containsValue(PrivateCloudPop.class.getName());
     }
 
+    @Test
+    public void testPops_testDisplayFunction() throws InvocationTargetException, IllegalAccessException {
+        setupFillPopulators();
+        assert populatorDisplays.get("Rover").containsKey("Rock Pop");
+    }
+
 //  GETTERS ------------------------------------------------------------------------------------------------------------
 
     @Test
@@ -341,6 +352,18 @@ public class EnvironmentRegistryTest {
     public void testUnknownPolulatorParamName(){
         setupFill();
         Assert.assertEquals(null, EnvironmentRegistry.getParametersForPopulator("Rover", "Bush Pop"));
+    }
+
+    @Test
+    public void testDisplayFunction(){
+        setupFill();
+        Assert.assertEquals(Color.GREEN, EnvironmentRegistry.getPopulatorDisplayFunction("Rover", "Rock Pop").displayFunction(4));
+    }
+
+    @Test
+    public void testDisplayFunctionNull(){
+        setupFill();
+        assert null == EnvironmentRegistry.getPopulatorDisplayFunction("UAV", "Cloud");
     }
 
 }

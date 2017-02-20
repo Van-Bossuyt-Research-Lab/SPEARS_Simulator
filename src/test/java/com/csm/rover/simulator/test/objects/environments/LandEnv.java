@@ -10,4 +10,8 @@ public class LandEnv extends PlatformEnvironment {
         super("Rover");
     }
 
+    @Override
+    public int getSize() {
+        return 0;
+    }
 }

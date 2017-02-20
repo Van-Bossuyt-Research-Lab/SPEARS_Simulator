@@ -10,4 +10,8 @@ public class ProtectedSkyEnv extends PlatformEnvironment {
         super("UAV");
     }
 
+    @Override
+    public int getSize() {
+        return 0;
+    }
 }

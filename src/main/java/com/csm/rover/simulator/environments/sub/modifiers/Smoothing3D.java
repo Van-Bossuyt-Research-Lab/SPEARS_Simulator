@@ -16,8 +16,8 @@ public class Smoothing3D extends EnvironmentModifier<AquaticMap> {
 
     @Override
     protected AquaticMap doModify(AquaticMap map, Map<String, Double> params) {
-        ArrayGrid3D values = map.rawValues();
-        ArrayGrid3D values2 = map.rawValues();
+        ArrayGrid3D<Float> values = map.rawValues();
+        ArrayGrid3D<Float> values2 = map.rawValues();
         int count = 9;
         for (int x = 0; x < values.getWidth(); x++){
             for (int y = 0; y < values.getHeight(); y++) {

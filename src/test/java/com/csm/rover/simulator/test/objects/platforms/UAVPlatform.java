@@ -8,4 +8,6 @@ public class UAVPlatform extends Platform {
     public UAVPlatform() {
         super("UAV");
     }
+
+    public void start() {}
 }

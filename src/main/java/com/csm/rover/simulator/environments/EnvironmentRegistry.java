@@ -9,7 +9,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * Registry pattern class that uses class structure and annotations to identify critical classes and dynamically makes
@@ -42,6 +44,7 @@ public class EnvironmentRegistry {
         modifierParameters = new TreeMap<>();
         populators = new TreeMap<>();
         populatorParameters = new TreeMap<>();
+        populatorDisplays = new TreeMap<>();
 
         LOG.log(Level.INFO, "Initializing Environment Registry");
 
@@ -183,6 +186,7 @@ public class EnvironmentRegistry {
         for (String type : environments.keySet()){
             populators.put(type, new TreeMap<>());
             populatorParameters.put(type, new TreeMap<>());
+            populatorDisplays.put(type, new TreeMap<>());
         }
 
         Set<Class<? extends EnvironmentPopulator>> classpops = reflect.getSubTypesOf(EnvironmentPopulator.class);
@@ -356,6 +360,14 @@ public class EnvironmentRegistry {
         }
     }
 
+    /**
+     * Returns the display function  registered to the requested populator.  If the populator is unknown will
+     * return null.
+     *
+     * @param type The type name of the populator
+     * @param name the name of the populator
+     * @return A {@link PopulatorDisplayFunction}
+     */
     public static PopulatorDisplayFunction getPopulatorDisplayFunction(String type, String name){
         if (environments.containsKey(type)){
             Map<String, PopulatorDisplayFunction> displays = populatorDisplays.get(type);

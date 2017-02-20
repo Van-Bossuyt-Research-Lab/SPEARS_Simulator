@@ -1,6 +1,6 @@
 package com.csm.rover.simulator.ui.implementation;
 
-import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.objects.FreeThread;
 
 abstract class DisplayWindow extends EmbeddedFrame {
 
