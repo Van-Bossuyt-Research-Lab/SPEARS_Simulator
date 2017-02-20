@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Globals {
 	private static final Logger LOG = LogManager.getFormatterLogger(Globals.class);
 
-	public static final String versionNumber = "2.7.1";
+	public final static String versionNumber = "3.0.0";
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;
