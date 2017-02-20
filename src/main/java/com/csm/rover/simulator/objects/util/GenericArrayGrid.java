@@ -1,30 +1,53 @@
 package com.csm.rover.simulator.objects.util;
 
-import java.util.ArrayList;
+import com.csm.rover.simulator.objects.CoverageIgnore;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * An implementation of {@link ArrayGrid} which uses {@link ArrayList}.  Default value  is null.
+ *
+ * @param <T>
+ */
 public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
 
-    private ArrayList<ArrayList<T>> grid;
+    private ArrayList<List<T>> grid;
 
+    /**
+     * Creates an empty 2D data structure
+     */
     public GenericArrayGrid(){
-        grid = new ArrayList<ArrayList<T>>();
+        grid = new ArrayList<>();
     }
 
+    /**
+     * Creates a 2D data structure using the provided values.  See {@link #loadFromArray(Object[][])}
+     *
+     * @param values 2D array of values, get(x, y) == [x][y]
+     */
     public GenericArrayGrid(T[][] values){
         loadFromArray(values);
     }
 
-    public GenericArrayGrid(GenericArrayGrid<T> original){
-        grid = new ArrayList<ArrayList<T>>();
-        for (int x = 0; x < getWidth(); x++){
-            for (int y = 0; y < getHeight(); y++){
+
+    /**
+     * Creates a clone of the original ArrayGrid.  See {@link #clone()}
+     *
+     * @param original ArrayGrid to be cloned
+     */
+    public GenericArrayGrid(ArrayGrid<T> original){
+        grid = new ArrayList<>();
+        for (int x = 0; x < original.getWidth(); x++){
+            for (int y = 0; y < original.getHeight(); y++){
                 put(x, y, original.get(x, y));
             }
         }
     }
 
+    @Override
     public void loadFromArray(T[][] values){
-        grid = new ArrayList<ArrayList<T>>();
+        grid = new ArrayList<>();
         for (int x = 0; x < values.length; x++){
             for (int y = 0; y < values[x].length; y++){
                 put(x, y, values[x][y]);
@@ -32,12 +55,14 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
+    @Override
     public void fillToSize(int width, int height){
         fillToSize(width, height, null);
     }
 
+    @Override
     public void fillToSize(int width, int height, T val){
-        grid = new ArrayList<ArrayList<T>>();
+        grid = new ArrayList<>();
         for (int x = 0; x < width; x++){
             for (int y = 0; y < height; y++){
                 put(x, y, val);
@@ -45,36 +70,41 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
+    @Override
     public void put(int x, int y, T val){
         while (x >= getWidth()){
-            addColumn(new ArrayList<T>());
+            addColumn(new ArrayList<>());
         }
         while (y >= getHeight()){
-            addRow(new ArrayList<T>());
+            addRow(new ArrayList<>());
         }
         grid.get(x).set(y, val);
     }
 
-    public void addColumn(ArrayList<T> col){
-        addColumnAt(getWidth(), col);
+    @Override
+    public void addColumn(List<T> col){
+        insertColumnAt(getWidth(), col);
     }
 
-    public void addColumnAt(int x, ArrayList<T> col){
+    @Override
+    public void insertColumnAt(int x, List<T> col){
         while (getWidth() < x){
-            addColumn(new ArrayList<T>());
+            addColumn(new ArrayList<>());
         }
         normalizeColumn(col);
         grid.add(x, col);
     }
 
-    public void addRow(ArrayList<T> row){
-        addRowAt(getHeight(), row);
+    @Override
+    public void addRow(List<T> row){
+        insertRowAt(getHeight(), row);
     }
 
-    public void addRowAt(int y, ArrayList<T> row){
+    @Override
+    public void insertRowAt(int y, List<T> row){
         normalizeRow(row);
         while (getHeight() < y){
-            addRow(new ArrayList<T>());
+            addRow(new ArrayList<>());
         }
         normalizeRow(row);
         for (int x = 0; x < grid.size(); x++){
@@ -82,26 +112,27 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
-    private void normalizeRow(ArrayList<T> row){
+    private void normalizeRow(List<T> row){
         while (getWidth() > row.size()){
             row.add(null);
         }
         while (getWidth() < row.size()){
-            addColumn(new ArrayList<T>());
+            addColumn(new ArrayList<>());
         }
     }
 
-    private void normalizeColumn(ArrayList<T> col){
+    private void normalizeColumn(List<T> col){
         if (grid.size() > 0){
             while (col.size() < getHeight()){
                 col.add(null);
             }
             while (col.size() > getHeight()){
-                addRow(new ArrayList<T>());
+                addRow(new ArrayList<>());
             }
         }
     }
 
+    @Override
     public T get(int x, int y){
         if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()){
             return grid.get(x).get(y);
@@ -111,7 +142,8 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
-    public ArrayList<T> getColumn(int x){
+    @Override
+    public List<T> getColumn(int x){
         if (x >= 0 && x < getWidth()){
             return grid.get(x);
         }
@@ -120,10 +152,11 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
-    public ArrayList<T> getRow(int y){
+    @Override
+    public List<T> getRow(int y){
         if (y >= 0 && y < getHeight()){
             ArrayList<T> row = new ArrayList<T>();
-            for (ArrayList<T> col : grid){
+            for (List<T> col : grid){
                 row.add(col.get(y));
             }
             return row;
@@ -133,10 +166,12 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
+    @Override
     public int getWidth(){
         return grid.size();
     }
 
+    @Override
     public int getHeight() {
         if (getWidth() > 0){
             return grid.get(0).size();
@@ -146,19 +181,42 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
         }
     }
 
+    @Override
     public int size(){
         return getWidth()*getHeight();
     }
 
+    @Override
     public boolean isEmpty(){
         return size() == 0;
     }
 
     @Override
-    public boolean equals(Object other) {
-        return other instanceof ArrayGrid && this.toString().equals(other.toString());
+    public boolean equals(Object o) {
+        if (o instanceof ArrayGrid){
+            ArrayGrid other = (ArrayGrid) o;
+            if (other.getWidth() == getWidth() && other.getHeight() == getHeight()){
+                for (int i = 0; i < getWidth(); i++){
+                    for (int j = 0; j < getHeight(); j++){
+                        if (get(i, j) == null){
+                            if (other.get(i, j) != null){
+                                return false;
+                            }
+                        }
+                        else {
+                            if (!get(i, j).equals(other.get(i, j))) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
+    @CoverageIgnore
     @Override
     public String toString(){
         ArrayList<String> rows = new ArrayList<String>(getHeight());

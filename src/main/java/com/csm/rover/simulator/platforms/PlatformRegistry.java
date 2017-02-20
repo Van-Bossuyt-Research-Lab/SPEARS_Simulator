@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.platforms;
 
+import com.csm.rover.simulator.objects.CoverageIgnore;
 import com.csm.rover.simulator.platforms.annotations.AutonomousCodeModel;
 import com.csm.rover.simulator.platforms.annotations.PhysicsModel;
 import com.csm.rover.simulator.platforms.annotations.State;
@@ -11,12 +12,15 @@ import org.reflections.Reflections;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+/**
+ * Registry pattern class that uses class structure and annotations to identify critical classes and dynamically makes
+ * them available to the user.
+ */
 public class PlatformRegistry {
+    @CoverageIgnore
     private static final Logger LOG = LogManager.getLogger(PlatformRegistry.class);
 
-    static {
-        fillRegistry();
-    }
+    private static Reflections reflect = new Reflections("com.csm.rover.simulator.platforms");
 
     private static Map<String, String> platforms;
 
@@ -28,7 +32,11 @@ public class PlatformRegistry {
     private static Map<String, Map<String, String[]>> autoModelParameters;
     private static Map<String, Map<String, String[]>> physicsModelParameters;
 
-    private static void fillRegistry() {
+    /**
+     * Initiates a reflection-based scan of the package com.csm.rover.simulator.platforms to look for implementations
+     * of Platforms and their supporting classes.
+     */
+    public static void fillRegistry() {
         platforms = new TreeMap<>();
         platformStates = new TreeMap<>();
         autoModels = new TreeMap<>();
@@ -37,7 +45,6 @@ public class PlatformRegistry {
         physicsModelParameters = new TreeMap<>();
 
         LOG.log(Level.INFO, "Initializing Platform Registry");
-        Reflections reflect = new Reflections("com.csm.rover.simulator.platforms");
 
         fillPlatforms(reflect);
         fillStates(reflect);
@@ -114,22 +121,20 @@ public class PlatformRegistry {
                 LOG.log(Level.WARN, "PlatformState {} has type {} which is not a recognized platform", getClassPath(state), type);
             }
         }
-        if (platformStates.size() == 0){
-            LOG.log(Level.WARN, "No PlatformStates were found");
-            return;
-        }
         for (String type : platforms.keySet()){
-            if (!platformStates.containsKey(type)){
+            if (platformStates.containsKey(type)){
+                LOG.log(Level.INFO, "For Platform {} identified state {}", type, platformStates.get(type));
+            }
+            else {
                 LOG.log(Level.WARN, "No PlatformState found for type {}", type);
             }
         }
-        LOG.log(Level.INFO, "Found PlatformStates: {}", platformStates.toString());
     }
 
     private static void fillAutoModels(Reflections reflect){
         for (String type : platforms.keySet()){
-            autoModels.put(type, new TreeMap<String, String>());
-            autoModelParameters.put(type, new TreeMap<String, String[]>());
+            autoModels.put(type, new TreeMap<>());
+            autoModelParameters.put(type, new TreeMap<>());
         }
 
         Set<Class<? extends PlatformAutonomousCodeModel>> classautos = reflect.getSubTypesOf(PlatformAutonomousCodeModel.class);
@@ -184,8 +189,8 @@ public class PlatformRegistry {
 
     private static void fillPhysicsModels(Reflections reflect){
         for (String type : platforms.keySet()){
-            physicsModels.put(type, new TreeMap<String, String>());
-            physicsModelParameters.put(type, new TreeMap<String, String[]>());
+            physicsModels.put(type, new TreeMap<>());
+            physicsModelParameters.put(type, new TreeMap<>());
         }
 
         Set<Class<? extends PlatformPhysicsModel>> classphysics = reflect.getSubTypesOf(PlatformPhysicsModel.class);
@@ -228,20 +233,31 @@ public class PlatformRegistry {
                 LOG.log(Level.WARN, "PhysicsModel {} has type {} which is not a recognized platform", clazz, type);
             }
         }
-        for (String type : autoModels.keySet()){
+        for (String type : physicsModels.keySet()){
             if (physicsModels.get(type).size() == 0){
-                LOG.log(Level.WARN, "Found no PhysicsModels for platform type {}", type);
+                LOG.log(Level.WARN, "Found no physicsModels for platform type {}", type);
             }
             else {
-                LOG.log(Level.INFO, "For platform type {} found PhysicsModels: {}", type, physicsModels.get(type).toString());
+                LOG.log(Level.INFO, "For platform type {} found physicsModels: {}", type, physicsModels.get(type).toString());
             }
         }
     }
 
+    /**
+     * Returns a list of all Platforms types.
+     *
+     * @return {@link java.util.List} of type names
+     */
     public static List<String> getTypes(){
         return new ArrayList<>(platforms.keySet());
     }
 
+    /**
+     * Returns the class for the platform of the requested type or null if the type is unknown.
+     *
+     * @param type The type name of the desired platform
+     * @return {@link java.lang.Class} extends {@link com.csm.rover.simulator.platforms.Platform Platform}
+     */
     @SuppressWarnings("unchecked")
     public static Class<? extends Platform> getPlatform(String type){
         if (platforms.keySet().contains(type)){
@@ -259,6 +275,13 @@ public class PlatformRegistry {
         }
     }
 
+    /**
+     * Returns the class for the platform state corresponding to the requested platform type name or null if the type
+     * is unknown or no state was found for that type.
+     *
+     * @param type The type name of the corresponding platform
+     * @return {@link java.lang.Class} extends {@link com.csm.rover.simulator.platforms.PlatformState PlatformState}
+     */
     @SuppressWarnings("unchecked")
     public static Class<? extends PlatformState> getPlatformState(String type){
         if (platformStates.containsKey(type)){
@@ -276,6 +299,15 @@ public class PlatformRegistry {
         }
     }
 
+    /**
+     * Returns the class of the autonomous code model of the given name belong to the given platform type.  If the
+     * platform type or the model name is unknown returns null.  A list of known model names can be found with
+     * {@link #listAutonomousCodeModels(String) listAutonomousCodeModels(type)}.
+     *
+     * @param type The type name of the corresponding platform
+     * @param name The name of the desired autonomous model
+     * @return {@link java.lang.Class} extends {@link com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel PlatformAutonomousCodeModel}
+     */
     @SuppressWarnings("unchecked")
     public static Class<? extends PlatformAutonomousCodeModel> getAutonomousCodeModel(String type, String name){
         if (platforms.keySet().contains(type)){
@@ -300,6 +332,15 @@ public class PlatformRegistry {
         }
     }
 
+    /**
+     * Returns the class of the physics model of the given name belong to the given platform type.  If the
+     * platform type or the model name is unknown returns null.  A list of known model names can be found with
+     * {@link #listPhysicsModels(String) listPhysicsModels(type)}.
+     *
+     * @param type The type name of the corresponding platform
+     * @param name The name fo the desired physics model
+     * @return {@link java.lang.Class} extends {@link com.csm.rover.simulator.platforms.PlatformPhysicsModel PlatformPhysicsModel}
+     */
     @SuppressWarnings("unchecked")
     public static Class<? extends PlatformPhysicsModel> getPhysicsModel(String type, String name){
         if (platforms.keySet().contains(type)){
@@ -324,6 +365,12 @@ public class PlatformRegistry {
         }
     }
 
+    /**
+     * Returns a list of all identified physics models registered to the given platform type.
+     *
+     * @param type The corresponding platform type name
+     * @return {@link java.util.List} of model names
+     */
     @SuppressWarnings("unchecked")
     public static List<String> listPhysicsModels(String type){
         if (physicsModels.keySet().contains(type)){
@@ -335,6 +382,12 @@ public class PlatformRegistry {
         }
     }
 
+    /**
+     * Returns a list of all identified autonomous code models registered to the given platform type.
+     *
+     * @param type The corresponding platform type name
+     * @return {@link java.util.List} of model names
+     */
     @SuppressWarnings("unchecked")
     public static List<String> listAutonomousCodeModels(String type){
         if (autoModels.keySet().contains(type)){
@@ -346,6 +399,15 @@ public class PlatformRegistry {
         }
     }
 
+    /**
+     * Returns of list of the parameters the given autonomous code model expects in its
+     * {@link com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel#constructParameters(Map) constructParameters(params)}
+     * method.  If either the platform type name or the model name are unknown returns null.
+     *
+     * @param type The type name of the corresponding platform
+     * @param name The name of the model
+     * @return {@link java.util.List} of parameter names
+     */
     @SuppressWarnings("unchecked")
     public static List<String> getParametersForAutonomousCodeModel(String type, String name){
         if (autoModelParameters.keySet().contains(type)){
@@ -363,6 +425,15 @@ public class PlatformRegistry {
         }
     }
 
+    /**
+     * Returns of list of the parameters the given physics model expects in its
+     * {@link com.csm.rover.simulator.platforms.PlatformPhysicsModel#constructParameters(Map) constructParameters(params)}
+     * method.  If either the platform type name or the model name are unknown returns null.
+     *
+     * @param type The type name of the corresponding platform
+     * @param name The name of the model
+     * @return {@link java.util.List} of parameter names
+     */
     @SuppressWarnings("unchecked")
     public static List<String> getParametersForPhysicsModel(String type, String name){
         if (physicsModelParameters.keySet().contains(type)){

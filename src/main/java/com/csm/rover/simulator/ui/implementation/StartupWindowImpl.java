@@ -2,7 +2,7 @@ package com.csm.rover.simulator.ui.implementation;
 
 import com.csm.rover.simulator.objects.io.ConfigurationFileFilter;
 import com.csm.rover.simulator.objects.io.RunConfiguration;
-import com.csm.rover.simulator.objects.util.FreeThread;
+import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.ui.visual.PopUp;
 import com.csm.rover.simulator.ui.visual.StartupListener;
 import com.csm.rover.simulator.ui.visual.StartupWindow;

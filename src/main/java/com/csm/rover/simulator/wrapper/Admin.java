@@ -153,7 +153,6 @@ public class Admin {
         return filename.substring(filename.lastIndexOf(".")+1, filename.length());
     }
 
-	//TODO clean up this interface for OCP
 	private Admin(){
 		GLOBAL = Globals.getInstance();
         environments = new TreeMap<>();
@@ -173,8 +172,6 @@ public class Admin {
         try {
             LOG.log(Level.INFO, "Starting simulation with configuration:\n{}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(config));
         } catch (JsonProcessingException e) {}
-
-        List<String> ids = new ArrayList<>();
         for (String type : config.getTypes()){
             PlatformEnvironment enviro = EnvironmentIO.loadEnvironment(config.getEnvironmentFile(type), EnvironmentRegistry.getEnvironment(type));
             environments.put(type, enviro);
@@ -182,13 +179,11 @@ public class Admin {
             platforms.put(type, new ArrayList<>());
             for (PlatformConfig platformConfig : config.getPlatforms(type)){
                 Platform platform = Platform.buildFromConfiguration(platformConfig);
-                ids.add(platformConfig.getID());
                 platforms.get(type).add(platform);
                 enviro.addPlatform(platform);
                 platform.start();
             }
         }
-        RoverObject.setSerialBuffers(new SerialBuffers(ids));
 
         GLOBAL.startTime(config.accelerated);
         if (config.accelerated){

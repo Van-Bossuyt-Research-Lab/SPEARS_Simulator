@@ -16,6 +16,13 @@
 		<junit.version>4.12</junit.version>
         <logger.version>2.0.2</logger.version>
 		<joda.version>2.4</joda.version>
+		<mockito.version>1.9.5</mockito.version>
+        <cobertura.version>2.7</cobertura.version>
+
+		<cobertura.check.lineRate>80</cobertura.check.lineRate>
+		<cobertura.check.branchRate>80</cobertura.check.branchRate>
+        <cobertura.check.totalLineRate>90</cobertura.check.totalLineRate>
+        <cobertura.check.totalBranchRate>90</cobertura.check.totalBranchRate>
 	</properties>
 
 	<dependencies>
@@ -26,6 +33,23 @@
 			<scope>test</scope>
 		</dependency>
         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.lkoskela</groupId>
+            <artifactId>beaninject</artifactId>
+            <version>0.9</version>
+            <scope>test</scope>
+        </dependency>
+		<dependency>
+			<groupId>jgoodies</groupId>
+			<artifactId>forms</artifactId>
+			<version>1.0.5</version>
+		</dependency>
+		<dependency>
             <groupId>com.miglayout</groupId>
             <artifactId>miglayout</artifactId>
             <version>3.7.3.1</version>
@@ -80,7 +104,68 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
-	</build>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>${cobertura.version}</version>
+                <configuration>
+                    <check>
+						<!--<lineRate>${cobertura.check.lineRate}</lineRate>-->
+						<!--<branchRate>${cobertura.check.branchRate}</branchRate>-->
+                        <totalLineRate>${cobertura.check.totalLineRate}</totalLineRate>
+                        <totalBranchRate>${cobertura.check.totalBranchRate}</totalBranchRate>
+                    </check>
+					<instrumentation>
+						<ignoreTrivial>true</ignoreTrivial>
+						<ignoreMethodAnnotation>com.csm.rover.simulator.objects.CoverageIgnore</ignoreMethodAnnotation>
+						<excludes>
+							<exclude>com/csm/rover/simulator/**/*Test.class</exclude>
+							<exclude>com/csm/rover/simulator/objects/io/DatedFileAppenderImpl.class</exclude>
+							<exclude>com/csm/rover/simulator/platforms/rover/autoCode/*.class</exclude>
+							<exclude>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</exclude>
+							<exclude>com/csm/rover/simulator/platforms/sub/subAuto/*.class</exclude>
+							<exclude>com/csm/rover/simulator/platforms/sub/physicsModels/*.class</exclude>
+							<exculde>com/csm/rover/simulator/ui/**/*.class</exculde>
+						</excludes>
+					</instrumentation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>clean</goal>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>${cobertura.version}</version>
+                <configuration>
+					<check>
+						<totalLineRate>${cobertura.check.totalLineRate}</totalLineRate>
+						<totalBranchRate>${cobertura.check.totalBranchRate}</totalBranchRate>
+					</check>
+                    <formats>
+                        <format>html</format>
+                    </formats>
+					<instrumentation>
+						<includes>
+							<include>com/csm/rover/simulator/platforms/rover/autoCode/*.class</include>
+							<include>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</include>
+							<include>com/csm/rover/simulator/platforms/sub/subAuto/*.class</include>
+							<include>com/csm/rover/simulator/platforms/sub/physicsModels/*.class</include>
+							<inculde>com/csm/rover/simulator/ui/**/*.class</inculde>
+						</includes>
+					</instrumentation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
 </project>

@@ -2,7 +2,8 @@ package com.csm.rover.simulator.objects.util;
 
 import java.util.ArrayList;
 
-public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
+//TODO Implment methods
+public class FloatArrayArrayArrayGrid implements ArrayGrid3D<Float> {
 
     private float[][][] grid3;
 
@@ -62,6 +63,11 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
         addColumnAt(getWidth(), getDepth(), col);
     }
 
+    @Override
+    public void addColumnAt(int x, ArrayList<Float> col) {
+
+    }
+
 
     public void addColumnAt(int x, int y, ArrayList<Float> col){
         while (getWidth() < x){
@@ -93,6 +99,21 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
 
     public void addRow(ArrayList<Float> row){
         addRowAt(getHeight(), getWidth(),row);
+    }
+
+    @Override
+    public void addRowAt(int y, ArrayList<Float> row) {
+
+    }
+
+    @Override
+    public void addLayer(ArrayList<Float> lay) {
+
+    }
+
+    @Override
+    public void addLayerAt(int z, ArrayList<Float> lay) {
+
     }
 
 
@@ -169,8 +190,18 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
         }
     }
 
-    public float get(int x, int y, int z){
+    public Float get(int x, int y, int z){
         return grid3[x][y][z];
+    }
+
+    @Override
+    public ArrayList<Float> getColumn(int x) {
+        return null;
+    }
+
+    @Override
+    public ArrayList<Float> getRow(int y) {
+        return null;
     }
 
     public int getWidth() {
@@ -182,10 +213,26 @@ public class FloatArrayArrayArrayGrid  implements ArrayGrid3D<Float> {
         return grid3.length == 0 ? 0 : grid3[0].length;
     }
 
+    @Override
     public int getDepth() {
         return grid3[0].length == 0 ? 0 : grid3[0][0].length;
     }
 
+
+    @Override
+    public int getX() {
+        return 0;
+    }
+
+    @Override
+    public int getY() {
+        return 0;
+    }
+
+    @Override
+    public int getZ() {
+        return 0;
+    }
 
     public int size() {
         return getWidth()*getHeight();

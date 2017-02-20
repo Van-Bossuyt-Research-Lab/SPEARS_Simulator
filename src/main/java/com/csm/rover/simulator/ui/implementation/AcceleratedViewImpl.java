@@ -1,19 +1,15 @@
 package com.csm.rover.simulator.ui.implementation;
 
-import com.csm.rover.simulator.objects.util.FreeThread;
-import com.csm.rover.simulator.ui.sound.SoundPlayer;
-import com.csm.rover.simulator.ui.sound.SpearsSound;
+import com.csm.rover.simulator.objects.FreeThread;
 import com.csm.rover.simulator.ui.visual.AbortListener;
 import com.csm.rover.simulator.ui.visual.AcceleratedView;
 import com.csm.rover.simulator.wrapper.Globals;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.LinkedList;
 import java.util.Optional;
 
 class AcceleratedViewImpl extends JDialog implements AcceleratedView {
@@ -80,7 +76,7 @@ class AcceleratedViewImpl extends JDialog implements AcceleratedView {
     }
 
     private void update(){
-        int sec = (int)(GLOBAL.timeMillis/1000);
+        int sec = (int)(GLOBAL.timeMillis()/1000);
         progressBar.setValue(sec);
         int percent = sec*100 / progressBar.getMaximum();
         progressLbl.setText(String.format("Progress: %d%%", percent));
