@@ -110,8 +110,8 @@
                 <version>${cobertura.version}</version>
                 <configuration>
                     <check>
-						<!--<lineRate>${cobertura.check.lineRate}</lineRate>-->
-						<!--<branchRate>${cobertura.check.branchRate}</branchRate>-->
+						<lineRate>${cobertura.check.lineRate}</lineRate>
+						<branchRate>${cobertura.check.branchRate}</branchRate>
                         <totalLineRate>${cobertura.check.totalLineRate}</totalLineRate>
                         <totalBranchRate>${cobertura.check.totalBranchRate}</totalBranchRate>
                     </check>
@@ -125,6 +125,10 @@
 							<exclude>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</exclude>
 							<exclude>com/csm/rover/simulator/platforms/sub/subAuto/*.class</exclude>
 							<exclude>com/csm/rover/simulator/platforms/sub/physicsModels/*.class</exclude>
+							<exclude>com/csm/rover/simulator/environments/rover/modifiers/*.class</exclude>
+							<exclude>com/csm/rover/simulator/environments/rover/populators/*.class</exclude>
+							<exclude>com/csm/rover/simulator/environments/sub/modifiers/*.class</exclude>
+							<exclude>com/csm/rover/simulator/environments/sub/populators/*.class</exclude>
 							<exculde>com/csm/rover/simulator/ui/**/*.class</exculde>
 						</excludes>
 					</instrumentation>
@@ -160,6 +164,10 @@
 							<include>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</include>
 							<include>com/csm/rover/simulator/platforms/sub/subAuto/*.class</include>
 							<include>com/csm/rover/simulator/platforms/sub/physicsModels/*.class</include>
+							<include>com/csm/rover/simulator/environments/rover/modifiers/*.class</include>
+							<include>com/csm/rover/simulator/environments/rover/populators/*.class</include>
+							<include>com/csm/rover/simulator/environments/sub/modifiers/*.class</include>
+							<include>com/csm/rover/simulator/environments/sub/populators/*.class</include>
 							<inculde>com/csm/rover/simulator/ui/**/*.class</inculde>
 						</includes>
 					</instrumentation>
