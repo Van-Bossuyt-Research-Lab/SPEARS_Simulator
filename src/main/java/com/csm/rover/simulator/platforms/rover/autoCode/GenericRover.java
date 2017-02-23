@@ -35,10 +35,6 @@ public class GenericRover extends RoverAutonomousCode {
 		if (milliTime-lastActionTime > 1000*seconds){
 			lastActionTime = milliTime;
 			action++;
-			if (action%11 == 0){
-				power -= 50;
-				return "chngmtr0" + power;
-			}
 			if (action%5 < 2){
 				return "move";
 			}

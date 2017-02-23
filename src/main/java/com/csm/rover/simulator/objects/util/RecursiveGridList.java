@@ -1,5 +1,6 @@
 package com.csm.rover.simulator.objects.util;
 
+import com.csm.rover.simulator.objects.CoverageIgnore;
 import com.csm.rover.simulator.objects.io.jsonserial.RecursiveGridListDeserializer;
 import com.csm.rover.simulator.objects.io.jsonserial.RecursiveGridListSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -90,11 +91,39 @@ public class RecursiveGridList<T> {
     public boolean equals(Object other){
         return other instanceof RecursiveGridList &&
                 this.layers == ((RecursiveGridList)other).layers &&
-                this.layers == 0 ?
-                    this.value.get().equals(((RecursiveGridList)other).value.get()) :
-                    this.list.equals(((RecursiveGridList)other).list);
+                (this.value.isPresent() ?
+                    valuesMatch(this.value.get(), ((RecursiveGridList)other).value.get()) :
+                    this.list.equals(((RecursiveGridList)other).list));
     }
 
+    private boolean valuesMatch(Object obj1, Object obj2){
+        double tolerance = 0.000001;
+        if (obj1 instanceof Double || obj2 instanceof Double){
+            double a, b;
+            if (obj1 instanceof Float){
+                a = (Float)obj1;
+            }
+            else {
+                a = (Double)obj1;
+            }
+            if (obj2 instanceof Float){
+                b = (Float)obj2;
+            }
+            else if (obj2 instanceof Double){
+                b = (Double)obj2;
+            }
+            else {
+                return false;
+            }
+            System.out.println(a + " - " + b + " = " + Math.abs(a - b));
+            return Math.abs(a - b) < tolerance;
+        }
+        else {
+            return obj1.equals(obj2);
+        }
+    }
+
+    @CoverageIgnore
     @Override
     public String toString(){
         if (value.isPresent()){

@@ -12,17 +12,12 @@ import java.io.IOException;
 public class ArrayGridSerializer extends JsonSerializer<ArrayGrid> {
 
     @Override
-    public void serialize(ArrayGrid arrayGrid, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+    public void serialize(ArrayGrid arrayGrid, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartArray();
         for (int j = 0; j < arrayGrid.getHeight(); j++){
             jsonGenerator.writeStartArray();
             for (int i = 0; i < arrayGrid.getWidth(); i++){
-                try{
-                    jsonGenerator.writeObject(arrayGrid.get(i, j));
-                }
-                catch (ArrayIndexOutOfBoundsException e){
-                    throw new MyJsonProcessingException(e);
-                }
+                jsonGenerator.writeObject(arrayGrid.get(i, j));
             }
             jsonGenerator.writeEndArray();
         }

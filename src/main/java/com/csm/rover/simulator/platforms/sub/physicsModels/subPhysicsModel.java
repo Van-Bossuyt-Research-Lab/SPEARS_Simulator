@@ -180,6 +180,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 
 	@Override
 	public void initializeState(PlatformState state) {
+        //create initial conditions for sub
 		if (state.getType().equals("Sub")){
 			this.sub_state = (SubState)state;
 			this.location = new DecimalPoint3D(state.<Double>get("x"), state.<Double>get("y"), state.<Double>get("z"));
