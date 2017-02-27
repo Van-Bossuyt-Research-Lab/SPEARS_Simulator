@@ -15,7 +15,7 @@ public class HillMod extends EnvironmentModifier<LandMap> {
 
     @Override
     protected LandMap doModify(LandMap map, Map params) {
-        return null;
+        return map;
     }
 
 }

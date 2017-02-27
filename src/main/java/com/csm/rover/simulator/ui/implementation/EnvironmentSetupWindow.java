@@ -308,7 +308,7 @@ class EnvironmentSetupWindow extends EmbeddedFrame {
         }
         for (String pop : populatorConfigs.keySet()){
             PopulatorConfig config = populatorConfigs.get(pop);
-            builder.addPopulator(pop, EnvironmentRegistry.getPopulator(platform, pop).newInstance(), config.params);
+            builder.addPopulator(EnvironmentRegistry.getPopulator(platform, pop).newInstance(), config.params);
         }
         builder.generate();
         UiFactory.getDesktop().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

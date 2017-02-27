@@ -13,6 +13,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
+/**
+ * Parent class for maintaining and creating the environment the the platforms operate within.
+ *
+ * @param <P> Associated Platform class
+ * @param <M> Associated Map class
+ */
 public abstract class PlatformEnvironment<P extends Platform, M extends EnvironmentMap> {
     private final static Logger LOG = LogManager.getLogger(PlatformEnvironment.class);
 
@@ -35,6 +41,11 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
     @JsonIgnore
     private Optional<Runnable> addedActions;
 
+    /**
+     * Blank start, initializes all collections as empty.
+     *
+     * @param type The platform type name
+     */
     protected PlatformEnvironment(String type){
         platform_type = type;
         populators = new TreeMap<>();
@@ -43,6 +54,13 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         addedActions = Optional.empty();
     }
 
+    /**
+     * Creates the environment using the specified map and populators.  Use for loading saved images.
+     *
+     * @param type The type name
+     * @param map A generated map
+     * @param pops Build populators
+     */
     protected PlatformEnvironment(String type, M map, Map<String, EnvironmentPopulator> pops){
         this(type);
         populators = pops;
@@ -53,6 +71,14 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         return platform_type;
     }
 
+    /**
+     * Adds a platform to the environment.  Calls {@link Platform#setEnvironment(PlatformEnvironment) platform.setEnvironment(this)}
+     * to give the platform access to the environment.
+     *
+     * @param platform Platform to be added
+     *
+     * @throws IllegalArgumentException If the platform is not of the same type as the environment
+     */
     public final void addPlatform(P platform){
         if (!platform.getType().equals(this.platform_type)){
             throw new IllegalArgumentException(String.format("Types do not match %s != %s", platform_type, platform.getType()));
@@ -64,15 +90,31 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         }
     }
 
+    /**
+     * Sets a single action to be executed when new platforms are added to the environment via
+     * {@link #addPlatform(Platform)}.
+     *
+     * @param run The action
+     */
     protected final void setPlatformAddedActions(Runnable run){
         addedActions = Optional.of(run);
     }
 
+    /**
+     * Builder init method.  Creates a new {@link MapBuilder} object to create a new map instance.
+     *
+     * @param gen The generator to be used.  See {@link EnvironmentModifier}
+     * @param params Build parameters for the generator gen
+     * @return Builder pattern for a new map
+     */
     public final MapBuilder generateNewMap(EnvironmentModifier<M> gen, Map<String, Double> params){
         MapBuilder builder = new MapBuilder(platform_type);
         return builder.setBaseGenerator(gen, params);
     }
 
+    /**
+     * Builder pattern object used for the creation of new maps.
+     */
     public class MapBuilder {
 
         private final String platform_type;
@@ -101,6 +143,15 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
             return this;
         }
 
+        /**
+         * Adds a modifier to generation sequence.  Modifiers will be applied to the map in the order they are added.
+         *
+         * @param mod Modifier to add
+         * @param params Build parameters for mod
+         * @return this
+         *
+         * @throws IllegalArgumentException If the modifier has the wrong type
+         */
         public MapBuilder addMapModifier(EnvironmentModifier<M> mod, Map<String, Double> params) {
             if (!mod.getType().equals(this.platform_type)) {
                 throw new IllegalArgumentException(String.format("Types do not match %s != %s", platform_type, mod.getType()));
@@ -113,18 +164,33 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
             return this;
         }
 
-        public MapBuilder addPopulator(String name, EnvironmentPopulator pop, Map<String, Double> params) {
+        /**
+         * Adds a new populator image to the environment.  Populators should not be built, they will be built as part of
+         * {@link #generate()}.
+         *
+         * @param pop The populator to add
+         * @param params Build parameters for pop
+         * @return this
+         *
+         * @throws IllegalArgumentException If the populator has the wrong type
+         * @throws IllegalArgumentException If the same populator has already been added
+         */
+        public MapBuilder addPopulator(EnvironmentPopulator pop, Map<String, Double> params) {
+            String name = pop.getName();
             if (!pop.getType().equals(platform_type)) {
                 throw new IllegalArgumentException(String.format("Types do not match %s != %s", platform_type, pop.getType()));
             }
-            if (populators.containsKey(name)) {
-                throw new IllegalArgumentException("A populator of name \"{}\" is already defined");
+            if (pops.containsKey(name)) {
+                throw new IllegalArgumentException("A populator of name \"" + name + "\" is already defined");
             }
             pops.put(name, pop);
             addAllParams(params);
             return this;
         }
 
+        /**
+         * Generates a new map.  Map is saved in the environment.
+         */
         public void generate(){
             doBuildMap(gen, mods, pops, params);
         }
@@ -154,10 +220,24 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         }
     }
 
+    /**
+     * Adds an action to be run after a map is built, at the end of {@link MapBuilder#generate()}.
+     *
+     * @param run The action
+     */
     protected final void setBuildActions(Runnable run){
         buildActions = Optional.of(run);
     }
 
+    /**
+     * Returns the value of the populator at the given coordinates.
+     *
+     * @param pop Name of the populator to quarry.
+     * @param coordinates Coordinates to quarry, should match the dimension of the map
+     * @return The populator value
+     *
+     * @throws IllegalArgumentException If the populator name is not currently defined
+     */
     public final double getPopulatorValue(String pop, double... coordinates){
         if (populators.containsKey(pop)){
             return populators.get(pop).getValue(coordinates);
@@ -167,6 +247,16 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         }
     }
 
+    /**
+     * Returns a true if a populator is defined for the given point.  That is the poulator value is greater than 0, not
+     * based on the default value.
+     *
+     * @param pop The populator name
+     * @param coordinates Coordinates to quarry, should match the dimension of the map
+     * @return True if defined
+     *
+     * @throws IllegalArgumentException If the populator name is not currently defined
+     */
     public final boolean isPopulatorAt(String pop, double... coordinates){
         if (populators.containsKey(pop)){
             return populators.get(pop).getValue(coordinates) > 0;
@@ -176,16 +266,29 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
         }
     }
 
+    /**
+     * Lists all populators currently defined in the environment.
+     *
+     * @return A {@link java.util.List List} of names
+     */
     @JsonIgnore
     public final List<String> getPopulators(){
         return Collections.unmodifiableList(new ArrayList<>(populators.keySet()));
     }
 
+    /**
+     * Returns the set of all platforms currently operating in the environment.
+     *
+     * @return A {@link java.util.List list} of platforms
+     */
     @JsonIgnore
     public List<P> getPlatforms(){
         return Collections.unmodifiableList(platforms);
     }
 
+    /**
+     * @return The size of the map
+     */
     public abstract int getSize();
 
 }

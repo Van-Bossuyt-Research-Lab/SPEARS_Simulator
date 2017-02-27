@@ -14,12 +14,15 @@ import java.util.Map;
 public class RockPop  extends EnvironmentPopulator {
 
     public RockPop() {
-        super("Rover", "Rock Pop", 0);
+        super("Rover", "Rock Pop", 10);
     }
 
     @Override
     protected RecursiveGridList<Double> doBuild(EnvironmentMap map, Map<String, Double> params) {
-        return null;
+        RecursiveGridList<Double> out = RecursiveGridList.newGridList(Double.class, 2);
+        out.put(3.14, 3, 4);
+        out.put(0., 0, 0);
+        return out;
     }
 
     @Override
