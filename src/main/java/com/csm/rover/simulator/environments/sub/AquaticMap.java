@@ -133,5 +133,17 @@ public class AquaticMap extends EnvironmentMap {
     public ArrayGrid3D<Float> rawValues() {
         return SubMap;
     }
+
+    @Override
+    protected boolean isEqual(EnvironmentMap o) {
+        if (o instanceof AquaticMap){
+            AquaticMap other = (AquaticMap)o;
+            return other.size == size && other.detail == detail &&
+                    other.SubMap.equals(this.SubMap);
+        }
+        else {
+            return false;
+        }
+    }
 }
 

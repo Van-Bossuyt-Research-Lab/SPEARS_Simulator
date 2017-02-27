@@ -141,4 +141,15 @@ public class TerrainMap extends EnvironmentMap {
         return heightMap.clone();
     }
 
+    @Override
+    protected boolean isEqual(EnvironmentMap o) {
+        if (o instanceof TerrainMap){
+            TerrainMap other = (TerrainMap)o;
+            return other.size == size && other.detail == detail &&
+                    other.heightMap.equals(heightMap);
+        }
+        else {
+            return false;
+        }
+    }
 }

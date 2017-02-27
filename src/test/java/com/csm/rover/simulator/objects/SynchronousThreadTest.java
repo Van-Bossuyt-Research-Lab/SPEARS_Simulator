@@ -49,6 +49,7 @@ public class SynchronousThreadTest {
             Thread.sleep(10);
             thread.Shake();
         }
+        Thread.sleep(200);
         verify(globalsMock, times(times)).threadCheckIn(name);
         verify(globalsMock, atLeastOnce()).checkOutThread(name);
     }

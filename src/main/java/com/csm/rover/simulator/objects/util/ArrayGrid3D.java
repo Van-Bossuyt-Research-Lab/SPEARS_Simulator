@@ -1,6 +1,13 @@
 package com.csm.rover.simulator.objects.util;
+import com.csm.rover.simulator.objects.io.jsonserial.ArrayGrid3DDeserializer;
+import com.csm.rover.simulator.objects.io.jsonserial.ArrayGrid3DSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.util.ArrayList;
 
+@JsonSerialize(using=ArrayGrid3DSerializer.class)
+@JsonDeserialize(using=ArrayGrid3DDeserializer.class)
 public interface ArrayGrid3D<T> extends Cloneable {
 
     void loadFromArray(T[][][] values);

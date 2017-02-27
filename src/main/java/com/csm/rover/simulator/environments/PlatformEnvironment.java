@@ -291,4 +291,18 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
      */
     public abstract int getSize();
 
+    @Override
+    public boolean equals(Object o){
+        if (this == o){
+            return true;
+        }
+        if (!(o instanceof PlatformEnvironment)){
+            return false;
+        }
+        PlatformEnvironment other = (PlatformEnvironment)o;
+        return this.platform_type.equals(other.platform_type) &&
+                this.map.equals(other.map) &&
+                this.populators.equals(other.populators);
+    }
+
 }

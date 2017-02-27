@@ -8,4 +8,16 @@ public class UnlabeledSkyMap extends EnvironmentMap{
         super("UAV");
     }
 
+    private boolean equalsCalled = false;
+
+    @Override
+    protected boolean isEqual(EnvironmentMap other) {
+        equalsCalled = true;
+        return this == other;
+    }
+
+    public boolean wasEqualsCalled(){
+        return equalsCalled;
+    }
+
 }

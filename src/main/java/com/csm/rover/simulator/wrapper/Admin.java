@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class Admin {
@@ -173,15 +174,21 @@ public class Admin {
             LOG.log(Level.INFO, "Starting simulation with configuration:\n{}", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(config));
         } catch (JsonProcessingException e) {}
         for (String type : config.getTypes()){
-            PlatformEnvironment enviro = EnvironmentIO.loadEnvironment(config.getEnvironmentFile(type), EnvironmentRegistry.getEnvironment(type));
-            environments.put(type, enviro);
+            try {
+                PlatformEnvironment enviro = EnvironmentIO.loadEnvironment(config.getEnvironmentFile(type), EnvironmentRegistry.getEnvironment(type));
+                environments.put(type, enviro);
 
-            platforms.put(type, new ArrayList<>());
-            for (PlatformConfig platformConfig : config.getPlatforms(type)){
-                Platform platform = Platform.buildFromConfiguration(platformConfig);
-                platforms.get(type).add(platform);
-                enviro.addPlatform(platform);
-                platform.start();
+                platforms.put(type, new ArrayList<>());
+                for (PlatformConfig platformConfig : config.getPlatforms(type)) {
+                    Platform platform = Platform.buildFromConfiguration(platformConfig);
+                    platforms.get(type).add(platform);
+                    enviro.addPlatform(platform);
+                    platform.start();
+                }
+            }
+            catch (IOException e){
+                LOG.log(Level.ERROR, "Failed to read in Environment - Terminating", e);
+                System.exit(1);
             }
         }
 

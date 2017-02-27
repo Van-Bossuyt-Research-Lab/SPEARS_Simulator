@@ -234,10 +234,35 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid3D<Float> {
         return 0;
     }
 
+    @Override
     public int size() {
-        return getWidth()*getHeight();
+        return getWidth();
     }
 
+    @Override
+    public boolean equals(Object o){
+        if (o instanceof ArrayGrid3D){
+            ArrayGrid3D other = (ArrayGrid3D)o;
+            if (other.size() == size()){
+                for (int i = 0; i < size(); i++){
+                    for (int j = 0; j < size(); j++){
+                        for (int k = 0; k < size(); k++){
+                            try {
+                                if (Math.abs(get(i, j, k) - (Float) other.get(i, j, k)) > 0.0000001) {
+                                    return false;
+                                }
+                            }
+                            catch (ClassCastException | NullPointerException e){
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 
     public boolean isEmpty() {
         return size() == 0;
