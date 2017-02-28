@@ -5,8 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
-@JsonIgnoreProperties(ignoreUnknown = true)
 
+/**
+ * A data structure object that stores information about platform instances.  Object and its contents are not
+ * modifiable after initialization.
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PlatformConfig {
 
     private String type;
@@ -23,6 +27,11 @@ public class PlatformConfig {
         stateParameters = new TreeMap<>();
     }
 
+    /**
+     * Builder initialization method.
+     *
+     * @return A builder
+     */
     public static Builder builder(){
         return new Builder();
     }
@@ -44,12 +53,7 @@ public class PlatformConfig {
     }
 
     public Map<String, Double> getPhysicsModelParameters(){
-        try {
-            return Collections.unmodifiableMap(physicsModelParameters);
-        }
-        catch(NullPointerException n){
-            return Collections.emptyMap();
-        }
+        return Collections.unmodifiableMap(physicsModelParameters);
     }
 
     public String getAutonomousModelName(){
@@ -57,12 +61,7 @@ public class PlatformConfig {
     }
 
     public Map<String, Double> getAutonomousModelParameters(){
-        try {
-            return Collections.unmodifiableMap(autonomousModelParameters);
-        }
-        catch(NullPointerException n){
-            return Collections.emptyMap();
-        }
+        return Collections.unmodifiableMap(autonomousModelParameters);
     }
 
     public Map<String, Double> getStateParameters(){
@@ -77,6 +76,13 @@ public class PlatformConfig {
             config = new PlatformConfig();
         }
 
+        /**
+         * Creates and returns the completed PlatformConfig.  Checks to make sure that all fields were initialized
+         * correctly.
+         *
+         * @return Completed platform config
+         * @throws IllegalStateException If the builder was not fully initialized
+         */
         public PlatformConfig build(){
             String missing = "";
             if (config.type == null){
@@ -115,52 +121,66 @@ public class PlatformConfig {
             return this;
         }
 
+        /**
+         * JSON use function.  Recommended to use {@link #setPhysicsModel(String, Map)}.
+         *
+         * @param name The name of the physics model
+         * @return this
+         */
         public Builder setPhysicsModelName(String name) {config.physicsModelName = name; return this;}
 
+        /**
+         * JSON use function.  Recommended to use {@link #setPhysicsModel(String, Map)}.
+         *
+         * @param params Build parameters for the physics model
+         * @return this
+         */
         public Builder setPhysicsModelParameters(Map<String, Double> params){
             if (params == null){
-                params = new TreeMap<String, Double>();
+                params = new TreeMap<>();
             }
             config.physicsModelParameters = params;
             return this;
         }
-
-        public Builder setPhysicsModel(String name){return setPhysicsModel(name, null);
-        }
-
 
         public Builder setPhysicsModel(String name, Map<String, Double> params){
-            if (params == null){
-                params = new TreeMap<String, Double>();
-            }
-            config.physicsModelName = name;
-            config.physicsModelParameters = params;
-            return this;
+            return setPhysicsModelName(name).setPhysicsModelParameters(params);
         }
 
+        /**
+         * JSON use function.  Recommended to use {@link #setAutonomousModel(String, Map)}.
+         *
+         * @param name The name of the autonomous code model
+         * @return this
+         */
         public Builder setAutonomousModelName(String name) {config.autonomousModelName = name; return this;}
 
+        /**
+         * JSON use function.  Recommended to use {@link #setAutonomousModel(String, Map)}.
+         *
+         * @param params Build parameters for the autonomous code model
+         * @return this
+         */
         public Builder setAutonomousModelParameters(Map<String, Double> params){
             if (params == null){
-                params = new TreeMap<String, Double>();
+                params = new TreeMap<>();
             }
             config.autonomousModelParameters= params;
             return this;
         }
 
-        public Builder setAutonomousModel(String name){
-            return setAutonomousModel(name, null);
-        }
-
         public Builder setAutonomousModel(String name, Map<String, Double> params){
-            if (params == null){
-                params = new TreeMap<String, Double>();
-            }
-            config.autonomousModelName = name;
-            config.autonomousModelParameters = params;
-            return this;
+            return setAutonomousModelName(name).setAutonomousModelParameters(params);
         }
 
+        /**
+         * Modifies entries in the {@link com.csm.rover.simulator.platforms.PlatformState}.  This is the only optional
+         * builder field.
+         *
+         * @param param Name of parameter
+         * @param value Value to set it to
+         * @return this
+         */
         public Builder addStateVariable(String param, double value){
             config.stateParameters.put(param, value);
             return this;
