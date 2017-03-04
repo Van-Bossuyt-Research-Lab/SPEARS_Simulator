@@ -44,7 +44,7 @@ public class TypeConfig implements Cloneable {
             @JsonProperty("map") String mapFile,
             @JsonProperty("platforms") List<PlatformConfig> platforms){
         this.type = type;
-        this.mapFile = new File(mapFile);
+        this.mapFile = new File(new File(mapFile).getAbsolutePath());
         this.platformConfigs = Collections.unmodifiableList(platforms);
     }
 
