@@ -176,7 +176,7 @@ public class Admin {
     /**
      * Initializes a simulation run with the GUI.
      *
-     * @param config
+     * @param config RunConfiguration to use
      */
     @CoverageIgnore
     protected void startWithGUI(RunConfiguration config){
@@ -255,7 +255,7 @@ public class Admin {
     /**
      * Displays a pop-up notification for an exception.
      *
-     * @param e
+     * @param e The thrown exception
      */
     @CoverageIgnore
     protected void alertFailed(Exception e){
