@@ -1,4 +1,3 @@
-com.csm.rover.simulator.control
 com.csm.rover.simulator.environments
 com.csm.rover.simulator.environments.annotations
 com.csm.rover.simulator.environments.rover
@@ -16,9 +15,10 @@ com.csm.rover.simulator.platforms.annotations
 com.csm.rover.simulator.platforms.rover
 com.csm.rover.simulator.platforms.rover.autoCode
 com.csm.rover.simulator.platforms.rover.physicsModels
-com.csm.rover.simulator.platforms.satellite
 com.csm.rover.simulator.platforms.sub
 com.csm.rover.simulator.platforms.sub.physicsModels
 com.csm.rover.simulator.platforms.sub.subAuto
-com.csm.rover.simulator.visual
+com.csm.rover.simulator.ui.implementation
+com.csm.rover.simulator.ui.sound
+com.csm.rover.simulator.ui.visual
 com.csm.rover.simulator.wrapper
