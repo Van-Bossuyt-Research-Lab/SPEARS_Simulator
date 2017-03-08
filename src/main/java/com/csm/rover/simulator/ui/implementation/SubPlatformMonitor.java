@@ -173,28 +173,26 @@ class SubPlatformMonitor extends PlatformDisplay {
         PlatformState state = sub.get().getState();
         switch (tabs.getSelectedIndex()){
             case 0:
-                updateDrive(state.get("x"), state.get("y"), state.get("pitch"), state.get("yaw"), state.get("speed"), state.get("acceleration"), state.get("pitch_velocity"), state.get("yaw_velocity"), state.get("pitch_acceleration"), state.get("yaw_acceleration"));
+                updateDrive(state.get("x"), state.get("y"), state.get("pitch"), state.get("speed"), state.get("angular_speed"));
                 break;
             case 1:
                 updateMotors(state.get("motor_state"), state.get("motor_power"), state.get("motor_voltage"), state.get("motor_current"), state.get("prop_speed"), state.get("motor_temp"));
                 break;
             default:
-                updateDrive(state.get("x"), state.get("y"), state.get("pitch"), state.get("yaw"), state.get("speed"), state.get("acceleration"), state.get("pitch_velocity"), state.get("yaw_velocity"), state.get("pitch_acceleration"), state.get("yaw_acceleration"));
-                updateMotors(state.get("motor_state"), state.get("motor_power"), state.get("motor_voltage"), state.get("motor_current"), state.get("wheel_speed"), state.get("motor_temp"));
-                break;
+                updateDrive(state.get("x"), state.get("y"), state.get("pitch"), state.get("speed"), state.get("pitch_velocity"));                break;
         }
     }
 
-    private void updateDrive(double x, double y, double dir, double dir2, double vel, double accel, double avel, double avel2, double aaccel, double aaccel2){
+    private void updateDrive(double x, double y, double dir, Double [] vel, Double [] avel){
         locationLbl.setText(round(x) + ", " + round(y));
         directionLbl.setText(round(dir*180./Math.PI) + "\u00B0");
         directionLb2.setText(round(dir*180./Math.PI) + "\u00B0");
-        velocityLbl.setText(round(vel) + " m/s");
-        accelLbl.setText(round(accel) + " m/s\u00B2");
-        angularVelLbl.setText(round(avel*180./Math.PI) + " \u00B0/s");
-        angularAccelLbl.setText(round(aaccel*180./Math.PI) + " \u00B0/s\u00B2");
-        angularVelLb2.setText(round(avel*180./Math.PI) + " \u00B0/s");
-        angularAccelLb2.setText(round(aaccel*180./Math.PI) + " \u00B0/s\u00B2");
+        velocityLbl.setText(round(vel[0]) + " m/s");
+       // accelLbl.setText(round(accel) + " m/s\u00B2");
+        angularVelLbl.setText(round(avel[0]*180./Math.PI) + " \u00B0/s");
+        //angularAccelLbl.setText(round(aaccel*180./Math.PI) + " \u00B0/s\u00B2");
+        angularVelLb2.setText(round(avel[0]*180./Math.PI) + " \u00B0/s");
+        //angularAccelLb2.setText(round(aaccel*180./Math.PI) + " \u00B0/s\u00B2");
     }
 
     private void updateMotors(Double[] states, Double[] powers, Double[] voltages, Double[] currents, Double[] speeds, Double[] temps){
