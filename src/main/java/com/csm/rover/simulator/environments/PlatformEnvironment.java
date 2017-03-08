@@ -79,7 +79,7 @@ public abstract class PlatformEnvironment<P extends Platform, M extends Environm
      *
      * @throws IllegalArgumentException If the platform is not of the same type as the environment
      */
-    public final void addPlatform(P platform){
+    public void addPlatform(P platform){
         if (!platform.getType().equals(this.platform_type)){
             throw new IllegalArgumentException(String.format("Types do not match %s != %s", platform_type, platform.getType()));
         }

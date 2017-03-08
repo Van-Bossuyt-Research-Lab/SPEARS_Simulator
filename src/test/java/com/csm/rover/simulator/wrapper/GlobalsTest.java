@@ -91,6 +91,18 @@ public class GlobalsTest {
         Assert.assertEquals(globals.subtractAngles(15*Math.PI/8., Math.PI/8.), globals.subtractAngles(-Math.PI/8., Math.PI/8.), TOLERANCE);
     }
 
+    @Test
+    public void angleSubtractDegTest(){
+        final double TOLERANCE = 0.00001;
+        Globals globals = Globals.getInstance();
+        Assert.assertEquals(-90, globals.subtractAnglesDeg(180, 90), TOLERANCE);
+        Assert.assertEquals(90, globals.subtractAnglesDeg(180, 270), TOLERANCE);
+        Assert.assertEquals(-45., globals.subtractAnglesDeg(22.5, 337.5), TOLERANCE);
+        Assert.assertEquals(45, globals.subtractAnglesDeg(337.5, 22.5), TOLERANCE);
+        Assert.assertEquals(globals.subtractAnglesDeg(22.5, 337.5), globals.subtractAnglesDeg(22.5, -22.5), TOLERANCE);
+        Assert.assertEquals(globals.subtractAnglesDeg(337.5, 22.5), globals.subtractAnglesDeg(-22.5, 22.5), TOLERANCE);
+    }
+
     @After
     public void cleanUp(){
         try {
