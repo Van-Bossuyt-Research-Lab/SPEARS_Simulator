@@ -19,7 +19,7 @@ class SubPlatformMonitor extends PlatformDisplay {
     private JPanel contentPane;
     private JTabbedPane tabs;
 
-    private JLabel locationLbl, directionLbl, velocityLbl, angularVelLbl, accelLbl, angularAccelLbl, directionLb2, angularVelLb2, angularAccelLb2;
+    private JLabel locationLbl, directionLbl, velocityLbl, velocityLb2, velocityLb3, accelLb3, accelLb2, angularAccelLb3, angularVelLb3, directionLb3, angularVelLbl, accelLbl, angularAccelLbl, directionLb2, angularVelLb2, angularAccelLb2;
     private com.csm.rover.simulator.ui.implementation.SubMotorDisplay[] motorDisplays;
 
     private Optional<SubObject> sub;
@@ -61,67 +61,107 @@ class SubPlatformMonitor extends PlatformDisplay {
 
         JLabel velocityTtl = new JLabel("Velocity:");
         velocityTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        drivePnl.add(velocityTtl, "cell 2 0");
+        drivePnl.add(velocityTtl, "cell 0 1");
 
         velocityLbl = new JLabel();
         velocityLbl.setFont(FontFunctions.bold(velocityLbl.getFont()));
-        drivePnl.add(velocityLbl, "cell 3 0");
+        drivePnl.add(velocityLbl, "cell 1 1");
+
+        velocityLb2 = new JLabel();
+        velocityLb2.setFont(FontFunctions.bold(velocityLb2.getFont()));
+        drivePnl.add(velocityLb2, "cell 2 1");
+
+        velocityLb3 = new JLabel();
+        velocityLb3.setFont(FontFunctions.bold(velocityLb3.getFont()));
+        drivePnl.add(velocityLb3, "cell 3 1");
 
         JLabel accelTtl = new JLabel("Acceleration:");
         accelTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        drivePnl.add(accelTtl, "cell 4 0");
+        drivePnl.add(accelTtl, "cell 0 2");
+
+        accelLb2 = new JLabel();
+        accelLb2.setFont(FontFunctions.bold(accelLb2.getFont()));
+        drivePnl.add(accelLb2, "cell 2 2");
 
         accelLbl = new JLabel();
         accelLbl.setFont(FontFunctions.bold(accelLbl.getFont()));
-        drivePnl.add(accelLbl, "cell 5 0");
+        drivePnl.add(accelLbl, "cell 1 2");
+
+        accelLb3 = new JLabel();
+        accelLb3.setFont(FontFunctions.bold(accelLb3.getFont()));
+        drivePnl.add(accelLb3, "cell 3 2");
 
         JLabel directionTtl = new JLabel("Pitch:");
         directionTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        drivePnl.add(directionTtl, "cell 0 1");
+        drivePnl.add(directionTtl, "cell 0 3");
 
         directionLbl = new JLabel();
         directionLbl.setFont(FontFunctions.bold(directionLbl.getFont()));
-        drivePnl.add(directionLbl, "cell 1 1");
+        drivePnl.add(directionLbl, "cell 1 3");
 
         JLabel angularVelTtl = new JLabel("Pitch Velocity:");
         angularVelTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        drivePnl.add(angularVelTtl, "cell 2 1");
+        drivePnl.add(angularVelTtl, "cell 2 3");
 
         angularVelLbl = new JLabel();
         angularVelLbl.setFont(FontFunctions.bold(angularVelLbl.getFont()));
-        drivePnl.add(angularVelLbl, "cell 3 1");
+        drivePnl.add(angularVelLbl, "cell 3 3");
 
         JLabel angularAccelTtl = new JLabel("Pitch Acceleration:");
         angularAccelTtl.setHorizontalAlignment(SwingConstants.RIGHT);
-        drivePnl.add(angularAccelTtl, "cell 4 1");
+        drivePnl.add(angularAccelTtl, "cell 4 3");
 
         angularAccelLbl = new JLabel();
         angularAccelLbl.setFont(FontFunctions.bold(angularAccelLbl.getFont()));
-        drivePnl.add(angularAccelLbl, "cell 5 1");
+        drivePnl.add(angularAccelLbl, "cell 5 3");
 
         JLabel directionTt2 = new JLabel("Yaw:");
         directionTt2.setHorizontalAlignment(SwingConstants.RIGHT);
-        drivePnl.add(directionTt2, "cell 0 2");
+        drivePnl.add(directionTt2, "cell 0 4");
 
         directionLb2 = new JLabel();
         directionLb2.setFont(FontFunctions.bold(directionLb2.getFont()));
-        drivePnl.add(directionLb2, "cell 1 2");
+        drivePnl.add(directionLb2, "cell 1 4");
+
+        JLabel directionTt3 = new JLabel("Roll:");
+        directionTt3.setHorizontalAlignment(SwingConstants.RIGHT);
+        drivePnl.add(directionTt3, "cell 0 5");
+
+        directionLb3 = new JLabel();
+        directionLb3.setFont(FontFunctions.bold(directionLb3.getFont()));
+        drivePnl.add(directionLb3, "cell 1 5");
+
+        JLabel angularVelTt3 = new JLabel("Roll Velocity:");
+        angularVelTt3.setHorizontalAlignment(SwingConstants.RIGHT);
+        drivePnl.add(angularVelTt3, "cell 2 5");
+
+        angularVelLb3 = new JLabel();
+        angularVelLb3.setFont(FontFunctions.bold(angularVelLb3.getFont()));
+        drivePnl.add(angularVelLb3, "cell 3 5");
+
+        JLabel angularAccelTt3 = new JLabel("Roll Acceleration:");
+        angularAccelTt3.setHorizontalAlignment(SwingConstants.RIGHT);
+        drivePnl.add(angularAccelTt3, "cell 4 5");
+
+        angularAccelLb3 = new JLabel();
+        angularAccelLb3.setFont(FontFunctions.bold(angularAccelLb3.getFont()));
+        drivePnl.add(angularAccelLb3, "cell 5 5");
 
         JLabel angularVelTt2 = new JLabel("Yaw Velocity:");
         angularVelTt2.setHorizontalAlignment(SwingConstants.RIGHT);
-        drivePnl.add(angularVelTt2, "cell 2 2");
+        drivePnl.add(angularVelTt2, "cell 2 4");
 
         angularVelLb2 = new JLabel();
         angularVelLb2.setFont(FontFunctions.bold(angularVelLb2.getFont()));
-        drivePnl.add(angularVelLb2, "cell 3 2");
+        drivePnl.add(angularVelLb2, "cell 3 4");
 
         JLabel angularAccelTt2 = new JLabel("Yaw Acceleration:");
         angularAccelTt2.setHorizontalAlignment(SwingConstants.RIGHT);
-        drivePnl.add(angularAccelTt2, "cell 4 2");
+        drivePnl.add(angularAccelTt2, "cell 4 4");
 
         angularAccelLb2 = new JLabel();
         angularAccelLb2.setFont(FontFunctions.bold(angularAccelLb2.getFont()));
-        drivePnl.add(angularAccelLb2, "cell 5 2");
+        drivePnl.add(angularAccelLb2, "cell 5 4");
 
         JPanel motorPnl = new JPanel();
         motorPnl.setBackground(Color.WHITE);
@@ -173,26 +213,33 @@ class SubPlatformMonitor extends PlatformDisplay {
         PlatformState state = sub.get().getState();
         switch (tabs.getSelectedIndex()){
             case 0:
-                updateDrive(state.get("x"), state.get("y"), state.get("pitch"), state.get("speed"), state.get("angular_speed"));
+                updateDrive(state.get("x"), state.get("y"), state.get("z"), state.get("pitch"), state.get("yaw"), state.get("roll"), state.get("speed"), state.get("angular_speed"), state.get("acceleration"), state.get("angular_acceleration"));
                 break;
             case 1:
                 updateMotors(state.get("motor_state"), state.get("motor_power"), state.get("motor_voltage"), state.get("motor_current"), state.get("prop_speed"), state.get("motor_temp"));
                 break;
             default:
-                updateDrive(state.get("x"), state.get("y"), state.get("pitch"), state.get("speed"), state.get("pitch_velocity"));                break;
+                updateDrive(state.get("x"), state.get("y"), state.get("z"), state.get("pitch"), state.get("yaw"), state.get("roll"), state.get("speed"), state.get("angular_speed"), state.get("acceleration"), state.get("angular_acceleration"));              break;
         }
     }
 
-    private void updateDrive(double x, double y, double dir, Double [] vel, Double [] avel){
-        locationLbl.setText(round(x) + ", " + round(y));
+    private void updateDrive(double x, double y, double z, double dir, double dir2, double dir3, Double [] vel, Double [] avel, Double [] accel, Double [] aaccel){
+        locationLbl.setText(round(x) + ", " + round(y) + ", " + round(z));
         directionLbl.setText(round(dir*180./Math.PI) + "\u00B0");
-        directionLb2.setText(round(dir*180./Math.PI) + "\u00B0");
+        directionLb2.setText(round(dir2*180./Math.PI) + "\u00B0");
+        directionLb3.setText(round(dir3*180./Math.PI) + "\u00B0");
         velocityLbl.setText(round(vel[0]) + " m/s");
-       // accelLbl.setText(round(accel) + " m/s\u00B2");
+        velocityLb2.setText(round(vel[1]) + " m/s");
+        velocityLb3.setText(round(vel[2]) + " m/s");
+        accelLbl.setText(round(accel[0]) + " m/s\u00B2");
+        accelLb2.setText(round(accel[1]) + " m/s\u00B2");
+        accelLb3.setText(round(accel[2]) + " m/s\u00B2");
         angularVelLbl.setText(round(avel[0]*180./Math.PI) + " \u00B0/s");
-        //angularAccelLbl.setText(round(aaccel*180./Math.PI) + " \u00B0/s\u00B2");
-        angularVelLb2.setText(round(avel[0]*180./Math.PI) + " \u00B0/s");
-        //angularAccelLb2.setText(round(aaccel*180./Math.PI) + " \u00B0/s\u00B2");
+        angularAccelLbl.setText(round(aaccel[0]*180./Math.PI) + " \u00B0/s\u00B2");
+        angularVelLb2.setText(round(avel[1]*180./Math.PI) + " \u00B0/s");
+        angularVelLb3.setText(round(avel[2]*180./Math.PI) + " \u00B0/s");
+        angularAccelLb2.setText(round(aaccel[1]*180./Math.PI) + " \u00B0/s\u00B2");
+        angularAccelLb3.setText(round(aaccel[2]*180./Math.PI) + " \u00B0/s\u00B2");
     }
 
     private void updateMotors(Double[] states, Double[] powers, Double[] voltages, Double[] currents, Double[] speeds, Double[] temps){
