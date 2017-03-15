@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.test.objects.autoModels;
+package com.csm.rover.simulator.test.objects.AutoModels;
 
 import com.csm.rover.simulator.platforms.PlatformAutonomousCodeModel;
 import com.csm.rover.simulator.platforms.PlatformState;

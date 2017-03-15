@@ -7,7 +7,7 @@ import com.csm.rover.simulator.platforms.annotations.State;
 public class RoverState extends PlatformState {
 
     public RoverState() {
-        super(PlatformState.builder("Rover"));
+        super(PlatformState.builder("Rover").addParameter("state", Double.class));
     }
 
 }
