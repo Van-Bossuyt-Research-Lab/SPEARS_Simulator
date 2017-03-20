@@ -2,13 +2,12 @@ package com.csm.rover.simulator.objects.util;
 
 import java.util.ArrayList;
 
-//TODO Implment methods
 public class FloatArrayArrayArrayGrid implements ArrayGrid3D<Float> {
 
-    private float[][][] grid3;
+    private Float[][][] grid3;
 
     public FloatArrayArrayArrayGrid(){
-        grid3 = new float[0][0][0];
+        grid3 = new Float[0][0][0];
     }
 
     public FloatArrayArrayArrayGrid(Float[][][] values){
@@ -16,11 +15,11 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid3D<Float> {
     }
 
     public FloatArrayArrayArrayGrid(FloatArrayArrayArrayGrid original){
-        grid3 = original.grid3.clone();
+        loadFromArray(original.grid3);
     }
 
     public void loadFromArray(Float[][][] values) {
-        grid3 = new float[values.length][values[0].length][values[0][0].length];
+        grid3 = new Float[values.length][values[0].length][values[0][0].length];
         for (int x = 0; x < values.length; x++) {
             for (int y = 0; y < values[x].length; y++) {
                 for (int z = 0; z < values[x][y].length; z++) {
@@ -30,223 +29,325 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid3D<Float> {
         }
     }
 
-    public void fillToSize(int width, int height, int length) {
-        fillToSize(width, height, length, 0f);
+    public void fillToSize(int width, int height, int depth) {
+        fillToSize(width, height, depth, 0f);
     }
 
-    public void fillToSize(int width, int height,int length, Float val) {
-        grid3 = new float[width][height][length];
+    public void fillToSize(int width, int height,int depth, Float val) {
+        grid3 = new Float[width][height][depth];
         for (int x = 0; x < width; x++){
             for (int y = 0; y < height; y++){
-                for (int z = 0; z < length; z++) {
+                for (int z = 0; z < depth; z++) {
                     grid3[x][y][z] = val;
                 }
             }
         }
     }
 
-
     public void put(int x, int y, int z, Float val){
+        if (getWidth() == 0 && getHeight() == 0 && getDepth() == 0){
+            fillToSize(x+1, y+1, z+1);
+            grid3[x][y][z] = val;
+            return;
+        }
+
         while (x >= getWidth()){
-            addColumn(new ArrayList<>());
+            addXLayer(new FloatArrayArrayGrid());
         }
         while (y >= getHeight()){
-            addRow(new ArrayList<>());
+            addYLayer(new FloatArrayArrayGrid());
         }
         while (z >= getDepth()){
-            addRow(new ArrayList<>());
+            addZLayer(new FloatArrayArrayGrid());
         }
         grid3[x][y][z] = val;
     }
 
-    public void addColumn(ArrayList<Float> col){
-        addColumnAt(getWidth(), getDepth(), col);
-    }
-
     @Override
-    public void addColumnAt(int x, ArrayList<Float> col) {
-
-    }
-
-
-    public void addColumnAt(int x, int y, ArrayList<Float> col){
-        while (getWidth() < x){
-            addColumn(new ArrayList<>());
-        }
-        normalizeColumn(col);
-
-        float[][][] grid2 = new float[getWidth()+1][getHeight()][getDepth()];
-        int i = 0;
-        int j =0;
-        while (i < x){
-            j =0;
-            while (j < y) {
-                grid2[i] = grid3[i];
-                j++;
-            }
-            i++;
-        }
-
-        for (int k = 0; k < getHeight(); k++){
-            grid2[i][j][k] = col.get(k);
-        }
-        while (i < grid3.length){
-            grid2[i+1] = grid3[i];
-            i++;
-        }
-        grid3 = grid2;
-    }
-
-    public void addRow(ArrayList<Float> row){
-        addRowAt(getHeight(), getWidth(),row);
-    }
-
-    @Override
-    public void addRowAt(int y, ArrayList<Float> row) {
-
-    }
-
-    @Override
-    public void addLayer(ArrayList<Float> lay) {
-
-    }
-
-    @Override
-    public void addLayerAt(int z, ArrayList<Float> lay) {
-
-    }
-
-
-    public void addRowAt(int z, int y, ArrayList<Float> row){
-        normalizeRow(row);
-        while (getHeight() < y){
-            addRow(new ArrayList<>());
-        }
-        normalizeRow(row);
-
-        float[][][] grid2 = new float[getWidth()][getHeight()+1][getDepth()];
-        int j = 0;
-        while (j < y){
-            for (int x = 0; x < getWidth(); x++){
-                grid2[z][x][j] = grid3[z][x][j];
-            }
-            j++;
-        }
-        for (int x = 0; x < getWidth(); x++){
-            grid2[z][x][y] = row.get(x);
-        }
-        while (j < getHeight()){
-            for (int x = 0; x < getWidth(); x++){
-                grid2[z][x][j+1] = grid3[z][x][j];
-            }
-            j++;
-        }
-        grid3 = grid2;
-    }
-
-    private void normalizeRow(ArrayList<Float> row){
-        while (getWidth() > row.size()){
-            row.add(0f);
-        }
-        while (getWidth() < row.size()){
-            addColumn(new ArrayList<>());
-        }
-    }
-
-    private void normalizeColumn(ArrayList<Float> col){
-        if (grid3.length > 0){
-            while (col.size() < getHeight()){
-                col.add(0f);
-            }
-            while (col.size() > getHeight()){
-                addRow(new ArrayList<>());
-            }
-        }
-    }
-
-    public ArrayList<Float> getColumn(int x, int y){
-        if (x >= 0 && x < getWidth()){
-            ArrayList<Float> col = new ArrayList<>(grid3[x][y].length);
-            for (float val : grid3[x][y]){
-                col.add(val);
-            }
-            return col;
-        }
-        else {
-            throw new ArrayIndexOutOfBoundsException(String.format("The column (%d) is out of bounds.  Expected a column less than %d", x, getWidth()));
-        }
-    }
-
-    public ArrayList<Float> getRow(int y, int z){
-        if (y >= 0 && y < getHeight()){
-            ArrayList<Float> row = new ArrayList<>();
-            for (float[][] col : grid3){
-                row.add(col[y][z]);
-            }
-            return row;
-        }
-        else {
-            throw new ArrayIndexOutOfBoundsException(String.format("The row (%d) is out of bounds.  Expected a row less than %d", y, getHeight()));
-        }
-    }
-
     public Float get(int x, int y, int z){
         return grid3[x][y][z];
     }
 
     @Override
-    public ArrayList<Float> getColumn(int x) {
-        return null;
+    public void addXLayer(ArrayGrid<Float> xlay) {
+        insertXLayerAt(getWidth(), xlay);
     }
 
     @Override
-    public ArrayList<Float> getRow(int y) {
-        return null;
+    public void insertXLayerAt(int x, ArrayGrid<Float> xlay) {
+        if (getWidth() == 0 && getHeight() == 0 && getDepth() == 0){
+            fillToSize(x+1, xlay.getWidth(), xlay.getHeight());
+            for (int j = 0; j < getHeight(); j++){
+                for (int k = 0; k < getDepth(); k++){
+                    grid3[x][j][k] = xlay.get(j, k);
+                }
+            }
+            return;
+        }
+
+        normalizeXLayer(xlay);
+        while (getWidth() < x){
+            addXLayer(new FloatArrayArrayGrid());
+        }
+        normalizeXLayer(xlay);
+
+        Float[][][] grid2 = new Float[getWidth()+1][getHeight()][getDepth()];
+        int i = 0;
+        while (i < x){
+            for (int j = 0; j < getHeight(); j++){
+                for (int k = 0; k < getDepth(); k++){
+                    grid2[i][j][k] = grid3[i][j][k];
+                }
+            }
+            i++;
+        }
+        for (int j = 0; j < getHeight(); j++){
+            for (int k = 0; k < getDepth(); k++){
+                grid2[x][j][k] = xlay.get(j, k);
+            }
+        }
+        while (i < getWidth()){
+            for (int j = 0; j < getHeight(); j++){
+                for (int k = 0; k < getDepth(); k++){
+                    grid2[i+1][j][k] = grid3[i][j][k];
+                }
+            }
+            i++;
+        }
+        grid3 = grid2;
     }
 
+    private void normalizeXLayer(ArrayGrid<Float> layer){
+        while (layer.getWidth() < getHeight()){
+            layer.addColumn(new ArrayList<>());
+        }
+        while (layer.getHeight() < getDepth()){
+            layer.addRow(new ArrayList<>());
+        }
+        while (getHeight() < layer.getWidth()){
+            addYLayer(new FloatArrayArrayGrid());
+        }
+        while (getDepth() < layer.getHeight()){
+            addZLayer(new FloatArrayArrayGrid());
+        }
+    }
+
+    @Override
+    public void addYLayer(ArrayGrid<Float> ylay) {
+        insertYLayerAt(getHeight(), ylay);
+    }
+
+    @Override
+    public void insertYLayerAt(int y, ArrayGrid<Float> ylay) {
+        if (getWidth() == 0 && getHeight() == 0 && getDepth() == 0){
+            fillToSize(ylay.getWidth(), y+1, ylay.getHeight());
+            for (int i = 0; i < getWidth(); i++){
+                for (int k = 0; k < getDepth(); k++){
+                    grid3[i][y][k] = ylay.get(i, k);
+                }
+            }
+            return;
+        }
+
+        normalizeYLayer(ylay);
+        while (getHeight() < y){
+            addYLayer(new FloatArrayArrayGrid());
+        }
+        normalizeYLayer(ylay);
+
+        Float[][][] grid2 = new Float[getWidth()][getHeight()+1][getDepth()];
+        int j = 0;
+        while (j < y){
+            for (int i = 0; i < getWidth(); i++){
+                for (int k = 0; k < getDepth(); k++){
+                    grid2[i][j][k] = grid3[i][j][k];
+                }
+            }
+            j++;
+        }
+        for (int i = 0; i < getWidth(); i++){
+            for (int k = 0; k < getDepth(); k++){
+                grid2[i][y][k] = ylay.get(i, k);
+            }
+        }
+        while (j < getHeight()){
+            for (int i = 0; i < getWidth(); i++){
+                for (int k = 0; k < getDepth(); k++){
+                    grid2[i][j+1][k] = grid3[i][j][k];
+                }
+            }
+            j++;
+        }
+        grid3 = grid2;
+    }
+
+    private void normalizeYLayer(ArrayGrid<Float> layer){
+        while (layer.getWidth() < getWidth()){
+            layer.addColumn(new ArrayList<>());
+        }
+        while (layer.getHeight() < getDepth()){
+            layer.addRow(new ArrayList<>());
+        }
+        while (getWidth() < layer.getWidth()){
+            addXLayer(new FloatArrayArrayGrid());
+        }
+        while (getDepth() < layer.getHeight()){
+            addZLayer(new FloatArrayArrayGrid());
+        }
+    }
+
+    @Override
+    public void addZLayer(ArrayGrid<Float> zlay) {
+        insertZLayerAt(getDepth(), zlay);
+    }
+
+    @Override
+    public void insertZLayerAt(int z, ArrayGrid<Float> zlay) {
+        if (getWidth() == 0 && getHeight() == 0 && getDepth() == 0){
+            fillToSize(zlay.getWidth(), zlay.getHeight(), z+1);
+            for (int i = 0; i < getWidth(); i++){
+                for (int j = 0; j < getHeight(); j++){
+                    grid3[i][j][z] = zlay.get(i, j);
+                }
+            }
+            return;
+        }
+
+        normalizeZLayer(zlay);
+        while (getDepth() < z){
+            addZLayer(new FloatArrayArrayGrid());
+        }
+        normalizeZLayer(zlay);
+
+        Float[][][] grid2 = new Float[getWidth()][getHeight()][getDepth()+1];
+        int k = 0;
+        while (k < z){
+            for (int i = 0; i < getWidth(); i++){
+                for (int j = 0; j < getHeight(); j++){
+                    grid2[i][j][k] = grid3[i][j][k];
+                }
+            }
+            k++;
+        }
+        for (int i = 0; i < getWidth(); i++){
+            for (int j = 0; j < getHeight(); j++){
+                grid2[i][j][z] = zlay.get(i, j);
+            }
+        }
+        while (k < getDepth()){
+            for (int i = 0; i < getWidth(); i++){
+                for (int j = 0; j < getHeight(); j++){
+                    grid2[i][j][k+1] = grid3[i][j][k];
+                }
+            }
+            k++;
+        }
+        grid3 = grid2;
+    }
+
+    private void normalizeZLayer(ArrayGrid<Float> layer){
+        while (layer.getWidth() < getWidth()){
+            layer.addColumn(new ArrayList<>());
+        }
+        while (layer.getHeight() < getHeight()){
+            layer.addRow(new ArrayList<>());
+        }
+        while (getWidth() < layer.getWidth()){
+            addXLayer(new FloatArrayArrayGrid());
+        }
+        while (getHeight() < layer.getHeight()){
+            addYLayer(new FloatArrayArrayGrid());
+        }
+    }
+
+    @Override
+    public ArrayGrid<Float> getXLayer(int x){
+        if (x >= 0 && x < getWidth()) {
+            ArrayGrid<Float> out = new FloatArrayArrayGrid();
+            for (int j = getHeight() - 1; j >= 0; j--) {
+                for (int k = getDepth() - 1; k >= 0; k--) {
+                    out.put(j, k, grid3[x][j][k]);
+                }
+            }
+            return out;
+        }
+        else {
+            throw new ArrayIndexOutOfBoundsException(
+                    String.format("The xLayer (%d) is out of bounds.  Expected a layer less than %d", x, getWidth()));
+        }
+    }
+
+    @Override
+    public ArrayGrid<Float> getYLayer(int y){
+        if (y >= 0 && y < getHeight()){
+            ArrayGrid<Float> out = new FloatArrayArrayGrid();
+            for (int i = getWidth()-1; i >= 0; i--){
+                for (int k = getDepth()-1; k >= 0; k--){
+                    out.put(i, k, grid3[i][y][k]);
+                }
+            }
+            return out;
+        }
+        else {
+            throw new ArrayIndexOutOfBoundsException(
+                    String.format("The yLayer (%d) is out of bounds.  Expected a layer less than %d", y, getHeight()));
+        }
+    }
+
+    @Override
+    public ArrayGrid<Float> getZLayer(int z){
+        if (z >= 0 && z < getDepth()){
+            ArrayGrid<Float> out = new FloatArrayArrayGrid();
+            for (int i = getWidth()-1; i >= 0; i--){
+                for (int j = getHeight()-1; j >= 0; j--){
+                    out.put(i, j, grid3[i][j][z]);
+                }
+            }
+            return out;
+        }
+        else {
+            throw new ArrayIndexOutOfBoundsException(
+                    String.format("The zLayer (%d) is out of bounds.  Expected a layer less than %d", z, getDepth()));
+        }
+    }
+
+    @Override
     public int getWidth() {
         return grid3.length;
     }
 
 
+    @Override
     public int getHeight() {
         return grid3.length == 0 ? 0 : grid3[0].length;
     }
 
     @Override
     public int getDepth() {
-        return grid3[0].length == 0 ? 0 : grid3[0][0].length;
+        return grid3.length == 0 || grid3[0].length == 0 ? 0 : grid3[0][0].length;
     }
 
-
-    @Override
-    public int getX() {
-        return 0;
-    }
-
-    @Override
-    public int getY() {
-        return 0;
-    }
-
-    @Override
-    public int getZ() {
-        return 0;
-    }
 
     @Override
     public int size() {
-        return getWidth();
+        return getWidth()*getHeight()*getDepth();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size() == 0;
     }
 
     @Override
     public boolean equals(Object o){
         if (o instanceof ArrayGrid3D){
             ArrayGrid3D other = (ArrayGrid3D)o;
-            if (other.size() == size()){
-                for (int i = 0; i < size(); i++){
-                    for (int j = 0; j < size(); j++){
-                        for (int k = 0; k < size(); k++){
+            if (getWidth() == other.getWidth() &&
+                    getHeight() == other.getHeight() &&
+                    getDepth() == other.getDepth()){
+                for (int i = 0; i < getWidth(); i++){
+                    for (int j = 0; j < getHeight(); j++){
+                        for (int k = 0; k < getDepth(); k++){
                             try {
                                 if (Math.abs(get(i, j, k) - (Float) other.get(i, j, k)) > 0.0000001) {
                                     return false;
@@ -262,10 +363,6 @@ public class FloatArrayArrayArrayGrid implements ArrayGrid3D<Float> {
             }
         }
         return false;
-    }
-
-    public boolean isEmpty() {
-        return size() == 0;
     }
 
     @Override

@@ -65,6 +65,12 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
 
     @Override
     public void put(int x, int y, Float val){
+        if (getWidth() == 0 && getHeight() == 0){
+            fillToSize(x+1, y+1);
+            grid[x][y] = val;
+            return;
+        }
+
         while (x >= getWidth()){
             addColumn(new ArrayList<>());
         }
@@ -81,6 +87,14 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
 
     @Override
     public void insertColumnAt(int x, List<Float> col){
+        if (getWidth() == 0 && getHeight() == 0){
+            fillToSize(x+1, col.size());
+            for (int j = 0; j < col.size(); j++){
+                grid[x][j] = col.get(j);
+            }
+            return;
+        }
+
         while (getWidth() < x){
             addColumn(new ArrayList<>());
         }
@@ -109,6 +123,14 @@ public class FloatArrayArrayGrid implements ArrayGrid<Float> {
 
     @Override
     public void insertRowAt(int y, List<Float> row){
+        if (getWidth() == 0 && getHeight() == 0){
+            fillToSize(row.size(), y+1);
+            for (int i = 0; i < grid.length; i++){
+                grid[i][y] = row.get(i);
+            }
+            return;
+        }
+
         normalizeRow(row);
         while (getHeight() < y){
             addRow(new ArrayList<>());

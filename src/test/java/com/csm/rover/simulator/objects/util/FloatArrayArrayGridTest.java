@@ -67,11 +67,11 @@ public class FloatArrayArrayGridTest {
         col.add(1.5f);
         col.add(1.6f);
         col.add(1.7f);
-        grid.insertColumnAt(2, col);
+        grid.addColumn(col);
 
-        assertEquals(3, grid.getWidth());
+        assertEquals(1, grid.getWidth());
         assertEquals(4, grid.getHeight());
-        assertEquals(col, grid.getColumn(2));
+        assertEquals(col, grid.getColumn(0));
     }
 
     @Test
@@ -82,11 +82,11 @@ public class FloatArrayArrayGridTest {
         row.add(1.6f);
         row.add(1.7f);
         row.add(1.8f);
-        grid.insertRowAt(5, row);
+        grid.addRow(row);
 
         assertEquals(5, grid.getWidth());
-        assertEquals(6, grid.getHeight());
-        assertEquals(row, grid.getRow(5));
+        assertEquals(1, grid.getHeight());
+        assertEquals(row, grid.getRow(0));
     }
 
     @Test

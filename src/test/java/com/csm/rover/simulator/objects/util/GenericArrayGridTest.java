@@ -43,13 +43,38 @@ public class GenericArrayGridTest {
         col.add("b");
         col.add("e");
         col.add("f");
+        grid.addColumn(col);
+
+        assertEquals(col, grid.getColumn(0));
+    }
+
+    @Test
+    public void testAddRow(){
+        ArrayList<String> row = new ArrayList<String>();
+        row.add("a");
+        row.add("b");
+        row.add("c");
+        row.add("e");
+        row.add("f");
+        grid.addRow(row);
+
+        assertEquals(row, grid.getRow(0));
+    }
+
+    @Test
+    public void testInsertCol(){
+        ArrayList<String> col = new ArrayList<String>();
+        col.add("a");
+        col.add("b");
+        col.add("e");
+        col.add("f");
         grid.insertColumnAt(2, col);
 
         assertEquals(col, grid.getColumn(2));
     }
 
     @Test
-    public void testAddRow(){
+    public void testInsertRow(){
         ArrayList<String> row = new ArrayList<String>();
         row.add("a");
         row.add("b");
