@@ -59,8 +59,8 @@ public class PlatformState {
         return platform_type;
     }
 
-    public final List<String> expectedValues(){
-        return Collections.unmodifiableList(new ArrayList<>(parameters.keySet()));
+    public final Set<String> expectedValues(){
+        return Collections.unmodifiableSet(parameters.keySet());
     }
 
     public final Class<?> getParameterType(String name){
@@ -68,20 +68,20 @@ public class PlatformState {
         return parameters.get(name);
     }
 
-    public final List<String> requiredValues(){
-        ArrayList<String> out = new ArrayList<>(parameters.keySet());
+    public final Set<String> requiredValues(){
+        Set<String> out = new TreeSet<>(parameters.keySet());
         out.removeAll(double_default_values.keySet());
         out.removeAll(double_list_default_values.keySet());
         out.removeAll(string_default_values.keySet());
-        return Collections.unmodifiableList(out);
+        return Collections.unmodifiableSet(out);
     }
 
-    public final List<String> optionalValues(){
-        List<String> out = new ArrayList<>();
+    public final Set<String> optionalValues(){
+        Set<String> out = new TreeSet<>();
         out.addAll(double_default_values.keySet());
         out.addAll(double_list_default_values.keySet());
         out.addAll(string_default_values.keySet());
-        return out;
+        return Collections.unmodifiableSet(out);
     }
 
     public final <T> void set(String param, T val){
