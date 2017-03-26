@@ -1,6 +1,8 @@
 package com.csm.rover.simulator.platforms;
 
 import com.csm.rover.simulator.test.objects.states.MoleState;
+import java.util.Map;
+import java.util.TreeMap;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,6 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class PlatformStateTest {
 
@@ -65,124 +68,147 @@ public class PlatformStateTest {
         state.set("weight", "heavy");
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testSet_UnknownParam(){
-
+        state.set("gender", "male");
     }
 
     @Test
     public void testGetDefault_String(){
-
+        assertEquals("Star-nose", state.get("species"));
     }
 
     @Test
     public void testGetDefault_Double(){
-
+        assertEquals(4.9, state.get("age"), TOLERANCE);
     }
 
     @Test
     public void testGetDefault_DoubleArray(){
-
+        assertArrayEquals(new Double[]{5., 5., 5., 5.}, state.get("toes"), TOLERANCE);
     }
 
-    @Test
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testNoDefault_Double(){
-
+        state.get("weight");
     }
 
-    @Test
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testNoDefault_String(){
-
+        state.get("name");
     }
 
-    @Test
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testNoDefault_DoubleArray(){
-
+        state.get("strength");
     }
 
-    @Test
+    @Test(expected = ClassCastException.class)
     public void testWrongType_Double(){
-
+        String species = state.get("age");
     }
 
-    @Test
+    @Test(expected = ClassCastException.class)
     public void testWrongType_DoubleArray(){
-
+        Double age = state.get("toes");
     }
 
-    @Test
+    @Test(expected = ClassCastException.class)
     public void testWrongType_String(){
-
+        Double[] toes = state.get("species");
     }
 
     @Test
     public void testGetType_Double(){
-
+        assertEquals(Double.class, state.getParameterType("age"));
     }
 
     @Test
     public void testGetType_DoubleArray(){
-
+        assertEquals(Double[].class, state.getParameterType("toes"));
     }
 
     @Test
     public void testGetType_String(){
-
+        assertEquals(String.class, state.getParameterType("name"));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testGetType_Unknown(){
-
+        state.getParameterType("nose");
     }
 
-    @Test
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testRemove_Double(){
-
+        state.set("weight", 12.);
+        state.remove("weight");
+        state.get("weight");
     }
 
-    @Test
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testRemove_DoubleArray(){
-
+        state.set("strength", new Double[] {34., 18., 10., 0.});
+        state.remove("strength");
+        state.get("strength");
     }
 
-    @Test
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testRemove_String(){
-
+        state.set("name", "Daisy");
+        state.remove("name");
+        state.get("name");
     }
 
     @Test
     public void testRemoveToDefault_Double(){
-
+        state.set("age", 2.);
+        state.remove("age");
+        assertEquals(4.9, state.get("age"), TOLERANCE);
     }
 
     @Test
     public void testRemoveToDefault_DoubleArray(){
-
+        state.set("toes", new Double[]{3., 5., 4., 3.});
+        state.remove("toes");
+        assertArrayEquals(new Double[]{5., 5., 5., 5.}, state.get("toes"), TOLERANCE);
     }
 
     @Test
     public void testRemoveToDefault_String(){
-
+        state.set("species", "brown");
+        state.remove("species");
+        assertEquals("Star-nose", state.get("species"));
     }
 
     @Test
     public void testCopy(){
-
+        state.set("name", "Daisy");
+        state.set("age", 5.);
+        PlatformState state2 = state.immutableCopy();
+        assertEquals("Daisy", state2.get("name"));
+        assertEquals(5., state2.get("age"), TOLERANCE);
     }
 
-    @Test
+    @Test(expected = IllegalAccessError.class)
     public void testReadOnly_Set(){
-
+        state.immutableCopy().set("name", "Ronald");
     }
 
-    @Test
+    @Test(expected = IllegalAccessError.class)
     public void testReadOnly_Remove(){
-
+        state.set("weight", 5.7);
+        state.immutableCopy().remove("weight");
     }
 
     @Test
     public void testOverride(){
-
+        Map<String, Object> paramMap = new TreeMap<>();
+        paramMap.put("weight", 4.5);
+        paramMap.put("gender", "male");
+        paramMap.put("toes", 2.3);
+        state.overrideValues(paramMap);
+        assertArrayEquals(new Double[]{5., 5., 5., 5.}, state.get("toes"), TOLERANCE);
+        assertEquals(4.5, state.get("weight"), TOLERANCE);
     }
 
     private static void assertArrayEquals(Double[] expected, Double[] value, double delta){

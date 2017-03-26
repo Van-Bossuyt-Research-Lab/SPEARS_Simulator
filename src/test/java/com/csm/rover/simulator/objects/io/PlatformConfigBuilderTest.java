@@ -65,7 +65,7 @@ public class PlatformConfigBuilderTest {
                 .setID("r1")
                 .setAutonomousModel("AutoCode", ParamMap.newParamMap().addParameter("version", 5).build())
                 .setPhysicsModel("PhysicsModel", ParamMap.newParamMap().addParameter("mass", 10).build())
-                .addStateVariable("weather", -5)
+                .addStateVariable("weather", -5.)
                 .build();
     }
 
@@ -100,14 +100,14 @@ public class PlatformConfigBuilderTest {
         PlatformConfig config = createPlatform();
         Assert.assertEquals("PhysicsModel", config.getPhysicsModelName());
         assert config.getPhysicsModelParameters().containsKey("mass");
-        Assert.assertEquals(10, config.getPhysicsModelParameters().get("mass"), TOLERANCE);
+        Assert.assertEquals(10., config.getPhysicsModelParameters().get("mass"), TOLERANCE);
     }
 
     @Test
     public void testState(){
         PlatformConfig config = createPlatform();
         assert config.getStateParameters().containsKey("weather");
-        Assert.assertEquals(-5, config.getStateParameters().get("weather"), TOLERANCE);
+        Assert.assertEquals(-5., (Double)config.getStateParameters().get("weather"), TOLERANCE);
     }
 
 }

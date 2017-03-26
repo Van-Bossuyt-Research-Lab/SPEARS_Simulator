@@ -36,7 +36,7 @@ public class PlatformBuilderTest {
                         .addParameter("param1", 1).addParameter("param2", 2).build())
                 .setPhysicsModel("Test Rover", ParamMap.newParamMap()
                         .addParameter("paramA", 'A').addParameter("paramB", 'B').build())
-                .addStateVariable("state", 0)
+                .addStateVariable("state", 0.)
                 .build();
         platform = Platform.buildFromConfiguration(config);
     }
@@ -91,7 +91,7 @@ public class PlatformBuilderTest {
 
     @Test
     public void testStateInit(){
-        assertEquals(0, platform.getState().get("state"), TOLERANCE);
+        assertEquals(0., platform.getState().get("state"), TOLERANCE);
     }
 
     @Test

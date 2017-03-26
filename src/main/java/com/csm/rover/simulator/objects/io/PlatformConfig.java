@@ -19,7 +19,7 @@ public class PlatformConfig {
     private String physicsModelName;
     private String autonomousModelName;
 
-    private Map<String, Double> stateParameters;
+    private Map<String, Object> stateParameters;
     private Map<String, Double> physicsModelParameters;
     private Map<String, Double> autonomousModelParameters;
 
@@ -64,7 +64,7 @@ public class PlatformConfig {
         return Collections.unmodifiableMap(autonomousModelParameters);
     }
 
-    public Map<String, Double> getStateParameters(){
+    public Map<String, Object> getStateParameters(){
         return Collections.unmodifiableMap(stateParameters);
     }
 
@@ -181,7 +181,7 @@ public class PlatformConfig {
          * @param value Value to set it to
          * @return this
          */
-        public Builder addStateVariable(String param, double value){
+        public Builder addStateVariable(String param, Object value){
             config.stateParameters.put(param, value);
             return this;
         }
