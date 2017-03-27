@@ -1,17 +1,12 @@
 package com.csm.rover.simulator.platforms;
 
 import com.csm.rover.simulator.test.objects.states.MoleState;
-import java.util.Map;
-import java.util.TreeMap;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class PlatformStateTest {
 
