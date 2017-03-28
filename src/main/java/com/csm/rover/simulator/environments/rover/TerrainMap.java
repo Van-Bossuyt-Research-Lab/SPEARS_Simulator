@@ -14,6 +14,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.awt.Point;
 import java.util.Optional;
 
+/**
+ * The EnvironmentMap implementation for the Rover Platform.
+ */
 @Map(type="Rover")
 @JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @JsonIgnoreProperties({"type"})
@@ -33,17 +36,39 @@ public class TerrainMap extends EnvironmentMap {
         this.detail = detail;
     }
 
+    /**
+     * Creates an empty, 0 size Map.
+     */
     public TerrainMap(){
         this(0, 0);
     }
 
+    /**
+     * Creates a Map based on the provided ArrayGrid.
+     *
+     * @param size Width of the map in meters
+     * @param detail Number of points per meter
+     * @param values Height map
+     *
+     * @throws IllegalArgumentException if the size of the ArrayGrid does not match the expected number of points
+     */
     @JsonCreator
-    public TerrainMap(@JsonProperty("size") int size, @JsonProperty("detail") int detail, @JsonProperty("heightMap") ArrayGrid<Float> values){
+    public TerrainMap(@JsonProperty("size") int size, @JsonProperty("detail") int detail,
+                      @JsonProperty("heightMap") ArrayGrid<Float> values){
         this(size, detail);
         this.heightMap = new FloatArrayArrayGrid((FloatArrayArrayGrid)values);
         checkSize();
     }
 
+    /**
+     * Creates a Map based on the provided Float[][].
+     *
+     * @param size Width of the map in meters
+     * @param detail Number of points per meter
+     * @param values Height map
+     *
+     * @throws IllegalArgumentException if the size of the Float[][] does not match the expected number of points
+     */
     public TerrainMap(int size, int detail, Float[][] values){
         this(size, detail);
         this.heightMap = new FloatArrayArrayGrid(values);
@@ -79,6 +104,11 @@ public class TerrainMap extends EnvironmentMap {
         min_val = Optional.of(min);
     }
 
+    /**
+     * Returns the maximum height of the map.
+     *
+     * @return Max value
+     */
     @JsonIgnore
     public float getMaxValue(){
         if (!max_val.isPresent()){
@@ -87,6 +117,11 @@ public class TerrainMap extends EnvironmentMap {
         return max_val.get();
     }
 
+    /**
+     * Returns the minimum height of the map.
+     *
+     * @return Min value
+     */
     @JsonIgnore
     public float getMinValue(){
         if (!min_val.isPresent()){
@@ -129,18 +164,39 @@ public class TerrainMap extends EnvironmentMap {
         return point00*(1-x)*(1-y) + point01*(1-x)*y + point10*x*(1-y) + point11*x*y;
     }
 
+    /**
+     * Returns the width of the map in meters.
+     *
+     * @return The map size
+     */
     public int getSize(){
         return size;
     }
 
+    /**
+     * Returns the resolution of the map in points per meter.
+     *
+     * @return The map detail
+     */
     public int getDetail(){
         return detail;
     }
 
+    /**
+     * Returns a GridList containing the raw values of the height map.
+     *
+     * @return Raw height map
+     */
     public ArrayGrid<Float> rawValues(){
         return heightMap.clone();
     }
 
+    /**
+     * Force implementation of equals as defined by super.
+     *
+     * @param o Another EnvironmentMap
+     * @return Whether the Maps are equal
+     */
     @Override
     protected boolean isEqual(EnvironmentMap o) {
         if (o instanceof TerrainMap){
