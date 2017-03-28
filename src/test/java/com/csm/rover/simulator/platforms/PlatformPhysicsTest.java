@@ -1,14 +1,13 @@
 package com.csm.rover.simulator.platforms;
 
+import com.csm.rover.simulator.test.objects.PhysicsModels.RoverPhysics;
 import org.junit.Before;
 import org.junit.Test;
 import org.laughingpanda.beaninject.Inject;
 
 import java.util.TreeMap;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 
 public class PlatformPhysicsTest {
 
@@ -16,7 +15,7 @@ public class PlatformPhysicsTest {
 
     @Before
     public void setup(){
-        model = mock(PlatformPhysicsModel.class);
+        model = new RoverPhysics();
         Inject.field("command_handlers").of(model).with(new TreeMap<>());
     }
 

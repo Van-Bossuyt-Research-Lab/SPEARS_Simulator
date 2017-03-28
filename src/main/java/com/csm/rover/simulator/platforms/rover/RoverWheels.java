@@ -1,5 +1,10 @@
 package com.csm.rover.simulator.platforms.rover;
 
+import com.csm.rover.simulator.objects.CoverageIgnore;
+
+/**
+ * An enum for identifying a motor/wheel in an array.
+ */
 public enum RoverWheels {
 	
 	FL(0),
@@ -20,7 +25,8 @@ public enum RoverWheels {
 	public int getValue(){
 		return value;
 	}
-	
+
+	@CoverageIgnore
 	public boolean equals(RoverWheels other){
 		return value == other.value;
 	}

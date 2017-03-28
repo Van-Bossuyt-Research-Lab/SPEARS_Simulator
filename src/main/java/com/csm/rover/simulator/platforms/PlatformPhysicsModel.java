@@ -86,12 +86,14 @@ public abstract class PlatformPhysicsModel {
      * @param cmd Command to execute
      * @param params Command parameters
      */
-    public final void sendDriveCommand(String cmd, double... params){
+    public boolean sendDriveCommand(String cmd, double... params){
         if (command_handlers.containsKey(cmd)) {
             command_handlers.get(cmd).processCommand(params);
+            return true;
         }
         else {
             LOG.log(Level.ERROR, "This PhysicsModel has no definition for command \"{}\"", cmd);
+            return false;
         }
     }
 

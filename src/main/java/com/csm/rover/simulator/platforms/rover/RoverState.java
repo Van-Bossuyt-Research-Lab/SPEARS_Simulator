@@ -3,6 +3,9 @@ package com.csm.rover.simulator.platforms.rover;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.State;
 
+/**
+ * PlatformState implementation for the Rover Platform.
+ */
 @State(type="Rover")
 public class RoverState extends PlatformState {
 
