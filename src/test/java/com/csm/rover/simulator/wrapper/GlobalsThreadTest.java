@@ -46,10 +46,10 @@ public class GlobalsThreadTest {
     public void testKill() throws InterruptedException {
         TreeMap<String, ThreadItem> threadMap = populateThreadMap();
         ThreadItem itemMock = spy(new ThreadItem("test", 2, 0,
-                new SynchronousThread(20, () -> {}, SynchronousThread.FOREVER, "test")));
+                new SynchronousThread(2, () -> {}, SynchronousThread.FOREVER, "test")));
         threadMap.put("test", itemMock);
         Globals.getInstance().killThread("test");
-        Thread.sleep(10);
+        Thread.sleep(80);
         assert !threadMap.containsKey("test");
         verify(itemMock, atLeastOnce()).killThread();
     }
@@ -147,7 +147,7 @@ public class GlobalsThreadTest {
         ThreadItem itemMock = new ThreadItem("test", 5000, 0, null);
         threadMap.put("test", itemMock);
         int delay = 333;
-        int tolerance = accel ? 25 : 5;
+        int tolerance = accel ? 35 : 15;
         Globals.getInstance().delayThread("test", delay);
         assert threadMap.containsKey("test-delay");
         Assert.assertEquals(ThreadItem.STATES.SUSPENDED, itemMock.getState());

@@ -1,21 +1,22 @@
-package com.csm.rover.simulator.platforms.rover;
+package com.csm.rover.simulator.platforms.sub;
 
-import com.csm.rover.simulator.platforms.rover.autoCode.RoverAutonomousCode;
-import com.csm.rover.simulator.platforms.rover.physicsModels.RoverPhysicsModel;
+import com.csm.rover.simulator.platforms.sub.physicsModels.subPhysicsModel;
+import com.csm.rover.simulator.platforms.sub.subAuto.SubAutonomousCode;
 import com.csm.rover.simulator.wrapper.Globals;
 import org.junit.Before;
 import org.junit.Test;
 import org.laughingpanda.beaninject.Inject;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 
-public class RoverObjectTest {
+public class SubObjectTest {
 
-    private RoverPhysicsModel physics;
-    private RoverAutonomousCode autoCode;
-    private RoverObject rover;
-    private RoverState state;
+    private subPhysicsModel physics;
+    private SubAutonomousCode autoCode;
+    private SubObject sub;
+    private SubState state;
 
     @Before
     public void reset(){
@@ -28,26 +29,26 @@ public class RoverObjectTest {
     }
 
     private void makePlatform(){
-        physics = mock(RoverPhysicsModel.class);
-        autoCode = mock(RoverAutonomousCode.class);
-        state = spy(new RoverState());
+        physics = mock(subPhysicsModel.class);
+        autoCode = mock(SubAutonomousCode.class);
+        state = spy(new SubState());
         doReturn(state).when(physics).getState();
-        rover = new RoverObject();
-        Inject.field("physicsModel").of(rover).with(physics);
-        Inject.field("autonomousCodeModel").of(rover).with(autoCode);
-        Inject.field("name").of(rover).with("Rover 1");
+        sub = new SubObject();
+        Inject.field("physicsModel").of(sub).with(physics);
+        Inject.field("autonomousCodeModel").of(sub).with(autoCode);
+        Inject.field("name").of(sub).with("Sub 1");
     }
 
     @Test
     public void testStartPhysics(){
-        rover.start();
+        sub.start();
         verify(physics).start();
     }
 
     @Test
     public void testStartCode() throws InterruptedException {
         when(autoCode.nextCommand(anyLong(), any())).thenReturn("");
-        rover.start();
+        sub.start();
         Globals.getInstance().startTime(false);
         Thread.sleep(12000);
         verify(autoCode).nextCommand(10000, state);
@@ -56,7 +57,7 @@ public class RoverObjectTest {
     @Test
     public void testDelayCommand() throws InterruptedException {
         when(autoCode.nextCommand(anyLong(), any())).thenReturn("delay");
-        rover.start();
+        sub.start();
         Globals.getInstance().startTime(false);
         Thread.sleep(12000);
         verify(autoCode).nextCommand(11000, state);
@@ -65,7 +66,7 @@ public class RoverObjectTest {
     @Test
     public void testPassesCommand() throws InterruptedException {
         when(autoCode.nextCommand(anyLong(), any())).thenReturn("move");
-        rover.start();
+        sub.start();
         Globals.getInstance().startTime(false);
         Thread.sleep(12000);
         verify(physics, atLeastOnce()).sendDriveCommand("move");
@@ -73,8 +74,7 @@ public class RoverObjectTest {
 
     @Test
     public void coverEnums(){
-        MotorState.values();
-        RoverWheels.values();
+        SubProp.values();
     }
 
 }

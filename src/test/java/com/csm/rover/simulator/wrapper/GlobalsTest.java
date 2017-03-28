@@ -5,7 +5,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.laughingpanda.beaninject.Inject;
-import org.reflections.util.FilterBuilder;
 
 import static org.junit.Assert.fail;
 
@@ -63,7 +62,7 @@ public class GlobalsTest {
             globals.clock.Stop();
         });
         globals.startTime(false);
-        Thread.sleep(1500);
+        Thread.sleep(2000);
         assert !globals.clock.isAlive();
     }
 

@@ -41,7 +41,7 @@ public abstract class SubAutonomousCode extends PlatformAutonomousCodeModel {
         subName = sub;
     }
     @Override
-    public final String nextCommand(long millitime, final PlatformState state){
+    public String nextCommand(long millitime, final PlatformState state){
         if (!state.getType().equals("Sub")){
             throw new IllegalArgumentException("The provided state is not a SubState");
         }
