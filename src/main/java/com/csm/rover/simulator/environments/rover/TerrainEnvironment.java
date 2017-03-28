@@ -15,14 +15,29 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
+/**
+ * The PlatformEnvironment implementation for the Rover Platform.
+ */
 @Environment(type="Rover")
 public class TerrainEnvironment extends PlatformEnvironment<RoverObject, TerrainMap> {
     private static final Logger LOG = LogManager.getLogger(TerrainEnvironment.class);
 
+    /**
+     * Creates and empty environment.
+     */
     public TerrainEnvironment(){
         super("Rover");
     }
 
+    /**
+     * Better constructor for the TerrainEnvironment.
+     *
+     * @param type Must be Rover
+     * @param map Environment map to base the environment on
+     * @param pops Map of Populators to use in the environment
+     *
+     * @throws IllegalArgumentException if type != "Rover"
+     */
     @JsonCreator
     public TerrainEnvironment(@JsonProperty("type") String type, @JsonProperty("map") TerrainMap map, @JsonProperty("populators") Map<String, EnvironmentPopulator> pops){
         super(type, map, pops);
@@ -31,6 +46,13 @@ public class TerrainEnvironment extends PlatformEnvironment<RoverObject, Terrain
         }
     }
 
+    /**
+     * Returns the map height at the requested point.  See {@link TerrainMap#getHeightAt(DecimalPoint)}.
+     * If the point is out of bounds, attempts to terminate the current thread.
+     *
+     * @param point Point to query
+     * @return Interpolated height map value
+     */
     public double getHeightAt(DecimalPoint point){
         try {
             return map.getHeightAt(point);
@@ -49,6 +71,13 @@ public class TerrainEnvironment extends PlatformEnvironment<RoverObject, Terrain
         }
     }
 
+    /**
+     * Returns the instantaneous slope at the requested point in the requested direction.
+     *
+     * @param point Point to query
+     * @param direction Direction to examine
+     * @return Slope in radians
+     */
     public double getSlopeAt(DecimalPoint point, double direction){
         double radius = 0.1;
         double h0 = getHeightAt(point);
@@ -57,34 +86,81 @@ public class TerrainEnvironment extends PlatformEnvironment<RoverObject, Terrain
         return Math.atan((hnew - h0) / radius);
     }
 
+    /**
+     * Returns the instantaneous slope at the requested point 90deg cw from the requested direction.
+     *
+     * @param point Point to query
+     * @param direction Base direction
+     * @return Slope in radians
+     */
     public double getCrossSlopeAt(DecimalPoint point, double direction){
         return getSlopeAt(point, (direction - Math.PI / 2.0 + Math.PI * 2) % (2 * Math.PI));
     }
 
+    /**
+     * Returns the base gravity value for the environment
+     *
+     * @return Gravitational acceleration in m/s^2
+     */
     @JsonIgnore
     public double getGravity(){
         //TODO handle this better
         return 9.81;
     }
 
+    /**
+     * Gets the value of a populator in the environment.
+     *
+     * See: {@link PlatformEnvironment#getPopulatorValue(String, double...)}
+     *
+     * @param pop Populator name
+     * @param point Point to query
+     *
+     * @return The value of the populator
+     */
     public double getPopulatorValue(String pop, DecimalPoint point){
         return super.getPopulatorValue(pop, point.getX(), point.getY());
     }
 
+    /**
+     * Returns whether the populator is defined at a point.
+     *
+     * See: {@link PlatformEnvironment#isPopulatorAt(String, double...)}
+     *
+     * @param pop Populator name
+     * @param point Point to query
+     *
+     * @return Populator value == 0
+     */
     public boolean isPopulatorAt(String pop, DecimalPoint point){
         return super.isPopulatorAt(pop, point.getX(), point.getY());
     }
 
+    /**
+     * Returns the size of the Map.
+     *
+     * @return {@link TerrainMap#getSize()}
+     */
     @JsonIgnore
     public int getSize(){
         return map.getSize();
     }
 
+    /**
+     * Returns the detail of the Map.
+     *
+     * @return {@link TerrainMap#getDetail()}
+     */
     @JsonIgnore
     public int getDetail(){
         return map.getDetail();
     }
 
+    /**
+     * Returns the maximum height of the Map.
+     *
+     * @return {@link TerrainMap#getMaxValue()}
+     */
     @JsonIgnore
     public double getMaxHeight(){
         return map.getMaxValue();
