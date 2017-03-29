@@ -104,6 +104,8 @@ public abstract class PlatformPhysicsModel {
      *
      * @param cmd Command to execute
      * @param params Command parameters
+     *
+     * @return true if the command sent successfully
      */
     public boolean sendDriveCommand(String cmd, double... params){
         if (command_handlers.containsKey(cmd)) {

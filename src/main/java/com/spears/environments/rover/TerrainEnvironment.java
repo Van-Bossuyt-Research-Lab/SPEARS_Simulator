@@ -148,7 +148,7 @@ public class TerrainEnvironment extends PlatformEnvironment<RoverObject, Terrain
      * @param pop Populator name
      * @param point Point to query
      *
-     * @return Populator value == 0
+     * @return Populator value greater than 0
      */
     public boolean isPopulatorAt(String pop, DecimalPoint point){
         return super.isPopulatorAt(pop, point.getX(), point.getY());

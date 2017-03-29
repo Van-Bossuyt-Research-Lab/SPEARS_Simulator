@@ -358,7 +358,7 @@ public class PlatformState {
          * @param default_val default value of the field
          * @param <T> Type parameter, should be Double, Double[], or String
          *
-         * @return
+         * @return this
          */
         public <T> Builder addParameter(String name, Class<T> type, T default_val){
             if (parameters.containsKey(name)){

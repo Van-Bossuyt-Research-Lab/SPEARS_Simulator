@@ -90,7 +90,7 @@ public class AquaticEnvironment extends PlatformEnvironment<SubObject, AquaticMa
      * @param pop The name of the populator to check
      * @param point The point to check
      *
-     * @return Populator value > 0
+     * @return Populator value greater than 0
      */
     public boolean isPopulatorAt(String pop, DecimalPoint3D point){
         return super.isPopulatorAt(pop, point.getX(), point.getY(), point.getZ());
