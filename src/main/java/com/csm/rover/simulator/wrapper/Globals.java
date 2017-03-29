@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Globals {
 	private static final Logger LOG = LogManager.getFormatterLogger(Globals.class);
 
-	public final static String versionNumber = "3.0.1";
+	public final static String versionNumber = "3.0.2";
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;
@@ -27,8 +27,6 @@ public class Globals {
 	private boolean begun = false;
 	private Map<String, ThreadItem> threads = new ConcurrentHashMap<>();
 	private boolean milliDone = false;
-	
-	private int exitTime = -1;
 
     public DateTime dateTime;
     public SynchronousThread clock;
