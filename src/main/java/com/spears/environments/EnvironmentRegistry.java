@@ -39,7 +39,7 @@ public class EnvironmentRegistry {
 
     private static final Logger LOG = LogManager.getLogger(EnvironmentRegistry.class);
 
-    private static Reflections reflect = new Reflections("com.csm.rover.simulator.environments");
+    private static Reflections reflect = new Reflections("com.spears.environments");
 
     private static Map<String, String> environments;
     private static Map<String, String> maps;
