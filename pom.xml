@@ -21,7 +21,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.csm.rover.simulator</groupId>
+	<groupId>com.spears</groupId>
 	<artifactId>SPEARS</artifactId>
 	<version>3.0.2</version>
 	<packaging>jar</packaging>
@@ -108,7 +108,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.csm.rover.simulator.wrapper.Admin</mainClass>
+							<mainClass>com.spears.wrapper.Admin</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -134,19 +134,19 @@
                     </check>
 					<instrumentation>
 						<ignoreTrivial>true</ignoreTrivial>
-						<ignoreMethodAnnotation>com.csm.rover.simulator.objects.CoverageIgnore</ignoreMethodAnnotation>
+						<ignoreMethodAnnotation>com.spears.objects.CoverageIgnore</ignoreMethodAnnotation>
 						<excludes>
-							<exclude>com/csm/rover/simulator/**/*Test.class</exclude>
-							<exclude>com/csm/rover/simulator/objects/io/DatedFileAppenderImpl.class</exclude>
-							<exclude>com/csm/rover/simulator/platforms/rover/autoCode/*.class</exclude>
-							<exclude>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</exclude>
-							<exclude>com/csm/rover/simulator/platforms/sub/subAuto/*.class</exclude>
-							<exclude>com/csm/rover/simulator/platforms/sub/physicsModels/*.class</exclude>
-							<exclude>com/csm/rover/simulator/environments/rover/modifiers/*.class</exclude>
-							<exclude>com/csm/rover/simulator/environments/rover/populators/*.class</exclude>
-							<exclude>com/csm/rover/simulator/environments/sub/modifiers/*.class</exclude>
-							<exclude>com/csm/rover/simulator/environments/sub/populators/*.class</exclude>
-							<exculde>com/csm/rover/simulator/ui/**/*.class</exculde>
+							<exclude>com/spears/**/*Test.class</exclude>
+							<exclude>com/spears/objects/io/DatedFileAppenderImpl.class</exclude>
+							<exclude>com/spears/platforms/rover/autoCode/*.class</exclude>
+							<exclude>com/spears/platforms/rover/physicsModels/*.class</exclude>
+							<exclude>com/spears/platforms/sub/subAuto/*.class</exclude>
+							<exclude>com/spears/platforms/sub/physicsModels/*.class</exclude>
+							<exclude>com/spears/environments/rover/modifiers/*.class</exclude>
+							<exclude>com/spears/environments/rover/populators/*.class</exclude>
+							<exclude>com/spears/environments/sub/modifiers/*.class</exclude>
+							<exclude>com/spears/environments/sub/populators/*.class</exclude>
+							<exculde>com/spears/ui/**/*.class</exculde>
 						</excludes>
 					</instrumentation>
                 </configuration>
@@ -177,15 +177,15 @@
                     </formats>
 					<instrumentation>
 						<includes>
-							<include>com/csm/rover/simulator/platforms/rover/autoCode/*.class</include>
-							<include>com/csm/rover/simulator/platforms/rover/physicsModels/*.class</include>
-							<include>com/csm/rover/simulator/platforms/sub/subAuto/*.class</include>
-							<include>com/csm/rover/simulator/platforms/sub/physicsModels/*.class</include>
-							<include>com/csm/rover/simulator/environments/rover/modifiers/*.class</include>
-							<include>com/csm/rover/simulator/environments/rover/populators/*.class</include>
-							<include>com/csm/rover/simulator/environments/sub/modifiers/*.class</include>
-							<include>com/csm/rover/simulator/environments/sub/populators/*.class</include>
-							<inculde>com/csm/rover/simulator/ui/**/*.class</inculde>
+							<include>com/spears/platforms/rover/autoCode/*.class</include>
+							<include>com/spears/platforms/rover/physicsModels/*.class</include>
+							<include>com/spears/platforms/sub/subAuto/*.class</include>
+							<include>com/spears/platforms/sub/physicsModels/*.class</include>
+							<include>com/spears/environments/rover/modifiers/*.class</include>
+							<include>com/spears/environments/rover/populators/*.class</include>
+							<include>com/spears/environments/sub/modifiers/*.class</include>
+							<include>com/spears/environments/sub/populators/*.class</include>
+							<inculde>com/spears/ui/**/*.class</inculde>
 						</includes>
 					</instrumentation>
                 </configuration>

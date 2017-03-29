@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.csm.rover.simulator.wrapper.Admin
+Main-Class: com.spears.wrapper.Admin
 
