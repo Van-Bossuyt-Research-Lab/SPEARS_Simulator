@@ -69,6 +69,8 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 	protected double[] orientation = {0, 0, 0}; //pitch, yaw, roll
     protected Double[] speed = {0., 0., 0.}; //m/s  x, y, z
 	protected Double[] angular_speed = {0., 0., 0.}; //rads/s  pitch, yaw, roll
+    protected Double[] acceleration = {0., 0., 0.}; //m/s  x, y, z
+    protected Double[] angular_acceleration = {0., 0., 0.}; //rads/s  pitch, yaw, roll
 
 	public subPhysicsModel() {
 		super("Sub");
@@ -365,6 +367,24 @@ public class subPhysicsModel extends PlatformPhysicsModel {
         orientation[0] += wP * time_step;
         orientation[1] += wW * time_step;
         orientation[2] += wR * time_step;
+        acceleration[0] = forceSumFnX.eval(0, speed[0], speed[1], speed[2],
+                density, prop_speed[F], prop_speed[B], prop_speed[L], prop_speed[R],
+                orientation[0], orientation[1], orientation[2]);
+        acceleration[1] = forceSumFnY.eval(0, speed[0], speed[1], speed[2],
+                density, prop_speed[F], prop_speed[B], prop_speed[L], prop_speed[R],
+                orientation[0], orientation[1], orientation[2]);
+        acceleration[2] = forceSumFnY.eval(0, speed[0], speed[1], speed[2],
+                density, prop_speed[F], prop_speed[B], prop_speed[L], prop_speed[R],
+                orientation[0], orientation[1], orientation[2]);
+        angular_acceleration[0] = torqueSumFnP.eval(0, speed[0], speed[1], speed[2],
+                density, prop_speed[F], prop_speed[B], prop_speed[L], prop_speed[R],
+                orientation[0], orientation[1], orientation[2]);
+        angular_acceleration[1] = torqueSumFnW.eval(0, speed[0], speed[1], speed[2],
+                density, prop_speed[F], prop_speed[B], prop_speed[L], prop_speed[R],
+                orientation[0], orientation[1], orientation[2]);
+        angular_acceleration[2] = torqueSumFnR.eval(0, speed[0], speed[1], speed[2],
+                density, prop_speed[F], prop_speed[B], prop_speed[L], prop_speed[R],
+                orientation[0], orientation[1], orientation[2]);
 
 		double temperature = 7.22;
 
@@ -394,6 +414,8 @@ public class subPhysicsModel extends PlatformPhysicsModel {
 		sub_state.set("roll", orientation[2]);
 		sub_state.set("speed", speed);
 		sub_state.set("angular_speed", angular_speed);
+        sub_state.set("acceleration", acceleration);
+        sub_state.set("angular_acceleration", angular_acceleration);
 	}
 
 	private Double[] convertToDoubleArray(double[] array){

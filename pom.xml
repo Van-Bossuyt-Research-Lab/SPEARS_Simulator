@@ -18,9 +18,8 @@
 		<joda.version>2.4</joda.version>
 		<mockito.version>1.9.5</mockito.version>
         <cobertura.version>2.7</cobertura.version>
-
-		<cobertura.check.lineRate>80</cobertura.check.lineRate>
-		<cobertura.check.branchRate>80</cobertura.check.branchRate>
+        <cobertura.check.lineRate>80</cobertura.check.lineRate>
+        <cobertura.check.branchRate>80</cobertura.check.branchRate>
         <cobertura.check.totalLineRate>90</cobertura.check.totalLineRate>
         <cobertura.check.totalBranchRate>90</cobertura.check.totalBranchRate>
 	</properties>
