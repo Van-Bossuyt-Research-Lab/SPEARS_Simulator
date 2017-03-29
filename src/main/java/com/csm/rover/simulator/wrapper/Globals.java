@@ -6,7 +6,6 @@ import com.csm.rover.simulator.objects.ThreadItem;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.util.SystemClock;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Globals {
 	private static final Logger LOG = LogManager.getFormatterLogger(Globals.class);
 
-	public final static String versionNumber = "3.0.0";
+	public final static String versionNumber = "3.0.1";
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;
@@ -83,7 +82,6 @@ public class Globals {
 			timeScale = time_accelerant;
 		}
         clock.start();
-		ThreadItem.offset = 0;
 		new FreeThread(0, () -> {
             long end = System.nanoTime() + (long)(1000000 / getTimeScale());
             while (System.nanoTime() < end) {}
@@ -259,7 +257,6 @@ public class Globals {
 	public void delayThread(String name, int time){
 		if (threads.get(name) != null){
 			String delayName = name + "-delay";
-			ThreadItem.offset = 0;
 			registerNewThread(delayName, time,
 					new SynchronousThread(time, () -> threads.get(name).unSuspend(), SynchronousThread.FOREVER, delayName));
 			threads.get(name).suspend();

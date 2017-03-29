@@ -7,20 +7,49 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Map;
+
+/**
+ * Parent class for the construction to Platforms.
+ */
 public abstract class Platform {
     @CoverageIgnore
     private static final Logger LOG = LogManager.getLogger(Platform.class);
 
+    /**
+     * The type name
+     */
     protected final String platform_type;
 
+    /**
+     * Environment the platform is operating in
+     */
     protected PlatformEnvironment environment;
 
+    /**
+     * The autonomous code model for this platform instance
+     */
     protected PlatformAutonomousCodeModel autonomousCodeModel;
+    /**
+     * Physics model for this platform instance
+     */
     protected PlatformPhysicsModel physicsModel;
 
+    /**
+     * The platform's name
+     */
     protected String name;
+    /**
+     * The communication ID for the platform
+     * @deprecated
+     */
     protected String ID;
 
+    /**
+     * Constructor requires a type.  See {@link #buildFromConfiguration(PlatformConfig)} to create a new Platform.
+     *
+     * @param type Platform type name
+     */
     protected Platform(String type){
         this.platform_type = type;
     }
@@ -29,6 +58,11 @@ public abstract class Platform {
         return platform_type;
     }
 
+    /**
+     * Set the active environment for this platform as well as its code and physics models.
+     *
+     * @param enviro The environment, must be of the same type
+     */
     public void setEnvironment(PlatformEnvironment enviro){
         this.environment = enviro;
         if (autonomousCodeModel != null){
@@ -45,6 +79,16 @@ public abstract class Platform {
         }
     }
 
+    /**
+     * Creates a new platform from a configuration object.  Instantiates the code and physics models using the
+     * {@link PlatformRegistry} and runs their {@link PlatformAutonomousCodeModel#constructParameters(Map)} and
+     * {@link PlatformAutonomousCodeModel#constructParameters(Map)} methods respectively.  Return null if instantiation
+     * fails.
+     *
+     * @param cfg Configuration to use
+     * @param <T> Return class of Platform, does not catch bad cast
+     * @return Complete Platform instance
+     */
     @SuppressWarnings("unchecked")
     public static <T extends Platform> T buildFromConfiguration(PlatformConfig cfg){
         Class<? extends Platform> type = PlatformRegistry.getPlatform(cfg.getType());
@@ -60,21 +104,27 @@ public abstract class Platform {
             platform.physicsModel.setPlatformName(cfg.getScreenName());
             return (T)platform;
         }
-        catch (InstantiationException | IllegalAccessException e) {
+        catch (NullPointerException | InstantiationException | IllegalAccessException e) {
             LOG.log(Level.ERROR, "One or more platform classes failed to initialize on construct", e);
-        }
-        catch (ClassCastException e){
-            LOG.log(Level.ERROR, "Incorrect type request, the final cast failed", e);
         }
         return null;
     }
 
+    /**
+     * Starts the platform executing the simulation.  This is implemented by the child object, which should
+     * start the code and physics models.
+     */
     public abstract void start();
 
     public String getName(){
         return name;
     }
 
+    /**
+     * Returns the current state of the platform taken from the physics model.
+     *
+     * @return {@link PlatformPhysicsModel#getState()}
+     */
     public final PlatformState getState(){
         return physicsModel.getState();
     }

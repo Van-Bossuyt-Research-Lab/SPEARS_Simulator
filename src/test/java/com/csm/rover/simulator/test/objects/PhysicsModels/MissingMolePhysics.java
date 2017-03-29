@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.test.objects.physicsModels;
+package com.csm.rover.simulator.test.objects.PhysicsModels;
 
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.platforms.PlatformPhysicsModel;
@@ -20,11 +20,6 @@ public class MissingMolePhysics extends PlatformPhysicsModel {
 
     @Override
     public void start() {
-
-    }
-
-    @Override
-    public void updatePhysics() {
 
     }
 

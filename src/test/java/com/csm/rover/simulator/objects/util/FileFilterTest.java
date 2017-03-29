@@ -1,4 +1,4 @@
-package com.csm.rover.simulator.test.objects.io;
+package com.csm.rover.simulator.objects.util;
 
 import com.csm.rover.simulator.objects.io.EnvrioFileFilter;
 import org.junit.Test;

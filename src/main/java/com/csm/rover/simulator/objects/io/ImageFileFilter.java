@@ -11,6 +11,12 @@ import java.io.File;
  */
 public class ImageFileFilter extends FileFilter {
 
+	/**
+	 * Checks if the given file is valid.  Also accepts directories for navigation purposes.
+	 *
+	 * @param file File to check
+	 * @return True for valid file or directory
+	 */
 	@Override
 	public boolean accept(File file) {
 		String path = file.getAbsolutePath();

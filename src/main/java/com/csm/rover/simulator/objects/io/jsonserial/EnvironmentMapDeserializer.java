@@ -2,6 +2,7 @@ package com.csm.rover.simulator.objects.io.jsonserial;
 
 import com.csm.rover.simulator.environments.EnvironmentMap;
 import com.csm.rover.simulator.environments.EnvironmentRegistry;
+import com.csm.rover.simulator.objects.CoverageIgnore;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -12,6 +13,7 @@ import java.io.IOException;
 
 public class EnvironmentMapDeserializer extends JsonDeserializer<EnvironmentMap> {
 
+    @CoverageIgnore
     @Override
     public EnvironmentMap deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);

@@ -325,8 +325,7 @@ public class subPhysicsModel extends PlatformPhysicsModel {
             };
 
 
-	@Override
-	public void updatePhysics() {
+	private void updatePhysics() {
 		// Motor Currents, based on voltage
         motor_current[F] = RK4.advance(motorCurrentFn, time_step, 0, motor_current[F], motor_power[F], motor_states[F], prop_speed[F]);
         motor_current[B] = RK4.advance(motorCurrentFn, time_step, 0, motor_current[B], motor_power[B], motor_states[B], prop_speed[B]);

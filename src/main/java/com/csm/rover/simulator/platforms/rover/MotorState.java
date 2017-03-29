@@ -1,5 +1,8 @@
 package com.csm.rover.simulator.platforms.rover;
 
+/**
+ * An enum that dictates the movement state of a motor
+ */
 public enum MotorState {
 
 	FORWARD(1),

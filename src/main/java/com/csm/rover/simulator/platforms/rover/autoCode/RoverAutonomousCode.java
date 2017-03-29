@@ -49,7 +49,7 @@ public abstract class RoverAutonomousCode extends PlatformAutonomousCodeModel {
 	}
 
     @Override
-    public final String nextCommand(long millitime, final PlatformState state){
+    public String nextCommand(long millitime, final PlatformState state){
         if (!state.getType().equals("Rover")){
             throw new IllegalArgumentException("The provided state is not a RoverState");
         }

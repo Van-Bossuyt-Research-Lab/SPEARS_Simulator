@@ -1,6 +1,5 @@
 package com.csm.rover.simulator.objects.io;
 
-import com.csm.rover.simulator.wrapper.NamesAndTags;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,6 +19,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * A data structure/IO object which defines how simulations should run.
+ */
 public class RunConfiguration implements Cloneable {
 	@JsonIgnore
 	private static final Logger LOG = LogManager.getLogger(RunConfiguration.class);
@@ -27,13 +29,29 @@ public class RunConfiguration implements Cloneable {
 	@JsonIgnore
 	private static final ObjectMapper mapper = new ObjectMapper();
 
-	@JsonIgnore
-	public NamesAndTags namesAndTags;
+    /**
+     * Unmodifiable list of the platform-environments to run.
+     */
     @JsonProperty("platforms")
-	public List<TypeConfig> types;
-	public boolean accelerated;
-	public int runtime;
+	public final List<TypeConfig> types;
 
+    /**
+     * Whether the simulation should be accelerated.
+     */
+	public final boolean accelerated;
+
+    /**
+     * Time the simulation should run.  Only used when accelerated.
+     */
+	public final int runtime;
+
+    /**
+     * Constructor for JSON.  Recommended using the {@link #newConfig() Builder}.
+     *
+     * @param types List of Platform listings
+     * @param accelerated Whether to accelerate the run
+     * @param runtime Length should run
+     */
 	@JsonCreator
 	public RunConfiguration(@JsonProperty("platforms") List<TypeConfig> types,
 							@JsonProperty("accelerated") boolean accelerated,
@@ -41,17 +59,22 @@ public class RunConfiguration implements Cloneable {
 		this.types = Collections.unmodifiableList(types);
 		this.accelerated = accelerated;
 		this.runtime = runtime;
-		this.namesAndTags = NamesAndTags.newFromPlatforms(types);
 	}
 
-
 	private RunConfiguration(RunConfiguration orig){
-		this.namesAndTags = orig.namesAndTags.clone();
 		this.types = Collections.unmodifiableList(orig.types);
 		this.accelerated = orig.accelerated;
 		this.runtime = orig.runtime;
 	}
-	
+
+    /**
+     * Load a saved configuration from file.
+     *
+     * @param save File where the configuration is saved
+     * @return New RunConfiguration
+     *
+     * @throws Exception On IOException or JsonExceptions
+     */
 	public static RunConfiguration fromFile(File save) throws Exception {
 		LOG.log(Level.INFO, "Loading saved configuration file from: {}", save.getAbsolutePath());
 		mapper.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
@@ -62,7 +85,6 @@ public class RunConfiguration implements Cloneable {
 		catch (JsonParseException e){
 			LOG.log(Level.ERROR, "File was not parsable to RunConfiguration", e);
 			throw new Exception("File was not parsable to RunConfiguration", e);
-
 		}
 		catch (JsonMappingException e){
 			LOG.log(Level.ERROR, "RunConfiguration could not be mapped from file", e);
@@ -74,6 +96,12 @@ public class RunConfiguration implements Cloneable {
 		}
 	}
 
+    /**
+     * Saves the current RunConfiguration to the given file.
+     *
+     * @param file File destination
+     * @throws Exception If save fails
+     */
 	public void save(File file) throws Exception {
 		LOG.log(Level.INFO, "Saving run configuration to: {}", file.getAbsolutePath());
 		try {
@@ -81,10 +109,15 @@ public class RunConfiguration implements Cloneable {
 		}
 		catch (Exception e){
 			LOG.log(Level.WARN, "Configuration failed to save to file", e);
-			throw e;
+			throw new Exception("Configuration failed to save", e);
 		}
 	}
 
+    /**
+     * Returns the type names of all the types used in this configuration.
+     *
+     * @return List of type names
+     */
     @JsonIgnore
     public List<String> getTypes(){
         List<String> out = new ArrayList<>();
@@ -94,6 +127,14 @@ public class RunConfiguration implements Cloneable {
         return out;
     }
 
+    /**
+     * Returns a file for the Environment configured for the request platform type.
+     *
+     * @param type The desired type name
+     * @return File to the {@link com.csm.rover.simulator.environments.PlatformEnvironment PlatformEnvironment}
+     *
+     * @throws IllegalArgumentException If the requested type is not used in this config
+     */
     public File getEnvironmentFile(String type){
         for (TypeConfig config : types){
             if (config.type.equals(type)){
@@ -103,6 +144,14 @@ public class RunConfiguration implements Cloneable {
         throw new IllegalArgumentException("No platforms found of type \'" + type + "\'");
     }
 
+    /**
+     * Returns a list of the configurations for the platforms configured for the given type.
+     *
+     * @param type The desired type name
+     * @return List of {@link PlatformConfig} for the config
+     *
+     * @throws IllegalArgumentException If the requested type is not defined in this config
+     */
 	public List<PlatformConfig> getPlatforms(String type){
         for (TypeConfig config : types){
             if (config.type.equals(type)){
@@ -112,15 +161,37 @@ public class RunConfiguration implements Cloneable {
         throw new IllegalArgumentException("No platforms found of type \'" + type + "\'");
 	}
 
+    @Override
+    public boolean equals(Object other){
+        if (other == this){
+            return true;
+        }
+        if (other instanceof RunConfiguration){
+            RunConfiguration o = (RunConfiguration)other;
+            return o.accelerated == this.accelerated &&
+                    (!this.accelerated || (o.runtime == this.runtime)) &&
+                    o.types.equals(this.types);
+        }
+        return false;
+    }
+
 	@Override
 	public RunConfiguration clone(){
 		return new RunConfiguration(this);
 	}
 
+    /**
+     * Builder pattern access.  Recommended way to create new RunConfigurations.
+     *
+     * @return A new Builder object
+     */
     public static Builder newConfig(){
         return new Builder();
     }
 
+    /**
+     * Builder class
+     */
     public static class Builder {
 
         private List<TypeConfig> types;
@@ -148,52 +219,17 @@ public class RunConfiguration implements Cloneable {
             return this;
         }
 
-        public TypeBuilder newType(String type){
-            return new TypeBuilder(this, type);
-        }
-
+        /**
+         * Fails if any field is not defined.
+         *
+         * @return Fully build RunConfiguration
+         */
         public RunConfiguration build(){
             if (types.size() > 0 && accelerated.isPresent() && (!accelerated.get() || runtime > 0)) {
                 return new RunConfiguration(types, accelerated.get(), runtime);
             }
             else {
                 throw new IllegalStateException("The builder is not fully initialized");
-            }
-        }
-
-    }
-
-    public static class TypeBuilder {
-
-        private Builder build;
-
-        private String type;
-        private File file;
-        private List<PlatformConfig> platforms;
-
-        private TypeBuilder(Builder build, String type){
-            this.build = build;
-            this.type = type;
-            this.platforms = new ArrayList<>();
-        }
-
-        public TypeBuilder setMapFile(File map){
-            this.file = map;
-            return this;
-        }
-
-        public TypeBuilder addPlatform(PlatformConfig config){
-            platforms.add(config);
-            return this;
-        }
-
-        private Builder build(){
-            if (this.file != null && platforms.size() > 0) {
-                build.types.add(new TypeConfig(type, file, platforms));
-                return build;
-            }
-            else {
-                throw new IllegalStateException("Builder not fully initialized");
             }
         }
 

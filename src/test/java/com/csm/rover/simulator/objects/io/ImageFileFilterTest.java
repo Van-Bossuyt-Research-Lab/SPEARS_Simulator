@@ -1,6 +1,5 @@
-package com.csm.rover.simulator.objects.util.io;
+package com.csm.rover.simulator.objects.io;
 
-import com.csm.rover.simulator.objects.io.ImageFileFilter;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

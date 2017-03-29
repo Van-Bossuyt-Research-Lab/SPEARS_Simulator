@@ -10,4 +10,8 @@ public class LandMap extends EnvironmentMap {
         super("Rover");
     }
 
+    @Override
+    protected boolean isEqual(EnvironmentMap other) {
+        return this == other;
+    }
 }

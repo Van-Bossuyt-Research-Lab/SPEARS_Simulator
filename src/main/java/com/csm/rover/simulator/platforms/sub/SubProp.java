@@ -1,7 +1,9 @@
 package com.csm.rover.simulator.platforms.sub;
 
+import com.csm.rover.simulator.objects.CoverageIgnore;
+
 /**
- * Created by PHM-Lab1 on 9/21/2016.
+ * Enum to track the location of motor/props in an array.
  */
 public enum SubProp {
     L(0),
@@ -23,6 +25,7 @@ public enum SubProp {
         return value;
     }
 
+    @CoverageIgnore
     public boolean equals(SubProp other){
         return value == other.value;
     }

@@ -3,6 +3,9 @@ package com.csm.rover.simulator.platforms.sub;
 import com.csm.rover.simulator.platforms.PlatformState;
 import com.csm.rover.simulator.platforms.annotations.State;
 
+/**
+ * Implementation of PlatformState for the Sub Platform.
+ */
 @State(type = "Sub")
 public class SubState extends PlatformState {
     public SubState(){

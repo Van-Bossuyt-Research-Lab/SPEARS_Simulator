@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * An implementation of {@link ArrayGrid} which uses {@link ArrayList}.  Default value  is null.
  *
- * @param <T>
+ * @param <T> Type to store
  */
 public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
 
@@ -219,7 +219,7 @@ public class GenericArrayGrid<T> implements ArrayGrid<T>,Cloneable {
     @CoverageIgnore
     @Override
     public String toString(){
-        ArrayList<String> rows = new ArrayList<String>(getHeight());
+        ArrayList<String> rows = new ArrayList<>(getHeight());
         for (int y = 0; y < getHeight(); y++){
             String row = "| ";
             for (int x = 0; x < getWidth()-1; x++){

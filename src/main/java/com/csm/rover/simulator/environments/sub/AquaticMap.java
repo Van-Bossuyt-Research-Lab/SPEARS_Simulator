@@ -13,13 +13,16 @@ import javafx.geometry.Point3D;
 
 import java.util.Optional;
 
+/**
+ * Map implementation for the Sub Platform.
+ */
 @Map(type="Sub")
 @JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 @JsonIgnoreProperties({"type"})
 public class AquaticMap extends EnvironmentMap {
 
     @JsonProperty("valueMap")
-    private ArrayGrid3D<Float> SubMap;
+    private ArrayGrid3D<Float> densityMap;
 
     @JsonProperty("size")
     private int size;
@@ -32,19 +35,24 @@ public class AquaticMap extends EnvironmentMap {
         this.detail = detail;
     }
 
-    public AquaticMap() {
-        this(0, 0);
-    }
-
+    /**
+     * Constructs a new AquaticMap based on the provided values as a density map.
+     *
+     * @param size The size of the map in meters
+     * @param detail The resolution of the map as points per meter
+     * @param values The density map to use
+     *
+     * @throws IllegalArgumentException if the size of the ArrayGrid3D does not match the size needed for the given size-detail
+     */
     @JsonCreator
     public AquaticMap(@JsonProperty("size") int size, @JsonProperty("detail") int detail, @JsonProperty("valueMap") ArrayGrid3D<Float> values) {
         this(size, detail);
-        this.SubMap = values;
+        this.densityMap = values;
         checkSize();
     }
 
     private void checkSize() {
-        if (SubMap.getWidth() != size*detail+1 || SubMap.getHeight() != size*detail+1) {
+        if (densityMap.getWidth() != size*detail+1 || densityMap.getHeight() != size*detail+1) {
             throw new IllegalArgumentException("The map does not match the given sizes");
         }
     }
@@ -57,10 +65,10 @@ public class AquaticMap extends EnvironmentMap {
     private void findMaxMin() {
         float max = Float.MIN_VALUE;
         float min = Float.MAX_VALUE;
-        for (int i = 0; i < SubMap.getWidth(); i++) {
-            for (int j = 0; j < SubMap.getHeight(); j++) {
-                for (int k = 0; k < SubMap.getDepth(); k++) {
-                    float val = SubMap.get(i, j, k);
+        for (int i = 0; i < densityMap.getWidth(); i++) {
+            for (int j = 0; j < densityMap.getHeight(); j++) {
+                for (int k = 0; k < densityMap.getDepth(); k++) {
+                    float val = densityMap.get(i, j, k);
                     if (val > max) {
                         max = val;
                     }
@@ -74,6 +82,11 @@ public class AquaticMap extends EnvironmentMap {
         min_val = Optional.of(min);
     }
 
+    /**
+     * Returns the maximum density of the map.
+     *
+     * @return Max value
+     */
     @JsonIgnore
     public float getMaxValue() {
         if (!max_val.isPresent()) {
@@ -82,6 +95,11 @@ public class AquaticMap extends EnvironmentMap {
         return max_val.get();
     }
 
+    /**
+     * Returns the minimum density of the map.
+     *
+     * @return Min value
+     */
     @JsonIgnore
     public float getMinValue() {
         if (!min_val.isPresent()) {
@@ -91,13 +109,20 @@ public class AquaticMap extends EnvironmentMap {
     }
 
     private Point3D getMapSquare(DecimalPoint3D loc) { // says which display square a given coordinate falls in
-        int outx = (int) (loc.getX() * detail) + SubMap.getWidth()/2;
-        int outy = (int) (loc.getY() * detail) + SubMap.getHeight()/2;
-        int outz = (int) (loc.getZ() * detail) + SubMap.getDepth()/2;
+        int outx = (int) (loc.getX() * detail) + densityMap.getWidth()/2;
+        int outy = (int) (loc.getY() * detail) + densityMap.getHeight()/2;
+        int outz = (int) (loc.getZ() * detail) + densityMap.getDepth()/2;
         return new Point3D(outx, outy, outz);
     }
 
-    public double getValueAt(DecimalPoint3D loc){
+    /**
+     * Returns the density of the map at the given point, interpolating between points of the grid.
+     *
+     * @param loc Point to query
+     *
+     * @return Density in kg/m^3
+     */
+    public double getDensityAt(DecimalPoint3D loc){
         Point3D mapSquare = getMapSquare(loc);
         int x = (int) mapSquare.getX();
         int y = (int) mapSquare.getY();
@@ -106,20 +131,17 @@ public class AquaticMap extends EnvironmentMap {
         double locx = loc.getX()* detail-x;
         double locy = loc.getY()* detail-y;
         double locz = loc.getZ()* detail-z;
-        return getIntermediateValue(SubMap.get(x, y, z), SubMap.get(x, y, z+1), SubMap.get(x, y+1, z), SubMap.get(x+1, y, z),
-                SubMap.get(x, y+1, z+1), SubMap.get(x+1, y+1, z), SubMap.get(x+1, y, z+1), SubMap.get(x+1, y+1, z+1),
+        return getIntermediateValue(densityMap.get(x, y, z), densityMap.get(x, y, z+1), densityMap.get(x, y+1, z), densityMap.get(x+1, y, z),
+                densityMap.get(x, y+1, z+1), densityMap.get(x+1, y+1, z), densityMap.get(x+1, y, z+1), densityMap.get(x+1, y+1, z+1),
                 locx, locy, locz);
     }
 
     private double getIntermediateValue(double point000, double point001, double point010, double point100,
                                         double point011, double point110, double point101, double point111,
-                                        double x, double y, double z){ //find the linear approximation of a value within a square where relative x and y are measured fro mtop left
+                                        double x, double y, double z){
+        //find the linear approximation of a value within a square where relative x and y are measured from top left
         return point000*(1-x)*(1-y)*(1-z) + point001*(1-x)*(1-y)*z + point010*(1-x)*y*(1-z) + point100*x*(1-y)*(1-z) +
                 point011*(1-x)*y*z + point110*x*y*(1-z) + point101*x*(1-y)*z + point111*x*y*z;
-    }
-
-    private double calcArm(double x, double y, double z){
-        return Math.sqrt(x*x + y*y + z*z);
     }
 
     public int getSize() {
@@ -130,8 +152,31 @@ public class AquaticMap extends EnvironmentMap {
         return detail;
     }
 
+    /**
+     * Returns a copy of the raw density values the map is based on.
+     *
+     * @return Density point map
+     */
     public ArrayGrid3D<Float> rawValues() {
-        return SubMap;
+        return densityMap.clone();
+    }
+
+    /**
+     * Force implementation of equals as defined by super.
+     *
+     * @param o Another EnvironmentMap
+     * @return Whether the Maps are equal
+     */
+    @Override
+    protected boolean isEqual(EnvironmentMap o) {
+        if (o instanceof AquaticMap){
+            AquaticMap other = (AquaticMap)o;
+            return other.size == size && other.detail == detail &&
+                    other.densityMap.equals(this.densityMap);
+        }
+        else {
+            return false;
+        }
     }
 }
 
