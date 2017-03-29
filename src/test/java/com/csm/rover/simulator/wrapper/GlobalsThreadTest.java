@@ -49,7 +49,7 @@ public class GlobalsThreadTest {
                 new SynchronousThread(2, () -> {}, SynchronousThread.FOREVER, "test")));
         threadMap.put("test", itemMock);
         Globals.getInstance().killThread("test");
-        Thread.sleep(80);
+        Thread.sleep(150);
         assert !threadMap.containsKey("test");
         verify(itemMock, atLeastOnce()).killThread();
     }
