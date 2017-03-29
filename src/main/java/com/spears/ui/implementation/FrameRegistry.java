@@ -43,7 +43,7 @@ class FrameRegistry {
 	
 	private static void findFrames(){
 		LOG.log(Level.INFO, "Compiling frame registry:");
-		Reflections reflect = new Reflections("com.csm.rover.simulator.ui");
+		Reflections reflect = new Reflections("com.spears.ui");
 		Set<Class<? extends EmbeddedFrame>> frameclasses = reflect.getSubTypesOf(EmbeddedFrame.class);
         for (Class<? extends EmbeddedFrame> frameclass : frameclasses){
         	FrameMarker marker = frameclass.getAnnotation(FrameMarker.class);

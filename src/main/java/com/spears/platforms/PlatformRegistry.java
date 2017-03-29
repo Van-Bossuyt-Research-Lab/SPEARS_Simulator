@@ -38,7 +38,7 @@ public class PlatformRegistry {
     @CoverageIgnore
     private static final Logger LOG = LogManager.getLogger(PlatformRegistry.class);
 
-    private static Reflections reflect = new Reflections("com.csm.rover.simulator.platforms");
+    private static Reflections reflect = new Reflections("com.spears.platforms");
 
     private static Map<String, String> platforms;
 
