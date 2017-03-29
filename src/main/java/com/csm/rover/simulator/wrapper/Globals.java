@@ -6,7 +6,6 @@ import com.csm.rover.simulator.objects.ThreadItem;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.util.SystemClock;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Globals {
 	private static final Logger LOG = LogManager.getFormatterLogger(Globals.class);
 
-	public final static String versionNumber = "3.0.0";
+	public final static String versionNumber = "3.0.1";
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;
