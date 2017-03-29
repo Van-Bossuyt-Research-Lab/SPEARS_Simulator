@@ -1,11 +1,17 @@
 package com.csm.rover.simulator.environments;
 
 import com.csm.rover.simulator.environments.rover.TerrainEnvironment;
+import com.csm.rover.simulator.environments.rover.TerrainMap;
 import com.csm.rover.simulator.environments.rover.modifiers.PlasmaFractalGen;
 import com.csm.rover.simulator.environments.sub.AquaticEnvironment;
+import com.csm.rover.simulator.environments.sub.AquaticMap;
 import com.csm.rover.simulator.environments.sub.modifiers.Gradient;
+import com.csm.rover.simulator.objects.util.ArrayGrid3D;
+import com.csm.rover.simulator.objects.util.FloatArrayArrayArrayGrid;
 import com.csm.rover.simulator.objects.util.ParamMap;
 import com.csm.rover.simulator.test.objects.environments.UnlabeledSeaEnv;
+import com.csm.rover.simulator.test.objects.populators.RockPop;
+import com.csm.rover.simulator.test.objects.populators.UnlabeledKelpPop;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -16,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 public class EnvironmentIOTest {
@@ -51,7 +58,19 @@ public class EnvironmentIOTest {
     @Test
     public void testReadWriteRover() throws IOException {
         File test = newFile("roverRW.rover.env");
-        TerrainEnvironment env = new TerrainEnvironment();
+        Map<String, EnvironmentPopulator> pops = new TreeMap<>();
+        EnvironmentPopulator pop = new RockPop();
+        pop.build(new TerrainMap(2, 1, new Float[][]{
+                new Float[] {1f, 1f, -0.5f},
+                new Float[] {-0.5f, 0f, 0.5f},
+                new Float[] {-1f, -1f, -0.5f}
+        }), ParamMap.emptyParamMap());
+        pops.put("Rock Pop", pop);
+        TerrainEnvironment env = new TerrainEnvironment("Rover", new TerrainMap(2, 1, new Float[][]{
+                new Float[] {1f, 1f, -0.5f},
+                new Float[] {-0.5f, 0f, 0.5f},
+                new Float[] {-1f, -1f, -0.5f}
+        }), pops);
         env.generateNewMap(new PlasmaFractalGen(),
                 ParamMap.newParamMap().addParameter("size", 10).addParameter("detail", 1).addParameter("rough", 0.5).build())
                 .generate();
@@ -63,7 +82,45 @@ public class EnvironmentIOTest {
     @Test
     public void testReadWriteSub() throws IOException {
         File test = newFile("subRW.sub.env");
-        AquaticEnvironment env = new AquaticEnvironment();
+        ArrayGrid3D<Float> grid = new FloatArrayArrayArrayGrid();
+        grid.loadFromArray(new Float[][][] {
+                new Float[][] {
+                        new Float[] {1f, 1f, 1f, 1f, 1f},
+                        new Float[] {1f, 1f, 1.1f, 1.3f, 1.1f},
+                        new Float[] {1f, 1f, 1.3f, 1.5f, 1.3f},
+                        new Float[] {1f, 1f, 1.1f, 1.3f, 1.1f},
+                        new Float[] {1f, 1f, 1f, 1f, 1f}},
+                new Float[][] {
+                        new Float[] {1f, 1f, 1.1f, 1.3f, 1.1f},
+                        new Float[] {1f, 1f, 1.3f, 1.5f, 1.3f},
+                        new Float[] {1f, 1f, 1.5f, 2f, 1.5f},
+                        new Float[] {1f, 1f, 1.3f, 1.5f, 1.3f},
+                        new Float[] {1f, 1f, 1.1f, 1.3f, 1.1f}},
+                new Float[][] {
+                        new Float[] {1f, 1f, 1f, 1f, 1f},
+                        new Float[] {1f, 1f, 1.1f, 1.3f, 1.1f},
+                        new Float[] {1f, 1f, 1.3f, 1.5f, 1.3f},
+                        new Float[] {1f, 1f, 1.1f, 1.3f, 1.1f},
+                        new Float[] {1f, 1f, 1f, 1f, 1f}},
+                new Float[][] {
+                        new Float[] {1f, 1f, 1f, 1f, 1f},
+                        new Float[] {1f, 0.75f, 1f, 1f, 1f},
+                        new Float[] {1f, 1f, 1f, 1f, 1f},
+                        new Float[] {1f, 1f, 1f, 1f, 1f},
+                        new Float[] {1f, 1f, 1f, 1f, 1f}},
+                new Float[][] {
+                        new Float[] {1f, 0.75f, 1f, 1f, 1f},
+                        new Float[] {0.75f, 0.5f, 0.75f, 1f, 1f},
+                        new Float[] {1f, 0.75f, 1f, 1f, 1f},
+                        new Float[] {1f, 1f, 1f, 1f, 1f},
+                        new Float[] {1f, 1f, 1f, 1f, 1f}},
+        });
+        AquaticMap map = new AquaticMap(2, 2, grid);
+        Map<String, EnvironmentPopulator> pops = new TreeMap<>();
+        EnvironmentPopulator pop = new UnlabeledKelpPop();
+        pop.build(map, ParamMap.emptyParamMap());
+        pops.put("Kelp Pop", pop);
+        AquaticEnvironment env = new AquaticEnvironment("Sub", map, pops);
         env.generateNewMap(new Gradient(), ParamMap.newParamMap().addParameter("size", 10).addParameter("detail", 2).build())
                 .generate();
         EnvironmentIO.saveEnvironment(env, test);

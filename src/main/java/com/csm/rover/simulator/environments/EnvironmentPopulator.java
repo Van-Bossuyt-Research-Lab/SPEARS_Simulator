@@ -5,7 +5,6 @@ import com.csm.rover.simulator.ui.visual.PopulatorDisplayFunction;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.awt.*;
 import java.util.Map;
 
 /**
@@ -100,5 +99,15 @@ public abstract class EnvironmentPopulator {
      */
     @JsonIgnore
     public abstract PopulatorDisplayFunction getDisplayFunction();
+
+    @Override
+    public boolean equals(Object o){
+        if (!(o instanceof EnvironmentPopulator)){
+            return false;
+        }
+        EnvironmentPopulator other = (EnvironmentPopulator)o;
+        return other.platform_type.equals(this.platform_type) &&
+                other.value_map.equals(this.value_map);
+    }
 
 }

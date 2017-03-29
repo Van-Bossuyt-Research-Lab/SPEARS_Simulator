@@ -21,7 +21,7 @@ public class RockPop  extends EnvironmentPopulator {
     protected RecursiveGridList<Double> doBuild(EnvironmentMap map, Map<String, Double> params) {
         RecursiveGridList<Double> out = RecursiveGridList.newGridList(Double.class, 2);
         out.put(3.14, 3, 4);
-        out.put(0., 0, 0);
+        out.put(params.containsKey("use") ? params.get("use") : 0., 0, 0);
         return out;
     }
 

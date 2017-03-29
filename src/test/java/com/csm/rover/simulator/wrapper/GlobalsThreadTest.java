@@ -147,7 +147,7 @@ public class GlobalsThreadTest {
         ThreadItem itemMock = new ThreadItem("test", 5000, 0, null);
         threadMap.put("test", itemMock);
         int delay = 333;
-        int tolerance = accel ? 35 : 15;
+        int tolerance = accel ? 35 : 20;
         Globals.getInstance().delayThread("test", delay);
         assert threadMap.containsKey("test-delay");
         Assert.assertEquals(ThreadItem.STATES.SUSPENDED, itemMock.getState());
