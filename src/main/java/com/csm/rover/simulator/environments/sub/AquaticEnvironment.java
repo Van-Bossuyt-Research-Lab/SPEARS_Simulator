@@ -48,7 +48,7 @@ public class AquaticEnvironment extends PlatformEnvironment<SubObject, AquaticMa
 
     @JsonIgnore
     public double getDensityAt(DecimalPoint3D point){
-        return map.getValueAt(point);
+        return map.getDensityAt(point);
     }
 
     @JsonIgnore
