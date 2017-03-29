@@ -83,7 +83,6 @@ public class Globals {
 			timeScale = time_accelerant;
 		}
         clock.start();
-		ThreadItem.offset = 0;
 		new FreeThread(0, () -> {
             long end = System.nanoTime() + (long)(1000000 / getTimeScale());
             while (System.nanoTime() < end) {}
@@ -259,7 +258,6 @@ public class Globals {
 	public void delayThread(String name, int time){
 		if (threads.get(name) != null){
 			String delayName = name + "-delay";
-			ThreadItem.offset = 0;
 			registerNewThread(delayName, time,
 					new SynchronousThread(time, () -> threads.get(name).unSuspend(), SynchronousThread.FOREVER, delayName));
 			threads.get(name).suspend();

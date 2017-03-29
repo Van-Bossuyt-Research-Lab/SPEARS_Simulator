@@ -20,11 +20,6 @@ public class ThreadItem {
 	private SynchronousThread thread;
 
 	/**
-	 * Builds in an offset of when run permission is granted to help improve performance.
-	 */
-	public static int offset = 0;
-
-	/**
 	 * Creates a new tracker for the provided thread.  The other parameters are used to
 	 * identify when the thread should have run permission.
 	 *
@@ -37,8 +32,7 @@ public class ThreadItem {
 		this.thread = thread;
 		this.name = name;
 		this.delay = delay;
-		next = start + delay + offset;
-		offset++;
+		next = start + delay;
 	}
 
 	/**

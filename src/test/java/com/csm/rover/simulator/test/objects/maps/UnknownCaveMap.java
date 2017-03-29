@@ -10,4 +10,8 @@ public class UnknownCaveMap extends EnvironmentMap {
         super("Mole");
     }
 
+    @Override
+    protected boolean isEqual(EnvironmentMap other) {
+        return this == other;
+    }
 }

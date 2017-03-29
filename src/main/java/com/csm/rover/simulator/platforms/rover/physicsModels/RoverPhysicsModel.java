@@ -273,8 +273,7 @@ public class RoverPhysicsModel extends PlatformPhysicsModel {
                 return (slip[FL] + slip[BL] + slip[FR] + slip[BR]) - environment.getGravity()*Math.sin(others[4])/rover_mass;
             };
 
-    @Override
-	public void updatePhysics() {
+    private void updatePhysics() {
 		// Motor Currents, based on voltage
         motor_current[FL] = RK4.advance(motorCurrentFn, time_step, 0, motor_current[FL], motor_power[FL], motor_states[FL], wheel_speed[FL]);
         motor_current[FR] = RK4.advance(motorCurrentFn, time_step, 0, motor_current[FR], motor_power[FR], motor_states[FR], wheel_speed[FR]);

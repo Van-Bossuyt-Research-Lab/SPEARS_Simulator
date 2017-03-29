@@ -22,17 +22,6 @@ public class ThreadItemTest {
     }
 
     @Test
-    public void testInitialOffset(){
-        ThreadItem.offset = 0;
-        int delay = 20;
-        ThreadItem item1 = new ThreadItem("", delay, 0, threadMock);
-        assert item1.getNext() == delay;
-        assert ThreadItem.offset == 1;
-        ThreadItem item2 = new ThreadItem("", delay, 0, threadMock);
-        assert item2.getNext() == delay+1;
-    }
-
-    @Test
     public void testAdvance(){
         long start = 500;
         int delay = 10;

@@ -9,4 +9,9 @@ public class ProtectedSeaMap extends EnvironmentMap {
     protected ProtectedSeaMap() {
         super("Sub");
     }
+
+    @Override
+    protected boolean isEqual(EnvironmentMap other) {
+        return this == other;
+    }
 }

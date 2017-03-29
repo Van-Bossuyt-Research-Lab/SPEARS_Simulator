@@ -11,20 +11,39 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * A static utility class for saving and loading {@link PlatformEnvironment Environments}.
+ */
 public class EnvironmentIO {
     private static final Logger LOG = LogManager.getLogger(EnvironmentIO.class);
 
     private static Map<String, PlatformEnvironment> environmentHolder = new TreeMap<>();
 
+    /**
+     * Appends the provided file with the correct suffix for its platform type.  If the file is already valid, it is
+     * returned without changes.
+     *
+     * @param platform The platform type of the environment to be saved
+     * @param file The current file
+     * @return The new file that should be used
+     */
     public static File appendSuffix(String platform, File file){
         if ((new EnvrioFileFilter(platform)).accept(file)){
             return file;
         }
         else {
-            return new File(file.getParent(), file.getName()+"."+platform+".env");
+            return new File(file.getParent(), file.getName()+"."+platform.toLowerCase()+".env");
         }
     }
 
+    /**
+     * Saves the given environment to the designated file using JSON.
+     *
+     * @param enviro The environment to save
+     * @param file The file to save it to
+     *
+     * @throws IllegalArgumentException If the provided file has the wrong extension.  See {@link #appendSuffix(String, File)}
+     */
     public static void saveEnvironment(PlatformEnvironment enviro, File file){
         if (!(new EnvrioFileFilter(enviro.platform_type)).accept(file)){
             throw new IllegalArgumentException("This file has an invalid suffix: "+file.getName());
@@ -40,7 +59,20 @@ public class EnvironmentIO {
         }
     }
 
-    public static <T extends PlatformEnvironment> T loadEnvironment(File file, Class<T> clazz){
+    /**
+     * Loads and returns the platform environment saved to the given file.  If the file was saved using
+     * {@link #saveEnvironment(PlatformEnvironment, File) saveEnvironment()} during this session, the environment
+     * will be loaded from memory instead of the file.
+     *
+     * @param file The file location
+     * @param clazz Class of the Environment to be loaded
+     * @param <T> Type of environment to be loaded, must extend {@link PlatformEnvironment}
+     *
+     * @return Loaded platform environment
+     *
+     * @throws IOException If the file is not found or the JSON cannot be parsed
+     */
+    public static <T extends PlatformEnvironment> T loadEnvironment(File file, Class<T> clazz) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         try {
             try {
@@ -57,8 +89,7 @@ public class EnvironmentIO {
         }
         catch (IOException e) {
             LOG.log(Level.ERROR, "Failed to read in JSON file", e);
-            System.exit(-1);
-            return null;
+            throw new IOException(e);
         }
     }
 

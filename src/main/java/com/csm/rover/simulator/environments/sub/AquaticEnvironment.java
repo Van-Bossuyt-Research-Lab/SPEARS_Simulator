@@ -3,7 +3,6 @@ package com.csm.rover.simulator.environments.sub;
 import com.csm.rover.simulator.environments.EnvironmentPopulator;
 import com.csm.rover.simulator.environments.PlatformEnvironment;
 import com.csm.rover.simulator.environments.annotations.Environment;
-import com.csm.rover.simulator.objects.util.DecimalPoint;
 import com.csm.rover.simulator.objects.util.DecimalPoint3D;
 import com.csm.rover.simulator.platforms.sub.SubObject;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -12,13 +11,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
+/**
+ * PlatformEnvironment implementation for the Sub Platform.
+ */
 @Environment(type="Sub")
 public class AquaticEnvironment extends PlatformEnvironment<SubObject, AquaticMap> {
 
+    /**
+     * Creates a new empty environment.
+     */
     public AquaticEnvironment(){
         super("Sub");
     }
 
+    /**
+     * Creates a new environment based on the provided map and populators.
+     *
+     * @param type must be "Sub"
+     * @param map Map to use
+     * @param pops Populator map
+     */
     @JsonCreator
     public AquaticEnvironment(@JsonProperty("type") String type, @JsonProperty("map") AquaticMap map, @JsonProperty("populators") Map<String, EnvironmentPopulator> pops){
         super(type, map, pops);
@@ -27,35 +39,82 @@ public class AquaticEnvironment extends PlatformEnvironment<SubObject, AquaticMa
         }
     }
 
+    /**
+     * Returns the current gravity acting in the environment.
+     *
+     * @return Gravitational acceleration in m/s^2
+     */
     @JsonIgnore
     public double getGravity(){
         //TODO handle this better
         return 9.81;
     }
 
+    /**
+     * Returns the value of the populator at he given point.
+     *
+     * See: {@link PlatformEnvironment#getPopulatorValue(String, double...)}.
+     *
+     * @param pop Name of the populator to check
+     * @param point Point to check at
+     *
+     * @return The populator value
+     */
     public double getPopulatorValue(String pop, DecimalPoint3D point){
         return super.getPopulatorValue(pop, point.getX(), point.getY(), point.getZ());
     }
 
-    public boolean isPopulatorAt(String pop, DecimalPoint point){
-        return super.isPopulatorAt(pop, point.getX(), point.getY());
+    /**
+     * Returns whether the populator is defined at the requested point.
+     *
+     * See: {@link PlatformEnvironment#isPopulatorAt(String, double...)}.
+     *
+     * @param pop The name of the populator to check
+     * @param point The point to check
+     *
+     * @return Populator value > 0
+     */
+    public boolean isPopulatorAt(String pop, DecimalPoint3D point){
+        return super.isPopulatorAt(pop, point.getX(), point.getY(), point.getZ());
     }
 
+    /**
+     * Returns the size of the environment's map.
+     *
+     * @return {@link AquaticMap#getSize()}
+     */
     @JsonIgnore
     public int getSize(){
         return map.getSize();
     }
 
-    @JsonIgnore
-    public double getDensityAt(DecimalPoint3D point){
-        return map.getValueAt(point);
-    }
-
+    /**
+     * Returns the detail of the environment's map.
+     *
+     * @return {@link AquaticMap#getDetail()}
+     */
     @JsonIgnore
     public int getDetail(){
         return map.getDetail();
     }
 
+    /**
+     * Returns the density at the requested point.
+     *
+     * @param point Point to query
+     *
+     * @return {@link AquaticMap#getDensityAt(DecimalPoint3D)} density in kg/m^3
+     */
+    @JsonIgnore
+    public double getDensityAt(DecimalPoint3D point){
+        return map.getDensityAt(point);
+    }
+
+    /**
+     * Returns the maximum density value in the map
+     *
+     * @return {@link AquaticMap#getMaxValue()}
+     */
     @JsonIgnore
     public double getMaxDensity(){
         return map.getMaxValue();

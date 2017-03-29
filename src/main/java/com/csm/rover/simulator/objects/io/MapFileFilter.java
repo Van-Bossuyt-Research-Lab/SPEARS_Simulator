@@ -10,10 +10,16 @@ import java.io.File;
  */
 public class MapFileFilter extends FileFilter {
 
+	/**
+	 * Checks if the given file is valid.  Also accepts directories for navigation purposes.
+	 *
+	 * @param file File to check
+	 * @return True for valid file or directory
+	 */
 	@Override
-	public boolean accept(File arg0) {
-		String path = arg0.getAbsolutePath();
-		return arg0.isDirectory() || path.substring(path.length() - 4, path.length()).equalsIgnoreCase(".map");
+	public boolean accept(File file) {
+		String path = file.getAbsolutePath();
+		return file.isDirectory() || path.substring(path.length() - 4, path.length()).equalsIgnoreCase(".map");
 	}
 
 	@CoverageIgnore

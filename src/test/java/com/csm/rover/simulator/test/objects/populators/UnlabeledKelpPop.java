@@ -15,7 +15,9 @@ public class UnlabeledKelpPop extends EnvironmentPopulator {
 
     @Override
     protected RecursiveGridList<Double> doBuild(EnvironmentMap map, Map<String, Double> params) {
-        return null;
+        RecursiveGridList<Double> out = RecursiveGridList.newGridList(Double.class, 3);
+        out.put(5., 2, 6, -1);
+        return out;
     }
 
     @Override

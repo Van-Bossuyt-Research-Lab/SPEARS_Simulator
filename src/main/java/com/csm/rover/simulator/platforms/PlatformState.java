@@ -6,6 +6,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
+/**
+ * A multi-type map that stores values relevant to the operational state of the platform.
+ */
 public class PlatformState {
     private static final Logger LOG = LogManager.getLogger(PlatformState.class);
 
@@ -23,6 +26,11 @@ public class PlatformState {
     private final Map<String, Double[]> double_list_default_values;
     private final Map<String, String> string_default_values;
 
+    /**
+     * Protected constructor requires an {@link Builder} parameter to define the fields.
+     *
+     * @param builder See {@link #builder(String)}
+     */
     protected PlatformState(Builder builder){
         this(builder.build());
     }
@@ -55,35 +63,80 @@ public class PlatformState {
         this.string_default_values = copyMap(orig.string_default_values);
     }
 
+    /**
+     * Returns the platform type of the State.
+     *
+     * @return Type name
+     */
     public String getType(){
         return platform_type;
     }
 
-    public final List<String> expectedValues(){
-        return Collections.unmodifiableList(new ArrayList<>(parameters.keySet()));
+    /**
+     * Returns the names of all valid map fields.
+     *
+     * @return Set of param names
+     */
+    public final Set<String> expectedValues(){
+        return Collections.unmodifiableSet(parameters.keySet());
     }
 
+    /**
+     * Returns the Class type a named parameter is stored as.
+     *
+     * @param name The name of the parameter.
+     *
+     * @return The type of the variable
+     *
+     * @throws IllegalArgumentException if the parameter is unknown
+     */
     public final Class<?> getParameterType(String name){
         checkParam(name);
         return parameters.get(name);
     }
 
-    public final List<String> requiredValues(){
-        ArrayList<String> out = new ArrayList<>(parameters.keySet());
+    /**
+     * Returns a list of all the parameters which do not have default values.  These should be filled in
+     * prior to starting a simulation to avoid errors.
+     *
+     * @return A set of parameter names
+     */
+    public final Set<String> requiredValues(){
+        Set<String> out = new TreeSet<>(parameters.keySet());
         out.removeAll(double_default_values.keySet());
         out.removeAll(double_list_default_values.keySet());
         out.removeAll(string_default_values.keySet());
-        return Collections.unmodifiableList(out);
+        return Collections.unmodifiableSet(out);
     }
 
-    public final List<String> optionalValues(){
-        List<String> out = new ArrayList<>();
+    /**
+     * Returns a list of all the parameter which have a default value and are not required to be filled in
+     * to avoid errors.
+     *
+     * @return A set of parameter names.
+     */
+    public final Set<String> optionalValues(){
+        Set<String> out = new TreeSet<>();
         out.addAll(double_default_values.keySet());
         out.addAll(double_list_default_values.keySet());
         out.addAll(string_default_values.keySet());
-        return out;
+        return Collections.unmodifiableSet(out);
     }
 
+    /**
+     * Stores a value in the state map.
+     *
+     * WARNING: the map can only store Double, Double[], and String.  Do not attempt to use
+     * int, double[], or Integer.
+     *
+     * @param param The name of the parameter to be set
+     * @param val The value to store
+     * @param <T> Unchecked type, should be Double, Double[], or Stirng
+     *
+     * @throws IllegalArgumentException if the parameter is unknown
+     * @throws ClassCastException if val is not the type param is stored as
+     * @throws IllegalAccessError if the state is read only
+     */
     public final <T> void set(String param, T val){
         checkReadOnly();
         Class<?> type = val.getClass();
@@ -104,6 +157,20 @@ public class PlatformState {
         }
     }
 
+    /**
+     * Retrieves a value from the state map
+     *
+     * WARNING: the map can only store Double, Double[], and String.  Do not attempt to use
+     * int, double[], or Integer.  Class casting will not be done until the return value is used.
+     *
+     * @param param The name of the parameter to be retrieved
+     * @param <T> Unchecked type, will be Double, Double[], or Stirng
+     *
+     * @return Value stored in the map
+     *
+     * @throws IllegalArgumentException if the parameter is unknown
+     * @throws IndexOutOfBoundsException if the parameter has not been set and doesn't have a default
+     */
     @SuppressWarnings("unchecked")
     public final <T> T get(String param){
         checkParam(param);
@@ -117,14 +184,9 @@ public class PlatformState {
                 out = double_default_values.get(param);
             }
             else {
-                throw new IndexOutOfBoundsException("\"%s\" has not been set");
+                throw new IndexOutOfBoundsException(String.format("\"%s\" has not been set", param));
             }
-            try {
-                return (T)new Double(out);
-            }
-            catch (ClassCastException e){
-                throw new TypeNotPresentException(String.format("The parameter \"%s\" is stored as a double", param), e);
-            }
+            return (T)new Double(out);
         }
         else if (type == Double[].class){
             Double[] out;
@@ -135,14 +197,9 @@ public class PlatformState {
                 out = double_list_default_values.get(param);
             }
             else {
-                throw new IndexOutOfBoundsException("\"%s\" has not been set");
+                throw new IndexOutOfBoundsException(String.format("\"%s\" has not been set", param));
             }
-            try {
-                return (T)out;
-            }
-            catch (ClassCastException e){
-                throw new TypeNotPresentException(String.format("The parameter \"%s\" is stored as a double array", param), e);
-            }
+            return (T)out;
         }
         else if (type == String.class){
             String out;
@@ -155,18 +212,21 @@ public class PlatformState {
             else {
                 throw new IndexOutOfBoundsException("\"%s\" has not been set, no default value");
             }
-            try {
-                return (T)out;
-            }
-            catch (ClassCastException e){
-                throw new TypeNotPresentException(String.format("The parameter \"%s\" is stored as a string", param), e);
-            }
+            return (T)out;
         }
         else {
             throw new IllegalStateException("You did something very very wrong");
         }
     }
 
+    /**
+     * Removed a value from the state map.  If the param has a default, it will revert to that.
+     *
+     * @param param The name of the parameter to be cleared
+     *
+     * @throws IllegalArgumentException if the parameter is unknown
+     * @throws IllegalAccessError if the state is read only
+     */
     public final void remove(String param){
         checkReadOnly();
         checkParam(param);
@@ -205,6 +265,11 @@ public class PlatformState {
         readOnly = true;
     }
 
+    /**
+     * Creates a clone of the State which cannot be edited.
+     *
+     * @return A new immutable PlatformState
+     */
     public PlatformState immutableCopy(){
         PlatformState out = new PlatformState(this);
         out.setReadOnly();
@@ -219,6 +284,13 @@ public class PlatformState {
         return out;
     }
 
+    /**
+     * Creates a new {@link Builder} which is passed to the constructor.  Builder should define all
+     * of the fields for the State.
+     *
+     * @param type Platform type name of the State
+     * @return Builder object
+     */
     protected static Builder builder(String type){
         return new Builder(type);
     }
@@ -232,7 +304,6 @@ public class PlatformState {
         protected Map<String, Double[]> double_list_default_values;
         protected Map<String, String> string_default_values;
 
-
         private Builder(String type){
             this.type = type;
             parameters = new TreeMap<>();
@@ -241,11 +312,36 @@ public class PlatformState {
             string_default_values = new TreeMap<>();
         }
 
+        /**
+         * Adds a required field to the state.
+         *
+         * WARNING: the map can only store Double, Double[], and String.  Do not attempt to use
+         * int, double[], or Integer.
+         *
+         * @param name Name of the field
+         * @param type Type to store the field as
+         * @param <T> Type parameter, should be Double, Double[], or String
+         *
+         * @return this
+         */
         public <T> Builder addParameter(String name, Class<T> type){
             addParameter(name, type, null);
             return this;
         }
 
+        /**
+         * Adds an optional field to the state.
+         *
+         * WARNING: the map can only store Double, Double[], and String.  Do not attempt to use
+         * int, double[], or Integer.
+         *
+         * @param name Name of the field
+         * @param type Type to store the field as
+         * @param default_val default value of the field
+         * @param <T> Type parameter, should be Double, Double[], or String
+         *
+         * @return
+         */
         public <T> Builder addParameter(String name, Class<T> type, T default_val){
             if (parameters.containsKey(name)){
                 throw new IllegalArgumentException(String.format("A parameter of name \"%s\" has already been written", name));
@@ -282,8 +378,16 @@ public class PlatformState {
             );
         }
     }
-    
-    public PlatformState overrideValues(Map<String, Double> vals){
+
+    /**
+     * Overrides values of the State with values extracted from the map.  Unknown values or values
+     * stored with the wrong type will be ignored and reported to the LOG.
+     *
+     * @param vals Parameter map to set
+     *
+     * @return this
+     */
+    public PlatformState overrideValues(Map<String, Object> vals){
         for (String key : vals.keySet()){
             if (parameters.containsKey(key)){
                 try {
