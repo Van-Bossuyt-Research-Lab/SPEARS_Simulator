@@ -19,12 +19,28 @@
 package com.spears.platforms;
 
 import com.spears.environments.PlatformEnvironment;
+import com.spears.objects.io.DatedFileAppenderImpl;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 
 public abstract class PlatformAutonomousCodeModel {
+    private static final Logger LOG = LogManager.getLogger(PlatformAutonomousCodeModel.class);
+
+    protected File logFile = null;
+
+    private boolean warnedAboutLog = false;
 
     protected final String platform_type;
+    protected String platform_name;
 
     protected PlatformAutonomousCodeModel(String type){
         this.platform_type = type;
@@ -39,5 +55,43 @@ public abstract class PlatformAutonomousCodeModel {
     public abstract void constructParameters(Map<String, Double> params);
 
     public abstract String nextCommand(long milliTime, final PlatformState state);
+
+    public final void setPlatformName(String name){
+        this.platform_name = name;
+        logFile = new File(String.format("%s/%s.log", DatedFileAppenderImpl.Log_File_Name, platform_name));
+        warnedAboutLog = false;
+    }
+
+    protected void writeToLog(String message){
+        if (logFile == null){
+            if (!warnedAboutLog){
+                LOG.log(Level.WARN, "Logging was attempted but no log file is set -- further warnings suppressed");
+                warnedAboutLog = true;
+            }
+            return;
+        }
+        if (!logFile.exists()) {
+            try {
+                logFile.getParentFile().mkdirs();
+                logFile.createNewFile();
+                LOG.log(Level.INFO, "Writing rover {}'s autonomous log file to: {}", platform_name, logFile.getAbsolutePath());
+            }
+            catch (IOException e){
+                LOG.log(Level.ERROR, platform_name + "'s autonomous log file failed to initialize.", e);
+                logFile = null;
+            }
+        }
+        try {
+            BufferedWriter write = new BufferedWriter(new FileWriter(logFile, true));
+            write.write(message + "\t\t" +
+                    new DateTime().toString(DateTimeFormat.forPattern("[MM/dd/yyyy hh:mm:ss.SS]" +
+                            System.getProperty("line.separator"))));
+            write.flush();
+            write.close();
+        }
+        catch (IOException e) {
+            LOG.log(Level.ERROR, "Failed to write to autonomous log file for " + platform_name, e);
+        }
+    }
 
 }

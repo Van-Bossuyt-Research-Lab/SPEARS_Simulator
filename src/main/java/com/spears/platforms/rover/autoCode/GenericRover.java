@@ -34,7 +34,7 @@ public class GenericRover extends RoverAutonomousCode {
 	private int power = 250;
 	
 	public GenericRover(){
-		super("Generic", "Generic");
+		super("Generic");
 	}
 
     @Override

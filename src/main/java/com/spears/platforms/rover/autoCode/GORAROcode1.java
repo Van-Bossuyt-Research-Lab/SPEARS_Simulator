@@ -62,7 +62,7 @@ public class GORAROcode1 extends RoverAutonomousCode {
 	private double[] mentality = new double[] { 10000, 3000, 1200, 500, 50 };
 
 	public GORAROcode1(){
-		super("GORARO Simple", "GORARO");
+		super("GORARO Simple");
 		potentials = new double[histories][sampleDirections];
 	}
 
