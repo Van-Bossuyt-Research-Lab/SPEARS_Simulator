@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.sound.sampled.*;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 
 public class SoundPlayer {
@@ -61,7 +62,8 @@ public class SoundPlayer {
 		}
 		try {
 			Clip clip = AudioSystem.getClip();
-			AudioInputStream ais = AudioSystem.getAudioInputStream(SoundPlayer.class.getResourceAsStream(soundPackage+sound.getURL()));
+			AudioInputStream ais = AudioSystem.getAudioInputStream(
+                    new BufferedInputStream(SoundPlayer.class.getResourceAsStream(soundPackage+sound.getURL())));
 			clip.open(ais);
 			FloatControl gainControl = 
 				    (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
