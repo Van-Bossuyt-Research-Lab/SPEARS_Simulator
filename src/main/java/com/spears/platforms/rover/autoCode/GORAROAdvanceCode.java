@@ -66,7 +66,7 @@ public class GORAROAdvanceCode extends RoverAutonomousCode {
 	private boolean runyet = false;
 	
 	public GORAROAdvanceCode(){
-		super("GORARO Adv.", "GORARO");
+		super("GORARO Adv.");
 		potentials = new double[histories][sampleDirections];
 	}
 

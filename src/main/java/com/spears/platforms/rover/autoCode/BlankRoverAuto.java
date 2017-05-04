@@ -29,7 +29,7 @@ public class BlankRoverAuto extends RoverAutonomousCode {
 	private static final long serialVersionUID = 4270320886718139449L;
 
 	public BlankRoverAuto() {
-		super("NULL", "NULL");
+		super("NULL");
     }
 
     @Override
