@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Globals {
 	private static final Logger LOG = LogManager.getFormatterLogger(Globals.class);
 
-	public final static String versionNumber = "3.0.2";
+	public final static String versionNumber = "3.0.3";
 
 	private static final double time_accelerant = 10;
 	private double timeScale = 1.0;
