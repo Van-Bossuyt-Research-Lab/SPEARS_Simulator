@@ -115,8 +115,8 @@ public abstract class Platform {
             platform.name = cfg.getScreenName();
             platform.ID = cfg.getID();
             platform.autonomousCodeModel = PlatformRegistry.getAutonomousCodeModel(cfg.getType(), cfg.getAutonomousModelName()).newInstance();
-            platform.autonomousCodeModel.constructParameters(cfg.getAutonomousModelParameters());
             platform.autonomousCodeModel.setPlatformName(cfg.getScreenName());
+            platform.autonomousCodeModel.constructParameters(cfg.getAutonomousModelParameters());
             platform.physicsModel = PlatformRegistry.getPhysicsModel(cfg.getType(), cfg.getPhysicsModelName()).newInstance();
             platform.physicsModel.constructParameters(cfg.getPhysicsModelParameters());
             platform.physicsModel.initializeState(PlatformRegistry.getPlatformState(cfg.getType()).newInstance().overrideValues(cfg.getStateParameters()));
